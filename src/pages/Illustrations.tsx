@@ -1,6 +1,6 @@
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
-import IllustrationsSection from "@/components/sections/IllustrationsSection";
+import EditorialGallery from "@/components/sections/EditorialGallery";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
 import {
@@ -15,11 +15,9 @@ import {
 const Illustrations = () => {
   const reduced = useReducedMotion();
 
-  const featuredRef = useRef<HTMLDivElement>(null);
   const appsRef = useRef<HTMLDivElement>(null);
   const processRef = useRef<HTMLDivElement>(null);
 
-  const featuredInView = useInView(featuredRef, inViewProps);
   const appsInView = useInView(appsRef, inViewProps);
   const processInView = useInView(processRef, inViewProps);
 
@@ -31,119 +29,9 @@ const Illustrations = () => {
   return (
     <div className="min-h-screen bg-brand-dark">
       <NavBar />
-      <main>
-        {/* Core Illustrations Section */}
-        <section id="collections" aria-label="Collections">
-          <IllustrationsSection />
-        </section>
-
-        {/* Featured Story */}
-        <section
-          ref={featuredRef}
-          id="featured"
-          className="w-full py-20"
-          style={{ backgroundColor: "#0A0A0A", borderTop: "1px solid #1A1A1A" }}
-          aria-label="Featured Story"
-        >
-          <div
-            className="mx-auto px-6 grid gap-12 items-center"
-            style={{ maxWidth: 1100, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}
-          >
-            <motion.div
-              variants={fadeVariants}
-              initial="hidden"
-              animate={featuredInView ? "visible" : "hidden"}
-              style={{
-                aspectRatio: "3 / 4",
-                backgroundColor: "#111111",
-                border: "1px solid #2A2A2A",
-                borderRadius: 2,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <p
-                className="font-display"
-                style={{
-                  fontStyle: "italic",
-                  fontSize: 13,
-                  color: "#444444",
-                  margin: 0,
-                  textAlign: "center",
-                  padding: 20,
-                }}
-              >
-                Featured Illustration
-              </p>
-            </motion.div>
-
-            <motion.div
-              variants={staggerVariants}
-              initial="hidden"
-              animate={featuredInView ? "visible" : "hidden"}
-              className="flex flex-col"
-              style={{ gap: 20 }}
-            >
-              <motion.p
-                variants={fadeVariants}
-                style={{
-                  fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: 11,
-                  color: "#C8A96E",
-                  letterSpacing: "4px",
-                  textTransform: "uppercase",
-                  fontWeight: 400,
-                  margin: 0,
-                }}
-              >
-                Featured Story
-              </motion.p>
-
-              <motion.h2
-                variants={headerVariants}
-                className="font-display"
-                style={{
-                  fontSize: "clamp(26px, 3.5vw, 42px)",
-                  fontWeight: 700,
-                  color: "#FAFAFA",
-                  margin: 0,
-                  lineHeight: 1.2,
-                }}
-              >
-                The Hatmaker
-              </motion.h2>
-
-              <motion.p
-                variants={fadeVariants}
-                style={{
-                  fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontWeight: 300,
-                  fontSize: 14,
-                  color: "#888888",
-                  lineHeight: 1.8,
-                  margin: 0,
-                }}
-              >
-                She chose the hat before she chose the room. This is a woman who decided long ago that presence was not something you asked for — it was something you wore.
-              </motion.p>
-
-              <motion.p
-                variants={fadeVariants}
-                style={{
-                  fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontWeight: 300,
-                  fontSize: 14,
-                  color: "#888888",
-                  lineHeight: 1.8,
-                  margin: 0,
-                }}
-              >
-                This piece celebrates the power of personal presentation — how what we wear tells the world who we are before we speak a single word.
-              </motion.p>
-            </motion.div>
-          </div>
-        </section>
+      <main className="pt-20">
+        {/* The Collection — editorial scrollytelling gallery */}
+        <EditorialGallery />
 
         {/* Commercial Applications */}
         <section
@@ -154,10 +42,7 @@ const Illustrations = () => {
           aria-label="Commercial Applications"
         >
           <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
-            <motion.div
-              className="flex flex-col items-center text-center mb-12"
-              style={{ gap: 16 }}
-            >
+            <motion.div className="flex flex-col items-center text-center mb-12" style={{ gap: 16 }}>
               <motion.p
                 variants={fadeVariants}
                 initial="hidden"
@@ -199,9 +84,22 @@ const Illustrations = () => {
               className="grid gap-6"
               style={{ gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}
             >
-              {["Brand Campaigns", "Editorial Assets", "Fashion Design"].map((app) => (
+              {[
+                {
+                  title: "Brand Campaigns",
+                  desc: "From #BreakTheBias to Mother's Day — illustration that gives a campaign a face and a voice.",
+                },
+                {
+                  title: "Editorial & Print",
+                  desc: "Covers, features, and storytelling spreads where a single image has to carry the headline.",
+                },
+                {
+                  title: "Fashion & Product",
+                  desc: "The Atelier line and the Lagos Icons accessories — art that walks off the page and onto the body.",
+                },
+              ].map((app) => (
                 <motion.div
-                  key={app}
+                  key={app.title}
                   variants={cardVariants}
                   whileHover={reduced ? {} : { y: -3 }}
                   transition={{ type: "spring", stiffness: 400, damping: 25 }}
@@ -214,14 +112,9 @@ const Illustrations = () => {
                 >
                   <h3
                     className="font-display"
-                    style={{
-                      fontSize: 20,
-                      fontWeight: 700,
-                      color: "#FAFAFA",
-                      marginBottom: 10,
-                    }}
+                    style={{ fontSize: 20, fontWeight: 700, color: "#FAFAFA", marginBottom: 10 }}
                   >
-                    {app}
+                    {app.title}
                   </h3>
                   <p
                     style={{
@@ -233,7 +126,7 @@ const Illustrations = () => {
                       margin: 0,
                     }}
                   >
-                    High-impact visual narratives for brands, publications, and fashion houses worldwide.
+                    {app.desc}
                   </p>
                 </motion.div>
               ))}
@@ -250,10 +143,7 @@ const Illustrations = () => {
           aria-label="Our Process"
         >
           <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
-            <motion.div
-              className="flex flex-col items-center text-center mb-12"
-              style={{ gap: 16 }}
-            >
+            <motion.div className="flex flex-col items-center text-center mb-12" style={{ gap: 16 }}>
               <motion.p
                 variants={fadeVariants}
                 initial="hidden"
@@ -298,8 +188,8 @@ const Illustrations = () => {
               {[
                 { num: "01", title: "Research", desc: "Deep dive into stories, themes, and visual inspiration" },
                 { num: "02", title: "Sketch", desc: "Conceptualize compositions and narrative hooks" },
-                { num: "03", title: "Digital", desc: "Refine in Procreate, Adobe, bringing precision and soul" },
-                { num: "04", title: "Delivery", desc: "Final artwork with accompanying story and context" },
+                { num: "03", title: "Digital", desc: "Refine in Procreate and Adobe, bringing precision and soul" },
+                { num: "04", title: "Delivery", desc: "Final artwork with its accompanying story and context" },
               ].map((step) => (
                 <motion.div
                   key={step.num}
@@ -326,12 +216,7 @@ const Illustrations = () => {
                   </span>
                   <h3
                     className="font-display"
-                    style={{
-                      fontSize: 17,
-                      fontWeight: 700,
-                      color: "#FAFAFA",
-                      marginBottom: 10,
-                    }}
+                    style={{ fontSize: 17, fontWeight: 700, color: "#FAFAFA", marginBottom: 10 }}
                   >
                     {step.title}
                   </h3>
