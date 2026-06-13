@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import logoAsset from "@/assets/viera-amber-logo.png.asset.json";
+import logoSrc from "@/assets/viera-amber-logo.png";
 
 const NAV_LINKS = [
   { label: "Illustrations", href: "/illustrations", isRoute: true },
@@ -69,7 +69,7 @@ const NavBar = () => {
           className="flex items-center"
         >
           <img
-            src={logoAsset.url}
+            src={logoSrc}
             alt="Viera Amber"
             className="h-5 md:h-6 w-auto select-none"
             draggable={false}

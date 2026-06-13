@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from "framer-motion";
-import logoAsset from "@/assets/viera-amber-logo.png.asset.json";
+import logoSrc from "@/assets/viera-amber-logo.png";
 
 const HeroSection = () => {
   const reduced = useReducedMotion();
@@ -18,7 +18,7 @@ const HeroSection = () => {
       {/* Watermark — actual logo, very faint, oversized */}
       <motion.img
         aria-hidden="true"
-        src={logoAsset.url}
+        src={logoSrc}
         alt=""
         initial={{ opacity: 0, scale: 1.04 }}
         animate={{ opacity: 0.05, scale: 1 }}
@@ -54,7 +54,7 @@ const HeroSection = () => {
         >
           <span className="sr-only">Viera Amber</span>
           <img
-            src={logoAsset.url}
+            src={logoSrc}
             alt=""
             aria-hidden="true"
             draggable={false}

@@ -17,6 +17,7 @@ export type ChapterId =
   | "lagos"
   | "heritage"
   | "wearable"
+  | "fivefor5"
   | "speaks";
 
 export interface Artwork {
@@ -95,8 +96,17 @@ export const CHAPTERS: Chapter[] = [
     layout: "mosaic",
   },
   {
-    id: "speaks",
+    id: "fivefor5",
     index: "06",
+    name: "The #5for5 Collection",
+    tagline: "Five demands, worn.",
+    description:
+      "In October 2020, a generation took to the streets under one banner: #EndSARS. This collection wears the movement's five demands — release, remembrance, justice, reform, and fair pay — turning protest into something you cannot look away from.",
+    layout: "feature",
+  },
+  {
+    id: "speaks",
+    index: "07",
     name: "She Speaks",
     tagline: "Art with a voice.",
     description:
@@ -142,12 +152,6 @@ export const ARTWORKS: Artwork[] = [
   mk(38, "The Ibari-Set", "Magenta on a midweek mission — a corseted set for the woman sealing the contract and making friends while she's at it.", "atelier", "Fashion Design"),
   mk(39, "The Yéwándé 3-Piece", "Three pieces, three lives — a mix-and-match cropped blazer, short and pant for the girl who refuses to be read just one way.", "atelier", "Fashion Design"),
   mk(40, "The Kikelomo Dress", "The Friday little black dress — detachable taffeta bubble sleeves that move between classy and carefree, because Fridays should be easy.", "atelier", "Fashion Design"),
-  // The #5for5 Collection — the five demands of #EndSARS, worn (notes are the artist's own captions).
-  mk(52, "Release Them", "#5for5, demand one: the immediate release of all arrested protesters — worn like a verdict in END SARS sashes.", "atelier", "Campaign"),
-  mk(53, "White Robes", "For the civilian soldiers who never came home — now in white, remembered in every hallelujah chorus.", "atelier", "Campaign"),
-  mk(54, "Served Hot", "Justice for every life taken — and the demand that it be served hot.", "atelier", "Campaign"),
-  mk(55, "Same Old Disguise", "Fine cloth, fine name — but the same old person still hides underneath. Reform, not rebranding.", "atelier", "Campaign"),
-  mk(56, "Pay Them Well", "Even the police know how to wear starched agbada — so pay them well, and let them protect, not prey.", "atelier", "Campaign"),
 
   // ── 03 · Lagos Icons ───────────────────────────────────────────────────
   mk(29, "Danfo", "The yellow bus that runs the city, shrunk to fit on your shoulder.", "lagos", "Product", true),
@@ -193,7 +197,15 @@ export const ARTWORKS: Artwork[] = [
   mk(49, "Ember", "Still glowing long after the room thought she'd cooled.", "wearable", "Couture"),
   mk(69, "Smoke & Rose", "Ash-grey drape, rose-red nerve.", "wearable", "Couture"),
 
-  // ── 06 · She Speaks ────────────────────────────────────────────────────
+  // ── 06 · The #5for5 Collection (#EndSARS) ──────────────────────────────
+  // The five demands of #EndSARS, worn. Notes are the artist's own captions.
+  mk(52, "Release Them", "#5for5, demand one: the immediate release of all arrested protesters — worn like a verdict in END SARS sashes.", "fivefor5", "Campaign", true),
+  mk(53, "White Robes", "For the civilian soldiers who never came home — now in white, remembered in every hallelujah chorus.", "fivefor5", "Campaign"),
+  mk(54, "Served Hot", "Justice for every life taken — and the demand that it be served hot.", "fivefor5", "Campaign"),
+  mk(55, "Same Old Disguise", "Fine cloth, fine name — but the same old person still hides underneath. Reform, not rebranding.", "fivefor5", "Campaign"),
+  mk(56, "Pay Them Well", "Even the police know how to wear starched agbada — so pay them well, and let them protect, not prey.", "fivefor5", "Campaign"),
+
+  // ── 07 · She Speaks ────────────────────────────────────────────────────
   mk(6, "New Chapter", "She closed the book the world wrote for her and opened a blank one.", "speaks", "Couture", true),
   mk(26, "Unsilenced", "The tape was meant to quiet her. Read it again.", "speaks", "Campaign", true),
   mk(15, "Embrace Equity", "Not the same start for everyone — the same chance to finish.", "speaks", "Campaign"),
