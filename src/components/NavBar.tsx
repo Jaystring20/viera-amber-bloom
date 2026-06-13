@@ -4,7 +4,7 @@ import { Menu, X } from "lucide-react";
 import logoAsset from "@/assets/viera-amber-logo.png.asset.json";
 
 const NAV_LINKS = [
-  { label: "Illustrations", href: "#illustrations" },
+  { label: "Illustrations", href: "/illustrations", isRoute: true },
   { label: "VAGIN", href: "#vagin" },
   { label: "VIVA", href: "#viva" },
   { label: "VAM", href: "#vam" },
@@ -41,6 +41,14 @@ const NavBar = () => {
   const handleNavClick = (href: string) => (e: React.MouseEvent) => {
     e.preventDefault();
     setOpen(false);
+
+    // Handle route navigation
+    if (href.startsWith("/")) {
+      window.location.pathname = href;
+      return;
+    }
+
+    // Handle anchor scrolling
     const el = document.querySelector(href);
     if (el) {
       const top = (el as HTMLElement).getBoundingClientRect().top + window.scrollY - 80;
