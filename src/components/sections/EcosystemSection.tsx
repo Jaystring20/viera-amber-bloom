@@ -15,7 +15,7 @@ const ARMS: Arm[] = [
   {
     number: "01",
     title: "Illustrations & Designs",
-    accent: "#C8A96E",
+    accent: "#D97706",
     description:
       "Vibrant, narrative-driven fashion illustrations celebrating women's diverse experiences. Commercial art that heals, inspires, and sells.",
     cta: "Enter the Studio →",
@@ -55,7 +55,7 @@ const ARMS: Arm[] = [
   {
     number: "05",
     title: "VASH — Shop",
-    accent: "#C8A96E",
+    accent: "#D97706",
     description:
       "Wearable art, premium Procreate brushes, pose references, and customized design products. The commercial engine of the ecosystem.",
     cta: "Shop Now →",
@@ -69,11 +69,30 @@ const EcosystemSection = () => {
   const gridRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
   const gridInView = useInView(gridRef, { once: true, amount: 0.1 });
   const headerInView = useInView(headerRef, { once: true, amount: 0.3 });
   const footerInView = useInView(footerRef, { once: true, amount: 0.5 });
 
   const d = (s: number) => (reduced ? 0 : s);
+
+  // Stagger animation variants
+  const containerVariants = {
+    initial: { opacity: 0 },
+    animate: {
+      opacity: 1,
+      transition: { staggerChildren: d(0.1), delayChildren: d(0.2) },
+    },
+  };
+
+  const itemVariants = {
+    initial: { opacity: 0, y: 30 },
+    animate: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: d(0.6), ease: "easeOut" },
+    },
+  };
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -84,33 +103,65 @@ const EcosystemSection = () => {
 
   return (
     <div
-      className="w-full min-h-screen"
-      style={{ backgroundColor: "#111111" }}
+      ref={sectionRef}
+      className="relative w-full min-h-screen overflow-hidden"
+      style={{ backgroundColor: "#0F172A" }}
       aria-label="The Viera Amber Ecosystem"
     >
+      {/* Subtle gradient background for depth */}
+      <motion.div
+        aria-hidden="true"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 0.06 }}
+        viewport={{ once: true, amount: 0.5 }}
+        transition={{ duration: d(0.8) }}
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "linear-gradient(135deg, #D97706 0%, #78716C 50%, #0F172A 100%)",
+          opacity: 0.04,
+        }}
+      />
+
       <div
-        className="mx-auto"
+        className="relative mx-auto"
         style={{
           maxWidth: 1400,
           padding: "clamp(60px, 8vw, 80px) clamp(24px, 4vw, 40px)",
         }}
       >
-        {/* Header */}
-        <div ref={headerRef} className="flex flex-col items-center text-center" style={{ gap: 20 }}>
+        {/* Header with parallax-like effect */}
+        <motion.div
+          ref={headerRef}
+          className="flex flex-col items-center text-center"
+          style={{ gap: 20 }}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={{
+            initial: { opacity: 0 },
+            animate: {
+              opacity: 1,
+              transition: { staggerChildren: d(0.1), delayChildren: d(0.1) },
+            },
+          }}
+        >
           <motion.p
-            initial={{ opacity: 0 }}
-            animate={headerInView ? { opacity: 1 } : {}}
-            transition={{ duration: d(0.5) }}
+            variants={itemVariants}
             className="font-body uppercase"
-            style={{ fontSize: 11, color: "#C8A96E", letterSpacing: "4px", margin: 0 }}
+            style={{ fontSize: 11, color: "#D97706", letterSpacing: "4px", margin: 0, fontWeight: 400 }}
           >
             The Ecosystem
           </motion.p>
 
           <motion.h2
-            initial={{ opacity: 0, y: 30 }}
-            animate={headerInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: d(0.6), delay: d(0.1), ease: "easeOut" }}
+            variants={{
+              initial: { opacity: 0, y: 40 },
+              animate: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: d(0.7), ease: "easeOut" },
+              },
+            }}
             className="font-display"
             style={{
               fontSize: "clamp(28px, 4vw, 52px)",
@@ -125,13 +176,11 @@ const EcosystemSection = () => {
           </motion.h2>
 
           <motion.p
-            initial={{ opacity: 0 }}
-            animate={headerInView ? { opacity: 1 } : {}}
-            transition={{ duration: d(0.6), delay: d(0.2) }}
+            variants={itemVariants}
             className="font-body"
             style={{
               fontSize: 16,
-              color: "#888888",
+              color: "#C0B5A0",
               fontWeight: 300,
               maxWidth: 560,
               lineHeight: 1.7,
@@ -140,17 +189,15 @@ const EcosystemSection = () => {
           >
             Art. Impact. Fashion. Education. Commerce. All rooted in the same conviction: creativity is the most powerful form of empowerment.
           </motion.p>
-        </div>
+        </motion.div>
 
-        {/* Cards grid */}
+        {/* Cards grid — top row */}
         <motion.div
           ref={gridRef}
           initial="initial"
-          animate={gridInView ? "animate" : "initial"}
-          variants={{
-            initial: {},
-            animate: { transition: { staggerChildren: d(0.1) } },
-          }}
+          whileInView="animate"
+          viewport={{ once: true, amount: 0.1 }}
+          variants={containerVariants}
           className="mt-16 grid gap-6"
           style={{
             gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
@@ -161,12 +208,17 @@ const EcosystemSection = () => {
           ))}
         </motion.div>
 
+        {/* Cards grid — bottom row */}
         <motion.div
           initial="initial"
-          animate={gridInView ? "animate" : "initial"}
+          whileInView="animate"
+          viewport={{ once: true, amount: 0.1 }}
           variants={{
-            initial: {},
-            animate: { transition: { staggerChildren: d(0.1), delayChildren: d(0.3) } },
+            initial: { opacity: 0 },
+            animate: {
+              opacity: 1,
+              transition: { staggerChildren: d(0.1), delayChildren: d(0.3) },
+            },
           }}
           className="mt-6 grid gap-6 mx-auto"
           style={{
@@ -179,22 +231,61 @@ const EcosystemSection = () => {
           ))}
         </motion.div>
 
-        {/* Bottom element */}
+        {/* Bottom element — scroll indicator */}
         <motion.div
           ref={footerRef}
-          initial={{ opacity: 0 }}
-          animate={footerInView ? { opacity: 1 } : {}}
-          transition={{ duration: d(0.6), delay: d(0.4) }}
           className="flex flex-col items-center"
           style={{ marginTop: 48, gap: 16 }}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true, amount: 0.5 }}
+          variants={{
+            initial: { opacity: 0, y: 20 },
+            animate: {
+              opacity: 1,
+              y: 0,
+              transition: { duration: d(0.6), delay: d(0.4), ease: "easeOut" },
+            },
+          }}
         >
-          <div style={{ width: 1, height: 48, backgroundColor: "#C8A96E" }} aria-hidden="true" />
-          <p
+          <motion.div
+            animate={
+              reduced
+                ? { height: 48 }
+                : { height: [48, 64, 48] }
+            }
+            transition={
+              reduced
+                ? { duration: 0 }
+                : {
+                    duration: 2.2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }
+            }
+            style={{ width: 1, backgroundColor: "#D97706" }}
+            aria-hidden="true"
+          />
+          <motion.p
+            animate={
+              reduced
+                ? { opacity: 0.6 }
+                : { opacity: [0.6, 1, 0.6] }
+            }
+            transition={
+              reduced
+                ? { duration: 0 }
+                : {
+                    duration: 2.2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }
+            }
             className="font-body uppercase"
-            style={{ fontSize: 12, color: "#888888", letterSpacing: "2px", margin: 0 }}
+            style={{ fontSize: 12, color: "#D97706", letterSpacing: "2px", margin: 0, fontWeight: 400 }}
           >
             ↓ Scroll to explore each world
-          </p>
+          </motion.p>
         </motion.div>
       </div>
     </div>
@@ -214,28 +305,41 @@ const ArmCard = ({
     <motion.article
       variants={{
         initial: { opacity: 0, y: 30 },
-        animate: { opacity: 1, y: 0, transition: { duration: reduced ? 0 : 0.5, ease: "easeOut" } },
+        animate: { opacity: 1, y: 0, transition: { duration: reduced ? 0 : 0.6, ease: "easeOut" } },
       }}
-      whileHover={reduced ? undefined : { scale: 1.02 }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className="group relative flex flex-col"
+      whileHover={
+        reduced
+          ? undefined
+          : {
+              scale: 1.03,
+              y: -4,
+              transition: { type: "spring", stiffness: 350, damping: 25, duration: 0.3 },
+            }
+      }
+      whileTap={reduced ? undefined : { scale: 0.98 }}
+      className="group relative flex flex-col cursor-pointer"
       style={{
-        backgroundColor: "#1A1A1A",
-        border: "1px solid #2A2A2A",
-        borderRadius: 4,
+        background: "rgba(26, 26, 26, 0.6)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        border: `1px solid rgba(217, 119, 6, 0.15)`,
+        borderRadius: 12,
         padding: "32px 28px",
         maxWidth: 380,
         width: "100%",
         justifySelf: "center",
-        transition: "border-color 0.25s ease, background-color 0.25s ease",
+        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
+        transition: "all 0.3s ease",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = arm.accent;
-        e.currentTarget.style.backgroundColor = "#222222";
+        e.currentTarget.style.borderColor = `rgba(217, 119, 6, 0.4)`;
+        e.currentTarget.style.background = "rgba(26, 26, 26, 0.75)";
+        e.currentTarget.style.boxShadow = "0 12px 40px rgba(217, 119, 6, 0.15)";
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = "#2A2A2A";
-        e.currentTarget.style.backgroundColor = "#1A1A1A";
+        e.currentTarget.style.borderColor = "rgba(217, 119, 6, 0.15)";
+        e.currentTarget.style.background = "rgba(26, 26, 26, 0.6)";
+        e.currentTarget.style.boxShadow = "0 8px 32px rgba(0, 0, 0, 0.2)";
       }}
     >
       {/* Tag */}

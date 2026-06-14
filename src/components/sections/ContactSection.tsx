@@ -52,23 +52,27 @@ const ContactSection = () => {
   const fadeVariants = useReducedVariants(fadeIn);
 
   const inputStyle: React.CSSProperties = {
-    backgroundColor: "#111111",
-    border: "1px solid #2A2A2A",
-    borderRadius: 2,
+    background: "rgba(17, 17, 17, 0.6)",
+    backdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(10px)",
+    border: "1px solid rgba(217, 119, 6, 0.15)",
+    borderRadius: 8,
     padding: "12px 14px",
     color: "#FAFAFA",
     fontFamily: "DM Sans, system-ui, sans-serif",
     fontSize: 13,
     outline: "none",
     width: "100%",
-    transition: "border-color 0.2s",
+    transition: "all 0.2s",
   };
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    e.target.style.borderColor = "#C8A96E";
+    e.target.style.borderColor = "rgba(217, 119, 6, 0.4)";
+    e.target.style.background = "rgba(17, 17, 17, 0.75)";
   };
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    e.target.style.borderColor = "#2A2A2A";
+    e.target.style.borderColor = "rgba(217, 119, 6, 0.15)";
+    e.target.style.background = "rgba(17, 17, 17, 0.6)";
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -107,7 +111,7 @@ const ContactSection = () => {
               style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
                 fontSize: 11,
-                color: "#C8A96E",
+                color: "#D97706",
                 letterSpacing: "4px",
                 textTransform: "uppercase",
                 fontWeight: 400,
@@ -155,7 +159,7 @@ const ContactSection = () => {
                     margin: 0,
                   }}
                 >
-                  <span style={{ color: "#C8A96E" }}>{item.label}: </span>
+                  <span style={{ color: "#D97706" }}>{item.label}: </span>
                   <span style={{ color: "#666666" }}>{item.value}</span>
                 </p>
               ))}
@@ -264,7 +268,7 @@ const ContactSection = () => {
 
                   <motion.button
                     type="submit"
-                    whileHover={reduced ? {} : { opacity: 0.85 }}
+                    whileHover={reduced ? {} : { opacity: 0.9, scale: 1.02 }}
                     whileTap={reduced ? {} : { scale: 0.98 }}
                     style={{
                       fontFamily: "DM Sans, system-ui, sans-serif",
@@ -272,13 +276,15 @@ const ContactSection = () => {
                       letterSpacing: "2px",
                       textTransform: "uppercase",
                       fontWeight: 500,
-                      backgroundColor: "#C8A96E",
+                      background: "#D97706",
                       color: "#0A0A0A",
-                      border: "none",
-                      borderRadius: 2,
+                      border: "1px solid rgba(217, 119, 6, 0.3)",
+                      borderRadius: 8,
                       padding: "13px",
                       cursor: "pointer",
                       width: "100%",
+                      transition: "all 0.2s",
+                      boxShadow: "0 4px 16px rgba(217, 119, 6, 0.2)",
                     }}
                   >
                     Send Message
@@ -302,12 +308,12 @@ const ContactSection = () => {
                       width: 48,
                       height: 48,
                       borderRadius: "50%",
-                      border: "1px solid #C8A96E",
+                      border: "1px solid #D97706",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       fontSize: 20,
-                      color: "#C8A96E",
+                      color: "#D97706",
                     }}
                   >
                     ✓

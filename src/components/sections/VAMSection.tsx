@@ -81,7 +81,7 @@ const VAMSection = () => {
             style={{
               fontFamily: "DM Sans, system-ui, sans-serif",
               fontSize: 11,
-              color: "#C8A96E",
+              color: "#D97706",
               letterSpacing: "4px",
               textTransform: "uppercase",
               fontWeight: 400,
@@ -145,13 +145,13 @@ const VAMSection = () => {
               whileHover={
                 reduced
                   ? {}
-                  : { y: -3, borderColor: "#C8A96E" }
+                  : { y: -3, borderColor: "#D97706" }
               }
               transition={{ type: "spring", stiffness: 350, damping: 20 }}
               style={{
                 backgroundColor: "#FFFFFF",
                 border: "1px solid #E8E8E8",
-                borderTop: "3px solid #C8A96E",
+                borderTop: "3px solid #D97706",
                 borderRadius: 4,
                 padding: "28px 24px",
               }}
@@ -161,7 +161,7 @@ const VAMSection = () => {
                   fontFamily: "DM Sans, system-ui, sans-serif",
                   fontWeight: 700,
                   fontSize: 10,
-                  color: "#C8A96E",
+                  color: "#D97706",
                   letterSpacing: "3px",
                   display: "block",
                   marginBottom: 12,
@@ -309,7 +309,7 @@ const VAMSection = () => {
                     outline: "none",
                   }}
                   onFocus={(e) =>
-                    (e.target.style.borderColor = "#C8A96E")
+                    (e.target.style.borderColor = "#D97706")
                   }
                   onBlur={(e) =>
                     (e.target.style.borderColor = "#2A2A2A")
@@ -323,7 +323,7 @@ const VAMSection = () => {
                     letterSpacing: "1px",
                     textTransform: "uppercase",
                     fontWeight: 500,
-                    backgroundColor: "#C8A96E",
+                    backgroundColor: "#D97706",
                     color: "#0A0A0A",
                     border: "none",
                     borderRadius: 2,
@@ -345,7 +345,7 @@ const VAMSection = () => {
                 style={{
                   fontFamily: "DM Sans, system-ui, sans-serif",
                   fontSize: 14,
-                  color: "#C8A96E",
+                  color: "#D97706",
                   fontWeight: 400,
                   margin: 0,
                 }}

@@ -16,7 +16,7 @@ import {
   type Medium,
 } from "@/lib/gallery-data";
 
-const GOLD = "#C8A96E";
+const GOLD = "#D97706";
 
 // ─── Lightbox ─────────────────────────────────────────────────────────────
 const Lightbox = ({

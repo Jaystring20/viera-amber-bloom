@@ -88,7 +88,7 @@ const FounderSection = () => {
               style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
                 fontSize: 11,
-                color: "#C8A96E",
+                color: "#D97706",
                 letterSpacing: "4px",
                 textTransform: "uppercase",
                 fontWeight: 400,
@@ -160,7 +160,7 @@ const FounderSection = () => {
                   style={{
                     fontFamily: "DM Sans, system-ui, sans-serif",
                     fontSize: 12,
-                    color: "#C8A96E",
+                    color: "#D97706",
                     margin: 0,
                   }}
                 >
