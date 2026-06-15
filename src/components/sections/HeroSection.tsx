@@ -92,17 +92,16 @@ const HeroSection = () => {
       }}
     >
       {/* Hero Background Image - Black & White with Ecosystem Colors */}
-      <motion.div
+      <div
         aria-hidden="true"
-        initial={{ opacity: 0, scale: 1.05 }}
-        animate={{ opacity: 0.25, scale: 1 }}
-        transition={{ duration: d(2), delay: d(0.1), ease: "easeOut" }}
         className="absolute inset-0 pointer-events-none overflow-hidden"
         style={{
           backgroundImage: "url('/artworks/artwork_0025.webp')",
           backgroundSize: "cover",
           backgroundPosition: "center",
-          filter: "grayscale(0.9) contrast(1.1)",
+          backgroundRepeat: "no-repeat",
+          filter: "grayscale(0.85) contrast(1.15) brightness(0.95)",
+          opacity: 0.5,
           zIndex: 0,
         }}
       />
