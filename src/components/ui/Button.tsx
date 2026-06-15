@@ -10,6 +10,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   size?: ButtonSize;
   ecosystemArm?: EcosystemArm;
   isLoading?: boolean;
+  isSuccess?: boolean;
   fullWidth?: boolean;
   ariaLabel?: string;
 }
@@ -46,6 +47,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       size = "md",
       ecosystemArm,
       isLoading = false,
+      isSuccess = false,
       fullWidth = false,
       disabled = false,
       children,
@@ -111,6 +113,20 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             </svg>
             Loading...
           </span>
+        ) : isSuccess ? (
+          <motion.span
+            className="flex items-center gap-2"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={
+              shouldReduceMotion ? { duration: 0 } : { type: "spring", stiffness: 300, damping: 20 }
+            }
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+              <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Success
+          </motion.span>
         ) : (
           children
         )}

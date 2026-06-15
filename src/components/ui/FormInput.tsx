@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 interface FormInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -74,6 +74,99 @@ export const FormInput = React.forwardRef<
 );
 
 FormInput.displayName = "FormInput";
+
+// ─── Password Input with Toggle ────────────────────────────────────────────
+
+interface FormPasswordProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> {
+  label?: string;
+  error?: string;
+  helperText?: string;
+  fullWidth?: boolean;
+}
+
+export const FormPassword = React.forwardRef<
+  HTMLInputElement,
+  FormPasswordProps
+>(
+  (
+    {
+      label,
+      error,
+      helperText,
+      fullWidth = true,
+      className = "",
+      ...props
+    },
+    ref
+  ) => {
+    const [showPassword, setShowPassword] = useState(false);
+
+    const inputClass =
+      `${inputBaseStyles} ${inputFocusStyles} ${
+        error ? inputErrorStyles : ""
+      } pr-10 ${className}`.trim();
+
+    return (
+      <div className={fullWidth ? "w-full" : ""}>
+        {label && (
+          <label
+            className="block font-body text-sm font-medium text-brand-text mb-2"
+            htmlFor={props.id}
+          >
+            {label}
+            {props.required && (
+              <span className="text-ecosystem-illustrations ml-1">*</span>
+            )}
+          </label>
+        )}
+        <div className="relative">
+          <input
+            ref={ref}
+            type={showPassword ? "text" : "password"}
+            className={inputClass}
+            {...props}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-brand-textDim hover:text-brand-text transition-colors"
+            tabIndex={-1}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? (
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                <line x1="1" y1="1" x2="23" y2="23" />
+              </svg>
+            )}
+          </button>
+        </div>
+        {error && (
+          <p
+            className="mt-1 font-body text-xs text-error"
+            role="alert"
+            aria-live="polite"
+          >
+            {error}
+          </p>
+        )}
+        {helperText && !error && (
+          <p className="mt-1 font-body text-xs text-brand-textDim">
+            {helperText}
+          </p>
+        )}
+      </div>
+    );
+  }
+);
+
+FormPassword.displayName = "FormPassword";
 
 // ─── Textarea ─────────────────────────────────────────────────────────────
 

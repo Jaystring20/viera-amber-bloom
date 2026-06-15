@@ -14,6 +14,7 @@ export {
 // Form components
 export {
   FormInput,
+  FormPassword,
   FormTextarea,
   FormSelect,
   FormLabel,
