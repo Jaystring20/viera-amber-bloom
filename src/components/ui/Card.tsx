@@ -1,5 +1,5 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 type CardVariant = "default" | "glass" | "solid" | "ghost";
 type EcosystemArm = "illustrations" | "vagin" | "viva" | "vam" | "vash";
@@ -41,6 +41,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     },
     ref
   ) => {
+    const shouldReduceMotion = useReducedMotion();
     const baseStyles = "rounded-lg transition-all duration-300";
     const variantClass = variantStyles[variant];
     const borderClass = ecosystemArm
@@ -62,8 +63,12 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       <motion.div
         ref={ref}
         className={finalClassName}
-        whileHover={hoverVariant}
-        transition={{ type: "spring", stiffness: 350, damping: 25 }}
+        whileHover={shouldReduceMotion ? {} : hoverVariant}
+        transition={
+          shouldReduceMotion
+            ? { duration: 0 }
+            : { type: "spring", stiffness: 350, damping: 25 }
+        }
         {...props}
       >
         {children}

@@ -55,7 +55,13 @@ export const FormInput = React.forwardRef<
           {...props}
         />
         {error && (
-          <p className="mt-1 font-body text-xs text-error">{error}</p>
+          <p
+            className="mt-1 font-body text-xs text-error"
+            role="alert"
+            aria-live="polite"
+          >
+            {error}
+          </p>
         )}
         {helperText && !error && (
           <p className="mt-1 font-body text-xs text-brand-textDim">
@@ -117,7 +123,13 @@ export const FormTextarea = React.forwardRef<
           {...props}
         />
         {error && (
-          <p className="mt-1 font-body text-xs text-error">{error}</p>
+          <p
+            className="mt-1 font-body text-xs text-error"
+            role="alert"
+            aria-live="polite"
+          >
+            {error}
+          </p>
         )}
         {helperText && !error && (
           <p className="mt-1 font-body text-xs text-brand-textDim">
@@ -203,7 +215,13 @@ export const FormSelect = React.forwardRef<
           </svg>
         </div>
         {error && (
-          <p className="mt-1 font-body text-xs text-error">{error}</p>
+          <p
+            className="mt-1 font-body text-xs text-error"
+            role="alert"
+            aria-live="polite"
+          >
+            {error}
+          </p>
         )}
         {helperText && !error && (
           <p className="mt-1 font-body text-xs text-brand-textDim">

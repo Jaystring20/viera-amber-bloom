@@ -1,5 +1,5 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 type ButtonVariant = "primary" | "secondary" | "accent" | "ghost" | "destructive";
 type ButtonSize = "sm" | "md" | "lg";
@@ -11,6 +11,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   ecosystemArm?: EcosystemArm;
   isLoading?: boolean;
   fullWidth?: boolean;
+  ariaLabel?: string;
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
@@ -49,10 +50,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       disabled = false,
       children,
       className = "",
+      ariaLabel,
       ...props
     },
     ref
   ) => {
+    const shouldReduceMotion = useReducedMotion();
     const baseStyles =
       "font-body rounded-lg font-medium uppercase tracking-wider transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed";
 
@@ -70,17 +73,22 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         className={finalClassName}
         disabled={disabled || isLoading}
+        aria-label={ariaLabel}
         whileHover={
-          !disabled && !isLoading
+          !disabled && !isLoading && !shouldReduceMotion
             ? { scale: 1.02, opacity: 0.95 }
             : undefined
         }
         whileTap={
-          !disabled && !isLoading
+          !disabled && !isLoading && !shouldReduceMotion
             ? { scale: 0.98 }
             : undefined
         }
-        transition={{ type: "spring", stiffness: 350, damping: 25 }}
+        transition={
+          shouldReduceMotion
+            ? { duration: 0 }
+            : { type: "spring", stiffness: 350, damping: 25 }
+        }
         {...props}
       >
         {isLoading ? (
