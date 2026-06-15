@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './styles/brand-colors.css';
+
 /* Viera Amber Design System
    All colors expressed in HSL for token consistency with Tailwind.
 */
@@ -11,13 +13,23 @@
     /* Brand raw values (reference) */
     --bg-dark: #0A0A0A;
     --bg-dark-secondary: #111111;
-    --accent-gold: #C8A96E;
-    --accent-gold-dim: #A08050;
+    --accent-gold: #D97706;
+    --accent-gold-dim: #B8630B;
     --text-primary: #FAFAFA;
     --text-secondary: #888888;
     --surface-light: #FAFAFA;
     --surface-card: #F7F7F7;
     --border-subtle: #2A2A2A;
+
+    /* Ecosystem arm colors */
+    --ecosystem-illustrations: #D97706;
+    --ecosystem-vagin: #62017F;
+    --ecosystem-vagin-accent: #ED155D;
+    --ecosystem-viva: #6E0025;
+    --ecosystem-vam: #888888;
+    --ecosystem-vash: #0B7B8C;
+
+    /* Legacy values (keep for backwards compatibility) */
     --vagin-purple: #62017F;
     --vagin-pink: #ED155D;
     --viva-wine: #6E0025;

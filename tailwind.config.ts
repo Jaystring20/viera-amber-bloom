@@ -52,11 +52,35 @@ const config = {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Base colors
         "brand-dark": "#0A0A0A",
+        "brand-darker": "#050505",
+        "brand-dark-secondary": "#0F172A",
         "brand-text": "#FAFAFA",
         "brand-textDim": "#888888",
-        "brand-gold": "#C8A96E",
         "brand-borderSubtle": "#2A2A2A",
+
+        // Ecosystem arm colors
+        "ecosystem-illustrations": "#D97706",  // Gold/Orange
+        "ecosystem-vagin": "#62017F",          // Purple
+        "ecosystem-vagin-accent": "#ED155D",   // Hot Pink (PAD KOLO)
+        "ecosystem-viva": "#6E0025",           // Deep Burgundy
+        "ecosystem-vam": "#888888",            // Gray (can be customized)
+        "ecosystem-vash": "#0B7B8C",           // Teal
+
+        // Legacy (keep for backwards compatibility)
+        "brand-gold": "#C8A96E",
+
+        // Semantic colors
+        "success": "#10B981",
+        "warning": "#F59E0B",
+        "error": "#EF4444",
+        "info": "#3B82F6",
+
+        // Glass effect colors (semi-transparent)
+        "glass-dark": "rgba(26, 26, 26, 0.6)",
+        "glass-border": "rgba(217, 119, 6, 0.15)",
+        "glass-border-hover": "rgba(217, 119, 6, 0.4)",
       },
       borderRadius: {
         lg: "var(--radius)",
