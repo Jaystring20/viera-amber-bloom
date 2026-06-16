@@ -63,6 +63,7 @@ const inputSx: React.CSSProperties = {
   background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
   borderRadius: 8, padding: "11px 14px", color: "#FAFAFA",
   fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, outline: "none",
+  colorScheme: "dark", // renders native dropdown popups & date pickers in dark mode (readable options)
 };
 const labelSx: React.CSSProperties = {
   fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10,
@@ -517,7 +518,14 @@ const VAGINDashboard = () => {
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: "#080810" }}>
+    <div className="vagin-dash" style={{ minHeight: "100vh", background: "#080810" }}>
+      {/* Dark-mode dropdown contrast: native option lists default to light bg + light text (invisible).
+          color-scheme handles Chromium/Firefox; the explicit option rule covers the rest. */}
+      <style>{`
+        .vagin-dash select, .vagin-dash input, .vagin-dash textarea { color-scheme: dark; }
+        .vagin-dash select option { background-color: #1A0B2E; color: #FAFAFA; }
+        .vagin-dash select option:checked { background-color: #62017F; color: #FFFFFF; }
+      `}</style>
       <NavBar />
 
       {/* ── Header ── */}
