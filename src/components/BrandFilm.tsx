@@ -15,28 +15,17 @@ const BrandFilm = ({ variant }: BrandFilmProps) => {
   const [muted, setMuted] = useState(true);
   const [playing, setPlaying] = useState(false);
   const [showPlayOverlay, setShowPlayOverlay] = useState(variant === "page");
+  const [hovered, setHovered] = useState(false);
   const reduced = useReducedMotion();
 
-  // Landing: autoplay when 30% of the container is in view, pause when not
-  useEffect(() => {
-    if (variant !== "landing" || !containerRef.current) return;
-
-    const el = containerRef.current;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const vid = videoRef.current;
-        if (!vid) return;
-        if (entry.isIntersecting && !reduced) {
-          vid.play().catch(() => {});
-        } else {
-          vid.pause();
-        }
-      },
-      { threshold: 0.3 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [variant, reduced]);
+  // Landing: play on first hover, keep looping — never pause automatically
+  const handleMouseEnter = () => {
+    if (variant !== "landing" || reduced) return;
+    setHovered(true);
+    const vid = videoRef.current;
+    if (!vid || playing) return;
+    vid.play().catch(() => {});
+  };
 
   const toggleMute = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -64,6 +53,8 @@ const BrandFilm = ({ variant }: BrandFilmProps) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.15 }}
       transition={{ duration: 0.7, ease: "easeOut" }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={() => setHovered(false)}
       style={{
         position: "relative",
         width: "100%",
@@ -93,6 +84,43 @@ const BrandFilm = ({ variant }: BrandFilmProps) => {
           display: "block",
         }}
       />
+
+      {/* ── Landing: hover-to-play hint (disappears after first play) ── */}
+      <AnimatePresence>
+        {isLanding && !playing && !reduced && (
+          <motion.div
+            key="hover-hint"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: hovered ? 0 : 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "rgba(0,0,0,0.38)",
+              zIndex: 8,
+              pointerEvents: "none",
+            }}
+          >
+            <p
+              style={{
+                color: "rgba(250,250,250,0.55)",
+                fontSize: 10,
+                letterSpacing: "3px",
+                textTransform: "uppercase",
+                margin: 0,
+                fontFamily: "DM Sans, system-ui, sans-serif",
+                fontWeight: 400,
+              }}
+            >
+              Hover to preview
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Landing: mute/unmute pill ─────────────────────────────── */}
       {isLanding && (
