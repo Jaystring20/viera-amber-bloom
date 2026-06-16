@@ -15,8 +15,8 @@ const GOLD   = "#D97706";
 const PL     = "#C77DFF";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
-interface SchoolRow { id: string; name: string; country: string; state_region: string | null; contact_name: string | null; city: string | null; girls_reached: number }
-interface Student   { id: string; student_id: string; name: string; school_id: string | null; class: string | null; balance_ngn: number; pads_received: number; active: boolean; created_at: string }
+interface SchoolRow { id: string; name: string; code: string | null; country: string; state_region: string | null; contact_name: string | null; city: string | null; girls_reached: number }
+interface Student   { id: string; student_id: string; name: string; school_id: string | null; class: string | null; balance_ngn: number; free_pads_used: number; paid_pads_used: number; pads_received: number; active: boolean; created_at: string }
 interface Matron    { id: string; name: string; phone: string; school_id: string | null; active: boolean; created_at: string }
 interface Distribution { id: string; school_id: string; distribution_date: string; girls_count: number; pads_count: number; savings_collected_ngn: number; distributed_by: string | null }
 interface Session      { id: string; school_id: string; session_date: string; topic: string; girls_attended: number; facilitator: string | null; delivery_format: string }
@@ -43,7 +43,19 @@ const fmt     = (n: number) => n.toLocaleString("en-NG");
 const fmtNGN  = (n: number) => `₦${fmt(Math.round(n))}`;
 const fmtDate = (s: string) => new Date(s).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
 const today   = () => new Date().toISOString().slice(0, 10);
-const genStudentId = (students: Student[]) => `VG-${String(students.length + 1).padStart(4, "0")}`;
+// Initials: first letter of first name + first letter of last name (fallback: first 2 chars)
+const studentInitials = (name: string) => {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "XX";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase().padEnd(2, "X");
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
+// Derive a 3-letter school code from its name if none was set (fallback only)
+const codeFromName = (name: string) =>
+  name.replace(/[^A-Za-z]/g, "").slice(0, 3).toUpperCase().padEnd(3, "X") || "VAG";
+// Build the globally-unique student ID: SCHOOLCODE-INITIALS-SEQ  e.g. LGS-FA-001
+const buildStudentId = (schoolCode: string, name: string, seq: number) =>
+  `${schoolCode}-${studentInitials(name)}-${String(seq).padStart(3, "0")}`;
 
 // ── Shared input styles ────────────────────────────────────────────────────────
 const inputSx: React.CSSProperties = {
@@ -276,8 +288,8 @@ const VAGINDashboard = () => {
   const [deleteTarget, setDeleteTarget] = useState<{ table: string; id: string; label: string } | null>(null);
 
   // Form states
-  const [schoolForm, setSchoolForm] = useState({ id: "", name: "", country: "Nigeria", city: "", state_region: "", contact_name: "" });
-  const [studentForm, setStudentForm] = useState({ id: "", student_id: "", name: "", school_id: "", class: "", balance_ngn: "0" });
+  const [schoolForm, setSchoolForm] = useState({ id: "", name: "", code: "", country: "Nigeria", city: "", state_region: "", contact_name: "" });
+  const [studentForm, setStudentForm] = useState({ id: "", student_id: "", name: "", school_id: "", class: "", balance_ngn: "0", free_pads_used: "0", paid_pads_used: "0", idManual: false });
   const [matronForm, setMatronForm] = useState({ id: "", name: "", phone: "", school_id: "", active: true });
   const [distForm, setDistForm]     = useState({ school_id: "", distribution_date: today(), girls_count: "", pads_count: "", savings_collected_ngn: "0", distributed_by: "" });
   const [sessForm, setSessForm]     = useState({ school_id: "", session_date: today(), topic: "puberty", girls_attended: "", facilitator: "", delivery_format: "in_school" });
@@ -329,12 +341,12 @@ const VAGINDashboard = () => {
   const handleSignOut = async () => { await supabase.auth.signOut(); setAuthed(false); setData(null); };
 
   // ── School CRUD ───────────────────────────────────────────────────────────
-  const openAddSchool  = () => { setSchoolForm({ id: "", name: "", country: "Nigeria", city: "", state_region: "", contact_name: "" }); setModal("add-school"); };
-  const openEditSchool = (s: SchoolRow) => { setSchoolForm({ id: s.id, name: s.name, country: s.country, city: s.city ?? "", state_region: s.state_region ?? "", contact_name: s.contact_name ?? "" }); setModal("edit-school"); };
+  const openAddSchool  = () => { setSchoolForm({ id: "", name: "", code: "", country: "Nigeria", city: "", state_region: "", contact_name: "" }); setModal("add-school"); };
+  const openEditSchool = (s: SchoolRow) => { setSchoolForm({ id: s.id, name: s.name, code: s.code ?? "", country: s.country, city: s.city ?? "", state_region: s.state_region ?? "", contact_name: s.contact_name ?? "" }); setModal("edit-school"); };
   const saveSchool = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true);
     try {
-      const payload = { name: schoolForm.name, country: schoolForm.country, city: schoolForm.city || null, state_region: schoolForm.state_region || null, contact_name: schoolForm.contact_name || null };
+      const payload = { name: schoolForm.name, code: (schoolForm.code || codeFromName(schoolForm.name)).toUpperCase(), country: schoolForm.country, city: schoolForm.city || null, state_region: schoolForm.state_region || null, contact_name: schoolForm.contact_name || null };
       const { error } = schoolForm.id
         ? await supabase.from("vagin_schools").update(payload).eq("id", schoolForm.id)
         : await supabase.from("vagin_schools").insert(payload);
@@ -346,12 +358,42 @@ const VAGINDashboard = () => {
   };
 
   // ── Student CRUD ──────────────────────────────────────────────────────────
-  const openAddStudent  = () => { setStudentForm({ id: "", student_id: data ? genStudentId(data.students) : "VG-0001", name: "", school_id: data?.schools[0]?.id ?? "", class: "", balance_ngn: "0" }); setModal("add-student"); };
-  const openEditStudent = (s: Student) => { setStudentForm({ id: s.id, student_id: s.student_id, name: s.name, school_id: s.school_id ?? "", class: s.class ?? "", balance_ngn: String(s.balance_ngn) }); setModal("edit-student"); };
+  // Next per-school sequence — based on max existing trailing number (delete-safe), not count
+  const nextSeqForSchool = (schoolId: string) => {
+    let max = 0;
+    (data?.students ?? []).filter(s => s.school_id === schoolId).forEach(s => {
+      const m = s.student_id.match(/-(\d+)$/);
+      if (m) max = Math.max(max, parseInt(m[1], 10));
+    });
+    return max + 1;
+  };
+  // SCHOOLCODE-INITIALS-SEQ
+  const computeStudentId = (schoolId: string, name: string) => {
+    const school = data?.schools.find(s => s.id === schoolId);
+    const code = (school?.code || (school ? codeFromName(school.name) : "VAG")).toUpperCase();
+    return buildStudentId(code, name, nextSeqForSchool(schoolId));
+  };
+  // Recompute the auto-ID when name/school change (unless the admin typed a custom one)
+  const studentField = (patch: Partial<typeof studentForm>) => setStudentForm(p => {
+    const next = { ...p, ...patch };
+    if (!next.id && !next.idManual && ("name" in patch || "school_id" in patch)) {
+      next.student_id = computeStudentId(next.school_id, next.name);
+    }
+    return next;
+  });
+
+  const openAddStudent  = () => {
+    const sid = data?.schools[0]?.id ?? "";
+    setStudentForm({ id: "", student_id: data ? computeStudentId(sid, "") : "VAG-XX-001", name: "", school_id: sid, class: "", balance_ngn: "0", free_pads_used: "0", paid_pads_used: "0", idManual: false });
+    setModal("add-student");
+  };
+  const openEditStudent = (s: Student) => { setStudentForm({ id: s.id, student_id: s.student_id, name: s.name, school_id: s.school_id ?? "", class: s.class ?? "", balance_ngn: String(s.balance_ngn), free_pads_used: String(s.free_pads_used ?? 0), paid_pads_used: String(s.paid_pads_used ?? 0), idManual: true }); setModal("edit-student"); };
   const saveStudent = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true);
     try {
-      const payload = { student_id: studentForm.student_id, name: studentForm.name, school_id: studentForm.school_id || null, class: studentForm.class || null, balance_ngn: parseFloat(studentForm.balance_ngn) || 0 };
+      const freePads = Math.min(parseInt(studentForm.free_pads_used) || 0, 1);
+      const paidPads = Math.min(parseInt(studentForm.paid_pads_used) || 0, 2);
+      const payload = { student_id: studentForm.student_id.toUpperCase(), name: studentForm.name, school_id: studentForm.school_id || null, class: studentForm.class || null, balance_ngn: parseFloat(studentForm.balance_ngn) || 0, free_pads_used: freePads, paid_pads_used: paidPads, pads_received: freePads + paidPads };
       const { error } = studentForm.id
         ? await supabase.from("vagin_students").update(payload).eq("id", studentForm.id)
         : await supabase.from("vagin_students").insert(payload);
@@ -561,10 +603,11 @@ const VAGINDashboard = () => {
               <motion.div key="schools" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
                 <Card title="School Registry" action={<AddBtn label="Add School" onClick={openAddSchool} />}>
                   <Table
-                    headers={["Name", "Country", "City", "Contact", "Students", "Actions"]}
+                    headers={["Code", "Name", "Country", "City", "Contact", "Students", "Actions"]}
                     rows={data.schools.map(s => {
                       const studs = data.students.filter(st => st.school_id === s.id);
                       return [
+                        <span key="c" style={{ fontFamily: "monospace", color: PL, fontWeight: 600, letterSpacing: "0.1em" }}>{s.code ?? "—"}</span>,
                         s.name, s.country, s.city ?? "—", s.contact_name ?? "—", studs.length,
                         <span key="a"><EditBtn onClick={() => openEditSchool(s)} /><DeleteBtn onClick={() => openDelete("vagin_schools", s.id, s.name)} /></span>
                       ];
@@ -584,16 +627,20 @@ const VAGINDashboard = () => {
                 </div>
                 <Card title="Student Registry" action={<AddBtn label="Register Student" onClick={openAddStudent} />}>
                   <Table
-                    headers={["ID", "Name", "School", "Class", "KOLO Balance", "Pads", "Actions"]}
-                    rows={data.students.map(s => [
-                      <span key="id" style={{ fontFamily: "monospace", color: PL, fontSize: 12, fontWeight: 600 }}>{s.student_id}</span>,
-                      s.name,
-                      schoolName(s.school_id ?? ""),
-                      s.class ?? "—",
-                      fmtNGN(s.balance_ngn),
-                      s.pads_received,
-                      <span key="a"><EditBtn onClick={() => openEditStudent(s)} /><DeleteBtn onClick={() => openDelete("vagin_students", s.id, s.name)} /></span>
-                    ])}
+                    headers={["ID", "Name", "School", "Class", "KOLO Balance", "Pads (cycle)", "Actions"]}
+                    rows={data.students.map(s => {
+                      const free = s.free_pads_used ?? 0, paid = s.paid_pads_used ?? 0;
+                      const total = free + paid;
+                      return [
+                        <span key="id" style={{ fontFamily: "monospace", color: PL, fontSize: 12, fontWeight: 600 }}>{s.student_id}</span>,
+                        s.name,
+                        schoolName(s.school_id ?? ""),
+                        s.class ?? "—",
+                        fmtNGN(s.balance_ngn),
+                        <span key="p" style={{ color: total >= 3 ? GOLD : "rgba(250,250,250,0.65)" }}>{total}/3 <span style={{ fontSize: 10, opacity: 0.6 }}>({free}f·{paid}p)</span></span>,
+                        <span key="a"><EditBtn onClick={() => openEditStudent(s)} /><DeleteBtn onClick={() => openDelete("vagin_students", s.id, s.name)} /></span>
+                      ];
+                    })}
                   />
                 </Card>
               </motion.div>
@@ -724,6 +771,13 @@ const VAGINDashboard = () => {
           <Modal key="school-modal" title={modal === "add-school" ? "Add School" : "Edit School"} onClose={closeModal}>
             <form onSubmit={saveSchool} style={{ display: "flex", flexDirection: "column" }}>
               <F label="School Name *"><input required style={inputSx} value={schoolForm.name} onChange={e => setSchoolForm(p => ({ ...p, name: e.target.value }))} /></F>
+              <F label="School Code * (2–4 letters — used in every student ID, must be unique)">
+                <input required maxLength={4} style={{ ...inputSx, textTransform: "uppercase", fontFamily: "monospace", letterSpacing: "0.15em", color: PL }}
+                  value={schoolForm.code} onChange={e => setSchoolForm(p => ({ ...p, code: e.target.value.toUpperCase().replace(/[^A-Z]/g, "") }))} placeholder="e.g. LGS" />
+                <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: "rgba(250,250,250,0.3)", margin: "5px 0 0" }}>
+                  Students here become e.g. <span style={{ color: PL, fontFamily: "monospace" }}>{(schoolForm.code || codeFromName(schoolForm.name || "School"))}-FA-001</span>. Leave blank to auto-derive from the name.
+                </p>
+              </F>
               <F label="Country *">
                 <select required style={inputSx} value={schoolForm.country} onChange={e => setSchoolForm(p => ({ ...p, country: e.target.value }))}>
                   <option value="Nigeria">Nigeria</option>
@@ -749,20 +803,36 @@ const VAGINDashboard = () => {
         {(modal === "add-student" || modal === "edit-student") && (
           <Modal key="student-modal" title={modal === "add-student" ? "Register Student" : "Edit Student"} onClose={closeModal}>
             <form onSubmit={saveStudent} style={{ display: "flex", flexDirection: "column" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <F label="Full Name *"><input required style={inputSx} value={studentForm.name} onChange={e => setStudentForm(p => ({ ...p, name: e.target.value }))} /></F>
-                <F label="Student ID *"><input required style={{ ...inputSx, fontFamily: "monospace", color: PL }} value={studentForm.student_id} onChange={e => setStudentForm(p => ({ ...p, student_id: e.target.value }))} placeholder="VG-0001" /></F>
-              </div>
-              <F label="School">
-                <select style={inputSx} value={studentForm.school_id} onChange={e => setStudentForm(p => ({ ...p, school_id: e.target.value }))}>
+              <F label="School * (sets the ID prefix)">
+                <select required style={inputSx} value={studentForm.school_id} onChange={e => studentField({ school_id: e.target.value })}>
                   <option value="">— Select school —</option>
                   {schoolOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </F>
+              <F label="Full Name *"><input required style={inputSx} value={studentForm.name} onChange={e => studentField({ name: e.target.value })} placeholder="e.g. Faith Adeyemi" /></F>
+              <F label="Student ID (auto-generated — globally unique)">
+                <input required style={{ ...inputSx, fontFamily: "monospace", color: PL, letterSpacing: "0.1em", fontWeight: 600 }} value={studentForm.student_id}
+                  onChange={e => setStudentForm(p => ({ ...p, student_id: e.target.value.toUpperCase(), idManual: true }))} placeholder="LGS-FA-001" />
+                <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: "rgba(250,250,250,0.3)", margin: "5px 0 0" }}>
+                  Built from school code + initials + per-school number. Edit only if you must override.
+                </p>
+              </F>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <F label="Class / Year"><input style={inputSx} value={studentForm.class} onChange={e => setStudentForm(p => ({ ...p, class: e.target.value }))} placeholder="e.g. JSS2" /></F>
+                <F label="Class / Year"><input style={inputSx} value={studentForm.class} onChange={e => setStudentForm(p => ({ ...p, class: e.target.value }))} placeholder="e.g. SS2" /></F>
                 <F label="KOLO Balance (₦)"><input type="number" min="0" style={inputSx} value={studentForm.balance_ngn} onChange={e => setStudentForm(p => ({ ...p, balance_ngn: e.target.value }))} /></F>
               </div>
+              <F label="Pads used this 3-month cycle (cap: 1 free + 2 paid)">
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <div>
+                    <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: "rgba(250,250,250,0.35)" }}>Free pads (0–1)</span>
+                    <input type="number" min="0" max="1" style={{ ...inputSx, marginTop: 4 }} value={studentForm.free_pads_used} onChange={e => setStudentForm(p => ({ ...p, free_pads_used: e.target.value }))} />
+                  </div>
+                  <div>
+                    <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: "rgba(250,250,250,0.35)" }}>Paid pads (0–2)</span>
+                    <input type="number" min="0" max="2" style={{ ...inputSx, marginTop: 4 }} value={studentForm.paid_pads_used} onChange={e => setStudentForm(p => ({ ...p, paid_pads_used: e.target.value }))} />
+                  </div>
+                </div>
+              </F>
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 8 }}>
                 <button type="button" onClick={closeModal} style={cancelBtnSx}>Cancel</button>
                 <SaveBtn loading={saving} label={modal === "add-student" ? "Register" : "Save"} />
