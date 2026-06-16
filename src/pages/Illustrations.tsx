@@ -1,6 +1,7 @@
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import EditorialGallery from "@/components/sections/EditorialGallery";
+import BrandFilm from "@/components/BrandFilm";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
 import {
@@ -30,6 +31,49 @@ const Illustrations = () => {
     <div className="min-h-screen bg-brand-dark">
       <NavBar />
       <main className="pt-20">
+        {/* ── Brand Film opener ───────────────────────────────────── */}
+        <section
+          aria-label="Brand Film"
+          style={{ backgroundColor: "#000" }}
+        >
+          {/* Cinematic header above the film */}
+          <div
+            className="mx-auto px-6 pt-12 pb-6 flex flex-col items-center text-center"
+            style={{ maxWidth: 1100, gap: 10 }}
+          >
+            <p
+              style={{
+                fontFamily: "DM Sans, system-ui, sans-serif",
+                fontSize: 10,
+                color: "#D97706",
+                letterSpacing: "4px",
+                textTransform: "uppercase",
+                fontWeight: 400,
+                margin: 0,
+              }}
+            >
+              The Collection
+            </p>
+            <h1
+              className="font-display"
+              style={{
+                fontSize: "clamp(22px, 3.5vw, 40px)",
+                fontWeight: 700,
+                color: "#FAFAFA",
+                margin: 0,
+                lineHeight: 1.1,
+              }}
+            >
+              Every piece tells a story.
+            </h1>
+          </div>
+
+          {/* Full-width film container */}
+          <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 48px" }}>
+            <BrandFilm variant="page" />
+          </div>
+        </section>
+
         {/* The Collection — editorial scrollytelling gallery */}
         <EditorialGallery />
 

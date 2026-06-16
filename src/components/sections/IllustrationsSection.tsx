@@ -12,6 +12,7 @@ import {
   useReducedVariants,
 } from "@/lib/animations";
 import { CHAPTERS, ARTWORKS as ALL_ARTWORKS } from "@/lib/gallery-data";
+import BrandFilm from "@/components/BrandFilm";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface PreviewCard {
@@ -495,6 +496,17 @@ const IllustrationsSection = () => {
             joy. We illustrate what she already knows about herself.
           </motion.p>
         </div>
+
+        {/* ── Brand Film (landing teaser) ────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ duration: 0.6 }}
+          style={{ marginBottom: 48 }}
+        >
+          <BrandFilm variant="landing" />
+        </motion.div>
 
         {/* ── Animated Carousel ─────────────────────────────────────── */}
         <motion.div
