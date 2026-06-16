@@ -6,8 +6,9 @@ import {
   LayoutDashboard, Droplets, Palette, School as SchoolIcon, LogOut,
   TrendingUp, Users, BookOpen, Coins,
   AlertCircle, RefreshCw, Plus, Pencil, Trash2, X,
-  GraduationCap, ClipboardList, CheckCircle2,
+  GraduationCap, ClipboardList, CheckCircle2, Images,
 } from "lucide-react";
+import GalleryAdminTab from "@/components/admin/GalleryAdminTab";
 
 const PINK   = "#ED155D";
 const PURPLE = "#62017F";
@@ -275,7 +276,7 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
 // MAIN DASHBOARD
 // ══════════════════════════════════════════════════════════════════════════════
 const VAGINDashboard = () => {
-  type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions";
+  type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions" | "gallery";
   type ModalType = "add-school" | "edit-school" | "add-student" | "edit-student" | "add-matron" | "edit-matron" | "add-distribution" | "add-session" | "confirm-delete" | null;
 
   const [authed, setAuthed]         = useState<boolean | null>(null);
@@ -509,6 +510,7 @@ const VAGINDashboard = () => {
     { id: "pad_kolo"      as TabId, label: "PAD KOLO",      Icon: Droplets },
     { id: "vaginart"      as TabId, label: "VaginART",      Icon: Palette },
     { id: "transactions"  as TabId, label: "Transactions",  Icon: ClipboardList },
+    { id: "gallery"       as TabId, label: "Gallery CMS",   Icon: Images },
   ] as const;
 
   const infoBox = (msg: React.ReactNode, color = PL) => (
@@ -735,6 +737,17 @@ const VAGINDashboard = () => {
                     ])}
                   />
                 </Card>
+              </motion.div>
+            )}
+
+            {/* ── GALLERY CMS ── */}
+            {activeTab === "gallery" && (
+              <motion.div key="gallery" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+                <div style={{ marginBottom: 20 }}>
+                  <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: PL, letterSpacing: "0.25em", textTransform: "uppercase", fontWeight: 600, margin: "0 0 4px" }}>Gallery CMS</p>
+                  <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "rgba(250,250,250,0.45)", margin: 0 }}>Manage Illustrations artworks and chapter descriptions. Changes appear live on the public gallery page.</p>
+                </div>
+                <GalleryAdminTab />
               </motion.div>
             )}
 

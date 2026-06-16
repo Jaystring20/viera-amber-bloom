@@ -8,13 +8,15 @@ import {
 } from "framer-motion";
 import { X, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import {
-  ARTWORKS,
-  CHAPTERS,
+  ARTWORKS as STATIC_ARTWORKS,
+  CHAPTERS as STATIC_CHAPTERS,
   MEDIA,
   type Artwork,
   type Chapter,
+  type ChapterId,
   type Medium,
 } from "@/lib/gallery-data";
+import { supabase } from "@/lib/supabase";
 
 const GOLD = "#D97706";
 
@@ -507,10 +509,52 @@ const EditorialGallery = () => {
   const [activeMedium, setActiveMedium] = useState<Medium | "All">("All");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
+  // Live data — starts from static file (instant render) and updates when Supabase responds.
+  const [artworks, setArtworks] = useState<Artwork[]>(STATIC_ARTWORKS);
+  const [chapters, setChapters] = useState<Chapter[]>(STATIC_CHAPTERS);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [{ data: arts }, { data: chaps }] = await Promise.all([
+          supabase.from("va_artworks").select("*").order("seq"),
+          supabase.from("va_gallery_chapters").select("*").order("sort_order"),
+        ]);
+        if (cancelled) return;
+        if (arts && arts.length > 0) {
+          setArtworks(arts.map((a): Artwork => ({
+            id: a.id,
+            n: a.seq,
+            title: a.title,
+            story: a.story,
+            chapter: (a.chapter_id ?? "speaks") as ChapterId,
+            medium: a.medium as Medium,
+            image: a.image_url,
+            feature: a.featured,
+          })));
+        }
+        if (chaps && chaps.length > 0) {
+          setChapters(chaps.map((c): Chapter => ({
+            id: c.id as ChapterId,
+            index: c.index_label,
+            name: c.name,
+            tagline: c.tagline,
+            description: c.description,
+            layout: c.layout as "mosaic" | "rail" | "feature",
+          })));
+        }
+      } catch {
+        // Supabase unavailable — static data already shown
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
   // Flat list = the current navigation order for the lightbox.
   const flatList = useMemo(
-    () => (activeMedium === "All" ? ARTWORKS : ARTWORKS.filter((a) => a.medium === activeMedium)),
-    [activeMedium],
+    () => (activeMedium === "All" ? artworks : artworks.filter((a) => a.medium === activeMedium)),
+    [activeMedium, artworks],
   );
   const indexOf = useMemo(() => {
     const map = new Map<string, number>();
@@ -551,7 +595,7 @@ const EditorialGallery = () => {
             className="font-display"
             style={{ fontSize: "clamp(28px, 4.5vw, 54px)", fontWeight: 700, color: "#FAFAFA", margin: 0, lineHeight: 1.05, maxWidth: 720 }}
           >
-            Six chapters, {ARTWORKS.length} women, one voice.
+            Six chapters, {artworks.length} women, one voice.
           </motion.h2>
           <motion.p
             initial={{ opacity: 0 }}
@@ -593,8 +637,8 @@ const EditorialGallery = () => {
         ) : (
           /* Story view: chapters */
           <div className="flex flex-col gap-20 md:gap-28">
-            {CHAPTERS.map((chapter) => {
-              const items = ARTWORKS.filter((a) => a.chapter === chapter.id);
+            {chapters.map((chapter) => {
+              const items = artworks.filter((a) => a.chapter === chapter.id);
               return (
                 <div key={chapter.id} id={`chapter-${chapter.id}`}>
                   <ChapterIntro chapter={chapter} />
