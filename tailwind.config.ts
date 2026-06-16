@@ -59,6 +59,7 @@ const config = {
         "brand-text": "#FAFAFA",
         "brand-textDim": "#888888",
         "brand-borderSubtle": "#2A2A2A",
+        "brand-orange": "#D97706",
 
         // Ecosystem arm colors
         "ecosystem-illustrations": "#D97706",  // Gold/Orange
