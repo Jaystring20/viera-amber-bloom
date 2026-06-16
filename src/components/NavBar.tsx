@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, Shield, X } from "lucide-react";
 import logoSrc from "@/assets/viera-amber-logo.png";
 import { useLocation } from "react-router-dom";
 
@@ -146,19 +146,47 @@ const NavBar = () => {
               </a>
             </li>
           ))}
+          {/* Admin access — desktop */}
+          <li>
+            <a
+              href="/vagin-dashboard"
+              aria-label="Admin dashboard"
+              className="flex items-center justify-center rounded-lg transition-all duration-200 hover:bg-white/5"
+              style={{ padding: "8px 10px", opacity: 0.35 }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.35")}
+            >
+              <Shield size={15} color="#D97706" strokeWidth={1.5} />
+            </a>
+          </li>
         </ul>
 
-        {/* Mobile Menu Button */}
-        <button
-          type="button"
-          aria-label={open ? "Close menu" : "Open menu"}
-          aria-expanded={open}
-          className="md:hidden text-brand-text transition-colors hover:text-brand-orange"
-          onClick={() => setOpen((v) => !v)}
-          style={{ padding: "8px" }}
-        >
-          {open ? <X size={20} /> : <Menu size={20} />}
-        </button>
+        {/* Mobile right-side controls */}
+        <div className="md:hidden flex items-center gap-1">
+          {/* Admin access — mobile */}
+          <a
+            href="/vagin-dashboard"
+            aria-label="Admin dashboard"
+            className="flex items-center justify-center rounded-lg transition-all duration-200"
+            style={{ padding: "8px", opacity: 0.35 }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.35")}
+          >
+            <Shield size={16} color="#D97706" strokeWidth={1.5} />
+          </a>
+
+          {/* Hamburger */}
+          <button
+            type="button"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            className="text-brand-text transition-colors hover:text-brand-orange"
+            onClick={() => setOpen((v) => !v)}
+            style={{ padding: "8px" }}
+          >
+            {open ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </nav>
 
       {/* Mobile Glass Menu Overlay */}
