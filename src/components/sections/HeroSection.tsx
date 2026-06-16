@@ -130,21 +130,43 @@ const HeroSection = () => {
             object-position: center 16%;
           }
         }
+
+        /* ── Mobile: zoom into face+shoulders, hide JACQUELINE watermark ── */
         @media (max-width: 767px) {
+          .hero-container {
+            align-items: flex-end;
+            padding-bottom: 4rem;
+          }
           .hero-artwork {
-            object-position: 58% 5%;
+            object-position: 58% 12%;
+            transform: scale(1.45);
+            transform-origin: 58% 30%;
+          }
+          .hero-bottom-fade {
+            height: 42% !important;
+          }
+          .hero-scroll-indicator {
+            display: none;
           }
         }
         @media (max-width: 479px) {
+          .hero-container {
+            padding-bottom: 3rem;
+          }
           .hero-artwork {
-            object-position: 60% 3%;
+            object-position: 60% 12%;
+            transform: scale(1.5);
+            transform-origin: 60% 30%;
+          }
+          .hero-bottom-fade {
+            height: 45% !important;
           }
         }
       `}</style>
 
       <div
         ref={containerRef}
-        className="relative w-full min-h-dvh overflow-hidden flex items-center justify-center px-4 sm:px-6"
+        className="hero-container relative w-full min-h-dvh overflow-hidden flex items-center justify-center px-4 sm:px-6"
         style={{ backgroundColor: "#0A0A0A" }}
       >
         {/* ── Jacqueline B&W artwork ─────────────────────────────────────────
@@ -183,7 +205,7 @@ const HeroSection = () => {
         {/* ── Bottom fade — transitions into next section cleanly ───────────── */}
         <div
           aria-hidden="true"
-          className="absolute bottom-0 left-0 right-0 pointer-events-none"
+          className="hero-bottom-fade absolute bottom-0 left-0 right-0 pointer-events-none"
           style={{
             height: "28%",
             background:
