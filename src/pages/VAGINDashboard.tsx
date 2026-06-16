@@ -354,7 +354,6 @@ const PadKoloSection = () => {
             }}
           >
             <div style={{ display: "flex", gap: 24, marginBottom: 24 }}>
-              {["3000+", "50+", "17"]} {" Girls"}
               <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                 <span className="font-display" style={{ fontSize: 28, fontWeight: 700, color: "#ED155D" }}>
                   3000+

@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import logoSrc from "@/assets/viera-amber-logo.png";
+import { useLocation } from "react-router-dom";
 
 const NAV_LINKS = [
   { label: "Illustrations", href: "/illustrations", isRoute: true },
-  { label: "VAGIN", href: "#vagin" },
+  { label: "VAGIN", href: "/vagin", isRoute: true },
   { label: "VIVA", href: "#viva" },
   { label: "VAM", href: "#vam" },
   { label: "Shop", href: "#shop" },
@@ -17,6 +18,8 @@ const NavBar = () => {
   const [open, setOpen] = useState(false);
   const reduced = useReducedMotion();
   const overlayRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+  const isVaginRoute = location.pathname === "/vagin";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
@@ -95,16 +98,38 @@ const NavBar = () => {
         <a
           href="/"
           onClick={handleLogoClick}
-          aria-label="Viera Amber — home"
+          aria-label={isVaginRoute ? "VAGIN — back to Viera Amber" : "Viera Amber — home"}
           className="flex items-center"
-          style={{ cursor: "pointer", transition: "opacity 0.2s" }}
+          style={{ cursor: "pointer", transition: "opacity 0.2s", gap: 10 }}
         >
-          <img
-            src={logoSrc}
-            alt="Viera Amber"
-            className="h-5 md:h-5 w-auto select-none"
-            draggable={false}
-          />
+          <AnimatePresence mode="wait">
+            {isVaginRoute ? (
+              <motion.img
+                key="vagin-logo"
+                src="/vagin-logo.png"
+                alt="VAGIN"
+                className="w-auto select-none"
+                style={{ height: 48, filter: "drop-shadow(0 0 8px rgba(237,21,93,0.3))" }}
+                draggable={false}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: reduced ? 0 : 0.25, ease: "easeOut" }}
+              />
+            ) : (
+              <motion.img
+                key="main-logo"
+                src={logoSrc}
+                alt="Viera Amber"
+                className="h-5 md:h-5 w-auto select-none"
+                draggable={false}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: reduced ? 0 : 0.25, ease: "easeOut" }}
+              />
+            )}
+          </AnimatePresence>
         </a>
 
         {/* Desktop Navigation */}

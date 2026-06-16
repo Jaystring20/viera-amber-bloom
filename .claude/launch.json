@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "viera-amber-dev",
+      "name": "viera-amber",
       "runtimeExecutable": "bun",
       "runtimeArgs": ["run", "dev"],
       "port": 8080

@@ -44,34 +44,57 @@ const FounderSection = () => {
             gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
           }}
         >
-          {/* ── Left — Image placeholder ─────────────────────────── */}
+          {/* ── Left — Founder portrait ──────────────────────────── */}
           <motion.div
             variants={leftVariants}
             initial="hidden"
             animate={inView ? "visible" : "hidden"}
+            className="relative"
           >
+            {/* subtle gold glow behind */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                inset: 0,
+                borderRadius: 2,
+                background: "radial-gradient(ellipse at 60% 30%, rgba(217,119,6,0.18) 0%, transparent 70%)",
+                filter: "blur(24px)",
+                transform: "scale(1.08)",
+                zIndex: 0,
+              }}
+            />
             <div
               style={{
+                position: "relative",
+                zIndex: 1,
                 aspectRatio: "3 / 4",
-                backgroundColor: "#111111",
-                border: "1px solid #2A2A2A",
                 borderRadius: 2,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                overflow: "hidden",
+                border: "1px solid rgba(217,119,6,0.25)",
               }}
             >
-              <p
-                className="font-display"
+              <img
+                src="/faith-adigwe-founder.webp"
+                alt="Faith Adigwe — Founder, Viera Amber"
+                style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }}
+              />
+              {/* name chip */}
+              <div
                 style={{
-                  fontStyle: "italic",
-                  fontSize: 13,
-                  color: "#444444",
-                  margin: 0,
+                  position: "absolute",
+                  left: 16,
+                  bottom: 16,
+                  background: "rgba(10,10,10,0.7)",
+                  backdropFilter: "blur(10px)",
+                  border: "1px solid rgba(217,119,6,0.3)",
+                  borderRadius: 4,
+                  padding: "8px 14px",
                 }}
               >
-                Faith Adigwe — Founder
-              </p>
+                <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: "#D97706", letterSpacing: "0.2em", textTransform: "uppercase", margin: 0, fontWeight: 500 }}>Founder</p>
+                <p className="font-display" style={{ fontSize: 14, color: "#FAFAFA", margin: 0, fontWeight: 600, marginTop: 2 }}>Faith Adigwe</p>
+              </div>
             </div>
           </motion.div>
 

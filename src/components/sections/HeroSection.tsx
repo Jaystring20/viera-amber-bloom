@@ -16,255 +16,348 @@ const HeroSection = () => {
     window.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
   };
 
-  // Unified orchestration: single 1.2s entrance
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { duration: d(1.2) },
-    },
-  };
-
-  // Establishment date
-  const labelVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: d(0.5), delay: d(0.1), ease: "easeOut" },
-    },
-  };
-
-  // Logo: spring physics entrance
-  const logoVariants = {
-    hidden: { opacity: 0, scale: 0.95, y: 20 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      y: 0,
       transition: {
-        duration: d(0.8),
-        delay: d(0.15),
-        type: "spring",
-        stiffness: 100,
-        damping: 20,
+        duration: d(1.4),
+        staggerChildren: d(0.1),
+        delayChildren: d(0.3),
       },
     },
   };
 
-  // Text animations
-  const textVariants = {
-    hidden: { opacity: 0, y: 10 },
+  const panelVariants = {
+    hidden: { opacity: 0, y: 28, scale: 0.97 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: d(0.6), delay: d(0.3), ease: "easeOut" },
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 90,
+        damping: 20,
+        delay: d(0.2),
+      },
     },
   };
 
-  // Divider
+  const labelVariants = {
+    hidden: { opacity: 0, y: 8 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: d(0.5), ease: "easeOut" },
+    },
+  };
+
+  const logoVariants = {
+    hidden: { opacity: 0, scale: 0.93 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 110,
+        damping: 18,
+        delay: d(0.1),
+      },
+    },
+  };
+
   const dividerVariants = {
     hidden: { scaleX: 0, opacity: 0 },
     visible: {
       scaleX: 1,
       opacity: 1,
+      transition: { duration: d(0.7), ease: "easeOut", delay: d(0.15) },
+    },
+  };
+
+  const textVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: d(0.6), ease: "easeOut", delay: d(0.2) },
+    },
+  };
+
+  const taglineVariants = {
+    hidden: { opacity: 0, y: 6 },
+    visible: {
+      opacity: 1,
+      y: 0,
       transition: { duration: d(0.6), ease: "easeOut", delay: d(0.4) },
     },
   };
 
-  // CTA
   const ctaVariants = {
     hidden: { opacity: 0, scale: 0.95 },
     visible: {
       opacity: 1,
       scale: 1,
-      transition: { duration: d(0.6), delay: d(0.7), ease: "easeOut" },
+      transition: {
+        type: "spring",
+        stiffness: 200,
+        damping: 22,
+        delay: d(0.5),
+      },
     },
   };
 
   return (
-    <div
-      ref={containerRef}
-      className="relative w-full h-screen overflow-hidden flex items-center justify-center px-6"
-      style={{
-        backgroundColor: "#0A0A0A",
-        background: "linear-gradient(135deg, #1A0025 0%, #0F172A 100%)",
-      }}
-    >
-      {/* Artwork_0064 "Jacqueline" — pure B&W, full bleed, no overlay hiding it */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none overflow-hidden"
-        style={{
-          backgroundImage: "url('/artworks/artwork_0064.webp')",
-          backgroundSize: "cover",
-          backgroundPosition: "center top",
-          backgroundRepeat: "no-repeat",
-          filter: "grayscale(100%) contrast(1.25) brightness(0.7) saturate(0)",
-          zIndex: 0,
-        }}
-      />
-
-      {/* Very subtle dark vignette only at edges — lets the artwork breathe */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: "radial-gradient(ellipse at center, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.55) 100%)",
-          zIndex: 1,
-        }}
-      />
-
-      {/* Bottom fade to dark so page content below flows in cleanly */}
-      <div
-        aria-hidden="true"
-        className="absolute bottom-0 left-0 right-0 pointer-events-none"
-        style={{
-          height: "30%",
-          background: "linear-gradient(to bottom, transparent 0%, rgba(10,10,10,0.8) 100%)",
-          zIndex: 2,
-        }}
-      />
-
-      {/* Content — glass panel behind text, Apple style */}
-      <motion.div
-        className="relative flex flex-col items-center text-center max-w-3xl mx-auto px-6"
-        style={{ gap: 20, zIndex: 10 }}
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {/* Frosted glass card wrapping logo + tagline */}
-        <motion.div
-          variants={logoVariants}
-          style={{
-            background: "rgba(10, 10, 10, 0.55)",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: 4,
-            padding: "40px 56px 32px",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 20,
-          }}
-        >
-          {/* Est label */}
-          <motion.p
-            variants={labelVariants}
-            className="font-body uppercase tracking-widest m-0"
-            style={{ fontSize: 11, color: "#D97706", letterSpacing: "6px", fontWeight: 500 }}
-          >
-            EST. 2013
-          </motion.p>
-
-          {/* Logo */}
-          <h1 className="m-0" style={{ lineHeight: 1 }}>
-            <span className="sr-only">Viera Amber</span>
-            <img
-              src={logoSrc}
-              alt=""
-              aria-hidden="true"
-              draggable={false}
-              className="select-none"
-              style={{ width: "clamp(220px, 40vw, 540px)", height: "auto", display: "block" }}
-            />
-          </h1>
-
-          {/* Divider */}
-          <motion.div
-            variants={dividerVariants}
-            style={{
-              width: 48,
-              height: 1,
-              background: "linear-gradient(90deg, transparent, #D97706, transparent)",
-              transformOrigin: "center",
-            }}
-            aria-hidden="true"
-          />
-
-          {/* Tagline */}
-          <motion.p
-            variants={textVariants}
-            className="font-body m-0"
-            style={{
-              fontSize: "clamp(14px, 1.6vw, 18px)",
-              color: "rgba(255,255,255,0.85)",
-              maxWidth: 460,
-              lineHeight: 1.7,
-              fontWeight: 300,
-            }}
-          >
-            A creative & impact-driven ecosystem for feminine empowerment.
-          </motion.p>
-        </motion.div>
-
-        {/* "For her, by her" sits outside the glass card, Apple editorial style */}
-        <motion.p
-          variants={textVariants}
-          className="font-display italic m-0"
-          style={{
-            fontSize: "clamp(18px, 2.2vw, 26px)",
-            background: "linear-gradient(135deg, #D97706 0%, #ED155D 100%)",
-            backgroundClip: "text",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            fontWeight: 400,
-          }}
-        >
-          For her, by her.
-        </motion.p>
-
-        {/* CTA */}
-        <motion.div variants={ctaVariants}>
-          <Button
-            variant="secondary"
-            ecosystemArm="illustrations"
-            className="rounded-full px-8 py-3 font-body uppercase tracking-widest text-xs"
-            onClick={handleScroll}
-            aria-label="Discover the full ecosystem"
-          >
-            Explore the Ecosystem ↓
-          </Button>
-        </motion.div>
-
-        {/* Scroll Indicator */}
-        <motion.div
-          animate={reduced ? undefined : { y: [0, 8, 0] }}
-          transition={{ duration: 3, repeat: Infinity }}
-          className="absolute bottom-12 left-1/2 transform -translate-x-1/2"
-          aria-hidden="true"
-        >
-          <div style={{
-            width: 24,
-            height: 40,
-            border: "2px solid rgba(217, 119, 6, 0.4)",
-            borderRadius: 12,
-            display: "flex",
-            justifyContent: "center",
-            paddingTop: 8,
-          }}>
-            <div style={{
-              width: 2,
-              height: 6,
-              background: "#D97706",
-              borderRadius: 1,
-            }} />
-          </div>
-        </motion.div>
-      </motion.div>
-
-      {/* Responsive adjustments */}
+    <>
+      {/*
+        Responsive object-position:
+        - Desktop (≥1024px): image is width-constrained (portrait img in landscape viewport).
+          The hat brim tip sits at ~12% from top of the original image.
+          With cover at 1280px wide → scaled height ≈1638px; container ≈ 800px.
+          object-position Y=22% pushes the "center" of the image window to 22% of overflow
+          from the top → hat brim aligns at the navbar level.
+        - Tablet (768–1023px): similar but slightly less crop needed → 16%
+        - Mobile (<768px): image becomes height-constrained (portrait fills full height).
+          No vertical crop; horizontal center keeps the face. Use top-biased Y=5% so
+          the brim is still the first thing seen below the nav.
+      */}
       <style>{`
-        @media (max-width: 768px) {
-          /* Reduce image opacity on mobile for better text readability */
-          [style*="grayscale"] {
-            opacity: 0.15 !important;
+        .hero-artwork {
+          object-position: center 22%;
+        }
+        @media (max-width: 1023px) {
+          .hero-artwork {
+            object-position: center 16%;
+          }
+        }
+        @media (max-width: 767px) {
+          .hero-artwork {
+            object-position: 58% 5%;
+          }
+        }
+        @media (max-width: 479px) {
+          .hero-artwork {
+            object-position: 60% 3%;
           }
         }
       `}</style>
-    </div>
+
+      <div
+        ref={containerRef}
+        className="relative w-full min-h-dvh overflow-hidden flex items-center justify-center px-4 sm:px-6"
+        style={{ backgroundColor: "#0A0A0A" }}
+      >
+        {/* ── Jacqueline B&W artwork ─────────────────────────────────────────
+            Using <img> + object-fit:cover so object-position precisely controls
+            which slice of the portrait is visible inside this landscape container.
+            Hat-brim tip aligns with the navbar (top of viewport) at desktop sizes.
+        ─────────────────────────────────────────────────────────────────────── */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none select-none overflow-hidden"
+          style={{ zIndex: 0 }}
+        >
+          <img
+            src="/artworks/artwork_0064.webp"
+            alt=""
+            draggable={false}
+            className="hero-artwork w-full h-full select-none"
+            style={{
+              objectFit: "cover",
+              filter: "grayscale(100%) contrast(1.18) brightness(0.92) saturate(0)",
+            }}
+          />
+        </div>
+
+        {/* ── Edge vignette — keeps eye on the centre ──────────────────────── */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 80% 80% at 50% 50%, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.58) 100%)",
+            zIndex: 1,
+          }}
+        />
+
+        {/* ── Bottom fade — transitions into next section cleanly ───────────── */}
+        <div
+          aria-hidden="true"
+          className="absolute bottom-0 left-0 right-0 pointer-events-none"
+          style={{
+            height: "28%",
+            background:
+              "linear-gradient(to bottom, transparent 0%, rgba(10,10,10,0.9) 100%)",
+            zIndex: 2,
+          }}
+        />
+
+        {/* ── Top fade — softens the hat brim / nav boundary ───────────────── */}
+        <div
+          aria-hidden="true"
+          className="absolute top-0 left-0 right-0 pointer-events-none"
+          style={{
+            height: "12%",
+            background:
+              "linear-gradient(to bottom, rgba(10,10,10,0.45) 0%, transparent 100%)",
+            zIndex: 2,
+          }}
+        />
+
+        {/* ── Content ──────────────────────────────────────────────────────── */}
+        <motion.div
+          className="relative flex flex-col items-center text-center w-full max-w-2xl mx-auto"
+          style={{ gap: 20, zIndex: 10 }}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {/* Frosted glass panel — Apple editorial card */}
+          <motion.div
+            variants={panelVariants}
+            className="w-full"
+            style={{
+              background: "rgba(8, 8, 8, 0.52)",
+              backdropFilter: "blur(18px)",
+              WebkitBackdropFilter: "blur(18px)",
+              border: "1px solid rgba(255,255,255,0.07)",
+              borderRadius: 3,
+              padding: "clamp(28px, 4vw, 52px) clamp(28px, 6vw, 72px) clamp(24px, 3.5vw, 44px)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "clamp(12px, 1.8vw, 20px)",
+            }}
+          >
+            {/* Est. label */}
+            <motion.p
+              variants={labelVariants}
+              className="m-0"
+              style={{
+                fontSize: 11,
+                color: "#D97706",
+                letterSpacing: "0.45em",
+                fontWeight: 500,
+                fontFamily: "var(--font-body, sans-serif)",
+                textTransform: "uppercase",
+              }}
+            >
+              EST. 2013
+            </motion.p>
+
+            {/* Wordmark logo */}
+            <motion.h1 variants={logoVariants} className="m-0" style={{ lineHeight: 1 }}>
+              <span className="sr-only">Viera Amber</span>
+              <img
+                src={logoSrc}
+                alt=""
+                aria-hidden="true"
+                draggable={false}
+                className="select-none"
+                style={{
+                  width: "clamp(180px, 36vw, 480px)",
+                  height: "auto",
+                  display: "block",
+                }}
+              />
+            </motion.h1>
+
+            {/* Gold divider */}
+            <motion.div
+              variants={dividerVariants}
+              aria-hidden="true"
+              style={{
+                width: 44,
+                height: 1,
+                background:
+                  "linear-gradient(90deg, transparent 0%, #D97706 50%, transparent 100%)",
+                transformOrigin: "center",
+              }}
+            />
+
+            {/* Tagline */}
+            <motion.p
+              variants={textVariants}
+              className="m-0"
+              style={{
+                fontSize: "clamp(13px, 1.5vw, 17px)",
+                color: "rgba(255,255,255,0.82)",
+                maxWidth: 420,
+                lineHeight: 1.75,
+                fontWeight: 300,
+                fontFamily: "var(--font-body, sans-serif)",
+              }}
+            >
+              A creative &amp; impact-driven ecosystem for feminine empowerment.
+            </motion.p>
+          </motion.div>
+
+          {/* "For her, by her." — Apple editorial pull-quote outside the card */}
+          <motion.p
+            variants={taglineVariants}
+            className="m-0"
+            style={{
+              fontSize: "clamp(16px, 2vw, 24px)",
+              background: "linear-gradient(135deg, #D97706 0%, #ED155D 80%)",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              fontWeight: 400,
+              fontFamily: "var(--font-display, serif)",
+              fontStyle: "italic",
+              letterSpacing: "0.01em",
+            }}
+          >
+            For her, by her.
+          </motion.p>
+
+          {/* CTA */}
+          <motion.div variants={ctaVariants}>
+            <Button
+              variant="secondary"
+              ecosystemArm="illustrations"
+              className="rounded-full px-8 py-3 font-body uppercase tracking-widest text-xs min-h-[44px]"
+              onClick={handleScroll}
+              aria-label="Scroll down to explore the Viera Amber ecosystem"
+            >
+              Explore the Ecosystem ↓
+            </Button>
+          </motion.div>
+
+          {/* Scroll indicator */}
+          <motion.div
+            animate={reduced ? undefined : { y: [0, 9, 0] }}
+            transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute"
+            style={{ bottom: "-4rem", left: "50%", transform: "translateX(-50%)" }}
+            aria-hidden="true"
+          >
+            <div
+              style={{
+                width: 22,
+                height: 38,
+                border: "1.5px solid rgba(217,119,6,0.35)",
+                borderRadius: 11,
+                display: "flex",
+                justifyContent: "center",
+                paddingTop: 7,
+              }}
+            >
+              <motion.div
+                animate={reduced ? undefined : { opacity: [1, 0.2, 1], y: [0, 8, 0] }}
+                transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+                style={{
+                  width: 2,
+                  height: 6,
+                  background: "#D97706",
+                  borderRadius: 1,
+                }}
+              />
+            </div>
+          </motion.div>
+        </motion.div>
+      </div>
+    </>
   );
 };
 

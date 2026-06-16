@@ -28,9 +28,10 @@
   --color-ecosystem-viva: #6e0025;
   --color-ecosystem-viva-light: rgba(110, 0, 37, 0.1);
 
-  /* 4. VAM - Masterclass */
-  --color-ecosystem-vam: #888888;
-  --color-ecosystem-vam-light: rgba(136, 136, 136, 0.1);
+  /* 4. VAM - Masterclass (education violet) */
+  --color-ecosystem-vam: #7c3aed;
+  --color-ecosystem-vam-light: rgba(124, 58, 237, 0.1);
+  --color-ecosystem-vam-border: rgba(124, 58, 237, 0.15);
 
   /* 5. VASH - Shop */
   --color-ecosystem-vash: #0b7b8c;

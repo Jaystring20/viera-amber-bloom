@@ -1,14 +1,30 @@
-import { motion, useInView, useReducedMotion } from "framer-motion";
-import { useRef } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useState } from "react";
+import {
+  Palette,
+  HeartHandshake,
+  Shirt,
+  GraduationCap,
+  ShoppingBag,
+  ArrowRight,
+  ChevronDown,
+  type LucideIcon,
+} from "lucide-react";
 
 type Arm = {
   number: string;
   title: string;
-  accent: string;
-  description: string;
-  cta: string;
-  target: string;
+  accent: string; // true brand hex — used for the dot, glow, and curve
+  text: string; // lightened, WCAG-legible variant — used for text, badges, borders on dark
   tag: string;
+  blurb: string;
+  target: string;
+  Icon: LucideIcon;
+  /* serpentine anchor on desktop, expressed in viewBox % (0–100) */
+  x: number;
+  y: number;
+  /* which side the label fans toward on desktop */
+  side: "top" | "bottom";
 };
 
 const ARMS: Arm[] = [
@@ -16,83 +32,79 @@ const ARMS: Arm[] = [
     number: "01",
     title: "Illustrations & Designs",
     accent: "#D97706",
-    description:
-      "Vibrant, narrative-driven fashion illustrations celebrating women's diverse experiences. Commercial art that heals, inspires, and sells.",
-    cta: "Enter the Studio →",
-    target: "illustrations",
+    text: "#F59E0B",
     tag: "Creative",
+    blurb: "Narrative fashion illustration — art that heals, inspires, and sells.",
+    target: "illustrations",
+    Icon: Palette,
+    x: 12,
+    y: 28,
+    side: "top",
   },
   {
     number: "02",
-    title: "VAGIN — Girls' Initiative",
+    title: "VAGIN",
     accent: "#62017F",
-    description:
-      "Corporate social responsibility targeting SRHR for young girls in underserved communities. 3,000+ girls impacted. SDG 3 & 5.",
-    cta: "Join the Mission →",
-    target: "vagin",
+    text: "#C77DFF",
     tag: "Impact",
+    blurb: "Girls' Initiative — SRHR for 3,000+ girls. SDG 3 & 5.",
+    target: "vagin",
+    Icon: HeartHandshake,
+    x: 31,
+    y: 72,
+    side: "bottom",
   },
   {
     number: "03",
     title: "VIVA",
     accent: "#6E0025",
-    description:
-      "An amalgamation of Viera Amber and Diva — high-end, structured yet fluid wearable art for the modern woman.",
-    cta: "View the Collection →",
-    target: "viva",
+    text: "#EC7A93",
     tag: "Fashion",
+    blurb: "Structured yet fluid wearable art for the modern woman.",
+    target: "viva",
+    Icon: Shirt,
+    x: 50,
+    y: 28,
+    side: "top",
   },
   {
     number: "04",
-    title: "VAM — Masterclass",
-    accent: "#888888",
-    description:
-      "Training young creatives to master digital design systems and fashion illustration — turning personal creative ideas into independent careers.",
-    cta: "Join the Waitlist →",
-    target: "vam",
+    title: "VAM",
+    accent: "#7C3AED",
+    text: "#A78BFA",
     tag: "Education",
+    blurb: "Masterclass turning creative ideas into independent careers.",
+    target: "vam",
+    Icon: GraduationCap,
+    x: 69,
+    y: 72,
+    side: "bottom",
   },
   {
     number: "05",
-    title: "VASH — Shop",
-    accent: "#D97706",
-    description:
-      "Wearable art, premium Procreate brushes, pose references, and customized design products. The commercial engine of the ecosystem.",
-    cta: "Shop Now →",
-    target: "shop",
+    title: "VASH",
+    accent: "#0B7B8C",
+    text: "#2DD4BF",
     tag: "Commerce",
+    blurb: "The shop — wearable art, brushes, references. The commercial engine.",
+    target: "shop",
+    Icon: ShoppingBag,
+    x: 88,
+    y: 28,
+    side: "top",
   },
 ];
 
+/* Smooth serpentine through the 5 anchors (viewBox 0 0 100 100, preserveAspectRatio none). */
+const FLOW_PATH =
+  "M12,28 C20,28 23,72 31,72 C39,72 42,28 50,28 C58,28 61,72 69,72 C77,72 80,28 88,28";
+
+type View = "flow" | "cards";
+
 const EcosystemSection = () => {
   const reduced = useReducedMotion();
-  const gridRef = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const footerRef = useRef<HTMLDivElement>(null);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const gridInView = useInView(gridRef, { once: true, amount: 0.1 });
-  const headerInView = useInView(headerRef, { once: true, amount: 0.3 });
-  const footerInView = useInView(footerRef, { once: true, amount: 0.5 });
-
   const d = (s: number) => (reduced ? 0 : s);
-
-  // Stagger animation variants
-  const containerVariants = {
-    initial: { opacity: 0 },
-    animate: {
-      opacity: 1,
-      transition: { staggerChildren: d(0.1), delayChildren: d(0.2) },
-    },
-  };
-
-  const itemVariants = {
-    initial: { opacity: 0, y: 30 },
-    animate: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: d(0.6), ease: "easeOut" },
-    },
-  };
+  const [view, setView] = useState<View>("flow");
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -101,327 +113,687 @@ const EcosystemSection = () => {
     window.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
   };
 
+  const headerVariants = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1, transition: { staggerChildren: d(0.1), delayChildren: d(0.1) } },
+  };
+  const fadeUp = {
+    initial: { opacity: 0, y: 24 },
+    animate: { opacity: 1, y: 0, transition: { duration: d(0.6), ease: "easeOut" } },
+  };
+
   return (
     <div
-      ref={sectionRef}
-      className="relative w-full min-h-screen overflow-hidden"
-      style={{ backgroundColor: "#0F172A" }}
+      className="relative w-full overflow-hidden"
+      style={{ backgroundColor: "#0F172A", paddingBottom: "clamp(60px, 8vw, 90px)" }}
       aria-label="The Viera Amber Ecosystem"
     >
-      {/* Subtle gradient background for depth */}
-      <motion.div
+      {/* Ambient brand wash */}
+      <div
         aria-hidden="true"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 0.06 }}
-        viewport={{ once: true, amount: 0.5 }}
-        transition={{ duration: d(0.8) }}
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: "linear-gradient(135deg, #D97706 0%, #78716C 50%, #0F172A 100%)",
-          opacity: 0.04,
+          background:
+            "radial-gradient(60% 50% at 50% 0%, rgba(217,119,6,0.07) 0%, transparent 70%), linear-gradient(135deg, rgba(98,1,127,0.05) 0%, rgba(15,23,42,1) 60%)",
         }}
       />
 
+      <style>{`
+        /* FLOW view: serpentine on desktop only (>=1100px); spine on tablet & mobile */
+        .eco-flow-desktop { display: none; }
+        .eco-flow-spine   { display: flex; }
+        /* CARDS view: connected rows on desktop only; responsive stack below */
+        .eco-cards-desktop { display: none; }
+        .eco-cards-stack   { display: grid; }
+        @media (min-width: 1100px) {
+          .eco-flow-desktop  { display: block; }
+          .eco-flow-spine    { display: none; }
+          .eco-cards-desktop { display: flex; }
+          .eco-cards-stack   { display: none; }
+        }
+        /* stack: 1-col on phones, 2-col on tablets */
+        .eco-cards-stack { grid-template-columns: 1fr; }
+        @media (min-width: 640px) {
+          .eco-cards-stack { grid-template-columns: 1fr 1fr; }
+        }
+      `}</style>
+
       <div
         className="relative mx-auto"
-        style={{
-          maxWidth: 1400,
-          padding: "clamp(60px, 8vw, 80px) clamp(24px, 4vw, 40px)",
-        }}
+        style={{ maxWidth: 1300, padding: "clamp(60px, 8vw, 90px) clamp(24px, 5vw, 64px) 0" }}
       >
-        {/* Header with parallax-like effect */}
+        {/* ── Header ─────────────────────────────────────────────────────── */}
         <motion.div
-          ref={headerRef}
           className="flex flex-col items-center text-center"
-          style={{ gap: 20 }}
+          style={{ gap: 18 }}
           initial="initial"
           whileInView="animate"
-          viewport={{ once: true, amount: 0.3 }}
-          variants={{
-            initial: { opacity: 0 },
-            animate: {
-              opacity: 1,
-              transition: { staggerChildren: d(0.1), delayChildren: d(0.1) },
-            },
-          }}
+          viewport={{ once: true, amount: 0.4 }}
+          variants={headerVariants}
         >
           <motion.p
-            variants={itemVariants}
-            className="font-body uppercase"
-            style={{ fontSize: 11, color: "#D97706", letterSpacing: "4px", margin: 0, fontWeight: 400 }}
+            variants={fadeUp}
+            className="font-body uppercase m-0"
+            style={{ fontSize: 11, color: "#D97706", letterSpacing: "0.4em", fontWeight: 500 }}
           >
             The Ecosystem
           </motion.p>
-
           <motion.h2
             variants={{
-              initial: { opacity: 0, y: 40 },
-              animate: {
-                opacity: 1,
-                y: 0,
-                transition: { duration: d(0.7), ease: "easeOut" },
-              },
+              initial: { opacity: 0, y: 36 },
+              animate: { opacity: 1, y: 0, transition: { duration: d(0.7), ease: "easeOut" } },
             }}
-            className="font-display"
+            className="font-display m-0"
             style={{
               fontSize: "clamp(28px, 4vw, 52px)",
               color: "#FAFAFA",
               fontWeight: 700,
               lineHeight: 1.15,
-              margin: 0,
               maxWidth: 800,
             }}
           >
             One brand. Five expressions.
           </motion.h2>
-
           <motion.p
-            variants={itemVariants}
-            className="font-body"
-            style={{
-              fontSize: 16,
-              color: "#C0B5A0",
-              fontWeight: 300,
-              maxWidth: 560,
-              lineHeight: 1.7,
-              margin: 0,
-            }}
+            variants={fadeUp}
+            className="font-body m-0"
+            style={{ fontSize: 16, color: "#C0B5A0", fontWeight: 300, maxWidth: 600, lineHeight: 1.7 }}
           >
-            Art. Impact. Fashion. Education. Commerce. All rooted in the same conviction: creativity is the most powerful form of empowerment.
+            Art. Impact. Fashion. Education. Commerce. One flowing current, all rooted in the
+            same conviction: creativity is the most powerful form of empowerment.
           </motion.p>
+
+          {/* ── Comparison toggle (temporary A/B control) ────────────────── */}
+          <ViewToggle view={view} onChange={setView} />
         </motion.div>
 
-        {/* Cards grid — top row */}
-        <motion.div
-          ref={gridRef}
-          initial="initial"
-          whileInView="animate"
-          viewport={{ once: true, amount: 0.1 }}
-          variants={containerVariants}
-          className="mt-16 grid gap-6"
-          style={{
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          }}
-        >
-          {ARMS.slice(0, 3).map((arm) => (
-            <ArmCard key={arm.number} arm={arm} reduced={!!reduced} onScroll={scrollTo} />
-          ))}
-        </motion.div>
+        {/* ── Views ──────────────────────────────────────────────────────── */}
+        <AnimatePresence mode="wait">
+          {view === "flow" ? (
+            <motion.div
+              key="flow"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: d(0.35), ease: "easeOut" }}
+            >
+              <FlowView reduced={!!reduced} d={d} onActivate={scrollTo} />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="cards"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: d(0.35), ease: "easeOut" }}
+            >
+              <CardsView reduced={!!reduced} d={d} onActivate={scrollTo} />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Cards grid — bottom row */}
+        {/* ── Footer scroll cue ──────────────────────────────────────────── */}
         <motion.div
-          initial="initial"
-          whileInView="animate"
-          viewport={{ once: true, amount: 0.1 }}
-          variants={{
-            initial: { opacity: 0 },
-            animate: {
-              opacity: 1,
-              transition: { staggerChildren: d(0.1), delayChildren: d(0.3) },
-            },
-          }}
-          className="mt-6 grid gap-6 mx-auto"
-          style={{
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            maxWidth: 820,
-          }}
-        >
-          {ARMS.slice(3).map((arm) => (
-            <ArmCard key={arm.number} arm={arm} reduced={!!reduced} onScroll={scrollTo} />
-          ))}
-        </motion.div>
-
-        {/* Bottom element — scroll indicator */}
-        <motion.div
-          ref={footerRef}
           className="flex flex-col items-center"
-          style={{ marginTop: 48, gap: 16 }}
-          initial="initial"
-          whileInView="animate"
-          viewport={{ once: true, amount: 0.5 }}
-          variants={{
-            initial: { opacity: 0, y: 20 },
-            animate: {
-              opacity: 1,
-              y: 0,
-              transition: { duration: d(0.6), delay: d(0.4), ease: "easeOut" },
-            },
-          }}
+          style={{ marginTop: 48, gap: 14 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.6 }}
+          transition={{ duration: d(0.6), delay: d(0.2), ease: "easeOut" }}
         >
           <motion.div
-            animate={
-              reduced
-                ? { height: 48 }
-                : { height: [48, 64, 48] }
-            }
-            transition={
-              reduced
-                ? { duration: 0 }
-                : {
-                    duration: 2.2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }
-            }
+            animate={reduced ? { height: 44 } : { height: [44, 60, 44] }}
+            transition={reduced ? { duration: 0 } : { duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
             style={{ width: 1, backgroundColor: "#D97706" }}
             aria-hidden="true"
           />
-          <motion.p
-            animate={
-              reduced
-                ? { opacity: 0.6 }
-                : { opacity: [0.6, 1, 0.6] }
-            }
-            transition={
-              reduced
-                ? { duration: 0 }
-                : {
-                    duration: 2.2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }
-            }
-            className="font-body uppercase"
-            style={{ fontSize: 12, color: "#D97706", letterSpacing: "2px", margin: 0, fontWeight: 400 }}
+          <p
+            className="font-body uppercase m-0"
+            style={{ fontSize: 12, color: "#D97706", letterSpacing: "0.18em", fontWeight: 400 }}
           >
             ↓ Scroll to explore each world
-          </motion.p>
+          </p>
         </motion.div>
       </div>
     </div>
   );
 };
 
-const ArmCard = ({
+/* ════════════════════════════════════════════════════════════════════════
+   View toggle — segmented control to A/B the two layouts
+   ════════════════════════════════════════════════════════════════════════ */
+const ViewToggle = ({ view, onChange }: { view: View; onChange: (v: View) => void }) => {
+  const opts: { id: View; label: string }[] = [
+    { id: "flow", label: "Serpentine Flow" },
+    { id: "cards", label: "Connected Cards" },
+  ];
+  return (
+    <div
+      role="tablist"
+      aria-label="Ecosystem layout"
+      className="relative flex"
+      style={{
+        marginTop: 10,
+        padding: 4,
+        gap: 4,
+        borderRadius: 999,
+        background: "rgba(20,20,28,0.6)",
+        border: "1px solid rgba(217,119,6,0.25)",
+      }}
+    >
+      {opts.map((o) => {
+        const active = view === o.id;
+        return (
+          <button
+            key={o.id}
+            role="tab"
+            aria-selected={active}
+            onClick={() => onChange(o.id)}
+            className="relative font-body uppercase cursor-pointer"
+            style={{
+              border: 0,
+              background: "transparent",
+              color: active ? "#0A0A0A" : "#C0B5A0",
+              fontSize: 11,
+              letterSpacing: "0.12em",
+              fontWeight: 600,
+              padding: "9px 18px",
+              borderRadius: 999,
+              minHeight: 40,
+              zIndex: 1,
+              transition: "color 0.25s ease",
+            }}
+          >
+            {active && (
+              <motion.span
+                layoutId="ecoTogglePill"
+                className="absolute inset-0"
+                style={{ background: "#D97706", borderRadius: 999, zIndex: -1 }}
+                transition={{ type: "spring", stiffness: 380, damping: 30 }}
+              />
+            )}
+            {o.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
+/* ════════════════════════════════════════════════════════════════════════
+   FLOW VIEW — serpentine (desktop) + vertical spine (tablet/mobile)
+   ════════════════════════════════════════════════════════════════════════ */
+const FlowView = ({
+  reduced,
+  d,
+  onActivate,
+}: {
+  reduced: boolean;
+  d: (s: number) => number;
+  onActivate: (id: string) => void;
+}) => {
+  return (
+    <>
+      {/* Desktop serpentine */}
+      <motion.div
+        className="eco-flow-desktop relative"
+        style={{ marginTop: 60, height: "clamp(500px, 40vw, 560px)" }}
+        initial="initial"
+        whileInView="animate"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={{ initial: {}, animate: { transition: { staggerChildren: d(0.18), delayChildren: d(0.2) } } }}
+        aria-hidden="true"
+      >
+        <svg
+          className="absolute inset-0"
+          width="100%"
+          height="100%"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          style={{ overflow: "visible" }}
+        >
+          <defs>
+            <linearGradient id="ecoFlowGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#D97706" />
+              <stop offset="27%" stopColor="#62017F" />
+              <stop offset="52%" stopColor="#6E0025" />
+              <stop offset="75%" stopColor="#7C3AED" />
+              <stop offset="100%" stopColor="#0B7B8C" />
+            </linearGradient>
+          </defs>
+          <path
+            d={FLOW_PATH}
+            fill="none"
+            stroke="url(#ecoFlowGrad)"
+            strokeWidth={2}
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+            opacity={0.25}
+          />
+          <motion.path
+            d={FLOW_PATH}
+            fill="none"
+            stroke="url(#ecoFlowGrad)"
+            strokeWidth={3}
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+            style={{ filter: "drop-shadow(0 0 6px rgba(217,119,6,0.35))" }}
+            initial={{ pathLength: reduced ? 1 : 0 }}
+            whileInView={{ pathLength: 1 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: d(1.8), ease: "easeInOut" }}
+          />
+        </svg>
+
+        {ARMS.map((arm) => (
+          <FlowNode key={arm.number} arm={arm} reduced={reduced} onActivate={onActivate} />
+        ))}
+      </motion.div>
+
+      {/* Tablet/mobile vertical spine */}
+      <motion.ol
+        className="eco-flow-spine flex-col m-0 p-0 list-none relative mx-auto"
+        style={{ marginTop: 44, maxWidth: 560 }}
+        initial="initial"
+        whileInView="animate"
+        viewport={{ once: true, amount: 0.1 }}
+        variants={{ initial: {}, animate: { transition: { staggerChildren: d(0.12), delayChildren: d(0.1) } } }}
+      >
+        <div
+          aria-hidden="true"
+          className="absolute"
+          style={{
+            left: 19,
+            top: 12,
+            bottom: 12,
+            width: 2,
+            background:
+              "linear-gradient(to bottom, #D97706 0%, #62017F 27%, #6E0025 52%, #7C3AED 75%, #0B7B8C 100%)",
+            opacity: 0.5,
+          }}
+        />
+        {ARMS.map((arm) => (
+          <SpineNode key={arm.number} arm={arm} reduced={reduced} onActivate={onActivate} />
+        ))}
+      </motion.ol>
+    </>
+  );
+};
+
+/* Desktop serpentine node: glowing dot ON the curve + larger fanned label */
+const FlowNode = ({
   arm,
   reduced,
-  onScroll,
+  onActivate,
 }: {
   arm: Arm;
   reduced: boolean;
-  onScroll: (id: string) => void;
+  onActivate: (id: string) => void;
 }) => {
+  const labelAbove = arm.side === "top";
+  const GAP = 18;
+  const { Icon } = arm;
+
   return (
-    <motion.article
+    <motion.button
+      type="button"
+      onClick={() => onActivate(arm.target)}
+      aria-label={`${arm.title} — ${arm.tag}. Jump to section.`}
+      className="absolute bg-transparent border-0 p-0 cursor-pointer"
+      style={{ left: `${arm.x}%`, top: `${arm.y}%`, width: 0, height: 0, overflow: "visible" }}
       variants={{
-        initial: { opacity: 0, y: 30 },
-        animate: { opacity: 1, y: 0, transition: { duration: reduced ? 0 : 0.6, ease: "easeOut" } },
+        initial: { opacity: 0, scale: 0.6 },
+        animate: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 260, damping: 18 } },
       }}
-      whileHover={
-        reduced
-          ? undefined
-          : {
-              scale: 1.03,
-              y: -4,
-              transition: { type: "spring", stiffness: 350, damping: 25, duration: 0.3 },
-            }
-      }
-      whileTap={reduced ? undefined : { scale: 0.98 }}
-      className="group relative flex flex-col cursor-pointer"
-      style={{
-        background: "rgba(26, 26, 26, 0.6)",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        border: `1px solid rgba(217, 119, 6, 0.15)`,
-        borderRadius: 12,
-        padding: "32px 28px",
-        maxWidth: 380,
-        width: "100%",
-        justifySelf: "center",
-        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
-        transition: "all 0.3s ease",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = `rgba(217, 119, 6, 0.4)`;
-        e.currentTarget.style.background = "rgba(26, 26, 26, 0.75)";
-        e.currentTarget.style.boxShadow = "0 12px 40px rgba(217, 119, 6, 0.15)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = "rgba(217, 119, 6, 0.15)";
-        e.currentTarget.style.background = "rgba(26, 26, 26, 0.6)";
-        e.currentTarget.style.boxShadow = "0 8px 32px rgba(0, 0, 0, 0.2)";
-      }}
+      whileHover={reduced ? undefined : "hover"}
+      whileTap={reduced ? undefined : { scale: 0.96 }}
     >
-      {/* Tag */}
-      <span
-        className="font-body uppercase absolute"
+      {/* Glowing node dot — center sits exactly on the anchor (x,y) */}
+      <motion.span
+        aria-hidden="true"
+        variants={{ hover: reduced ? {} : { scale: 1.3 } }}
+        transition={{ type: "spring", stiffness: 300, damping: 18 }}
         style={{
-          top: 16,
-          right: 16,
-          fontSize: 9,
-          letterSpacing: "2px",
-          color: arm.accent,
-          border: `1px solid ${arm.accent}`,
+          position: "absolute",
+          left: 0,
+          top: 0,
+          transform: "translate(-50%, -50%)",
+          width: 22,
+          height: 22,
           borderRadius: 999,
-          padding: "3px 10px",
-          fontWeight: 400,
+          background: arm.accent,
+          border: "2px solid rgba(255,255,255,0.9)",
+          boxShadow: `0 0 16px ${arm.accent}, 0 0 34px ${arm.accent}88`,
+        }}
+      />
+
+      {/* Label card — larger, fanned above/below the dot */}
+      <motion.div
+        variants={{ hover: reduced ? {} : { y: labelAbove ? -4 : 4 } }}
+        style={{
+          position: "absolute",
+          left: 0,
+          width: 248,
+          transform: "translateX(-50%)",
+          ...(labelAbove ? { bottom: GAP + 11 } : { top: GAP + 11 }),
+          background: "rgba(18, 18, 26, 0.78)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          border: `1px solid ${arm.text}55`,
+          borderRadius: 14,
+          padding: "18px 20px",
+          boxShadow: "0 12px 36px rgba(0,0,0,0.4)",
+          textAlign: "center",
         }}
       >
-        {arm.tag}
-      </span>
+        <div className="flex items-center justify-center" style={{ gap: 10, marginBottom: 10 }}>
+          <span
+            aria-hidden="true"
+            className="flex items-center justify-center"
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 999,
+              background: `${arm.accent}22`,
+              border: `1px solid ${arm.text}66`,
+            }}
+          >
+            <Icon size={18} color={arm.text} strokeWidth={1.75} />
+          </span>
+          <span
+            className="font-body uppercase"
+            style={{
+              fontSize: 9,
+              color: arm.text,
+              letterSpacing: "0.14em",
+              border: `1px solid ${arm.text}`,
+              borderRadius: 999,
+              padding: "2px 9px",
+              fontWeight: 600,
+            }}
+          >
+            {arm.tag}
+          </span>
+        </div>
+        <div className="flex items-baseline justify-center" style={{ gap: 7, marginBottom: 7 }}>
+          <span className="font-body" style={{ fontSize: 11, color: arm.text, fontWeight: 700, letterSpacing: "1px" }}>
+            {arm.number}
+          </span>
+          <h3 className="font-display m-0" style={{ fontSize: 17, color: "#FAFAFA", fontWeight: 700, lineHeight: 1.25 }}>
+            {arm.title}
+          </h3>
+        </div>
+        <p className="font-body m-0" style={{ fontSize: 12.5, color: "#A6ADBB", fontWeight: 300, lineHeight: 1.5 }}>
+          {arm.blurb}
+        </p>
+      </motion.div>
+    </motion.button>
+  );
+};
 
-      {/* Number */}
+/* Tablet/mobile spine node: dot on the spine + card to the right */
+const SpineNode = ({
+  arm,
+  reduced,
+  onActivate,
+}: {
+  arm: Arm;
+  reduced: boolean;
+  onActivate: (id: string) => void;
+}) => {
+  const { Icon } = arm;
+  return (
+    <motion.li
+      variants={{
+        initial: { opacity: 0, x: -16 },
+        animate: { opacity: 1, x: 0, transition: { duration: reduced ? 0 : 0.5, ease: "easeOut" } },
+      }}
+      style={{ position: "relative", paddingLeft: 52, paddingBottom: 24 }}
+    >
       <span
         aria-hidden="true"
-        className="font-body block"
         style={{
-          fontSize: 12,
-          color: arm.accent,
-          letterSpacing: "3px",
-          fontWeight: 700,
-          marginBottom: 16,
+          position: "absolute",
+          left: 11,
+          top: 18,
+          width: 18,
+          height: 18,
+          borderRadius: 999,
+          background: arm.accent,
+          border: "2px solid rgba(255,255,255,0.85)",
+          boxShadow: `0 0 12px ${arm.accent}, 0 0 24px ${arm.accent}77`,
         }}
-      >
-        {arm.number}
-      </span>
-
-      {/* Title */}
-      <h3
-        className="font-display"
-        style={{
-          fontSize: 18,
-          color: "#FAFAFA",
-          fontWeight: 700,
-          margin: 0,
-          marginBottom: 12,
-          lineHeight: 1.3,
-        }}
-      >
-        {arm.title}
-      </h3>
-
-      {/* Description */}
-      <p
-        className="font-body"
-        style={{
-          fontSize: 14,
-          color: "#888888",
-          fontWeight: 300,
-          lineHeight: 1.6,
-          margin: 0,
-          marginBottom: 24,
-          flex: 1,
-        }}
-      >
-        {arm.description}
-      </p>
-
-      {/* CTA */}
+      />
       <button
         type="button"
-        onClick={() => onScroll(arm.target)}
-        className="font-body text-left self-start cursor-pointer bg-transparent border-0 p-0 hover:underline"
+        onClick={() => onActivate(arm.target)}
+        aria-label={`${arm.title} — ${arm.tag}. Jump to section.`}
+        className="text-left w-full bg-transparent border-0 cursor-pointer"
         style={{
-          fontSize: 12,
-          color: arm.accent,
-          letterSpacing: "1px",
-          fontWeight: 400,
-          transition: "opacity 0.2s ease",
+          background: "rgba(20, 20, 28, 0.6)",
+          border: `1px solid ${arm.text}40`,
+          borderRadius: 12,
+          padding: "16px 18px",
+          minHeight: 44,
         }}
       >
-        {arm.cta}
+        <div className="flex items-center" style={{ gap: 10, marginBottom: 7 }}>
+          <span
+            aria-hidden="true"
+            className="flex items-center justify-center"
+            style={{ width: 30, height: 30, borderRadius: 999, background: `${arm.accent}22`, border: `1px solid ${arm.text}55` }}
+          >
+            <Icon size={16} color={arm.text} strokeWidth={1.75} />
+          </span>
+          <span className="font-body" style={{ fontSize: 11, color: arm.text, fontWeight: 700, letterSpacing: "1px" }}>
+            {arm.number}
+          </span>
+          <h3 className="font-display m-0" style={{ fontSize: 16, color: "#FAFAFA", fontWeight: 700, lineHeight: 1.2 }}>
+            {arm.title}
+          </h3>
+          <span
+            className="font-body uppercase"
+            style={{
+              marginLeft: "auto",
+              fontSize: 8,
+              color: arm.text,
+              letterSpacing: "0.14em",
+              border: `1px solid ${arm.text}`,
+              borderRadius: 999,
+              padding: "2px 8px",
+              fontWeight: 600,
+            }}
+          >
+            {arm.tag}
+          </span>
+        </div>
+        <p className="font-body m-0" style={{ fontSize: 13, color: "#A6ADBB", fontWeight: 300, lineHeight: 1.55 }}>
+          {arm.blurb}
+        </p>
       </button>
-    </motion.article>
+    </motion.li>
+  );
+};
+
+/* ════════════════════════════════════════════════════════════════════════
+   CARDS VIEW (Option 3) — connected cards with flow connectors
+   ════════════════════════════════════════════════════════════════════════ */
+const CardsView = ({
+  reduced,
+  d,
+  onActivate,
+}: {
+  reduced: boolean;
+  d: (s: number) => number;
+  onActivate: (id: string) => void;
+}) => {
+  const stagger = {
+    initial: {},
+    animate: { transition: { staggerChildren: d(0.1), delayChildren: d(0.15) } },
+  };
+
+  return (
+    <div style={{ marginTop: 56 }}>
+      {/* Desktop: 3 + 2 connected rows */}
+      <motion.div
+        className="eco-cards-desktop flex-col items-center"
+        style={{ gap: 0 }}
+        initial="initial"
+        whileInView="animate"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={stagger}
+      >
+        <div className="flex items-stretch justify-center" style={{ gap: 0 }}>
+          <EcoCard arm={ARMS[0]} reduced={reduced} onActivate={onActivate} />
+          <Connector reduced={reduced} />
+          <EcoCard arm={ARMS[1]} reduced={reduced} onActivate={onActivate} />
+          <Connector reduced={reduced} />
+          <EcoCard arm={ARMS[2]} reduced={reduced} onActivate={onActivate} />
+        </div>
+
+        <DownConnector reduced={reduced} />
+
+        <div className="flex items-stretch justify-center" style={{ gap: 0 }}>
+          <EcoCard arm={ARMS[3]} reduced={reduced} onActivate={onActivate} />
+          <Connector reduced={reduced} />
+          <EcoCard arm={ARMS[4]} reduced={reduced} onActivate={onActivate} />
+        </div>
+      </motion.div>
+
+      {/* Tablet/mobile: responsive grid */}
+      <motion.div
+        className="eco-cards-stack"
+        style={{ gap: 16 }}
+        initial="initial"
+        whileInView="animate"
+        viewport={{ once: true, amount: 0.1 }}
+        variants={stagger}
+      >
+        {ARMS.map((arm) => (
+          <EcoCard key={arm.number} arm={arm} reduced={reduced} onActivate={onActivate} stack />
+        ))}
+      </motion.div>
+    </div>
+  );
+};
+
+const Connector = ({ reduced }: { reduced: boolean }) => (
+  <motion.div
+    aria-hidden="true"
+    className="flex items-center justify-center self-center"
+    style={{ width: 40, flexShrink: 0 }}
+    variants={{
+      initial: { opacity: 0, scale: 0.5 },
+      animate: { opacity: 1, scale: 1, transition: { duration: reduced ? 0 : 0.4 } },
+    }}
+  >
+    <ArrowRight size={20} color="#D97706" strokeWidth={2} />
+  </motion.div>
+);
+
+const DownConnector = ({ reduced }: { reduced: boolean }) => (
+  <motion.div
+    aria-hidden="true"
+    className="flex items-center justify-center"
+    style={{ height: 36 }}
+    variants={{
+      initial: { opacity: 0, y: -6 },
+      animate: { opacity: 1, y: 0, transition: { duration: reduced ? 0 : 0.4 } },
+    }}
+  >
+    <ChevronDown size={22} color="#D97706" strokeWidth={2} />
+  </motion.div>
+);
+
+const EcoCard = ({
+  arm,
+  reduced,
+  onActivate,
+  stack = false,
+}: {
+  arm: Arm;
+  reduced: boolean;
+  onActivate: (id: string) => void;
+  stack?: boolean;
+}) => {
+  const { Icon } = arm;
+  return (
+    <motion.button
+      type="button"
+      onClick={() => onActivate(arm.target)}
+      aria-label={`${arm.title} — ${arm.tag}. Jump to section.`}
+      className="group text-left cursor-pointer flex flex-col"
+      style={{
+        width: stack ? "100%" : 268,
+        background: "rgba(18, 18, 26, 0.72)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        border: `1px solid ${arm.text}33`,
+        borderTop: `3px solid ${arm.accent}`,
+        borderRadius: 14,
+        padding: "24px 22px",
+        boxShadow: "0 12px 36px rgba(0,0,0,0.32)",
+      }}
+      variants={{
+        initial: { opacity: 0, y: 26 },
+        animate: { opacity: 1, y: 0, transition: { duration: reduced ? 0 : 0.55, ease: "easeOut" } },
+      }}
+      whileHover={reduced ? undefined : { y: -6, scale: 1.02, transition: { type: "spring", stiffness: 350, damping: 25 } }}
+      whileTap={reduced ? undefined : { scale: 0.98 }}
+    >
+      <div className="flex items-center" style={{ gap: 12, marginBottom: 16 }}>
+        <span
+          aria-hidden="true"
+          className="flex items-center justify-center"
+          style={{ width: 46, height: 46, borderRadius: 12, background: `${arm.accent}22`, border: `1px solid ${arm.text}55` }}
+        >
+          <Icon size={22} color={arm.text} strokeWidth={1.75} />
+        </span>
+        <span
+          className="font-body uppercase"
+          style={{
+            marginLeft: "auto",
+            fontSize: 9,
+            color: arm.text,
+            letterSpacing: "0.14em",
+            border: `1px solid ${arm.text}`,
+            borderRadius: 999,
+            padding: "3px 10px",
+            fontWeight: 600,
+          }}
+        >
+          {arm.tag}
+        </span>
+      </div>
+
+      <div className="flex items-baseline" style={{ gap: 8, marginBottom: 10 }}>
+        <span className="font-body" style={{ fontSize: 12, color: arm.text, fontWeight: 700, letterSpacing: "1px" }}>
+          {arm.number}
+        </span>
+        <h3 className="font-display m-0" style={{ fontSize: 19, color: "#FAFAFA", fontWeight: 700, lineHeight: 1.25 }}>
+          {arm.title}
+        </h3>
+      </div>
+
+      <p
+        className="font-body m-0"
+        style={{ fontSize: 13.5, color: "#A6ADBB", fontWeight: 300, lineHeight: 1.6, flex: 1, marginBottom: 18 }}
+      >
+        {arm.blurb}
+      </p>
+
+      <span
+        className="font-body inline-flex items-center"
+        style={{ gap: 6, fontSize: 12, color: arm.text, fontWeight: 600, letterSpacing: "0.04em" }}
+      >
+        Explore
+        <ArrowRight
+          size={14}
+          strokeWidth={2}
+          className="transition-transform group-hover:translate-x-1"
+        />
+      </span>
+    </motion.button>
   );
 };
 
