@@ -35,6 +35,10 @@ import {
   MapPin,
   Mail,
   Instagram,
+  Coins,
+  Smartphone,
+  GraduationCap,
+  TrendingUp,
 } from "lucide-react";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
@@ -233,6 +237,7 @@ const VAGINPage = () => {
   const impactRef = useRef<HTMLDivElement>(null);
   const programsRef = useRef<HTMLDivElement>(null);
   const curriculumRef = useRef<HTMLDivElement>(null);
+  const padKoloRef = useRef<HTMLElement>(null);
   const involveRef = useRef<HTMLDivElement>(null);
 
   const heroInView = useInView(heroRef, { once: true, amount: 0.3 });
@@ -240,6 +245,7 @@ const VAGINPage = () => {
   const impactInView = useInView(impactRef, inViewProps);
   const programsInView = useInView(programsRef, inViewProps);
   const curriculumInView = useInView(curriculumRef, inViewProps);
+  const padKoloInView = useInView(padKoloRef, { once: true, amount: 0.12 });
   const involveInView = useInView(involveRef, inViewProps);
 
   const fadeV = useReducedVariants(fadeIn);
@@ -916,6 +922,174 @@ const VAGINPage = () => {
                 </motion.div>
               ))}
             </motion.div>
+          </div>
+        </section>
+
+        {/* ── PAD KOLO PROJECT ───────────────────────────────────────────────── */}
+        <section
+          ref={padKoloRef}
+          className="w-full py-24 relative overflow-hidden"
+          style={{
+            background: "linear-gradient(160deg, #200008 0%, #0F0018 40%, #1A0010 70%, #0A0A0A 100%)",
+            borderTop: "1px solid rgba(237,21,93,0.18)",
+          }}
+          aria-label="PAD KOLO Project"
+        >
+          <div aria-hidden="true" className="absolute" style={{ left: -180, top: -120, width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle, rgba(237,21,93,0.12) 0%, transparent 65%)", filter: "blur(2px)", pointerEvents: "none" }} />
+          <div aria-hidden="true" className="absolute" style={{ right: -100, bottom: -80, width: 380, height: 380, borderRadius: "50%", background: "radial-gradient(circle, rgba(217,119,6,0.1) 0%, transparent 65%)", filter: "blur(2px)", pointerEvents: "none" }} />
+
+          <div className="relative mx-auto px-6" style={{ maxWidth: 1100, zIndex: 1 }}>
+
+            {/* Header */}
+            <motion.div
+              variants={fadeV}
+              initial="hidden"
+              animate={padKoloInView ? "visible" : "hidden"}
+              className="text-center mb-16"
+            >
+              <div className="inline-flex items-center justify-center mb-5" style={{ gap: 8, background: "rgba(237,21,93,0.12)", border: "1px solid rgba(237,21,93,0.35)", borderRadius: 999, padding: "7px 18px" }}>
+                <Droplets size={13} color={PINK} strokeWidth={2.2} />
+                <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: PINK, letterSpacing: "0.35em", textTransform: "uppercase", fontWeight: 600 }}>PAD KOLO Project</span>
+              </div>
+              <h2 className="font-display m-0" style={{ fontSize: "clamp(28px, 4.5vw, 56px)", fontWeight: 700, color: "#FAFAFA", lineHeight: 1.08, maxWidth: 740, margin: "0 auto 20px" }}>
+                No girl should miss school<br />because of her period.
+              </h2>
+              <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 16, color: "rgba(250,250,250,0.6)", maxWidth: 620, margin: "0 auto", lineHeight: 1.8 }}>
+                Period poverty is one of the leading causes of school absenteeism for adolescent girls across Nigeria and Malawi. PAD KOLO is VAGIN's answer — a community-powered model that pairs menstrual health access with financial inclusion.
+              </p>
+            </motion.div>
+
+            {/* KOLO Explainer */}
+            <motion.div
+              initial={{ opacity: 0, y: 28 }}
+              animate={padKoloInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
+              transition={reduced ? { duration: 0 } : { duration: 0.65, ease: "easeOut", delay: 0.12 }}
+              className="mb-14 relative overflow-hidden"
+              style={{ background: "rgba(217,119,6,0.07)", border: "1px solid rgba(217,119,6,0.28)", borderRadius: 20, padding: "clamp(24px, 4vw, 40px)" }}
+            >
+              <div aria-hidden="true" className="absolute" style={{ right: -40, top: -40, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, rgba(217,119,6,0.18) 0%, transparent 70%)", pointerEvents: "none" }} />
+              <div className="flex flex-col lg:flex-row gap-7 items-start relative" style={{ zIndex: 1 }}>
+                <span className="flex-shrink-0 flex items-center justify-center" style={{ width: 68, height: 68, borderRadius: 18, background: "rgba(217,119,6,0.16)", border: "1px solid rgba(217,119,6,0.45)" }}>
+                  <Coins size={32} color="#D97706" strokeWidth={1.5} />
+                </span>
+                <div>
+                  <h3 className="font-display m-0" style={{ fontSize: "clamp(18px, 2.5vw, 24px)", fontWeight: 700, color: "#FAFAFA", marginBottom: 12 }}>
+                    What does <span style={{ color: "#D97706" }}>"KOLO"</span> mean?
+                  </h3>
+                  <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 15, color: "rgba(250,250,250,0.72)", lineHeight: 1.85, margin: 0 }}>
+                    <span style={{ color: "#D97706", fontWeight: 600 }}>KOLO</span> is Yoruba for a <span style={{ color: "#D97706", fontWeight: 600 }}>savings pot</span> — a piggy bank. The PAD KOLO model turns menstrual health support into a community savings act: girls and their families contribute micro-amounts (as little as <span style={{ color: "#FAFAFA", fontWeight: 500 }}>₦50–₦200/month</span>). VAGIN matches those contributions with a sustainable supply of sanitary pads. Girls become <span style={{ color: "#FAFAFA", fontWeight: 500 }}>co-investors in their own health</span> — not passive recipients of charity. This ownership changes how girls relate to their own bodies and futures.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* How It Works — 3 Steps */}
+            <motion.div
+              variants={staggerV}
+              initial="hidden"
+              animate={padKoloInView ? "visible" : "hidden"}
+              className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-14"
+            >
+              {[
+                { step: "01", Icon: Coins, title: "KOLO Savings Pool", body: "Girls and their communities contribute small amounts each month. No amount is too small — the act of saving builds ownership, dignity, and collective responsibility.", accent: "#D97706" },
+                { step: "02", Icon: Smartphone, title: "WhatsApp Distribution", body: "Schools register on the VAGIN WhatsApp channel. Pad requests are placed, confirmed, and tracked digitally — ensuring accountability from order to delivery at the school gate.", accent: PINK },
+                { step: "03", Icon: GraduationCap, title: "Pads + Education", body: "Every pad distribution is paired with a VaginART session. Girls receive menstrual products and SRHR knowledge together — staying in school, informed, and in control.", accent: PURPLE_LIGHT },
+              ].map((s) => (
+                <motion.div
+                  key={s.step}
+                  variants={cardV}
+                  whileHover={reduced ? {} : { y: -5 }}
+                  transition={{ type: "spring", stiffness: 360, damping: 26 }}
+                  className="relative flex flex-col"
+                  style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${s.accent}30`, borderTop: `3px solid ${s.accent}`, borderRadius: 18, padding: "32px 26px", gap: 20 }}
+                >
+                  <span className="font-display" aria-hidden="true" style={{ fontSize: 56, fontWeight: 800, color: `${s.accent}18`, lineHeight: 1, position: "absolute", top: 14, right: 18, userSelect: "none", pointerEvents: "none" }}>{s.step}</span>
+                  <span className="flex items-center justify-center flex-shrink-0" style={{ width: 52, height: 52, borderRadius: 14, background: `${s.accent}18`, border: `1px solid ${s.accent}44` }}>
+                    <s.Icon size={24} color={s.accent} strokeWidth={1.75} />
+                  </span>
+                  <div>
+                    <h3 className="font-display m-0" style={{ fontSize: 19, fontWeight: 700, color: "#FAFAFA", marginBottom: 10 }}>{s.title}</h3>
+                    <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 13.5, color: "rgba(250,250,250,0.62)", lineHeight: 1.75, margin: 0 }}>{s.body}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Impact Numbers */}
+            <motion.div
+              variants={fadeV}
+              initial="hidden"
+              animate={padKoloInView ? "visible" : "hidden"}
+              transition={{ delay: reduced ? 0 : 0.38 }}
+              className="mb-12 rounded-2xl"
+              style={{ background: "rgba(237,21,93,0.07)", border: "1px solid rgba(237,21,93,0.22)", padding: "clamp(24px, 4vw, 40px)" }}
+            >
+              <div className="flex items-center mb-6" style={{ gap: 10 }}>
+                <TrendingUp size={15} color={PINK} strokeWidth={2} />
+                <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: PINK, letterSpacing: "0.28em", textTransform: "uppercase", fontWeight: 600, margin: 0 }}>PAD KOLO Impact So Far</p>
+              </div>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+                {[
+                  { val: "1,500+", label: "Girls Supported" },
+                  { val: "2", label: "Countries" },
+                  { val: "₦50", label: "Min. Monthly Savings" },
+                  { val: "2022", label: "Year Launched" },
+                ].map(({ val, label }) => (
+                  <div key={label} className="flex flex-col items-center" style={{ gap: 6 }}>
+                    <p className="font-display m-0" style={{ fontSize: "clamp(26px, 3.5vw, 40px)", fontWeight: 700, color: PINK, lineHeight: 1 }}>{val}</p>
+                    <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: "rgba(250,250,250,0.5)", textTransform: "uppercase", letterSpacing: "0.14em", margin: 0 }}>{label}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Photo + Quote */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={padKoloInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+              transition={reduced ? { duration: 0 } : { duration: 0.7, ease: "easeOut", delay: 0.45 }}
+              className="mb-12 relative overflow-hidden rounded-2xl"
+              style={{ minHeight: 260, border: "1px solid rgba(237,21,93,0.2)" }}
+            >
+              <img src="/vagin-images/vagin_malawi_02.webp" alt="PAD KOLO distribution in Malawi" className="w-full h-full object-cover" style={{ minHeight: 260, objectPosition: "center 40%" }} />
+              <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(13,0,21,0.92) 0%, rgba(13,0,21,0.7) 45%, rgba(13,0,21,0.2) 100%)" }} />
+              <div className="absolute inset-0 flex flex-col justify-center px-10 py-8" style={{ maxWidth: 540 }}>
+                <Droplets size={28} color={PINK} strokeWidth={1.5} style={{ marginBottom: 16 }} />
+                <p className="font-display m-0" style={{ fontSize: "clamp(17px, 2.6vw, 26px)", fontWeight: 700, color: "#FAFAFA", lineHeight: 1.35, marginBottom: 14 }}>
+                  "A pad is not just a pad —<br />it's a day of school, a chance at a future."
+                </p>
+                <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "rgba(250,250,250,0.55)", margin: 0, letterSpacing: "0.08em" }}>
+                  VAGIN Field Team — Malawi
+                </p>
+              </div>
+            </motion.div>
+
+            {/* CTAs */}
+            <motion.div
+              variants={fadeV}
+              initial="hidden"
+              animate={padKoloInView ? "visible" : "hidden"}
+              transition={{ delay: reduced ? 0 : 0.52 }}
+              className="flex flex-wrap justify-center"
+              style={{ gap: 14 }}
+            >
+              <button
+                type="button"
+                onClick={() => { const el = document.getElementById("get-involved"); if (el) el.scrollIntoView({ behavior: reduced ? "auto" : "smooth" }); }}
+                className="inline-flex items-center"
+                style={{ gap: 10, fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, letterSpacing: "1px", textTransform: "uppercase", fontWeight: 600, background: `linear-gradient(135deg, ${PINK} 0%, #9B0040 100%)`, color: "#FAFAFA", border: "none", borderRadius: 999, padding: "14px 34px", cursor: "pointer", minHeight: 44, boxShadow: "0 8px 28px rgba(237,21,93,0.35)" }}
+              >
+                <Droplets size={14} strokeWidth={2.2} /> Fund Pads for Girls
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate("/vagin-dashboard")}
+                style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, letterSpacing: "1px", textTransform: "uppercase", fontWeight: 500, background: "transparent", color: "rgba(250,250,250,0.72)", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 999, padding: "14px 34px", cursor: "pointer", minHeight: 44 }}
+              >
+                Track Distribution →
+              </button>
+            </motion.div>
+
           </div>
         </section>
 
