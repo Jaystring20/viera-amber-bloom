@@ -238,6 +238,7 @@ const VAGINPage = () => {
   const programsRef = useRef<HTMLDivElement>(null);
   const curriculumRef = useRef<HTMLDivElement>(null);
   const padKoloRef = useRef<HTMLElement>(null);
+  const vaginartDeepRef = useRef<HTMLElement>(null);
   const involveRef = useRef<HTMLDivElement>(null);
 
   const heroInView = useInView(heroRef, { once: true, amount: 0.3 });
@@ -246,6 +247,7 @@ const VAGINPage = () => {
   const programsInView = useInView(programsRef, inViewProps);
   const curriculumInView = useInView(curriculumRef, inViewProps);
   const padKoloInView = useInView(padKoloRef, { once: true, amount: 0.12 });
+  const vaginartDeepInView = useInView(vaginartDeepRef, { once: true, amount: 0.12 });
   const involveInView = useInView(involveRef, inViewProps);
 
   const fadeV = useReducedVariants(fadeIn);
@@ -922,6 +924,284 @@ const VAGINPage = () => {
                 </motion.div>
               ))}
             </motion.div>
+          </div>
+        </section>
+
+        {/* ── VAGINART DEEP DIVE ─────────────────────────────────────────────── */}
+        <section
+          ref={vaginartDeepRef}
+          className="w-full py-24 relative overflow-hidden"
+          style={{
+            background: "linear-gradient(160deg, #050010 0%, #0E0028 45%, #0A0A1E 70%, #0A0A0A 100%)",
+            borderTop: "1px solid rgba(98,1,127,0.28)",
+          }}
+          aria-label="VaginART Program"
+        >
+          {/* Ambient glows */}
+          <div aria-hidden="true" className="absolute pointer-events-none" style={{ right: -160, top: -100, width: 480, height: 480, borderRadius: "50%", background: "radial-gradient(circle, rgba(98,1,127,0.18) 0%, transparent 65%)", filter: "blur(1px)" }} />
+          <div aria-hidden="true" className="absolute pointer-events-none" style={{ left: -100, bottom: -80, width: 360, height: 360, borderRadius: "50%", background: "radial-gradient(circle, rgba(199,125,255,0.1) 0%, transparent 65%)", filter: "blur(1px)" }} />
+
+          <div className="relative mx-auto px-6" style={{ maxWidth: 1100, zIndex: 1 }}>
+
+            {/* Header */}
+            <motion.div
+              variants={fadeV}
+              initial="hidden"
+              animate={vaginartDeepInView ? "visible" : "hidden"}
+              className="text-center mb-16"
+            >
+              <div className="inline-flex items-center justify-center mb-5" style={{ gap: 8, background: "rgba(98,1,127,0.18)", border: "1px solid rgba(199,125,255,0.35)", borderRadius: 999, padding: "7px 18px" }}>
+                <Palette size={13} color={PURPLE_LIGHT} strokeWidth={2.2} />
+                <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: PURPLE_LIGHT, letterSpacing: "0.35em", textTransform: "uppercase", fontWeight: 600 }}>VaginART Program</span>
+              </div>
+              <h2 className="font-display m-0" style={{ fontSize: "clamp(28px, 4.5vw, 52px)", fontWeight: 700, color: "#FAFAFA", lineHeight: 1.1, maxWidth: 700, margin: "0 auto 18px" }}>
+                One session changes how a girl sees herself.
+              </h2>
+              <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 16, color: "rgba(250,250,250,0.6)", maxWidth: 600, margin: "0 auto", lineHeight: 1.8 }}>
+                VaginART sessions are 60–90 minute facilitated experiences that combine digital illustrations, guided discussion, and creative expression — built for schools, community halls, and after-school programs.
+              </p>
+            </motion.div>
+
+            {/* Delivery formats — 3 columns */}
+            <motion.div
+              variants={staggerV}
+              initial="hidden"
+              animate={vaginartDeepInView ? "visible" : "hidden"}
+              className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-20"
+            >
+              {[
+                {
+                  Icon: School,
+                  num: "01",
+                  title: "In-School Sessions",
+                  body: "60–90 minute facilitated classes, integrated into the school timetable. A trained VAGIN facilitator leads using digital slides, printed handouts, and group discussion.",
+                  accent: PURPLE,
+                  accentText: PURPLE_LIGHT,
+                  border: "rgba(98,1,127,0.35)",
+                  bg: "rgba(98,1,127,0.1)",
+                },
+                {
+                  Icon: Users,
+                  num: "02",
+                  title: "Community Circles",
+                  body: "Small group sessions (12–25 girls) at community centres, churches, and youth clubs. Flexible scheduling accommodates girls outside the formal school system.",
+                  accent: PINK,
+                  accentText: PINK_LIGHT,
+                  border: "rgba(237,21,93,0.3)",
+                  bg: "rgba(237,21,93,0.08)",
+                },
+                {
+                  Icon: BookOpen,
+                  num: "03",
+                  title: "Teacher Toolkits",
+                  body: "Downloadable digital kits that teachers and parents can use independently — illustrated slides, activity sheets, and facilitator notes. No external facilitator needed.",
+                  accent: PURPLE_LIGHT,
+                  accentText: PURPLE_LIGHT,
+                  border: "rgba(199,125,255,0.3)",
+                  bg: "rgba(199,125,255,0.07)",
+                },
+              ].map((d) => (
+                <motion.div
+                  key={d.num}
+                  variants={cardV}
+                  whileHover={reduced ? {} : { y: -5, scale: 1.015 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 26 }}
+                  style={{
+                    background: d.bg,
+                    border: `1px solid ${d.border}`,
+                    borderRadius: 16,
+                    padding: "28px 24px",
+                    backdropFilter: "blur(8px)",
+                  }}
+                >
+                  <div className="flex items-center justify-between mb-5">
+                    <span className="flex items-center justify-center" style={{ width: 48, height: 48, borderRadius: 13, background: `${d.accent}22`, border: `1px solid ${d.accent}55` }}>
+                      <d.Icon size={22} color={d.accentText} strokeWidth={1.75} />
+                    </span>
+                    <span className="font-display" style={{ fontSize: 13, fontWeight: 700, color: d.accentText, letterSpacing: "0.08em", opacity: 0.55 }}>{d.num}</span>
+                  </div>
+                  <h3 className="font-display m-0" style={{ fontSize: 19, fontWeight: 700, color: "#FAFAFA", marginBottom: 10 }}>{d.title}</h3>
+                  <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 13.5, color: "rgba(250,250,250,0.6)", lineHeight: 1.7, margin: 0 }}>{d.body}</p>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Session walkthrough + photo */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
+
+              {/* Steps */}
+              <motion.div
+                initial={{ opacity: 0, x: -28 }}
+                animate={vaginartDeepInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -28 }}
+                transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
+              >
+                <p className="font-body m-0 uppercase" style={{ fontSize: 11, color: PURPLE_LIGHT, letterSpacing: "0.4em", marginBottom: 14 }}>Inside a Session</p>
+                <h3 className="font-display m-0" style={{ fontSize: "clamp(22px, 3vw, 34px)", fontWeight: 700, color: "#FAFAFA", lineHeight: 1.15, marginBottom: 28 }}>
+                  Every session follows a simple, proven structure.
+                </h3>
+                <div className="flex flex-col" style={{ gap: 0 }}>
+                  {[
+                    {
+                      num: "1",
+                      title: "Open",
+                      body: "A welcome circle establishes ground rules — confidentiality, respect, and no wrong questions. Girls introduce themselves and set intentions for the session.",
+                      color: PURPLE_LIGHT,
+                    },
+                    {
+                      num: "2",
+                      title: "Explore",
+                      body: "Illustrated slides walk through the topic of the day (puberty, hygiene, consent, or SRHR rights). Facilitators pause for questions and peer discussion after each slide.",
+                      color: PINK_LIGHT,
+                    },
+                    {
+                      num: "3",
+                      title: "Create",
+                      body: "Girls respond through drawing, writing, or short role-play. This expressive step locks in learning and gives girls a personal artifact — something theirs.",
+                      color: PURPLE_LIGHT,
+                    },
+                  ].map((step, i) => (
+                    <div key={step.num} className="flex gap-5" style={{ paddingBottom: i < 2 ? 28 : 0, borderLeft: i < 2 ? `1px solid rgba(199,125,255,0.2)` : "none", marginLeft: 16, paddingLeft: 24, position: "relative" }}>
+                      <div style={{ position: "absolute", left: -16, top: 0, width: 32, height: 32, borderRadius: "50%", background: "#0E0028", border: `2px solid ${step.color}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <span className="font-display" style={{ fontSize: 13, fontWeight: 700, color: step.color }}>{step.num}</span>
+                      </div>
+                      <div>
+                        <p className="font-display m-0" style={{ fontSize: 17, fontWeight: 700, color: "#FAFAFA", marginBottom: 6 }}>{step.title}</p>
+                        <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 13.5, color: "rgba(250,250,250,0.6)", lineHeight: 1.7, margin: 0 }}>{step.body}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Photo */}
+              <motion.div
+                initial={{ opacity: 0, x: 28 }}
+                animate={vaginartDeepInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 28 }}
+                transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
+                style={{ position: "relative", borderRadius: 20, overflow: "hidden", aspectRatio: "4/5", border: "1.5px solid rgba(199,125,255,0.25)", boxShadow: "0 32px 80px rgba(0,0,0,0.7)" }}
+              >
+                <img
+                  src="/vagin-images/vagin_page_06_img_1.webp"
+                  alt="Girls actively participating in a VaginART session, Malawi"
+                  style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 30%" }}
+                  loading="lazy"
+                />
+                {/* Gradient overlay + quote */}
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(10,0,28,0.85) 0%, rgba(10,0,28,0.15) 50%, transparent 80%)" }} />
+                <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "24px 24px 28px" }}>
+                  <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontStyle: "italic", fontSize: 15, color: "rgba(250,250,250,0.92)", lineHeight: 1.6, margin: 0, marginBottom: 10 }}>
+                    "I didn't know I could ask questions about my body. This session gave me permission."
+                  </p>
+                  <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: PURPLE_LIGHT, letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 600, margin: 0 }}>— VaginART participant, Malawi</p>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Photo strip — 3 session snapshots */}
+            <motion.div
+              variants={staggerV}
+              initial="hidden"
+              animate={vaginartDeepInView ? "visible" : "hidden"}
+              className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-16"
+            >
+              {[
+                { src: "/vagin-images/vagin_page_05_img_2.webp", alt: "Girls' gathering, VAGIN initiative, Nigeria", label: "Lagos, Nigeria" },
+                { src: "/vagin-images/vagin_team_02.webp", alt: "Community outreach — VAGIN team", label: "Community Session" },
+                { src: "/vagin-images/vagin_page_08_img_3.webp", alt: "Girls in community workshop", label: "Workshop Session" },
+              ].map((photo) => (
+                <motion.div
+                  key={photo.src}
+                  variants={cardV}
+                  style={{ position: "relative", borderRadius: 14, overflow: "hidden", aspectRatio: "4/3", border: "1px solid rgba(255,255,255,0.1)" }}
+                >
+                  <img
+                    src={photo.src}
+                    alt={photo.alt}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    loading="lazy"
+                  />
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(10,0,28,0.65) 0%, transparent 55%)" }} />
+                  <div style={{ position: "absolute", bottom: 10, left: 12 }}>
+                    <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: PURPLE_LIGHT, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>{photo.label}</span>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Stats strip + CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={vaginartDeepInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="flex flex-col items-center"
+              style={{ gap: 28 }}
+            >
+              {/* Stats */}
+              <div className="flex flex-wrap justify-center" style={{ gap: "32px 48px" }}>
+                {[
+                  { value: "40+", label: "Partner Schools" },
+                  { value: "5", label: "Curriculum Topics" },
+                  { value: "60–90", label: "Minutes per Session" },
+                  { value: "2", label: "Countries Reached" },
+                ].map((s) => (
+                  <div key={s.label} className="text-center">
+                    <p className="font-display m-0" style={{ fontSize: "clamp(28px, 4vw, 40px)", fontWeight: 700, color: PURPLE_LIGHT, lineHeight: 1 }}>{s.value}</p>
+                    <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: "rgba(250,250,250,0.45)", letterSpacing: "0.2em", textTransform: "uppercase", margin: "6px 0 0" }}>{s.label}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA */}
+              <div className="flex flex-wrap justify-center" style={{ gap: 14 }}>
+                <motion.button
+                  whileHover={reduced ? {} : { scale: 1.04 }}
+                  whileTap={reduced ? {} : { scale: 0.97 }}
+                  onClick={() => {
+                    document.getElementById("get-involved")?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  style={{
+                    fontFamily: "DM Sans, system-ui, sans-serif",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    letterSpacing: "0.05em",
+                    background: `linear-gradient(135deg, ${PURPLE} 0%, #8B00B0 100%)`,
+                    color: "#FAFAFA",
+                    border: "none",
+                    borderRadius: 999,
+                    padding: "14px 32px",
+                    cursor: "pointer",
+                    boxShadow: "0 8px 28px rgba(98,1,127,0.45)",
+                  }}
+                >
+                  Bring VaginART to Your School
+                </motion.button>
+                <motion.a
+                  href="mailto:vieraambergirls@gmail.com?subject=VaginART Partnership Inquiry"
+                  whileHover={reduced ? {} : { scale: 1.04 }}
+                  whileTap={reduced ? {} : { scale: 0.97 }}
+                  style={{
+                    fontFamily: "DM Sans, system-ui, sans-serif",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    letterSpacing: "0.05em",
+                    background: "transparent",
+                    color: PURPLE_LIGHT,
+                    border: `1.5px solid rgba(199,125,255,0.45)`,
+                    borderRadius: 999,
+                    padding: "13px 28px",
+                    cursor: "pointer",
+                    textDecoration: "none",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                  }}
+                >
+                  <Mail size={14} strokeWidth={2} />
+                  Email Us
+                </motion.a>
+              </div>
+            </motion.div>
+
           </div>
         </section>
 
