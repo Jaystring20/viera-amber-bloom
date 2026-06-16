@@ -7,9 +7,13 @@ interface BrandFilmProps {
    * page     → paused poster, centered play button, sound on, plays once
    */
   variant: "landing" | "page";
+  /** Called ~4×/sec while the video plays; receives currentTime in seconds */
+  onTimeUpdate?: (currentTime: number) => void;
+  /** Called when play/pause state changes */
+  onPlayStateChange?: (playing: boolean) => void;
 }
 
-const BrandFilm = ({ variant }: BrandFilmProps) => {
+const BrandFilm = ({ variant, onTimeUpdate, onPlayStateChange }: BrandFilmProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [muted, setMuted] = useState(true);
@@ -45,6 +49,28 @@ const BrandFilm = ({ variant }: BrandFilmProps) => {
   };
 
   const isLanding = variant === "landing";
+
+  // Wire timeupdate and play-state callbacks
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    const handlers: [string, () => void][] = [];
+    if (onTimeUpdate) {
+      const h = () => onTimeUpdate(vid.currentTime);
+      vid.addEventListener("timeupdate", h);
+      handlers.push(["timeupdate", h]);
+    }
+    if (onPlayStateChange) {
+      const onPlay = () => onPlayStateChange(true);
+      const onPause = () => onPlayStateChange(false);
+      const onEnded = () => onPlayStateChange(false);
+      vid.addEventListener("play", onPlay);
+      vid.addEventListener("pause", onPause);
+      vid.addEventListener("ended", onEnded);
+      handlers.push(["play", onPlay], ["pause", onPause], ["ended", onEnded]);
+    }
+    return () => handlers.forEach(([event, fn]) => vid.removeEventListener(event, fn));
+  }, [onTimeUpdate, onPlayStateChange]);
 
   return (
     <motion.div

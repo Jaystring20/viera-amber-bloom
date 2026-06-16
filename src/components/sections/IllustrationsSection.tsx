@@ -66,6 +66,35 @@ const PREVIEW_CARDS: PreviewCard[] = FEATURED_ARTWORKS.map((item) => {
   };
 });
 
+// ─── Video-Carousel Sync Map ────────────────────────────────────────────────────
+// Maps video timestamps (seconds) to the artwork index (0-11) that should
+// be shown in the carousel while that segment plays in the brand film.
+//
+// Artwork index reference:
+//   0: The Hatmaker   1: Jacqueline     2: The Ada-Set     3: The Ibari-Set
+//   4: Danfo          5: Last Bus       6: Trial by Fire   7: Coronation
+//   8: The Golden Hr  9: Pink Means Biz 10: Release Them  11: Served Hot
+//
+// ⚠️ FILL IN: Watch public/brand-film.mp4 and replace the placeholder entries
+// below with the real second-ranges when each artwork appears in the video.
+// Example: { from: 12, to: 18, artworkIndex: 3 } = Ibari-Set appears 12–18s.
+const FILM_ARTWORK_MAP: { from: number; to: number; artworkIndex: number }[] = [
+  { from: 0, to: 8, artworkIndex: 0 },
+  { from: 8, to: 15, artworkIndex: 1 },
+  { from: 15, to: 22, artworkIndex: 2 },
+  { from: 22, to: 29, artworkIndex: 3 },
+  { from: 29, to: 36, artworkIndex: 4 },
+  { from: 36, to: 43, artworkIndex: 5 },
+  { from: 43, to: 50, artworkIndex: 6 },
+  { from: 50, to: 57, artworkIndex: 7 },
+  { from: 57, to: 63, artworkIndex: 8 },
+];
+
+function getArtworkIndexForTime(t: number): number | null {
+  const entry = FILM_ARTWORK_MAP.find((e) => t >= e.from && t < e.to);
+  return entry ? entry.artworkIndex : null;
+}
+
 // ─── Carousel Card Component ────────────────────────────────────────────────────
 const CarouselCard = ({ card, isActive }: { card: PreviewCard; isActive: boolean }) => {
   const reduced = useReducedMotion();
@@ -245,7 +274,13 @@ const CarouselCard = ({ card, isActive }: { card: PreviewCard; isActive: boolean
 };
 
 // ─── Carousel Container ─────────────────────────────────────────────────────────
-const CarouselContainer = ({ cards }: { cards: PreviewCard[] }) => {
+const CarouselContainer = ({
+  cards,
+  forceArtworkIndex = null,
+}: {
+  cards: PreviewCard[];
+  forceArtworkIndex?: number | null;
+}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
@@ -259,6 +294,14 @@ const CarouselContainer = ({ cards }: { cards: PreviewCard[] }) => {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  // When the brand film is playing, drive the carousel to match the current artwork
+  useEffect(() => {
+    if (forceArtworkIndex == null) return;
+    const clamped = Math.max(0, Math.min(forceArtworkIndex, cards.length - 1));
+    const slideIndex = isMobile ? clamped : Math.floor(clamped / 2);
+    setCurrentIndex(slideIndex);
+  }, [forceArtworkIndex, isMobile, cards.length]);
+
   // Responsive: 1 card on mobile, 2 on larger screens
   const cardsPerView = isMobile ? 1 : 2;
   const totalSlides = Math.ceil(cards.length / cardsPerView);
@@ -270,16 +313,16 @@ const CarouselContainer = ({ cards }: { cards: PreviewCard[] }) => {
         cards[(currentIndex * 2 + 1) % cards.length],
       ];
 
-  // Auto-rotate
+  // Auto-rotate (paused while film is syncing)
   useEffect(() => {
-    if (!isAutoPlay || reduced) return;
+    if (!isAutoPlay || reduced || forceArtworkIndex != null) return;
 
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % totalSlides);
     }, 5000); // Change every 5 seconds
 
     return () => clearInterval(interval);
-  }, [isAutoPlay, totalSlides, reduced]);
+  }, [isAutoPlay, totalSlides, reduced, forceArtworkIndex]);
 
   const handlePrev = () => {
     setCurrentIndex((prev) => (prev - 1 + totalSlides) % totalSlides);
@@ -417,6 +460,26 @@ const IllustrationsSection = () => {
   const carouselRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  // Video-carousel sync state
+  const [filmArtworkIndex, setFilmArtworkIndex] = useState<number | null>(null);
+  const lastArtworkIndexRef = useRef<number | null>(null);
+
+  const handleFilmTimeUpdate = (t: number) => {
+    if (reduced) return;
+    const idx = getArtworkIndexForTime(t);
+    if (idx !== lastArtworkIndexRef.current) {
+      lastArtworkIndexRef.current = idx;
+      setFilmArtworkIndex(idx);
+    }
+  };
+
+  const handleFilmPlayState = (playing: boolean) => {
+    if (!playing) {
+      lastArtworkIndexRef.current = null;
+      setFilmArtworkIndex(null);
+    }
+  };
+
   const headerInView = useInView(headerRef, inViewProps);
   const carouselInView = useInView(carouselRef, { once: true, amount: 0.2 });
   const bottomInView = useInView(bottomRef, inViewProps);
@@ -505,7 +568,11 @@ const IllustrationsSection = () => {
           transition={{ duration: 0.6 }}
           style={{ marginBottom: 48 }}
         >
-          <BrandFilm variant="landing" />
+          <BrandFilm
+            variant="landing"
+            onTimeUpdate={handleFilmTimeUpdate}
+            onPlayStateChange={handleFilmPlayState}
+          />
         </motion.div>
 
         {/* ── Animated Carousel ─────────────────────────────────────── */}
@@ -516,7 +583,7 @@ const IllustrationsSection = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           style={{ marginBottom: 48 }}
         >
-          <CarouselContainer cards={PREVIEW_CARDS} />
+          <CarouselContainer cards={PREVIEW_CARDS} forceArtworkIndex={filmArtworkIndex} />
         </motion.div>
 
         {/* ── Bottom CTA ───────────────────────────────────────────── */}
