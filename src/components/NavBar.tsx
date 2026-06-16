@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Menu, Shield, X } from "lucide-react";
 import logoSrc from "@/assets/viera-amber-logo.png";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const GOLD = "#D97706";
 const GOLD_DIM = "rgba(217,119,6,0.10)";
@@ -10,9 +10,9 @@ const GOLD_DIM = "rgba(217,119,6,0.10)";
 const NAV_LINKS = [
   { label: "Illustrations", href: "/illustrations", isRoute: true },
   { label: "VAGIN", href: "/vagin", isRoute: true },
-  { label: "VIVA", href: "#viva" },
-  { label: "VAM", href: "#vam" },
-  { label: "Shop", href: "#shop" },
+  { label: "VIVA", href: "/viva", isRoute: true },
+  { label: "VAM", href: "/vam", isRoute: true },
+  { label: "Shop", href: "/vash", isRoute: true },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -21,6 +21,7 @@ const NavBar = () => {
   const reduced = useReducedMotion();
   const overlayRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
+  const navigate = useNavigate();
   const isVaginRoute = location.pathname === "/vagin";
 
   // Active route detection
@@ -46,7 +47,19 @@ const NavBar = () => {
     e.preventDefault();
     setOpen(false);
     if (href.startsWith("/")) {
-      window.location.pathname = href;
+      navigate(href);
+      return;
+    }
+    // Hash link — try to scroll on current page, else go home first
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(() => {
+        const el = document.querySelector(href);
+        if (el) {
+          const top = (el as HTMLElement).getBoundingClientRect().top + window.scrollY - 80;
+          window.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
+        }
+      }, 300);
       return;
     }
     const el = document.querySelector(href);
@@ -59,14 +72,14 @@ const NavBar = () => {
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
     setOpen(false);
-    if (window.location.pathname === "/") {
+    if (location.pathname === "/") {
       const heroEl = document.getElementById("hero");
       if (heroEl) {
         const top = heroEl.getBoundingClientRect().top + window.scrollY - 80;
         window.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
       }
     } else {
-      window.location.pathname = "/";
+      navigate("/");
     }
   };
 

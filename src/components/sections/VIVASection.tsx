@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { motion, useInView, useReducedMotion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   fadeIn,
   staggerContainer,
@@ -11,6 +12,7 @@ import {
 
 const VIVASection = () => {
   const reduced = useReducedMotion();
+  const navigate = useNavigate();
   const pillarsRef = useRef<HTMLDivElement>(null);
   const pillarsInView = useInView(pillarsRef, inViewProps);
 
@@ -20,13 +22,6 @@ const VIVASection = () => {
   const ruleVariants = useReducedVariants(scaleXRule);
 
   const d = (s: number) => (reduced ? 0 : s);
-
-  const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const top = el.getBoundingClientRect().top + window.scrollY - 80;
-    window.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
-  };
 
   return (
     <div
@@ -175,7 +170,7 @@ const VIVASection = () => {
           {/* CTA */}
           <motion.button
             type="button"
-            onClick={() => scrollTo("contact")}
+            onClick={() => navigate("/viva")}
             variants={fadeVariants}
             initial="hidden"
             animate="visible"

@@ -5,6 +5,7 @@ import {
   useReducedMotion,
   AnimatePresence,
 } from "framer-motion";
+import { supabase } from "@/lib/supabase";
 import {
   slideInLeft,
   slideInRight,
@@ -46,6 +47,8 @@ const ContactSection = () => {
     message: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(false);
 
   const leftVariants = useReducedVariants(slideInLeft);
   const rightVariants = useReducedVariants(slideInRight);
@@ -75,9 +78,28 @@ const ContactSection = () => {
     e.target.style.background = "rgba(17, 17, 17, 0.6)";
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSaving(true);
+    setSaveError(false);
+    try {
+      const { error } = await supabase.from("contact_submissions").insert({
+        name: form.name,
+        email: form.email,
+        subject: form.subject || "General Enquiry",
+        message: form.message,
+      });
+      if (error) throw error;
+      // Fire-and-forget email notification
+      supabase.functions.invoke("notify-admin", {
+        body: { type: "contact", data: form },
+      }).catch(() => {});
+      setSubmitted(true);
+    } catch {
+      setSaveError(true);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -266,28 +288,40 @@ const ContactSection = () => {
                     onBlur={handleBlur}
                   />
 
+                  {saveError && (
+                    <p style={{
+                      fontFamily: "DM Sans, system-ui, sans-serif",
+                      fontSize: 12,
+                      color: "#EF4444",
+                      margin: 0,
+                    }}>
+                      Something went wrong. Email us directly at admin@vieraamber.com
+                    </p>
+                  )}
+
                   <motion.button
                     type="submit"
-                    whileHover={reduced ? {} : { opacity: 0.9, scale: 1.02 }}
-                    whileTap={reduced ? {} : { scale: 0.98 }}
+                    disabled={saving}
+                    whileHover={reduced || saving ? {} : { opacity: 0.9, scale: 1.02 }}
+                    whileTap={reduced || saving ? {} : { scale: 0.98 }}
                     style={{
                       fontFamily: "DM Sans, system-ui, sans-serif",
                       fontSize: 11,
                       letterSpacing: "2px",
                       textTransform: "uppercase",
                       fontWeight: 500,
-                      background: "#D97706",
+                      background: saving ? "rgba(217,119,6,0.55)" : "#D97706",
                       color: "#0A0A0A",
                       border: "1px solid rgba(217, 119, 6, 0.3)",
                       borderRadius: 8,
                       padding: "13px",
-                      cursor: "pointer",
+                      cursor: saving ? "not-allowed" : "pointer",
                       width: "100%",
                       transition: "all 0.2s",
                       boxShadow: "0 4px 16px rgba(217, 119, 6, 0.2)",
                     }}
                   >
-                    Send Message
+                    {saving ? "Sending..." : "Send Message"}
                   </motion.button>
                 </motion.form>
               ) : (

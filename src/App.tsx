@@ -6,6 +6,9 @@ import Index from "./pages/Index.tsx";
 import Illustrations from "./pages/Illustrations.tsx";
 import VAGINPage from "./pages/VAGIN.tsx";
 import VAGINDashboard from "./pages/VAGINDashboard.tsx";
+import VIVAPage from "./pages/VIVA.tsx";
+import VAMPage from "./pages/VAM.tsx";
+import VASHPage from "./pages/VASH.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -20,6 +23,9 @@ const App = () => (
           <Route path="/illustrations" element={<Illustrations />} />
           <Route path="/vagin" element={<VAGINPage />} />
           <Route path="/vagin-dashboard" element={<VAGINDashboard />} />
+          <Route path="/viva" element={<VIVAPage />} />
+          <Route path="/vam" element={<VAMPage />} />
+          <Route path="/vash" element={<VASHPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
