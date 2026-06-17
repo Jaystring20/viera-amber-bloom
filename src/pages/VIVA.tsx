@@ -104,7 +104,7 @@ const VIVAPage = () => {
       {/* ═══════════════════════════════════════════════════════
           HERO — deep burgundy, Daughters of Adonai centred portrait
           ═══════════════════════════════════════════════════════ */}
-      <section style={{ position: "relative", overflow: "hidden", background: BURGUNDY }}>
+      <section style={{ position: "relative", overflow: "hidden", background: BURGUNDY, minHeight: "clamp(720px, 95vh, 940px)" }}>
         {/* Subtle crosshatch grain */}
         <div aria-hidden="true" style={{
           position: "absolute", inset: 0, pointerEvents: "none",
@@ -116,7 +116,49 @@ const VIVAPage = () => {
           background: "radial-gradient(ellipse 90% 45% at 50% -2%, rgba(212,175,55,0.14) 0%, transparent 65%)",
         }} />
 
-        <div className="relative mx-auto px-6" style={{ maxWidth: 680, zIndex: 1 }}>
+        {/* Editorial flanking models — pink LEFT, olive-stripe RIGHT, mirrored to face center */}
+        <motion.img
+          src={vivaHeroLeft.url}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          initial={{ opacity: 0, x: reduced ? 0 : -40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: d(1.1), delay: d(0.35), ease: [0.16, 1, 0.3, 1] }}
+          className="hidden md:block"
+          style={{
+            position: "absolute", left: 0, bottom: 0,
+            height: "clamp(440px, 78vh, 780px)", width: "auto",
+            objectFit: "contain", objectPosition: "bottom left",
+            transform: "scaleX(-1)",
+            transformOrigin: "bottom left",
+            pointerEvents: "none", userSelect: "none",
+            zIndex: 0,
+            filter: "drop-shadow(0 30px 50px rgba(0,0,0,0.35))",
+          }}
+        />
+        <motion.img
+          src={vivaHeroRight.url}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          initial={{ opacity: 0, x: reduced ? 0 : 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: d(1.1), delay: d(0.35), ease: [0.16, 1, 0.3, 1] }}
+          className="hidden md:block"
+          style={{
+            position: "absolute", right: 0, bottom: 0,
+            height: "clamp(440px, 78vh, 780px)", width: "auto",
+            objectFit: "contain", objectPosition: "bottom right",
+            transform: "scaleX(-1)",
+            transformOrigin: "bottom right",
+            pointerEvents: "none", userSelect: "none",
+            zIndex: 0,
+            filter: "drop-shadow(0 30px 50px rgba(0,0,0,0.35))",
+          }}
+        />
+
+        <div className="relative mx-auto px-6" style={{ maxWidth: 680, zIndex: 2 }}>
           <div
             className="flex flex-col items-center"
             style={{ paddingTop: 120, paddingBottom: 72, gap: 16, textAlign: "center" }}
