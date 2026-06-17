@@ -104,7 +104,7 @@ const VIVAPage = () => {
       {/* ═══════════════════════════════════════════════════════
           HERO — deep burgundy, Daughters of Adonai centred portrait
           ═══════════════════════════════════════════════════════ */}
-      <section style={{ position: "relative", overflow: "hidden", background: BURGUNDY, minHeight: "clamp(720px, 95vh, 940px)" }}>
+      <section style={{ position: "relative", overflow: "hidden", background: BURGUNDY, minHeight: "clamp(900px, 115vh, 1240px)" }}>
         {/* Subtle crosshatch grain */}
         <div aria-hidden="true" style={{
           position: "absolute", inset: 0, pointerEvents: "none",
@@ -116,25 +116,25 @@ const VIVAPage = () => {
           background: "radial-gradient(ellipse 90% 45% at 50% -2%, rgba(212,175,55,0.14) 0%, transparent 65%)",
         }} />
 
-        {/* Editorial flanking models — pink LEFT, olive-stripe RIGHT, mirrored to face center */}
+        {/* Editorial flanking models — pink LEFT (flipped, arm reaches right), olive RIGHT (natural, arm reaches left) */}
         <motion.img
           src={vivaHeroLeft.url}
           alt=""
           aria-hidden="true"
           draggable={false}
-          initial={{ opacity: 0, x: reduced ? 0 : -40 }}
+          initial={{ opacity: 0, x: reduced ? 0 : -60 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: d(1.1), delay: d(0.35), ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: d(1.2), delay: d(0.35), ease: [0.16, 1, 0.3, 1] }}
           className="hidden md:block"
           style={{
-            position: "absolute", left: 0, bottom: 0,
-            height: "clamp(440px, 78vh, 780px)", width: "auto",
+            position: "absolute", left: "-4%", bottom: 0,
+            height: "clamp(820px, 120vh, 1180px)", width: "auto",
             objectFit: "contain", objectPosition: "bottom left",
             transform: "scaleX(-1)",
             transformOrigin: "bottom left",
             pointerEvents: "none", userSelect: "none",
-            zIndex: 0,
-            filter: "drop-shadow(0 30px 50px rgba(0,0,0,0.35))",
+            zIndex: 1,
+            filter: "drop-shadow(0 40px 60px rgba(0,0,0,0.4))",
           }}
         />
         <motion.img
@@ -142,21 +142,22 @@ const VIVAPage = () => {
           alt=""
           aria-hidden="true"
           draggable={false}
-          initial={{ opacity: 0, x: reduced ? 0 : 40 }}
+          initial={{ opacity: 0, x: reduced ? 0 : 60 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: d(1.1), delay: d(0.35), ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: d(1.2), delay: d(0.35), ease: [0.16, 1, 0.3, 1] }}
           className="hidden md:block"
           style={{
-            position: "absolute", right: 0, bottom: 0,
-            height: "clamp(440px, 78vh, 780px)", width: "auto",
+            position: "absolute", right: "-4%", bottom: 0,
+            height: "clamp(820px, 120vh, 1180px)", width: "auto",
             objectFit: "contain", objectPosition: "bottom right",
-            transform: "scaleX(-1)",
             transformOrigin: "bottom right",
             pointerEvents: "none", userSelect: "none",
-            zIndex: 0,
-            filter: "drop-shadow(0 30px 50px rgba(0,0,0,0.35))",
+            zIndex: 1,
+            filter: "drop-shadow(0 40px 60px rgba(0,0,0,0.4))",
           }}
         />
+
+
 
         <div className="relative mx-auto px-6" style={{ maxWidth: 680, zIndex: 2 }}>
           <div
