@@ -1,7 +1,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
 import logoSrc from "@/assets/viera-amber-logo.png";
-import { Button } from "@/components/ui";
+
 
 const HeroSection = () => {
   const reduced = useReducedMotion();
