@@ -1,268 +1,262 @@
 import { useRef } from "react";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import {
-  fadeIn,
-  fadeSlideUp,
-  staggerContainer,
-  cardItem,
-  scaleXRule,
-  inViewProps,
-  useReducedVariants,
-} from "@/lib/animations";
+import { fadeIn, scaleXRule, inViewProps, useReducedVariants } from "@/lib/animations";
 
 const GOLD = "#D4AF37";
-const GOLD_DIM = "rgba(212,175,55,0.15)";
-const GOLD_BORDER = "rgba(212,175,55,0.3)";
+const GOLD_BORDER = "rgba(212,175,55,0.28)";
 
 const LOOKS = [
-  {
-    src: "/viva/look-1.jpeg",
-    name: "The Heritage",
-    tag: "Look 01",
-    desc: "Olive woven kimono · Wide-leg pleated denim · Gold cuffs",
-  },
-  {
-    src: "/viva/look-2.jpeg",
-    name: "The Bold",
-    tag: "Look 02",
-    desc: "Hot-pink structured crop · Wide-leg pleated denim · Statement earrings",
-  },
-  {
-    src: "/viva/look-3.jpeg",
-    name: "The Artist",
-    tag: "Look 03",
-    desc: "Chartreuse palazzo · Structured pink crop · Layered gold jewellery",
-  },
+  { src: "/viva/look-1.jpeg", name: "The Heritage", tag: "01", mood: "Power & Craft" },
+  { src: "/viva/look-2.jpeg", name: "The Bold",     tag: "02", mood: "Vivid Authority" },
+  { src: "/viva/look-3.jpeg", name: "The Artist",   tag: "03", mood: "Chromatic Freedom" },
 ];
 
 const VIVASection = () => {
-  const reduced = useReducedMotion();
-  const navigate = useNavigate();
-
-  const looksRef  = useRef<HTMLDivElement>(null);
+  const reduced   = useReducedMotion();
+  const navigate  = useNavigate();
+  const heroRef   = useRef<HTMLDivElement>(null);
   const pillarsRef = useRef<HTMLDivElement>(null);
-  const looksInView   = useInView(looksRef,   inViewProps);
+  const heroInView    = useInView(heroRef,   inViewProps);
   const pillarsInView = useInView(pillarsRef, inViewProps);
 
-  const fadeVariants   = useReducedVariants(fadeIn);
-  const slideUp        = useReducedVariants(fadeSlideUp);
-  const staggerVariants = useReducedVariants(staggerContainer);
-  const cardVariants   = useReducedVariants(cardItem);
-  const ruleVariants   = useReducedVariants(scaleXRule);
-
+  const fadeVariants = useReducedVariants(fadeIn);
+  const ruleVariants = useReducedVariants(scaleXRule);
   const d = (s: number) => (reduced ? 0 : s);
 
   return (
     <div
       id="viva"
-      style={{ backgroundColor: "#6E0025", position: "relative", overflow: "hidden" }}
-      className="w-full py-20"
+      style={{
+        backgroundColor: "#6E0025",
+        position: "relative",
+        // overflow: visible lets photo 3 bleed into the next section
+        overflow: "visible",
+        paddingTop: 80,
+        paddingBottom: 60,
+      }}
     >
-      {/* Diagonal texture */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute", inset: 0,
-          backgroundImage: "repeating-linear-gradient(45deg, rgba(0,0,0,0.025) 0px, rgba(0,0,0,0.025) 1px, transparent 1px, transparent 10px)",
-          pointerEvents: "none", zIndex: 0,
-        }}
-      />
+      {/* Crosshatch texture */}
+      <div aria-hidden="true" style={{
+        position: "absolute", inset: 0, pointerEvents: "none",
+        backgroundImage: "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px, transparent 1px, transparent 10px)",
+      }} />
 
-      <div className="mx-auto px-6 relative" style={{ maxWidth: 1100, zIndex: 1 }}>
+      {/* ── Hero copy (compact, centered) ────────────────────── */}
+      <div ref={heroRef} style={{ textAlign: "center", position: "relative", zIndex: 2, marginBottom: 0 }}>
+        <motion.p
+          variants={fadeVariants} initial="hidden"
+          animate={heroInView ? "visible" : "hidden"} transition={{ delay: d(0.1) }}
+          style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: "rgba(212,175,55,0.5)", letterSpacing: "6px", textTransform: "uppercase", margin: "0 0 14px 0" }}
+        >By Viera Amber</motion.p>
 
-        {/* ── Hero block ───────────────────────────────────────────── */}
-        <div className="flex flex-col items-center text-center" style={{ gap: 18 }}>
+        <motion.img
+          src="/viva-logo.svg" alt="VIVA by Viera Amber"
+          initial={{ opacity: 0, scale: reduced ? 1 : 0.88 }}
+          animate={heroInView ? { opacity: 1, scale: 1 } : { opacity: 0 }}
+          transition={{ duration: d(0.9), ease: "easeOut", delay: d(0.2) }}
+          style={{ height: "clamp(52px, 8.5vw, 100px)", width: "auto", filter: "drop-shadow(0 0 22px rgba(212,175,55,0.2))", marginBottom: 18 }}
+          draggable={false}
+        />
 
-          {/* Super label */}
-          <motion.p
-            variants={fadeVariants} initial="hidden" animate="visible"
-            transition={{ delay: d(0.15) }}
-            style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: "rgba(212,175,55,0.6)", letterSpacing: "6px", textTransform: "uppercase", fontWeight: 400, margin: 0 }}
-          >
-            By Viera Amber
-          </motion.p>
+        <motion.div
+          variants={ruleVariants} initial="hidden"
+          animate={heroInView ? "visible" : "hidden"} transition={{ delay: d(0.9) }}
+          style={{ width: 36, height: 1, background: GOLD_BORDER, transformOrigin: "center", margin: "0 auto 16px" }}
+        />
 
-          {/* VIVA logo */}
-          <motion.img
-            src="/viva-logo.svg"
-            alt="VIVA by Viera Amber"
-            initial={{ opacity: 0, scale: reduced ? 1 : 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: d(0.9), ease: "easeOut", delay: d(0.25) }}
-            style={{
-              height: "clamp(64px, 11vw, 120px)",
-              width: "auto",
-              filter: "drop-shadow(0 0 24px rgba(212,175,55,0.25))",
-            }}
-            draggable={false}
-          />
+        <motion.p
+          className="font-display" variants={fadeVariants} initial="hidden"
+          animate={heroInView ? "visible" : "hidden"} transition={{ delay: d(1.0) }}
+          style={{ fontStyle: "italic", fontSize: "clamp(15px, 2vw, 22px)", color: "rgba(250,245,246,0.82)", fontWeight: 400, margin: "0 auto 10px", maxWidth: 340 }}
+        >'Batya' — Daughters of Adonai</motion.p>
 
-          {/* Rule */}
-          <motion.div
-            variants={ruleVariants} initial="hidden" animate="visible"
-            transition={{ delay: d(0.9) }}
-            aria-hidden="true"
-            style={{ width: 48, height: 1, backgroundColor: GOLD_BORDER, transformOrigin: "left center" }}
-          />
+        <motion.p
+          variants={fadeVariants} initial="hidden"
+          animate={heroInView ? "visible" : "hidden"} transition={{ delay: d(1.1) }}
+          style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 12, color: "rgba(250,245,246,0.4)", maxWidth: 300, lineHeight: 1.7, margin: "0 auto 22px" }}
+        >Structured tailoring meets fluid artistic silhouettes.</motion.p>
 
-          {/* Collection name */}
-          <motion.p
-            variants={fadeVariants} initial="hidden" animate="visible"
-            transition={{ delay: d(1.0) }}
-            className="font-display"
-            style={{ fontStyle: "italic", fontSize: "clamp(18px, 2.5vw, 28px)", color: "rgba(250,245,246,0.88)", fontWeight: 400, margin: 0 }}
-          >
-            'Batya' — Daughters of Adonai
-          </motion.p>
+        <motion.button
+          type="button" onClick={() => navigate("/viva")}
+          variants={fadeVariants} initial="hidden"
+          animate={heroInView ? "visible" : "hidden"} transition={{ delay: d(1.3) }}
+          whileHover={reduced ? {} : { opacity: 0.82, scale: 1.03 }}
+          whileTap={reduced ? {} : { scale: 0.97 }}
+          style={{
+            fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, letterSpacing: "2.5px",
+            textTransform: "uppercase", fontWeight: 500,
+            backgroundColor: "transparent", color: GOLD,
+            border: `1px solid ${GOLD}`, borderRadius: 3,
+            padding: "9px 24px", cursor: "pointer",
+          }}
+        >View the Collection →</motion.button>
+      </div>
 
-          {/* Sub-copy */}
-          <motion.p
-            variants={fadeVariants} initial="hidden" animate="visible"
-            transition={{ delay: d(1.2) }}
-            style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 14, color: "rgba(250,245,246,0.5)", maxWidth: 420, lineHeight: 1.75, margin: 0 }}
-          >
-            Structured tailoring meets fluid artistic silhouettes. High-end wearable art
-            for the modern woman who wears her confidence out loud.
-          </motion.p>
-
-          {/* CTA */}
-          <motion.button
-            type="button"
+      {/* ── Mobile: clean stack ─────────────────────────────── */}
+      <div className="md:hidden flex flex-col gap-5 px-5 mt-10" style={{ alignItems: "center" }}>
+        {LOOKS.map((look) => (
+          <div
+            key={look.name}
             onClick={() => navigate("/viva")}
-            variants={fadeVariants} initial="hidden" animate="visible"
-            transition={{ delay: d(1.4) }}
-            whileHover={reduced ? {} : { opacity: 0.85, scale: 1.03 }}
-            whileTap={reduced ? {} : { scale: 0.97 }}
-            style={{
-              fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, letterSpacing: "2px",
-              textTransform: "uppercase", fontWeight: 500,
-              backgroundColor: "transparent", color: GOLD,
-              border: `1px solid ${GOLD}`, borderRadius: 3,
-              padding: "12px 32px", cursor: "pointer", marginTop: 4,
-            }}
+            style={{ width: "100%", maxWidth: 320, border: `1px solid ${GOLD_BORDER}`, borderRadius: 3, overflow: "hidden", cursor: "pointer" }}
           >
-            View the Collection →
-          </motion.button>
-        </div>
+            <div style={{ aspectRatio: "3/4", overflow: "hidden" }}>
+              <img src={look.src} alt={look.name} loading="lazy"
+                style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }} />
+            </div>
+            <div style={{ padding: "11px 14px", background: "rgba(0,0,0,0.38)" }}>
+              <p style={{ fontFamily: "DM Sans", fontSize: 8, color: GOLD, opacity: 0.55, letterSpacing: "3px", textTransform: "uppercase", margin: "0 0 3px 0" }}>Look {look.tag}</p>
+              <h3 className="font-display" style={{ fontSize: 15, color: "#FAF9F6", margin: 0 }}>{look.name}</h3>
+            </div>
+          </div>
+        ))}
+      </div>
 
-        {/* ── Lookbook row ─────────────────────────────────────────── */}
+      {/* ── Desktop: editorial scattered tableau ────────────── */}
+      {/*
+          Three cards in a flex-row (align-items: flex-start).
+          Each card's Framer `y` value is the visual offset from layout position.
+          Photo 1: rotates -1.8deg, stays near top
+          Photo 2: tallest, no rotation, y:-20 (pulls into hero zone)
+          Photo 3: rotates +1.8deg, y:110 → bleeds ~110px past the section edge
+          The section overflow:visible + large paddingBottom absorbs the bleed.
+      */}
+      <div
+        className="hidden md:flex"
+        style={{ alignItems: "flex-start", gap: "1.5%", position: "relative", zIndex: 1, overflow: "visible", marginTop: 32 }}
+      >
+        {/* Look 01 — left, tilted left, bleeds off left edge */}
         <motion.div
-          ref={looksRef}
-          variants={staggerVariants}
-          initial="hidden"
-          animate={looksInView ? "visible" : "hidden"}
-          className="grid gap-5 mt-16"
-          style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}
+          initial={{ opacity: 0, y: reduced ? 0 : 60, rotate: 0 }}
+          whileInView={{ opacity: 1, y: 20, rotate: -1.8 }}
+          viewport={{ once: true, amount: 0.12 }}
+          transition={{ duration: d(0.9), delay: d(0.08), ease: [0.16, 1, 0.3, 1] }}
+          whileHover={reduced ? {} : { y: 10, rotate: -0.4, transition: { duration: 0.3 } }}
+          onClick={() => navigate("/viva")}
+          style={{
+            flexShrink: 0, width: "clamp(180px, 27%, 280px)",
+            marginLeft: "-16px", marginTop: 80,
+            cursor: "pointer", border: `1px solid ${GOLD_BORDER}`,
+            borderRadius: 3, overflow: "hidden",
+            boxShadow: "12px 24px 64px rgba(0,0,0,0.6)",
+            transformOrigin: "center center", zIndex: 2,
+          }}
         >
-          {LOOKS.map((look) => (
-            <motion.div
-              key={look.name}
-              variants={cardVariants}
-              whileHover={reduced ? {} : { y: -6, borderColor: GOLD }}
-              transition={{ type: "spring", stiffness: 280, damping: 22 }}
-              style={{
-                border: `1px solid ${GOLD_BORDER}`,
-                borderRadius: 6,
-                overflow: "hidden",
-                cursor: "pointer",
-              }}
-              onClick={() => navigate("/viva")}
-            >
-              {/* Photo */}
-              <div style={{ position: "relative", aspectRatio: "3/4", overflow: "hidden" }}>
-                <img
-                  src={look.src}
-                  alt={look.name}
-                  loading="lazy"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    objectPosition: "top",
-                    display: "block",
-                    transition: "transform 0.55s ease",
-                  }}
-                  onMouseEnter={(e) => { if (!reduced) (e.currentTarget as HTMLImageElement).style.transform = "scale(1.04)"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLImageElement).style.transform = "scale(1)"; }}
-                />
-                {/* Subtle vignette at bottom */}
-                <div
-                  aria-hidden="true"
-                  style={{
-                    position: "absolute", bottom: 0, left: 0, right: 0, height: "35%",
-                    background: "linear-gradient(to top, rgba(70,0,20,0.55) 0%, transparent 100%)",
-                    pointerEvents: "none",
-                  }}
-                />
-                {/* Look tag */}
-                <span style={{
-                  position: "absolute", top: 14, left: 14,
-                  fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: 9, letterSpacing: "3px", textTransform: "uppercase",
-                  color: "rgba(250,250,250,0.85)",
-                  background: "rgba(110,0,37,0.75)",
-                  border: `1px solid ${GOLD_BORDER}`,
-                  borderRadius: 2, padding: "4px 10px",
-                  backdropFilter: "blur(6px)",
-                }}>
-                  {look.tag}
-                </span>
-              </div>
-
-              {/* Caption */}
-              <div
-                style={{
-                  padding: "16px 18px 18px",
-                  background: "rgba(0,0,0,0.28)",
-                  backdropFilter: "blur(4px)",
-                }}
-              >
-                <h3 className="font-display" style={{ fontSize: 18, fontWeight: 700, color: "#FAF9F6", margin: "0 0 5px 0" }}>
-                  {look.name}
-                </h3>
-                <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, fontWeight: 300, color: "rgba(250,245,246,0.5)", margin: 0, lineHeight: 1.6 }}>
-                  {look.desc}
-                </p>
-              </div>
-            </motion.div>
-          ))}
+          <div style={{ aspectRatio: "3/4", overflow: "hidden" }}>
+            <img src={LOOKS[0].src} alt={LOOKS[0].name} loading="lazy"
+              style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block", transition: "transform 0.6s ease" }}
+              onMouseEnter={(e) => { if (!reduced) (e.currentTarget as HTMLImageElement).style.transform = "scale(1.05)"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLImageElement).style.transform = "scale(1)"; }}
+            />
+          </div>
+          <div style={{ padding: "10px 13px", background: "rgba(0,0,0,0.48)" }}>
+            <p style={{ fontFamily: "DM Sans", fontSize: 8, color: GOLD, opacity: 0.5, letterSpacing: "3px", textTransform: "uppercase", margin: "0 0 2px 0" }}>Look {LOOKS[0].tag}</p>
+            <h3 className="font-display" style={{ fontSize: 13, color: "#FAF9F6", margin: 0 }}>{LOOKS[0].name}</h3>
+          </div>
         </motion.div>
 
-        {/* ── Brand Pillars ────────────────────────────────────────── */}
+        {/* Look 02 — center, tallest, pulled up into hero zone */}
         <motion.div
-          ref={pillarsRef}
-          variants={staggerVariants}
-          initial="hidden"
-          animate={pillarsInView ? "visible" : "hidden"}
-          className="grid gap-8 mt-14"
-          style={{ gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}
+          initial={{ opacity: 0, y: reduced ? 0 : 60 }}
+          whileInView={{ opacity: 1, y: -20 }}
+          viewport={{ once: true, amount: 0.12 }}
+          transition={{ duration: d(0.9), delay: d(0.22), ease: [0.16, 1, 0.3, 1] }}
+          whileHover={reduced ? {} : { y: -30, transition: { duration: 0.3 } }}
+          onClick={() => navigate("/viva")}
+          style={{
+            flex: "1 1 auto", maxWidth: "clamp(240px, 40%, 400px)",
+            margin: "0 auto",
+            cursor: "pointer", border: `1px solid ${GOLD_BORDER}`,
+            borderRadius: 3, overflow: "hidden",
+            boxShadow: "0 40px 100px rgba(0,0,0,0.7)",
+            zIndex: 3, position: "relative",
+          }}
         >
-          {[
-            {
-              title: "Structured Fluidity",
-              body: "Tailored lines paired with flowing fabrics. Precision and grace in one silhouette — the garments hold shape and invite movement at once.",
-            },
-            {
-              title: "Artistic Agency",
-              body: "VIVA translates internal confidence into a vivid exterior statement. Every touchpoint is deliberate, curated, gallery-grade — the wardrobe as manifesto.",
-            },
-          ].map((pillar) => (
-            <motion.div
-              key={pillar.title}
-              variants={cardVariants}
-              style={{ borderTop: `2px solid ${GOLD_DIM}`, paddingTop: 24 }}
-            >
-              <h3 className="font-display" style={{ fontSize: 18, fontWeight: 700, color: "#FAF9F6", marginBottom: 10 }}>
-                {pillar.title}
-              </h3>
-              <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 13, color: "rgba(250,245,246,0.5)", lineHeight: 1.75, margin: 0 }}>
-                {pillar.body}
-              </p>
-            </motion.div>
-          ))}
+          <div style={{ aspectRatio: "3/4", overflow: "hidden" }}>
+            <img src={LOOKS[1].src} alt={LOOKS[1].name} loading="lazy"
+              style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block", transition: "transform 0.6s ease" }}
+              onMouseEnter={(e) => { if (!reduced) (e.currentTarget as HTMLImageElement).style.transform = "scale(1.05)"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLImageElement).style.transform = "scale(1)"; }}
+            />
+          </div>
+          <div style={{ padding: "12px 15px", background: "rgba(0,0,0,0.48)" }}>
+            <p style={{ fontFamily: "DM Sans", fontSize: 8, color: GOLD, opacity: 0.5, letterSpacing: "3px", textTransform: "uppercase", margin: "0 0 2px 0" }}>Look {LOOKS[1].tag}</p>
+            <h3 className="font-display" style={{ fontSize: 14, color: "#FAF9F6", margin: 0 }}>{LOOKS[1].name}</h3>
+          </div>
         </motion.div>
 
+        {/* Look 03 — right, tilted right, y:110 bleeds below section */}
+        <motion.div
+          initial={{ opacity: 0, y: reduced ? 0 : 60, rotate: 0 }}
+          whileInView={{ opacity: 1, y: 110, rotate: 1.8 }}
+          viewport={{ once: true, amount: 0.08 }}
+          transition={{ duration: d(0.9), delay: d(0.38), ease: [0.16, 1, 0.3, 1] }}
+          whileHover={reduced ? {} : { y: 100, rotate: 0.4, transition: { duration: 0.3 } }}
+          onClick={() => navigate("/viva")}
+          style={{
+            flexShrink: 0, width: "clamp(180px, 27%, 280px)",
+            marginRight: "-16px", marginTop: 30,
+            cursor: "pointer", border: `1px solid ${GOLD_BORDER}`,
+            borderRadius: 3, overflow: "hidden",
+            boxShadow: "-12px 24px 64px rgba(0,0,0,0.6)",
+            transformOrigin: "center center", zIndex: 2,
+          }}
+        >
+          <div style={{ aspectRatio: "3/4", overflow: "hidden" }}>
+            <img src={LOOKS[2].src} alt={LOOKS[2].name} loading="lazy"
+              style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block", transition: "transform 0.6s ease" }}
+              onMouseEnter={(e) => { if (!reduced) (e.currentTarget as HTMLImageElement).style.transform = "scale(1.05)"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLImageElement).style.transform = "scale(1)"; }}
+            />
+          </div>
+          <div style={{ padding: "10px 13px", background: "rgba(0,0,0,0.48)" }}>
+            <p style={{ fontFamily: "DM Sans", fontSize: 8, color: GOLD, opacity: 0.5, letterSpacing: "3px", textTransform: "uppercase", margin: "0 0 2px 0" }}>Look {LOOKS[2].tag}</p>
+            <h3 className="font-display" style={{ fontSize: 13, color: "#FAF9F6", margin: 0 }}>{LOOKS[2].name}</h3>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* ── Brand Pillars (desktop) — pushed down to clear the floating cards ── */}
+      <motion.div
+        ref={pillarsRef}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={{ visible: { transition: { staggerChildren: reduced ? 0 : 0.15 } }, hidden: {} }}
+        className="hidden md:grid gap-8"
+        style={{
+          maxWidth: 860, margin: "0 auto", padding: "0 24px",
+          marginTop: 340, // clears the bleed area of photo 3
+          position: "relative", zIndex: 1,
+          gridTemplateColumns: "1fr 1fr",
+        }}
+      >
+        {[
+          { title: "Structured Fluidity", body: "Tailored lines paired with flowing fabrics. Precision and grace in one silhouette — the garments hold shape and invite movement at once." },
+          { title: "Artistic Agency", body: "VIVA translates internal confidence into a vivid exterior statement. Every touchpoint is deliberate, curated, gallery-grade." },
+        ].map((p) => (
+          <motion.div key={p.title}
+            variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: reduced ? 0 : 0.5 } } }}
+            style={{ borderTop: "1px solid rgba(212,175,55,0.16)", paddingTop: 20 }}
+          >
+            <h3 className="font-display" style={{ fontSize: 16, fontWeight: 700, color: "#FAF9F6", marginBottom: 10 }}>{p.title}</h3>
+            <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 13, color: "rgba(250,245,246,0.4)", lineHeight: 1.75, margin: 0 }}>{p.body}</p>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Brand Pillars (mobile) */}
+      <div className="md:hidden px-5 mt-12 flex flex-col gap-6">
+        {[
+          { title: "Structured Fluidity", body: "Tailored lines paired with flowing fabrics. Precision and grace in one silhouette." },
+          { title: "Artistic Agency", body: "VIVA translates internal confidence into a vivid exterior statement." },
+        ].map((p) => (
+          <div key={p.title} style={{ borderTop: "1px solid rgba(212,175,55,0.16)", paddingTop: 18 }}>
+            <h3 className="font-display" style={{ fontSize: 16, fontWeight: 700, color: "#FAF9F6", marginBottom: 8 }}>{p.title}</h3>
+            <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 13, color: "rgba(250,245,246,0.4)", lineHeight: 1.75, margin: 0 }}>{p.body}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
