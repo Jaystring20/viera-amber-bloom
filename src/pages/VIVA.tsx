@@ -18,7 +18,7 @@ const LOOKBOOK = [
   { title: "The Heritage", mood: "Power & Craft",      photo: "/viva/look-1.jpeg", desc: "Olive woven kimono · Wide-leg pleated denim · Gold cuffs" },
   { title: "The Bold",     mood: "Vivid Authority",    photo: "/viva/look-2.jpeg", desc: "Hot-pink structured crop · Wide-leg denim · Statement earrings" },
   { title: "The Artist",   mood: "Chromatic Freedom",  photo: "/viva/look-3.jpeg", desc: "Chartreuse palazzo · Structured crop · Layered gold jewellery" },
-  { title: "Ibari Set",    mood: "Cultural Reverence", desc: "Where tradition meets a new vocabulary. Ibari honours the garment as memory, as lineage, as pride." },
+  { title: "Daughters",    mood: "Sacred Identity",    photo: "/viva/look-4.jpeg", desc: "The graphic tee that started a conversation. 'Daughters of Adonai' — identity as a statement, thread as testimony." },
   { title: "Coronation",   mood: "Divine Right",       desc: "There is a moment when a woman stops asking permission. Coronation is that moment, dressed." },
   { title: "Golden Hour",  mood: "Warmth & Light",     desc: "The hour when everything you've built is lit from the right angle. Warm, burnished, yours." },
 ];
@@ -389,7 +389,7 @@ const VIVAPage = () => {
               </p>
             </motion.div>
 
-            {/* Bottom row: 3 editorial placeholder cards */}
+            {/* Bottom row: mix of real photos + editorial placeholders */}
             <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
               {LOOKBOOK.slice(3).map((piece, i) => (
                 <motion.div
@@ -397,22 +397,44 @@ const VIVAPage = () => {
                   variants={cardVariants}
                   whileHover={reduced ? {} : { y: -5, borderColor: GOLD }}
                   transition={{ type: "spring", stiffness: 260, damping: 22 }}
-                  style={{
-                    border: `1px solid ${GOLD_BORDER}`, borderRadius: 4, overflow: "hidden",
-                    background: `linear-gradient(${145 + i * 25}deg, rgba(110,0,37,0.35) 0%, rgba(5,0,3,0.9) 60%)`,
-                  }}
+                  style={{ border: `1px solid ${GOLD_BORDER}`, borderRadius: 4, overflow: "hidden" }}
                 >
-                  <div style={{ padding: "40px 20px 28px", display: "flex", flexDirection: "column", gap: 12, minHeight: 200 }}>
-                    <span style={{ fontFamily: "DM Sans", fontSize: 9, color: "rgba(212,175,55,0.4)", letterSpacing: "3px", textTransform: "uppercase" }}>Look 0{i + 4} · {piece.mood}</span>
-                    <h3 className="font-display" style={{ fontSize: 20, color: "rgba(250,245,246,0.7)", margin: 0, fontWeight: 700 }}>{piece.title}</h3>
-                    <p style={{ fontFamily: "DM Sans", fontWeight: 300, fontSize: 12, color: "rgba(250,245,246,0.3)", lineHeight: 1.7, margin: 0 }}>{piece.desc}</p>
-                    <span style={{
-                      marginTop: "auto", fontFamily: "DM Sans", fontSize: 9, letterSpacing: "2px",
-                      textTransform: "uppercase", color: "rgba(212,175,55,0.4)",
-                      border: "1px solid rgba(212,175,55,0.18)", borderRadius: 2,
-                      padding: "4px 10px", width: "fit-content",
-                    }}>Coming Soon</span>
-                  </div>
+                  {piece.photo ? (
+                    /* Real photo card */
+                    <div style={{ position: "relative", overflow: "hidden" }}>
+                      <div style={{ aspectRatio: "3/4", overflow: "hidden" }}>
+                        <img
+                          src={piece.photo}
+                          alt={piece.title}
+                          loading="lazy"
+                          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block", transition: "transform 0.6s ease" }}
+                          onMouseEnter={(e) => { if (!reduced) (e.currentTarget as HTMLImageElement).style.transform = "scale(1.04)"; }}
+                          onMouseLeave={(e) => { (e.currentTarget as HTMLImageElement).style.transform = "scale(1)"; }}
+                        />
+                      </div>
+                      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "40%", background: "linear-gradient(to top, rgba(5,0,3,0.8) 0%, transparent 100%)" }} />
+                      <div style={{ position: "absolute", bottom: 16, left: 16 }}>
+                        <p style={{ fontFamily: "DM Sans", fontSize: 9, color: "rgba(212,175,55,0.65)", letterSpacing: "3px", textTransform: "uppercase", margin: "0 0 4px 0" }}>Look 0{i + 4} · {piece.mood}</p>
+                        <h3 className="font-display" style={{ fontSize: 18, color: "#FAF9F6", margin: 0 }}>{piece.title}</h3>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Editorial placeholder */
+                    <div style={{
+                      padding: "40px 20px 28px", display: "flex", flexDirection: "column", gap: 12, minHeight: 200,
+                      background: `linear-gradient(${145 + i * 25}deg, rgba(110,0,37,0.35) 0%, rgba(5,0,3,0.9) 60%)`,
+                    }}>
+                      <span style={{ fontFamily: "DM Sans", fontSize: 9, color: "rgba(212,175,55,0.4)", letterSpacing: "3px", textTransform: "uppercase" }}>Look 0{i + 4} · {piece.mood}</span>
+                      <h3 className="font-display" style={{ fontSize: 20, color: "rgba(250,245,246,0.7)", margin: 0, fontWeight: 700 }}>{piece.title}</h3>
+                      <p style={{ fontFamily: "DM Sans", fontWeight: 300, fontSize: 12, color: "rgba(250,245,246,0.3)", lineHeight: 1.7, margin: 0 }}>{piece.desc}</p>
+                      <span style={{
+                        marginTop: "auto", fontFamily: "DM Sans", fontSize: 9, letterSpacing: "2px",
+                        textTransform: "uppercase", color: "rgba(212,175,55,0.4)",
+                        border: "1px solid rgba(212,175,55,0.18)", borderRadius: 2,
+                        padding: "4px 10px", width: "fit-content",
+                      }}>Coming Soon</span>
+                    </div>
+                  )}
                 </motion.div>
               ))}
             </div>
