@@ -690,7 +690,7 @@ const VAGINPage = () => {
               className="p-7 rounded-xl"
               style={{ background: "rgba(237,21,93,0.06)", border: "1px solid rgba(237,21,93,0.18)" }}
             >
-              <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: PINK, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600, marginBottom: 14, margin: 0, marginBottom: 12 }}>
+              <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: PINK, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600, margin: 0, marginBottom: 12 }}>
                 What girls in low-resourced settings face
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
