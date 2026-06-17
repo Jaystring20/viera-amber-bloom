@@ -117,13 +117,13 @@ export const overlayFade: Variants = {
 /** Card hover lift — spring physics */
 export const cardHover = {
   scale: 1.03,
-  transition: { type: "spring" as const as const, stiffness: 300, damping: 22 },
+  transition: { type: "spring" as const, stiffness: 300, damping: 22 },
 };
 
 /** Subtle card lift — for less dramatic hover */
 export const cardHoverSubtle = {
   y: -3,
-  transition: { type: "spring" as const as const, stiffness: 400, damping: 25 },
+  transition: { type: "spring" as const, stiffness: 400, damping: 25 },
 };
 
 // ─── Reduced-motion variant override ─────────────────────────────────────────

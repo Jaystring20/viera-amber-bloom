@@ -21,7 +21,7 @@ const Footer = () => {
     animate: {
       opacity: 1,
       y: 0,
-      transition: { duration: d(0.5), ease: "easeOut" as const as const },
+      transition: { duration: d(0.5), ease: "easeOut" as const },
     },
   };
 

@@ -1,7 +1,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
 import logoSrc from "@/assets/viera-amber-logo.png";
-import { Button } from "@/components/ui";
+
 
 const HeroSection = () => {
   const reduced = useReducedMotion();
@@ -335,15 +335,14 @@ const HeroSection = () => {
 
           {/* CTA */}
           <motion.div variants={ctaVariants}>
-            <Button
-              variant="secondary"
-              ecosystemArm="illustrations"
-              className="rounded-full px-8 py-3 font-body uppercase tracking-widest text-xs min-h-[44px]"
+            <button
+              type="button"
+              className="rounded-full px-8 py-3 font-body uppercase tracking-widest text-xs min-h-[44px] bg-brand-gold text-brand-dark hover:opacity-90 transition-opacity"
               onClick={handleScroll}
               aria-label="Scroll down to explore the Viera Amber ecosystem"
             >
               Explore the Ecosystem ↓
-            </Button>
+            </button>
           </motion.div>
 
           {/* Scroll indicator */}
