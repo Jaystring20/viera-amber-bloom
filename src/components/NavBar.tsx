@@ -129,7 +129,7 @@ const NavBar = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: reduced ? 0 : 0.25, ease: "easeOut" }}
+                transition={{ duration: reduced ? 0 : 0.25, ease: "easeOut" as const }}
               />
             ) : isVivaRoute ? (
               <motion.img
@@ -142,7 +142,7 @@ const NavBar = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: reduced ? 0 : 0.25, ease: "easeOut" }}
+                transition={{ duration: reduced ? 0 : 0.25, ease: "easeOut" as const }}
               />
             ) : (
               <motion.img
@@ -154,7 +154,7 @@ const NavBar = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: reduced ? 0 : 0.25, ease: "easeOut" }}
+                transition={{ duration: reduced ? 0 : 0.25, ease: "easeOut" as const }}
               />
             )}
           </AnimatePresence>
@@ -170,7 +170,7 @@ const NavBar = () => {
                   href={l.href}
                   onClick={handleNavClick(l.href)}
                   whileHover={reduced ? {} : { scale: 1.02 }}
-                  transition={{ duration: 0.15, ease: "easeOut" }}
+                  transition={{ duration: 0.15, ease: "easeOut" as const }}
                   className="relative flex flex-col items-center uppercase rounded-lg"
                   style={{
                     fontSize: 11,
@@ -208,7 +208,7 @@ const NavBar = () => {
                         background: GOLD,
                         marginTop: 3,
                       }}
-                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      transition={{ type: "spring" as const, stiffness: 380, damping: 30 }}
                     />
                   )}
                 </motion.a>
@@ -288,7 +288,7 @@ const NavBar = () => {
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: reduced ? 0 : 0.2, ease: "easeOut" }}
+              transition={{ duration: reduced ? 0 : 0.2, ease: "easeOut" as const }}
               className="flex flex-col gap-3 p-4 mt-2 mx-4"
               style={{
                 background: "rgba(5,5,5,0.95)",

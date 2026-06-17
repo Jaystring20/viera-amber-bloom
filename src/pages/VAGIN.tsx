@@ -167,7 +167,7 @@ const InfiniteCarousel = () => {
             key={i}
             className="relative overflow-hidden group"
             whileHover={reduced ? {} : { scale: 1.03 }}
-            transition={{ type: "spring", stiffness: 300, damping: 28 }}
+            transition={{ type: "spring" as const, stiffness: 300, damping: 28 }}
             style={{
               flexShrink: 0,
               width: "clamp(260px, 28vw, 390px)",
@@ -296,7 +296,7 @@ const VAGINPage = () => {
                 <motion.div
                   initial={{ opacity: 0, x: reduced ? 0 : -28 }}
                   animate={heroInView ? { opacity: 1, x: 0 } : { opacity: 0, x: reduced ? 0 : -28 }}
-                  transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 240, damping: 24 }}
+                  transition={reduced ? { duration: 0 } : { type: "spring" as const, stiffness: 240, damping: 24 }}
                   className="flex-shrink-0 flex items-center justify-center"
                 >
                   <img
@@ -316,7 +316,7 @@ const VAGINPage = () => {
                   className="hidden md:block flex-shrink-0"
                   initial={{ scaleY: 0, opacity: 0 }}
                   animate={heroInView ? { scaleY: 1, opacity: 1 } : { scaleY: 0, opacity: 0 }}
-                  transition={reduced ? { duration: 0 } : { duration: 0.55, ease: "easeOut", delay: 0.16 }}
+                  transition={reduced ? { duration: 0 } : { duration: 0.55, ease: "easeOut" as const, delay: 0.16 }}
                   style={{
                     width: 1,
                     height: "clamp(64px, 8vw, 100px)",
@@ -331,7 +331,7 @@ const VAGINPage = () => {
                   className="block md:hidden"
                   initial={{ scaleX: 0, opacity: 0 }}
                   animate={heroInView ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0 }}
-                  transition={reduced ? { duration: 0 } : { duration: 0.4, ease: "easeOut", delay: 0.16 }}
+                  transition={reduced ? { duration: 0 } : { duration: 0.4, ease: "easeOut" as const, delay: 0.16 }}
                   style={{ width: 48, height: 1, margin: "16px 0", background: `linear-gradient(90deg, transparent, ${PINK}, transparent)`, transformOrigin: "center" }}
                 />
 
@@ -339,7 +339,7 @@ const VAGINPage = () => {
                 <motion.div
                   initial={{ opacity: 0, x: reduced ? 0 : 28 }}
                   animate={heroInView ? { opacity: 1, x: 0 } : { opacity: 0, x: reduced ? 0 : 28 }}
-                  transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 240, damping: 24, delay: 0.1 }}
+                  transition={reduced ? { duration: 0 } : { type: "spring" as const, stiffness: 240, damping: 24, delay: 0.1 }}
                   className="flex-shrink-0"
                 >
                   <h1
@@ -355,7 +355,7 @@ const VAGINPage = () => {
               <motion.p
                 initial={{ opacity: 0, y: reduced ? 0 : 16 }}
                 animate={heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: reduced ? 0 : 16 }}
-                transition={reduced ? { duration: 0 } : { duration: 0.65, ease: "easeOut", delay: 0.28 }}
+                transition={reduced ? { duration: 0 } : { duration: 0.65, ease: "easeOut" as const, delay: 0.28 }}
                 className="m-0"
                 style={{
                   fontFamily: "DM Sans, system-ui, sans-serif",
@@ -482,7 +482,7 @@ const VAGINPage = () => {
               <motion.div
                 initial={{ opacity: 0, y: reduced ? 0 : 32 }}
                 animate={heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: reduced ? 0 : 32 }}
-                transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 180, damping: 22, delay: 0.22 }}
+                transition={reduced ? { duration: 0 } : { type: "spring" as const, stiffness: 180, damping: 22, delay: 0.22 }}
                 className="absolute overflow-hidden group"
                 style={{ left: 24, top: 16, width: "54%", height: "74%", borderRadius: 20, border: "1.5px solid rgba(237,21,93,0.4)", transform: "rotate(-2deg)", boxShadow: "0 28px 72px rgba(0,0,0,0.75), 0 0 0 1px rgba(237,21,93,0.1), 0 0 48px rgba(98,1,127,0.25)", zIndex: 2 }}
               >
@@ -494,7 +494,7 @@ const VAGINPage = () => {
               <motion.div
                 initial={{ opacity: 0, y: reduced ? 0 : -24 }}
                 animate={heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: reduced ? 0 : -24 }}
-                transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 180, damping: 22, delay: 0.38 }}
+                transition={reduced ? { duration: 0 } : { type: "spring" as const, stiffness: 180, damping: 22, delay: 0.38 }}
                 className="absolute overflow-hidden group"
                 style={{ right: 0, top: 0, width: "43%", height: "46%", borderRadius: 16, border: "1.5px solid rgba(237,21,93,0.28)", transform: "rotate(2.5deg)", boxShadow: "0 18px 52px rgba(0,0,0,0.65)", zIndex: 2 }}
               >
@@ -509,7 +509,7 @@ const VAGINPage = () => {
               <motion.div
                 initial={{ opacity: 0, x: reduced ? 0 : 24 }}
                 animate={heroInView ? { opacity: 1, x: 0 } : { opacity: 0, x: reduced ? 0 : 24 }}
-                transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 180, damping: 22, delay: 0.52 }}
+                transition={reduced ? { duration: 0 } : { type: "spring" as const, stiffness: 180, damping: 22, delay: 0.52 }}
                 className="absolute overflow-hidden group"
                 style={{ right: 0, bottom: 8, width: "43%", height: "47%", borderRadius: 16, border: "1.5px solid rgba(98,1,127,0.4)", transform: "rotate(-1.5deg)", boxShadow: "0 18px 52px rgba(0,0,0,0.65)", zIndex: 2 }}
               >
@@ -722,7 +722,7 @@ const VAGINPage = () => {
                 initial={{ opacity: 0, x: -28 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.7, ease: "easeOut" }}
+                transition={{ duration: 0.7, ease: "easeOut" as const }}
               >
                 <p className="font-body uppercase m-0" style={{ fontSize: 11, color: PURPLE_LIGHT, letterSpacing: "0.4em", marginBottom: 14 }}>The Method</p>
                 <h2 className="font-display m-0" style={{ fontSize: "clamp(26px, 4vw, 46px)", fontWeight: 700, color: "#FAFAFA", lineHeight: 1.12, marginBottom: 20 }}>
@@ -913,7 +913,7 @@ const VAGINPage = () => {
                   key={c.title}
                   variants={cardV}
                   whileHover={reduced ? {} : { y: -4 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
                   style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: "26px 22px" }}
                 >
                   <span aria-hidden="true" className="flex items-center justify-center" style={{ width: 46, height: 46, borderRadius: 12, background: `${c.color}1F`, border: `1px solid ${c.color}55`, marginBottom: 16 }}>
@@ -1005,7 +1005,7 @@ const VAGINPage = () => {
                   key={d.num}
                   variants={cardV}
                   whileHover={reduced ? {} : { y: -5, scale: 1.015 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 26 }}
+                  transition={{ type: "spring" as const, stiffness: 400, damping: 26 }}
                   style={{
                     background: d.bg,
                     border: `1px solid ${d.border}`,
@@ -1033,7 +1033,7 @@ const VAGINPage = () => {
               <motion.div
                 initial={{ opacity: 0, x: -28 }}
                 animate={vaginartDeepInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -28 }}
-                transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
+                transition={{ duration: 0.7, ease: "easeOut" as const, delay: 0.1 }}
               >
                 <p className="font-body m-0 uppercase" style={{ fontSize: 11, color: PURPLE_LIGHT, letterSpacing: "0.4em", marginBottom: 14 }}>Inside a Session</p>
                 <h3 className="font-display m-0" style={{ fontSize: "clamp(22px, 3vw, 34px)", fontWeight: 700, color: "#FAFAFA", lineHeight: 1.15, marginBottom: 28 }}>
@@ -1077,7 +1077,7 @@ const VAGINPage = () => {
               <motion.div
                 initial={{ opacity: 0, x: 28 }}
                 animate={vaginartDeepInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 28 }}
-                transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
+                transition={{ duration: 0.7, ease: "easeOut" as const, delay: 0.2 }}
                 style={{ position: "relative", borderRadius: 20, overflow: "hidden", aspectRatio: "4/5", border: "1.5px solid rgba(199,125,255,0.25)", boxShadow: "0 32px 80px rgba(0,0,0,0.7)" }}
               >
                 <img
@@ -1243,7 +1243,7 @@ const VAGINPage = () => {
             <motion.div
               initial={{ opacity: 0, y: 28 }}
               animate={padKoloInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
-              transition={reduced ? { duration: 0 } : { duration: 0.65, ease: "easeOut", delay: 0.12 }}
+              transition={reduced ? { duration: 0 } : { duration: 0.65, ease: "easeOut" as const, delay: 0.12 }}
               className="mb-14 relative overflow-hidden"
               style={{ background: "rgba(217,119,6,0.07)", border: "1px solid rgba(217,119,6,0.28)", borderRadius: 20, padding: "clamp(24px, 4vw, 40px)" }}
             >
@@ -1279,7 +1279,7 @@ const VAGINPage = () => {
                   key={s.step}
                   variants={cardV}
                   whileHover={reduced ? {} : { y: -5 }}
-                  transition={{ type: "spring", stiffness: 360, damping: 26 }}
+                  transition={{ type: "spring" as const, stiffness: 360, damping: 26 }}
                   className="relative flex flex-col"
                   style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${s.accent}30`, borderTop: `3px solid ${s.accent}`, borderRadius: 18, padding: "32px 26px", gap: 20 }}
                 >
@@ -1327,7 +1327,7 @@ const VAGINPage = () => {
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               animate={padKoloInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-              transition={reduced ? { duration: 0 } : { duration: 0.7, ease: "easeOut", delay: 0.45 }}
+              transition={reduced ? { duration: 0 } : { duration: 0.7, ease: "easeOut" as const, delay: 0.45 }}
               className="mb-12 relative overflow-hidden rounded-2xl"
               style={{ minHeight: 260, border: "1px solid rgba(237,21,93,0.2)" }}
             >
@@ -1405,7 +1405,7 @@ const VAGINPage = () => {
                   key={v.title}
                   variants={cardItem}
                   whileHover={{ y: -4 }}
-                  transition={{ type: "spring", stiffness: 380, damping: 26 }}
+                  transition={{ type: "spring" as const, stiffness: 380, damping: 26 }}
                   style={{
                     background: "rgba(255,255,255,0.04)",
                     border: "1px solid rgba(255,255,255,0.09)",

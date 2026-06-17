@@ -67,7 +67,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
         transition={
           shouldReduceMotion
             ? { duration: 0 }
-            : { type: "spring", stiffness: 350, damping: 25 }
+            : { type: "spring" as const, stiffness: 350, damping: 25 }
         }
         {...props}
       >

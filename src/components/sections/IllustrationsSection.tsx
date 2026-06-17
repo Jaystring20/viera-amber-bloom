@@ -121,7 +121,7 @@ const CarouselCard = ({ card, isActive }: { card: PreviewCard; isActive: boolean
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+      transition={{ duration: 0.5, ease: "easeOut" as const }}
       whileHover={reduced ? {} : { scale: 1.04 }}
     >
       {/* Artwork Image - positioned to show full figure including head */}

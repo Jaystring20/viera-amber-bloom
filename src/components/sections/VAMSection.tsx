@@ -147,7 +147,7 @@ const VAMSection = () => {
                   ? {}
                   : { y: -3, borderColor: "#D97706" }
               }
-              transition={{ type: "spring", stiffness: 350, damping: 20 }}
+              transition={{ type: "spring" as const, stiffness: 350, damping: 20 }}
               style={{
                 backgroundColor: "#FFFFFF",
                 border: "1px solid #E8E8E8",

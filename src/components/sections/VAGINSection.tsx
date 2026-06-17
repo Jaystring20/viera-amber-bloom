@@ -115,7 +115,7 @@ const ProgramCard = ({ Icon, accent, title, body, onLearn, reduced }: ProgramPro
     variants={useReducedVariants(cardItem)}
     whileHover={reduced ? {} : { y: -4 }}
     whileTap={reduced ? {} : { scale: 0.985 }}
-    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+    transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
     className="group text-left cursor-pointer flex flex-col"
     style={{
       backgroundColor: "rgba(255,255,255,0.05)",
@@ -228,7 +228,7 @@ const VAGINSection = () => {
           <motion.div
             initial={{ scaleX: 0, opacity: 0 }}
             animate={headerInView ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0 }}
-            transition={reduced ? { duration: 0 } : { duration: 0.5, ease: "easeOut", delay: 0.1 }}
+            transition={reduced ? { duration: 0 } : { duration: 0.5, ease: "easeOut" as const, delay: 0.1 }}
             style={{ width: 40, height: 1, background: "linear-gradient(90deg, transparent, #ED155D, transparent)", transformOrigin: "center" }}
           />
 
@@ -458,7 +458,7 @@ const VAGINSection = () => {
             onClick={() => navigate("/vagin")}
             whileHover={reduced ? {} : { scale: 1.03 }}
             whileTap={reduced ? {} : { scale: 0.97 }}
-            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+            transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
             className="inline-flex items-center"
             style={{
               gap: 8,
