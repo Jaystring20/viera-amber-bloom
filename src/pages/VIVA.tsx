@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import NavBar from "@/components/NavBar";
 import { fadeIn, fadeSlideUp, staggerContainer, cardItem, scaleXRule, inViewProps, useReducedVariants } from "@/lib/animations";
 import { supabase } from "@/lib/supabase";
+import vivaHeroLeft from "@/assets/viva-hero-left.png.asset.json";
+import vivaHeroRight from "@/assets/viva-hero-right.png.asset.json";
 
 const ALABASTER  = "#FAF9F6";
 const CREAM      = "#F5EDE6";
