@@ -6,22 +6,26 @@ import NavBar from "@/components/NavBar";
 import { fadeIn, fadeSlideUp, staggerContainer, cardItem, scaleXRule, inViewProps, useReducedVariants } from "@/lib/animations";
 import { supabase } from "@/lib/supabase";
 
-const ALABASTER = "#FAF9F6";
-const CREAM     = "#F5EDE6";
-const BURGUNDY  = "#6E0025";
-const GOLD      = "#D4AF37";
-const DARK_TEXT = "#221A1A";
-const CORMORANT = "'Cormorant Garamond', 'Playfair Display', Georgia, serif";
-const GOLD_BORDER   = "rgba(212,175,55,0.35)";
-const BURG_BORDER   = "rgba(110,0,37,0.14)";
+const ALABASTER  = "#FAF9F6";
+const CREAM      = "#F5EDE6";
+const BURGUNDY   = "#6E0025";
+const GOLD       = "#D4AF37";
+const DARK_TEXT  = "#221A1A";
+const CORMORANT  = "'Cormorant Garamond', 'Playfair Display', Georgia, serif";
+const GOLD_ALPHA = "rgba(212,175,55,0.3)";
+const BURG_ALPHA = "rgba(110,0,37,0.14)";
 
+// Three outfit looks go into the lookbook
 const LOOKBOOK = [
-  { title: "The Heritage", mood: "Power & Craft",      photo: "/viva/look-1.jpeg", desc: "Olive woven kimono · Wide-leg pleated denim · Gold cuffs" },
-  { title: "The Bold",     mood: "Vivid Authority",    photo: "/viva/look-2.jpeg", desc: "Hot-pink structured crop · Wide-leg denim · Statement earrings" },
-  { title: "The Artist",   mood: "Chromatic Freedom",  photo: "/viva/look-3.jpeg", desc: "Chartreuse palazzo · Structured crop · Layered gold jewellery" },
-  { title: "Daughters",    mood: "Sacred Identity",    photo: "/viva/look-4.jpeg", desc: "The graphic tee that started a conversation. 'Daughters of Adonai' — identity as a statement, thread as testimony." },
-  { title: "Coronation",   mood: "Divine Right",       desc: "There is a moment when a woman stops asking permission. Coronation is that moment, dressed." },
-  { title: "Golden Hour",  mood: "Warmth & Light",     desc: "The hour when everything you've built is lit from the right angle. Warm, burnished, yours." },
+  { title: "The Heritage", mood: "Power & Craft",     photo: "/viva/look-1.jpeg", desc: "Olive woven kimono · Wide-leg pleated denim · Gold cuffs" },
+  { title: "The Bold",     mood: "Vivid Authority",   photo: "/viva/look-2.jpeg", desc: "Hot-pink structured crop · Wide-leg denim · Statement earrings" },
+  { title: "The Artist",   mood: "Chromatic Freedom", photo: "/viva/look-3.jpeg", desc: "Chartreuse palazzo · Structured crop · Layered gold jewellery" },
+];
+
+// Upcoming pieces (no photo yet)
+const COMING = [
+  { title: "Coronation",  mood: "Divine Right",   desc: "There is a moment when a woman stops asking permission. Coronation is that moment, dressed." },
+  { title: "Golden Hour", mood: "Warmth & Light", desc: "The hour when everything you've built is lit from the right angle. Warm, burnished, yours." },
 ];
 
 const PILLARS = [
@@ -44,8 +48,8 @@ const enquiryInputStyle: React.CSSProperties = {
 };
 
 const VIVAPage = () => {
-  const navigate = useNavigate();
-  const reduced  = useReducedMotion();
+  const navigate   = useNavigate();
+  const reduced    = useReducedMotion();
 
   const pillarsRef  = useRef<HTMLDivElement>(null);
   const lookbookRef = useRef<HTMLDivElement>(null);
@@ -86,64 +90,34 @@ const VIVAPage = () => {
     }
   };
 
+  const scrollToEnquiry = (e: React.MouseEvent) => {
+    e.preventDefault();
+    document.getElementById("viva-enquiry")?.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
+  };
+
   return (
-    <div style={{ backgroundColor: ALABASTER, minHeight: "100vh" }}>
+    <div style={{ backgroundColor: BURGUNDY, minHeight: "100vh" }}>
       <NavBar />
 
       {/* ═══════════════════════════════════════════════════════
-          HERO — centered, warm editorial, brand board aligned
+          HERO — deep burgundy, Daughters of Adonai centred portrait
           ═══════════════════════════════════════════════════════ */}
-      <section style={{ position: "relative", overflow: "hidden", minHeight: "92vh", background: ALABASTER }}>
-        {/* Warm radial glow from top — mimics sand/taupe from brand board */}
+      <section style={{ position: "relative", overflow: "hidden", background: BURGUNDY }}>
+        {/* Subtle crosshatch grain */}
         <div aria-hidden="true" style={{
           position: "absolute", inset: 0, pointerEvents: "none",
-          background: "radial-gradient(ellipse 150% 80% at 50% -5%, #E5CEAD 0%, rgba(250,249,246,0) 62%)",
+          backgroundImage: "repeating-linear-gradient(45deg, rgba(0,0,0,0.018) 0px, rgba(0,0,0,0.018) 1px, transparent 1px, transparent 12px)",
+        }} />
+        {/* Gold glow from top — warmth */}
+        <div aria-hidden="true" style={{
+          position: "absolute", inset: 0, pointerEvents: "none",
+          background: "radial-gradient(ellipse 90% 45% at 50% -2%, rgba(212,175,55,0.14) 0%, transparent 65%)",
         }} />
 
-        {/* Flanking photo — left, desktop only */}
-        <div
-          className="hidden md:block"
-          aria-hidden="true"
-          style={{
-            position: "absolute", bottom: 0, left: 0,
-            width: "20%", height: "66%",
-            overflow: "hidden",
-          }}
-        >
-          <img src="/viva/look-1.jpeg" alt=""
-            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block" }}
-          />
-          {/* Fade right into page */}
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, transparent 0%, rgba(250,249,246,0.92) 88%)" }} />
-          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "28%", background: `linear-gradient(to top, ${ALABASTER} 0%, transparent 100%)` }} />
-        </div>
-
-        {/* Flanking photo — right, desktop only */}
-        <div
-          className="hidden md:block"
-          aria-hidden="true"
-          style={{
-            position: "absolute", bottom: 0, right: 0,
-            width: "20%", height: "78%",
-            overflow: "hidden",
-          }}
-        >
-          <img src="/viva/look-3.jpeg" alt=""
-            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block" }}
-          />
-          {/* Fade left into page */}
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to left, transparent 0%, rgba(250,249,246,0.92) 88%)" }} />
-          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "28%", background: `linear-gradient(to top, ${ALABASTER} 0%, transparent 100%)` }} />
-        </div>
-
-        {/* ── Center content ── */}
-        <div
-          className="relative mx-auto px-6"
-          style={{ maxWidth: 640, zIndex: 1 }}
-        >
+        <div className="relative mx-auto px-6" style={{ maxWidth: 680, zIndex: 1 }}>
           <div
             className="flex flex-col items-center"
-            style={{ paddingTop: 140, paddingBottom: 72, gap: 18, textAlign: "center" }}
+            style={{ paddingTop: 120, paddingBottom: 72, gap: 16, textAlign: "center" }}
           >
             {/* Back */}
             <motion.button
@@ -151,18 +125,18 @@ const VIVAPage = () => {
               variants={fadeVariants} initial="hidden" animate="visible"
               style={{
                 background: "none", border: "none",
-                color: `rgba(110,0,37,0.4)`, cursor: "pointer",
+                color: `rgba(212,175,55,0.45)`, cursor: "pointer",
                 fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11,
                 letterSpacing: "1.5px", textTransform: "uppercase", padding: 0,
                 display: "flex", alignItems: "center", gap: 6,
                 alignSelf: "flex-start",
               }}
-              whileHover={reduced ? {} : { color: BURGUNDY }}
+              whileHover={reduced ? {} : { color: GOLD }}
             >
               <ArrowLeft size={13} /> Back
             </motion.button>
 
-            {/* VIVA logo — centered, prominent */}
+            {/* VIVA logo — gold on burgundy */}
             <motion.img
               src="/viva-logo.svg"
               alt="VIVA by Viera Amber"
@@ -170,46 +144,69 @@ const VIVAPage = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: d(0.9), ease: "easeOut", delay: d(0.2) }}
               style={{
-                height: "clamp(100px, 14vw, 186px)",
+                height: "clamp(80px, 12vw, 150px)",
                 width: "auto",
                 display: "block",
-                margin: "4px auto 0",
-                filter: "drop-shadow(0 2px 28px rgba(110,0,37,0.13)) brightness(0.9) sepia(0.08)",
+                margin: "0 auto",
+                filter: "drop-shadow(0 0 28px rgba(212,175,55,0.28))",
               }}
               draggable={false}
             />
 
-            {/* "For her, by her." tagline */}
+            {/* "For her, by her." */}
             <motion.p
               variants={fadeVariants} initial="hidden" animate="visible"
-              transition={{ delay: d(0.75) }}
+              transition={{ delay: d(0.7) }}
               style={{
                 fontFamily: CORMORANT,
                 fontStyle: "italic",
-                fontSize: "clamp(16px, 2vw, 22px)",
-                color: BURGUNDY,
+                fontSize: "clamp(15px, 2vw, 21px)",
+                color: GOLD,
                 margin: 0,
-                letterSpacing: "0.3px",
-                opacity: 0.9,
+                opacity: 0.85,
               }}
             >For her, by her.</motion.p>
 
-            {/* Rule */}
+            {/* Gold rule */}
             <motion.div
               variants={ruleVariants} initial="hidden" animate="visible"
-              transition={{ delay: d(0.9) }}
-              style={{ width: 44, height: 1, background: `rgba(110,0,37,0.22)`, transformOrigin: "center" }}
+              transition={{ delay: d(0.88) }}
+              style={{ width: 44, height: 1, background: GOLD_ALPHA, transformOrigin: "center" }}
             />
+
+            {/* Daughters of Adonai — centred portrait, magazine-cover style */}
+            <motion.div
+              initial={{ opacity: 0, y: reduced ? 0 : 32 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: d(0.85), delay: d(0.95), ease: [0.16, 1, 0.3, 1] }}
+              style={{
+                width: "clamp(200px, 36%, 310px)",
+                margin: "4px auto 0",
+                overflow: "hidden",
+                borderRadius: 3,
+                border: `1px solid ${GOLD_ALPHA}`,
+                boxShadow: "0 32px 80px rgba(0,0,0,0.55)",
+              }}
+            >
+              <div style={{ aspectRatio: "3/4", overflow: "hidden" }}>
+                <img
+                  src="/viva/look-4.jpeg"
+                  alt="Daughters of Adonai — VIVA 'Batya' collection"
+                  loading="eager"
+                  style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }}
+                />
+              </div>
+            </motion.div>
 
             {/* Collection name */}
             <motion.p
               variants={fadeVariants} initial="hidden" animate="visible"
-              transition={{ delay: d(1.0) }}
+              transition={{ delay: d(1.1) }}
               style={{
                 fontFamily: CORMORANT,
                 fontStyle: "italic",
-                fontSize: "clamp(20px, 3vw, 34px)",
-                color: DARK_TEXT,
+                fontSize: "clamp(18px, 2.5vw, 28px)",
+                color: `rgba(250,249,246,0.82)`,
                 fontWeight: 400,
                 margin: 0,
               }}
@@ -218,12 +215,12 @@ const VIVAPage = () => {
             {/* Body */}
             <motion.p
               variants={fadeVariants} initial="hidden" animate="visible"
-              transition={{ delay: d(1.15) }}
+              transition={{ delay: d(1.22) }}
               style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
                 fontWeight: 300,
                 fontSize: 14,
-                color: `rgba(34,26,26,0.52)`,
+                color: `rgba(250,249,246,0.42)`,
                 lineHeight: 1.8,
                 margin: 0,
                 maxWidth: 360,
@@ -233,16 +230,13 @@ const VIVAPage = () => {
               for the modern woman who wears her confidence out loud.
             </motion.p>
 
-            {/* CTA */}
+            {/* CTA — gold fill */}
             <motion.a
               href="#viva-enquiry"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById("viva-enquiry")?.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
-              }}
+              onClick={scrollToEnquiry}
               variants={fadeVariants} initial="hidden" animate="visible"
-              transition={{ delay: d(1.3) }}
-              whileHover={reduced ? {} : { opacity: 0.84, scale: 1.02 }}
+              transition={{ delay: d(1.35) }}
+              whileHover={reduced ? {} : { opacity: 0.85, scale: 1.02 }}
               whileTap={reduced ? {} : { scale: 0.97 }}
               style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
@@ -250,8 +244,8 @@ const VIVAPage = () => {
                 letterSpacing: "2.5px",
                 textTransform: "uppercase",
                 fontWeight: 500,
-                background: BURGUNDY,
-                color: ALABASTER,
+                background: GOLD,
+                color: DARK_TEXT,
                 border: "none",
                 borderRadius: 3,
                 padding: "13px 30px",
@@ -262,40 +256,27 @@ const VIVAPage = () => {
               }}
             >Enquire About a Commission</motion.a>
 
-            {/* Stat strip */}
+            {/* Stats strip */}
             <motion.div
               variants={fadeVariants} initial="hidden" animate="visible"
               transition={{ delay: d(1.5) }}
-              style={{ display: "flex", gap: 36, marginTop: 10 }}
+              style={{ display: "flex", gap: 36, marginTop: 8 }}
             >
               {[["Selective", "Commissions"], ["Bespoke", "Garments"], ["48hr", "Response"]].map(([val, lbl]) => (
                 <div key={lbl} style={{ textAlign: "center" }}>
-                  <p style={{ fontFamily: CORMORANT, fontSize: 22, fontWeight: 700, color: BURGUNDY, margin: 0, lineHeight: 1 }}>{val}</p>
-                  <p style={{ fontFamily: "DM Sans", fontSize: 9, color: `rgba(34,26,26,0.38)`, margin: "5px 0 0 0", letterSpacing: "1.8px", textTransform: "uppercase" }}>{lbl}</p>
+                  <p style={{ fontFamily: CORMORANT, fontSize: 22, fontWeight: 700, color: GOLD, margin: 0, lineHeight: 1 }}>{val}</p>
+                  <p style={{ fontFamily: "DM Sans", fontSize: 9, color: `rgba(212,175,55,0.38)`, margin: "5px 0 0 0", letterSpacing: "1.8px", textTransform: "uppercase" }}>{lbl}</p>
                 </div>
               ))}
             </motion.div>
           </div>
         </div>
-
-        {/* Mobile: photo strip below copy */}
-        <div
-          className="md:hidden"
-          style={{ height: "62vw", overflow: "hidden", position: "relative" }}
-        >
-          <img src="/viva/look-2.jpeg" alt="VIVA look"
-            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 12%", display: "block" }}
-          />
-          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "32%", background: `linear-gradient(to bottom, ${ALABASTER} 0%, transparent 100%)` }} />
-          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "32%", background: `linear-gradient(to top, ${ALABASTER} 0%, transparent 100%)` }} />
-        </div>
       </section>
 
       {/* ═══════════════════════════════════════════════════════
-          PILLARS — warm cream
+          PILLARS — warm cream contrast break
           ═══════════════════════════════════════════════════════ */}
       <section className="w-full py-20" style={{ background: CREAM, position: "relative", overflow: "hidden" }}>
-        {/* Burgundy accent top line */}
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: BURGUNDY, opacity: 0.45 }} />
 
         <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
@@ -334,7 +315,7 @@ const VIVAPage = () => {
       </section>
 
       {/* ═══════════════════════════════════════════════════════
-          LOOKBOOK — alabaster background, editorial asymmetric
+          LOOKBOOK — alabaster, look-1 / look-2 / look-3 only
           ═══════════════════════════════════════════════════════ */}
       <section className="w-full" style={{ background: ALABASTER, paddingTop: 80, paddingBottom: 80 }}>
         <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
@@ -356,20 +337,20 @@ const VIVAPage = () => {
             animate={lookbookInView ? "visible" : "hidden"}
             variants={staggerVariants}
           >
-            {/* Top row: look-1 tall left | look-2 + look-3 stacked right */}
+            {/* Asymmetric top row: look-1 tall left | look-2 + look-3 stacked right */}
             <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: "1fr 1fr" }}>
 
-              {/* Look 1 — tall left */}
+              {/* Look 1 — tall */}
               <motion.div
                 variants={cardVariants}
                 whileHover={reduced ? {} : { y: -6 }}
                 transition={{ type: "spring", stiffness: 260, damping: 22 }}
-                style={{ border: `1px solid ${BURG_BORDER}`, borderRadius: 4, overflow: "hidden", cursor: "pointer" }}
-                onClick={() => document.getElementById("viva-enquiry")?.scrollIntoView({ behavior: "smooth" })}
+                style={{ border: `1px solid ${BURG_ALPHA}`, borderRadius: 4, overflow: "hidden", cursor: "pointer" }}
+                onClick={scrollToEnquiry}
               >
                 <div style={{ position: "relative", height: "100%", minHeight: 480, overflow: "hidden" }}>
                   <img
-                    src={LOOKBOOK[0].photo!}
+                    src={LOOKBOOK[0].photo}
                     alt={LOOKBOOK[0].title}
                     loading="lazy"
                     style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block", transition: "transform 0.6s ease" }}
@@ -384,7 +365,7 @@ const VIVAPage = () => {
                 </div>
               </motion.div>
 
-              {/* Right: Look 2 + Look 3 stacked */}
+              {/* Look 2 + Look 3 stacked */}
               <div className="flex flex-col gap-4">
                 {[LOOKBOOK[1], LOOKBOOK[2]].map((piece, i) => (
                   <motion.div
@@ -392,12 +373,12 @@ const VIVAPage = () => {
                     variants={cardVariants}
                     whileHover={reduced ? {} : { y: -5 }}
                     transition={{ type: "spring", stiffness: 260, damping: 22 }}
-                    style={{ border: `1px solid ${BURG_BORDER}`, borderRadius: 4, overflow: "hidden", cursor: "pointer", flex: 1 }}
-                    onClick={() => document.getElementById("viva-enquiry")?.scrollIntoView({ behavior: "smooth" })}
+                    style={{ border: `1px solid ${BURG_ALPHA}`, borderRadius: 4, overflow: "hidden", cursor: "pointer", flex: 1 }}
+                    onClick={scrollToEnquiry}
                   >
                     <div style={{ position: "relative", minHeight: 228, overflow: "hidden" }}>
                       <img
-                        src={piece.photo!}
+                        src={piece.photo}
                         alt={piece.title}
                         loading="lazy"
                         style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block", transition: "transform 0.6s ease" }}
@@ -418,60 +399,38 @@ const VIVAPage = () => {
             {/* Pull quote */}
             <motion.div
               variants={cardVariants}
-              style={{ textAlign: "center", padding: "44px 20px", borderTop: `1px solid ${BURG_BORDER}`, borderBottom: `1px solid ${BURG_BORDER}`, margin: "0 0 32px 0" }}
+              style={{ textAlign: "center", padding: "44px 20px", borderTop: `1px solid ${BURG_ALPHA}`, borderBottom: `1px solid ${BURG_ALPHA}`, margin: "0 0 32px 0" }}
             >
               <p style={{ fontFamily: CORMORANT, fontStyle: "italic", fontSize: "clamp(18px, 3vw, 30px)", color: BURGUNDY, fontWeight: 400, margin: 0, maxWidth: 600, display: "inline-block", opacity: 0.82 }}>
                 "She knows exactly who she is — the clothes are just the evidence."
               </p>
             </motion.div>
 
-            {/* Bottom row: look-4 + editorial placeholders */}
-            <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
-              {LOOKBOOK.slice(3).map((piece, i) => (
+            {/* Coming soon — 2-column */}
+            <div className="grid gap-4" style={{ gridTemplateColumns: "1fr 1fr" }}>
+              {COMING.map((piece, i) => (
                 <motion.div
                   key={piece.title}
                   variants={cardVariants}
-                  whileHover={reduced ? {} : { y: -5 }}
-                  transition={{ type: "spring", stiffness: 260, damping: 22 }}
-                  style={{ border: `1px solid ${BURG_BORDER}`, borderRadius: 4, overflow: "hidden" }}
+                  style={{ border: `1px solid ${BURG_ALPHA}`, borderRadius: 4, overflow: "hidden" }}
                 >
-                  {piece.photo ? (
-                    <div style={{ position: "relative", overflow: "hidden" }}>
-                      <div style={{ aspectRatio: "3/4", overflow: "hidden" }}>
-                        <img
-                          src={piece.photo}
-                          alt={piece.title}
-                          loading="lazy"
-                          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block", transition: "transform 0.6s ease" }}
-                          onMouseEnter={(e) => { if (!reduced) (e.currentTarget as HTMLImageElement).style.transform = "scale(1.04)"; }}
-                          onMouseLeave={(e) => { (e.currentTarget as HTMLImageElement).style.transform = "scale(1)"; }}
-                        />
-                      </div>
-                      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "44%", background: "linear-gradient(to top, rgba(10,0,5,0.82) 0%, transparent 100%)" }} />
-                      <div style={{ position: "absolute", bottom: 16, left: 16 }}>
-                        <p style={{ fontFamily: "DM Sans", fontSize: 9, color: "rgba(212,175,55,0.8)", letterSpacing: "3px", textTransform: "uppercase", margin: "0 0 4px 0" }}>Look 0{i + 4} · {piece.mood}</p>
-                        <h3 style={{ fontFamily: CORMORANT, fontSize: 20, color: ALABASTER, margin: 0, fontStyle: "italic" }}>{piece.title}</h3>
-                      </div>
-                    </div>
-                  ) : (
-                    /* Editorial placeholder — warm sand gradient */
-                    <div style={{
-                      padding: "38px 20px 28px",
-                      display: "flex", flexDirection: "column", gap: 12, minHeight: 220,
-                      background: `linear-gradient(${145 + i * 22}deg, rgba(212,175,55,0.07) 0%, rgba(229,198,157,0.18) 45%, rgba(250,249,246,0.95) 100%)`,
-                    }}>
-                      <span style={{ fontFamily: "DM Sans", fontSize: 9, color: `rgba(110,0,37,0.5)`, letterSpacing: "3px", textTransform: "uppercase" }}>Look 0{i + 4} · {piece.mood}</span>
-                      <h3 style={{ fontFamily: CORMORANT, fontSize: 22, color: DARK_TEXT, margin: 0, fontWeight: 700 }}>{piece.title}</h3>
-                      <p style={{ fontFamily: "DM Sans", fontWeight: 300, fontSize: 12, color: `rgba(34,26,26,0.5)`, lineHeight: 1.75, margin: 0 }}>{piece.desc}</p>
-                      <span style={{
-                        marginTop: "auto",
-                        fontFamily: "DM Sans", fontSize: 9, letterSpacing: "2px",
-                        textTransform: "uppercase", color: `rgba(110,0,37,0.45)`,
-                        border: `1px solid rgba(110,0,37,0.18)`, borderRadius: 2,
-                        padding: "4px 10px", width: "fit-content",
-                      }}>Coming Soon</span>
-                    </div>
-                  )}
+                  <div style={{
+                    padding: "44px 28px 36px",
+                    display: "flex", flexDirection: "column", gap: 14,
+                    minHeight: 220,
+                    background: `linear-gradient(${138 + i * 30}deg, rgba(110,0,37,0.07) 0%, rgba(212,175,55,0.04) 45%, rgba(250,249,246,0.96) 100%)`,
+                  }}>
+                    <span style={{ fontFamily: "DM Sans", fontSize: 9, color: `rgba(110,0,37,0.5)`, letterSpacing: "3px", textTransform: "uppercase" }}>Look 0{i + 4} · {piece.mood}</span>
+                    <h3 style={{ fontFamily: CORMORANT, fontSize: 26, color: DARK_TEXT, margin: 0, fontWeight: 700 }}>{piece.title}</h3>
+                    <p style={{ fontFamily: "DM Sans", fontWeight: 300, fontSize: 13, color: `rgba(34,26,26,0.5)`, lineHeight: 1.78, margin: 0 }}>{piece.desc}</p>
+                    <span style={{
+                      marginTop: "auto",
+                      fontFamily: "DM Sans", fontSize: 9, letterSpacing: "2px",
+                      textTransform: "uppercase", color: `rgba(110,0,37,0.45)`,
+                      border: `1px solid rgba(110,0,37,0.18)`, borderRadius: 2,
+                      padding: "5px 12px", width: "fit-content",
+                    }}>Coming Soon</span>
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -480,7 +439,7 @@ const VIVAPage = () => {
       </section>
 
       {/* ═══════════════════════════════════════════════════════
-          ENQUIRY — burgundy accent section (dark used intentionally)
+          ENQUIRY — deep burgundy accent
           ═══════════════════════════════════════════════════════ */}
       <section
         id="viva-enquiry"
@@ -607,7 +566,7 @@ const VIVAPage = () => {
       </section>
 
       {/* Footer */}
-      <footer style={{ borderTop: `1px solid rgba(250,249,246,0.08)`, padding: "24px", textAlign: "center", background: "#1A0808" }}>
+      <footer style={{ borderTop: `1px solid rgba(212,175,55,0.1)`, padding: "24px", textAlign: "center", background: "#1A0808" }}>
         <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: `rgba(212,175,55,0.28)`, margin: 0, letterSpacing: "1px" }}>
           © {new Date().getFullYear()} Viera Amber. All rights reserved.
         </p>
