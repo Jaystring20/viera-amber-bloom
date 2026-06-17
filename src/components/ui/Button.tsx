@@ -89,7 +89,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         transition={
           shouldReduceMotion
             ? { duration: 0 }
-            : { type: "spring", stiffness: 350, damping: 25 }
+            : { type: "spring" as const, stiffness: 350, damping: 25 }
         }
         {...props}
       >
@@ -119,7 +119,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={
-              shouldReduceMotion ? { duration: 0 } : { type: "spring", stiffness: 300, damping: 20 }
+              shouldReduceMotion ? { duration: 0 } : { type: "spring" as const, stiffness: 300, damping: 20 }
             }
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">

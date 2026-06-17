@@ -186,7 +186,7 @@ const VIVAPage = () => {
               alt="VIVA by Viera Amber"
               initial={{ opacity: 0, scale: reduced ? 1 : 0.88 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: d(0.9), ease: "easeOut", delay: d(0.2) }}
+              transition={{ duration: d(0.9), ease: "easeOut" as const, delay: d(0.2) }}
               style={{
                 height: "clamp(80px, 12vw, 150px)",
                 width: "auto",
@@ -388,7 +388,7 @@ const VIVAPage = () => {
               <motion.div
                 variants={cardVariants}
                 whileHover={reduced ? {} : { y: -6 }}
-                transition={{ type: "spring", stiffness: 260, damping: 22 }}
+                transition={{ type: "spring" as const, stiffness: 260, damping: 22 }}
                 style={{ border: `1px solid ${BURG_ALPHA}`, borderRadius: 4, overflow: "hidden", cursor: "pointer" }}
                 onClick={scrollToEnquiry}
               >
@@ -416,7 +416,7 @@ const VIVAPage = () => {
                     key={piece.title}
                     variants={cardVariants}
                     whileHover={reduced ? {} : { y: -5 }}
-                    transition={{ type: "spring", stiffness: 260, damping: 22 }}
+                    transition={{ type: "spring" as const, stiffness: 260, damping: 22 }}
                     style={{ border: `1px solid ${BURG_ALPHA}`, borderRadius: 4, overflow: "hidden", cursor: "pointer", flex: 1 }}
                     onClick={scrollToEnquiry}
                   >

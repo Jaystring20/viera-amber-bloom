@@ -94,7 +94,7 @@ const BarChart = ({ data, color }: { data: { label: string; value: number }[]; c
       {data.map(d => (
         <div key={d.label} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
           <motion.div
-            initial={{ scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ duration: 0.6, ease: "easeOut" }}
+            initial={{ scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ duration: 0.6, ease: "easeOut" as const }}
             style={{ width: "100%", height: Math.max((d.value / max) * 64, 4), background: color, borderRadius: "4px 4px 0 0", transformOrigin: "bottom", opacity: 0.85 }}
           />
           <span style={{ fontSize: 9, color: "rgba(250,250,250,0.4)", whiteSpace: "nowrap" }}>{d.label}</span>

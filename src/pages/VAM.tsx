@@ -349,7 +349,7 @@ const VAMPage = () => {
                   key={pillar.num}
                   variants={cardVariants}
                   whileHover={reduced ? {} : { y: -3, borderColor: GOLD }}
-                  transition={{ type: "spring", stiffness: 320, damping: 22 }}
+                  transition={{ type: "spring" as const, stiffness: 320, damping: 22 }}
                   style={{
                     background: "#FAFAFA",
                     border: "1px solid #EBEBEB",
@@ -723,7 +723,7 @@ const VAMPage = () => {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: reduced ? 0 : 0.25, ease: "easeInOut" }}
+                      transition={{ duration: reduced ? 0 : 0.25, ease: "easeInOut" as const }}
                       style={{ overflow: "hidden" }}
                     >
                       <p style={{

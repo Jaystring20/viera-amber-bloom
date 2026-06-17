@@ -119,7 +119,7 @@ const EcosystemSection = () => {
   };
   const fadeUp = {
     initial: { opacity: 0, y: 24 },
-    animate: { opacity: 1, y: 0, transition: { duration: d(0.6), ease: "easeOut" } },
+    animate: { opacity: 1, y: 0, transition: { duration: d(0.6), ease: "easeOut" as const } },
   };
 
   return (
@@ -181,7 +181,7 @@ const EcosystemSection = () => {
           <motion.h2
             variants={{
               initial: { opacity: 0, y: 36 },
-              animate: { opacity: 1, y: 0, transition: { duration: d(0.7), ease: "easeOut" } },
+              animate: { opacity: 1, y: 0, transition: { duration: d(0.7), ease: "easeOut" as const } },
             }}
             className="font-display m-0"
             style={{
@@ -215,7 +215,7 @@ const EcosystemSection = () => {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: d(0.35), ease: "easeOut" }}
+              transition={{ duration: d(0.35), ease: "easeOut" as const }}
             >
               <FlowView reduced={!!reduced} d={d} onActivate={scrollTo} />
             </motion.div>
@@ -225,7 +225,7 @@ const EcosystemSection = () => {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: d(0.35), ease: "easeOut" }}
+              transition={{ duration: d(0.35), ease: "easeOut" as const }}
             >
               <CardsView reduced={!!reduced} d={d} onActivate={scrollTo} />
             </motion.div>
@@ -239,11 +239,11 @@ const EcosystemSection = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: d(0.6), delay: d(0.2), ease: "easeOut" }}
+          transition={{ duration: d(0.6), delay: d(0.2), ease: "easeOut" as const }}
         >
           <motion.div
             animate={reduced ? { height: 44 } : { height: [44, 60, 44] }}
-            transition={reduced ? { duration: 0 } : { duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+            transition={reduced ? { duration: 0 } : { duration: 2.2, repeat: Infinity, ease: "easeInOut" as const }}
             style={{ width: 1, backgroundColor: "#D97706" }}
             aria-hidden="true"
           />
@@ -309,7 +309,7 @@ const ViewToggle = ({ view, onChange }: { view: View; onChange: (v: View) => voi
                 layoutId="ecoTogglePill"
                 className="absolute inset-0"
                 style={{ background: "#D97706", borderRadius: 999, zIndex: -1 }}
-                transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                transition={{ type: "spring" as const, stiffness: 380, damping: 30 }}
               />
             )}
             {o.label}
@@ -381,7 +381,7 @@ const FlowView = ({
             initial={{ pathLength: reduced ? 1 : 0 }}
             whileInView={{ pathLength: 1 }}
             viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: d(1.8), ease: "easeInOut" }}
+            transition={{ duration: d(1.8), ease: "easeInOut" as const }}
           />
         </svg>
 
@@ -443,7 +443,7 @@ const FlowNode = ({
       style={{ left: `${arm.x}%`, top: `${arm.y}%`, width: 0, height: 0, overflow: "visible" }}
       variants={{
         initial: { opacity: 0, scale: 0.6 },
-        animate: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 260, damping: 18 } },
+        animate: { opacity: 1, scale: 1, transition: { type: "spring" as const, stiffness: 260, damping: 18 } },
       }}
       whileHover={reduced ? undefined : "hover"}
       whileTap={reduced ? undefined : { scale: 0.96 }}
@@ -452,7 +452,7 @@ const FlowNode = ({
       <motion.span
         aria-hidden="true"
         variants={{ hover: reduced ? {} : { scale: 1.3 } }}
-        transition={{ type: "spring", stiffness: 300, damping: 18 }}
+        transition={{ type: "spring" as const, stiffness: 300, damping: 18 }}
         style={{
           position: "absolute",
           left: 0,
@@ -546,7 +546,7 @@ const SpineNode = ({
     <motion.li
       variants={{
         initial: { opacity: 0, x: -16 },
-        animate: { opacity: 1, x: 0, transition: { duration: reduced ? 0 : 0.5, ease: "easeOut" } },
+        animate: { opacity: 1, x: 0, transition: { duration: reduced ? 0 : 0.5, ease: "easeOut" as const } },
       }}
       style={{ position: "relative", paddingLeft: 52, paddingBottom: 24 }}
     >
@@ -736,9 +736,9 @@ const EcoCard = ({
       }}
       variants={{
         initial: { opacity: 0, y: 26 },
-        animate: { opacity: 1, y: 0, transition: { duration: reduced ? 0 : 0.55, ease: "easeOut" } },
+        animate: { opacity: 1, y: 0, transition: { duration: reduced ? 0 : 0.55, ease: "easeOut" as const } },
       }}
-      whileHover={reduced ? undefined : { y: -6, scale: 1.02, transition: { type: "spring", stiffness: 350, damping: 25 } }}
+      whileHover={reduced ? undefined : { y: -6, scale: 1.02, transition: { type: "spring" as const, stiffness: 350, damping: 25 } }}
       whileTap={reduced ? undefined : { scale: 0.98 }}
     >
       <div className="flex items-center" style={{ gap: 12, marginBottom: 16 }}>

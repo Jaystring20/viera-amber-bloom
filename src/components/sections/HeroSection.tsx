@@ -35,7 +35,7 @@ const HeroSection = () => {
       y: 0,
       scale: 1,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 90,
         damping: 20,
         delay: d(0.2),
@@ -48,7 +48,7 @@ const HeroSection = () => {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: d(0.5), ease: "easeOut" },
+      transition: { duration: d(0.5), ease: "easeOut" as const },
     },
   };
 
@@ -58,7 +58,7 @@ const HeroSection = () => {
       opacity: 1,
       scale: 1,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 110,
         damping: 18,
         delay: d(0.1),
@@ -71,7 +71,7 @@ const HeroSection = () => {
     visible: {
       scaleX: 1,
       opacity: 1,
-      transition: { duration: d(0.7), ease: "easeOut", delay: d(0.15) },
+      transition: { duration: d(0.7), ease: "easeOut" as const, delay: d(0.15) },
     },
   };
 
@@ -80,7 +80,7 @@ const HeroSection = () => {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: d(0.6), ease: "easeOut", delay: d(0.2) },
+      transition: { duration: d(0.6), ease: "easeOut" as const, delay: d(0.2) },
     },
   };
 
@@ -89,7 +89,7 @@ const HeroSection = () => {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: d(0.6), ease: "easeOut", delay: d(0.4) },
+      transition: { duration: d(0.6), ease: "easeOut" as const, delay: d(0.4) },
     },
   };
 
@@ -99,7 +99,7 @@ const HeroSection = () => {
       opacity: 1,
       scale: 1,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 200,
         damping: 22,
         delay: d(0.5),
@@ -349,7 +349,7 @@ const HeroSection = () => {
           {/* Scroll indicator */}
           <motion.div
             animate={reduced ? undefined : { y: [0, 9, 0] }}
-            transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" as const }}
             className="absolute"
             style={{ bottom: "-4rem", left: "50%", transform: "translateX(-50%)" }}
             aria-hidden="true"
@@ -367,7 +367,7 @@ const HeroSection = () => {
             >
               <motion.div
                 animate={reduced ? undefined : { opacity: [1, 0.2, 1], y: [0, 8, 0] }}
-                transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+                transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" as const }}
                 style={{
                   width: 2,
                   height: 6,
