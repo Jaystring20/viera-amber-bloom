@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 96">
+  <!-- Top rule -->
+  <line x1="12" y1="14" x2="288" y2="14" stroke="#D4AF37" stroke-width="0.8" stroke-opacity="0.75"/>
+  <!-- VIVA wordmark -->
+  <text
+    x="150" y="58"
+    font-family="Georgia,'Palatino Linotype','Book Antiqua',Palatino,serif"
+    font-size="44"
+    font-weight="700"
+    fill="#D4AF37"
+    text-anchor="middle"
+    letter-spacing="14"
+  >VIVA</text>
+  <!-- Byline -->
+  <text
+    x="150" y="77"
+    font-family="'Arial Narrow',Arial,'Helvetica Neue',sans-serif"
+    font-size="7.5"
+    font-weight="400"
+    fill="#D4AF37"
+    fill-opacity="0.6"
+    text-anchor="middle"
+    letter-spacing="5"
+  >BY VIERA AMBER</text>
+  <!-- Bottom rule -->
+  <line x1="12" y1="88" x2="288" y2="88" stroke="#D4AF37" stroke-width="0.8" stroke-opacity="0.75"/>
+</svg>

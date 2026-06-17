@@ -20,9 +20,9 @@ const GOLD_DIM = "rgba(212,175,55,0.2)";
 const GOLD_BORDER = "rgba(212,175,55,0.3)";
 
 const LOOKBOOK = [
-  { title: "Hatmaker", mood: "Power & Craft", desc: "A woman who shapes her own crown. The Hatmaker speaks of quiet authority and inherited skill." },
-  { title: "Jacqueline", mood: "Grace Under Fire", desc: "Elegance that has survived something. Structured, soft — a silhouette that has learned when to bend and when to hold." },
-  { title: "Ada Set", mood: "Regal Certainty", desc: "For the woman who needs no introduction. Tailored with the confidence of a name already known." },
+  { title: "The Heritage", mood: "Power & Craft", desc: "Olive woven kimono meets wide-leg pleated denim. The garment that says: I know where I come from.", photo: "/viva/look-1.jpeg" },
+  { title: "The Bold", mood: "Grace Under Fire", desc: "Hot-pink structured crop, wide-leg silhouette. Unapologetic colour as a declaration — not a question.", photo: "/viva/look-2.jpeg" },
+  { title: "The Artist", mood: "Regal Certainty", desc: "Chartreuse palazzo, structured crop, layered gold. When every element earns its place.", photo: "/viva/look-3.jpeg" },
   { title: "Ibari Set", mood: "Cultural Reverence", desc: "Where tradition meets a new vocabulary. Ibari honours the garment as memory, as lineage, as pride." },
   { title: "Coronation", mood: "Divine Right", desc: "There is a moment when a woman stops asking permission. Coronation is that moment, dressed." },
   { title: "Golden Hour", mood: "Warmth & Light", desc: "The hour when everything you've built is lit from the right angle. Warm, burnished, yours." },
@@ -171,24 +171,19 @@ const VIVAPage = () => {
               By Viera Amber
             </motion.p>
 
-            <motion.h1
-              className="font-display"
-              initial={{ opacity: 0, letterSpacing: reduced ? "14px" : "4px" }}
-              animate={{ opacity: 1, letterSpacing: "14px" }}
-              transition={{
-                opacity: { duration: d(0.7), delay: d(0.2) },
-                letterSpacing: { duration: d(1.5), ease: "easeOut", delay: d(0.2) },
-              }}
+            <motion.img
+              src="/viva-logo.svg"
+              alt="VIVA by Viera Amber"
+              initial={{ opacity: 0, scale: reduced ? 1 : 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: d(0.9), ease: "easeOut", delay: d(0.2) }}
               style={{
-                fontSize: "clamp(64px, 12vw, 120px)",
-                fontWeight: 700,
-                color: GOLD,
-                lineHeight: 1,
-                margin: 0,
+                height: "clamp(80px, 14vw, 155px)",
+                width: "auto",
+                filter: "drop-shadow(0 0 36px rgba(212,175,55,0.3))",
               }}
-            >
-              VIVA
-            </motion.h1>
+              draggable={false}
+            />
 
             <motion.div
               variants={ruleVariants}
@@ -361,37 +356,70 @@ const VIVAPage = () => {
                   cursor: "default",
                 }}
               >
-                {/* Artwork placeholder — gradient art */}
-                <div
-                  aria-hidden="true"
-                  style={{
-                    height: 220,
-                    background: `linear-gradient(${135 + i * 20}deg,
-                      rgba(110,0,37,0.9) 0%,
-                      rgba(60,0,20,0.95) 40%,
-                      rgba(${80 + i * 8},${30 + i * 5},${10 + i * 3},0.8) 100%)`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    position: "relative",
-                    overflow: "hidden",
-                  }}
-                >
-                  <div style={{
-                    position: "absolute",
-                    inset: 0,
-                    background: `radial-gradient(ellipse at ${30 + i * 10}% ${40 + i * 8}%, rgba(212,175,55,0.12) 0%, transparent 60%)`,
-                  }} />
-                  <span className="font-display" style={{
-                    fontSize: 13,
-                    color: "rgba(212,175,55,0.5)",
-                    letterSpacing: "4px",
-                    textTransform: "uppercase",
-                    zIndex: 1,
-                  }}>
-                    {piece.title}
-                  </span>
-                </div>
+                {/* Photo or gradient placeholder */}
+                {piece.photo ? (
+                  <div style={{ position: "relative", aspectRatio: "3/4", overflow: "hidden" }}>
+                    <img
+                      src={piece.photo}
+                      alt={piece.title}
+                      loading="lazy"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        objectPosition: "top",
+                        display: "block",
+                        transition: "transform 0.55s ease",
+                      }}
+                      onMouseEnter={(e) => { if (!reduced) (e.currentTarget as HTMLImageElement).style.transform = "scale(1.04)"; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLImageElement).style.transform = "scale(1)"; }}
+                    />
+                    <div aria-hidden="true" style={{
+                      position: "absolute", bottom: 0, left: 0, right: 0, height: "30%",
+                      background: "linear-gradient(to top, rgba(70,0,20,0.55) 0%, transparent 100%)",
+                      pointerEvents: "none",
+                    }} />
+                    <span style={{
+                      position: "absolute", top: 12, left: 12,
+                      fontFamily: "DM Sans, system-ui, sans-serif",
+                      fontSize: 9, letterSpacing: "3px", textTransform: "uppercase",
+                      color: "rgba(250,250,250,0.85)",
+                      background: "rgba(110,0,37,0.75)",
+                      border: `1px solid rgba(212,175,55,0.3)`,
+                      borderRadius: 2, padding: "4px 10px",
+                      backdropFilter: "blur(6px)",
+                    }}>
+                      Look 0{i + 1}
+                    </span>
+                  </div>
+                ) : (
+                  <div
+                    aria-hidden="true"
+                    style={{
+                      height: 220,
+                      background: `linear-gradient(${135 + i * 20}deg,
+                        rgba(110,0,37,0.9) 0%,
+                        rgba(60,0,20,0.95) 40%,
+                        rgba(${80 + i * 8},${30 + i * 5},${10 + i * 3},0.8) 100%)`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      position: "relative",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <div style={{
+                      position: "absolute", inset: 0,
+                      background: `radial-gradient(ellipse at ${30 + i * 10}% ${40 + i * 8}%, rgba(212,175,55,0.12) 0%, transparent 60%)`,
+                    }} />
+                    <span className="font-display" style={{
+                      fontSize: 13, color: "rgba(212,175,55,0.5)",
+                      letterSpacing: "4px", textTransform: "uppercase", zIndex: 1,
+                    }}>
+                      {piece.title}
+                    </span>
+                  </div>
+                )}
 
                 <div style={{ padding: "18px 20px", background: "rgba(0,0,0,0.25)" }}>
                   <p style={{

@@ -23,6 +23,7 @@ const NavBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isVaginRoute = location.pathname === "/vagin";
+  const isVivaRoute = location.pathname === "/viva";
 
   // Active route detection
   const isActive = (href: string) => {
@@ -108,7 +109,11 @@ const NavBar = () => {
         <a
           href="/"
           onClick={handleLogoClick}
-          aria-label={isVaginRoute ? "VAGIN — back to Viera Amber" : "Viera Amber — home"}
+          aria-label={
+            isVaginRoute ? "VAGIN — back to Viera Amber"
+            : isVivaRoute ? "VIVA — back to Viera Amber"
+            : "Viera Amber — home"
+          }
           className="flex items-center"
           style={{ cursor: "pointer", gap: 10 }}
         >
@@ -120,6 +125,19 @@ const NavBar = () => {
                 alt="VAGIN"
                 className="w-auto select-none"
                 style={{ height: 48, filter: "drop-shadow(0 0 8px rgba(237,21,93,0.3))" }}
+                draggable={false}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: reduced ? 0 : 0.25, ease: "easeOut" }}
+              />
+            ) : isVivaRoute ? (
+              <motion.img
+                key="viva-logo"
+                src="/viva-logo.svg"
+                alt="VIVA"
+                className="w-auto select-none"
+                style={{ height: 42, filter: "drop-shadow(0 0 10px rgba(212,175,55,0.35))" }}
                 draggable={false}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
