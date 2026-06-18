@@ -300,7 +300,7 @@ const VAGINPage = () => {
                   className="flex-shrink-0 flex items-center justify-center"
                 >
                   <img
-                    src="/vagin-logo.png"
+                    src="/vagin-logo.webp"
                     alt="VAGIN — Viera Amber Girls' Initiative"
                     style={{
                       height: "clamp(80px, 10vw, 115px)",

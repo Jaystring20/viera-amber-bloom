@@ -18,8 +18,8 @@ declare global {
   }
 }
 
-const vivaHeroLeft  = "/viva/hero-left.png";  // Look 1 — olive kimono — left flank
-const vivaHeroRight = "/viva/hero-right.png"; // Look 2 — hot-pink crop — right flank
+const vivaHeroLeft  = "/viva/hero-left.webp";  // Look 1 — olive kimono — left flank
+const vivaHeroRight = "/viva/hero-right.webp"; // Look 2 — hot-pink crop — right flank
 
 const ALABASTER  = "#FAF9F6";
 const CREAM      = "#F5EDE6";
@@ -32,17 +32,17 @@ const BURG_ALPHA = "rgba(110,0,37,0.14)";
 
 // Three outfit looks go into the lookbook
 const LOOKBOOK = [
-  { title: "The Heritage", mood: "Power & Craft",     photo: "/viva/look-1.jpeg", desc: "Olive woven kimono · Wide-leg pleated denim · Gold cuffs" },
-  { title: "The Bold",     mood: "Vivid Authority",   photo: "/viva/look-2.jpeg", desc: "Hot-pink structured crop · Wide-leg denim · Statement earrings" },
-  { title: "The Artist",   mood: "Chromatic Freedom", photo: "/viva/look-3.jpeg", desc: "Chartreuse palazzo · Structured crop · Layered gold jewellery" },
+  { title: "The Heritage", mood: "Power & Craft",     photo: "/viva/look-1.webp", desc: "Olive woven kimono · Wide-leg pleated denim · Gold cuffs" },
+  { title: "The Bold",     mood: "Vivid Authority",   photo: "/viva/look-2.webp", desc: "Hot-pink structured crop · Wide-leg denim · Statement earrings" },
+  { title: "The Artist",   mood: "Chromatic Freedom", photo: "/viva/look-3.webp", desc: "Chartreuse palazzo · Structured crop · Layered gold jewellery" },
 ];
 
 const SHOP_PRODUCTS = [
-  { id: "heritage", title: "The Heritage",  subtitle: "Look 01 · Batya Collection",        type: "garment" as const, badge: "Made to Order", photo: "/viva/look-1.jpeg", priceNGN: 180000, priceUSD: 115, desc: "Olive woven kimono · wide-leg pleated denim · gold cuffs. Bespoke fit, made to your measurements." },
-  { id: "bold",     title: "The Bold",      subtitle: "Look 02 · Batya Collection",        type: "garment" as const, badge: "Limited",       photo: "/viva/look-2.jpeg", priceNGN: 195000, priceUSD: 126, desc: "Hot-pink structured crop · wide-leg denim · statement earrings. Confidence, personalised." },
-  { id: "artist",   title: "The Artist",    subtitle: "Look 03 · Batya Collection",        type: "garment" as const, badge: "Made to Order", photo: "/viva/look-3.jpeg", priceNGN: 188000, priceUSD: 121, desc: "Chartreuse palazzo · structured crop · layered gold jewellery. Chromatic freedom in fabric." },
+  { id: "heritage", title: "The Heritage",  subtitle: "Look 01 · Batya Collection",        type: "garment" as const, badge: "Made to Order", photo: "/viva/look-1.webp", priceNGN: 180000, priceUSD: 115, desc: "Olive woven kimono · wide-leg pleated denim · gold cuffs. Bespoke fit, made to your measurements." },
+  { id: "bold",     title: "The Bold",      subtitle: "Look 02 · Batya Collection",        type: "garment" as const, badge: "Limited",       photo: "/viva/look-2.webp", priceNGN: 195000, priceUSD: 126, desc: "Hot-pink structured crop · wide-leg denim · statement earrings. Confidence, personalised." },
+  { id: "artist",   title: "The Artist",    subtitle: "Look 03 · Batya Collection",        type: "garment" as const, badge: "Made to Order", photo: "/viva/look-3.webp", priceNGN: 188000, priceUSD: 121, desc: "Chartreuse palazzo · structured crop · layered gold jewellery. Chromatic freedom in fabric." },
   { id: "print-01", title: "Batya No.1",    subtitle: "Fashion Illustration · A3 Giclée", type: "print"   as const, badge: "Edition / 30", photo: "/viva/look-4.jpeg", priceNGN: 35000,  priceUSD: 22,  desc: "Archival giclée on 300gsm cotton rag. Signed + numbered. Ships in a protective tube." },
-  { id: "print-02", title: "Heritage Print",subtitle: "Fashion Illustration · A3 Giclée", type: "print"   as const, badge: "Edition / 30", photo: "/viva/look-1.jpeg", priceNGN: 35000,  priceUSD: 22,  desc: "The Heritage silhouette in ink and gouache. Signed by Viera Amber. Edition of 30." },
+  { id: "print-02", title: "Heritage Print",subtitle: "Fashion Illustration · A3 Giclée", type: "print"   as const, badge: "Edition / 30", photo: "/viva/look-1.webp", priceNGN: 35000,  priceUSD: 22,  desc: "The Heritage silhouette in ink and gouache. Signed by Viera Amber. Edition of 30." },
 ] as const;
 
 type ShopProduct = typeof SHOP_PRODUCTS[number];

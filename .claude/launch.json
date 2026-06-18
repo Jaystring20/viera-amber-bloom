@@ -1,1 +1,1 @@
-﻿{"version":"0.0.1","configurations":[{"name":"viera-amber","runtimeExecutable":"python","runtimeArgs":["C:\\Users\\DELL\\Downloads\\serve_spa.py"],"port":8091}]}
+version:0.0.1 configurations:[name:viera-amber-dev] configurations:[runtimeExecutable:bun] configurations:[runtimeArgs:[run] configurations:[dev]] configurations:[port:8080]

@@ -218,7 +218,7 @@ const VAGINSection = () => {
             animate={headerInView ? "visible" : "hidden"}
           >
             <img
-              src="/vagin-logo.png"
+              src="/vagin-logo.webp"
               alt="VAGIN — Girls' Initiative"
               style={{ height: 90, width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 18px rgba(237,21,93,0.35)) drop-shadow(0 2px 6px rgba(0,0,0,0.5))" }}
             />

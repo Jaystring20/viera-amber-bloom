@@ -7,9 +7,9 @@ const GOLD = "#D4AF37";
 const GOLD_BORDER = "rgba(212,175,55,0.28)";
 
 const LOOKS = [
-  { src: "/viva/look-1.jpeg", name: "The Heritage", tag: "01", mood: "Power & Craft" },
-  { src: "/viva/look-2.jpeg", name: "The Bold",     tag: "02", mood: "Vivid Authority" },
-  { src: "/viva/look-3.jpeg", name: "The Artist",   tag: "03", mood: "Chromatic Freedom" },
+  { src: "/viva/look-1.webp", name: "The Heritage", tag: "01", mood: "Power & Craft" },
+  { src: "/viva/look-2.webp", name: "The Bold",     tag: "02", mood: "Vivid Authority" },
+  { src: "/viva/look-3.webp", name: "The Artist",   tag: "03", mood: "Chromatic Freedom" },
 ];
 
 const VIVASection = () => {

@@ -121,7 +121,7 @@ const NavBar = () => {
             {isVaginRoute ? (
               <motion.img
                 key="vagin-logo"
-                src="/vagin-logo.png"
+                src="/vagin-logo.webp"
                 alt="VAGIN"
                 className="w-auto select-none"
                 style={{ height: 48, filter: "drop-shadow(0 0 8px rgba(237,21,93,0.3))" }}
