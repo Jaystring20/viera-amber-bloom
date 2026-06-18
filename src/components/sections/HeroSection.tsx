@@ -2,6 +2,9 @@ import { motion, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
 import logoSrc from "@/assets/viera-amber-logo.png";
 
+const INK = "#0A0A0A";
+const PAPER = "#FFFFFF";
+const MUTED = "#444444";
 
 const HeroSection = () => {
   const reduced = useReducedMotion();
@@ -24,21 +27,6 @@ const HeroSection = () => {
         duration: d(1.4),
         staggerChildren: d(0.1),
         delayChildren: d(0.3),
-      },
-    },
-  };
-
-  const panelVariants = {
-    hidden: { opacity: 0, y: 28, scale: 0.97 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        type: "spring" as const,
-        stiffness: 90,
-        damping: 20,
-        delay: d(0.2),
       },
     },
   };
@@ -109,18 +97,6 @@ const HeroSection = () => {
 
   return (
     <>
-      {/*
-        Responsive object-position:
-        - Desktop (≥1024px): image is width-constrained (portrait img in landscape viewport).
-          The hat brim tip sits at ~12% from top of the original image.
-          With cover at 1280px wide → scaled height ≈1638px; container ≈ 800px.
-          object-position Y=22% pushes the "center" of the image window to 22% of overflow
-          from the top → hat brim aligns at the navbar level.
-        - Tablet (768–1023px): similar but slightly less crop needed → 16%
-        - Mobile (<768px): image becomes height-constrained (portrait fills full height).
-          No vertical crop; horizontal center keeps the face. Use top-biased Y=5% so
-          the brim is still the first thing seen below the nav.
-      */}
       <style>{`
         .hero-artwork {
           object-position: center 22%;
@@ -130,8 +106,6 @@ const HeroSection = () => {
             object-position: center 16%;
           }
         }
-
-        /* ── Mobile: zoom into face+shoulders, hide JACQUELINE watermark ── */
         @media (max-width: 767px) {
           .hero-container {
             align-items: flex-end;
@@ -167,13 +141,9 @@ const HeroSection = () => {
       <div
         ref={containerRef}
         className="hero-container relative w-full min-h-dvh overflow-hidden flex items-center justify-center px-4 sm:px-6"
-        style={{ backgroundColor: "#0A0A0A" }}
+        style={{ backgroundColor: PAPER }}
       >
-        {/* ── Jacqueline B&W artwork ─────────────────────────────────────────
-            Using <img> + object-fit:cover so object-position precisely controls
-            which slice of the portrait is visible inside this landscape container.
-            Hat-brim tip aligns with the navbar (top of viewport) at desktop sizes.
-        ─────────────────────────────────────────────────────────────────────── */}
+        {/* ── Jacqueline portrait — high-contrast B&W, multiply-blended onto white paper ── */}
         <div
           aria-hidden="true"
           className="absolute inset-0 pointer-events-none select-none overflow-hidden"
@@ -186,144 +156,113 @@ const HeroSection = () => {
             className="hero-artwork w-full h-full select-none"
             style={{
               objectFit: "cover",
-              filter: "grayscale(100%) contrast(1.18) brightness(0.92) saturate(0)",
+              filter: "grayscale(100%) contrast(1.28) brightness(1.02) saturate(0)",
+              mixBlendMode: "multiply",
             }}
           />
         </div>
 
-        {/* ── Edge vignette — keeps eye on the centre ──────────────────────── */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(ellipse 80% 80% at 50% 50%, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.58) 100%)",
-            zIndex: 1,
-          }}
-        />
-
-        {/* ── Bottom fade — transitions into next section cleanly ───────────── */}
+        {/* ── Soft white bottom fade — dissolves into the next white section ── */}
         <div
           aria-hidden="true"
           className="hero-bottom-fade absolute bottom-0 left-0 right-0 pointer-events-none"
           style={{
-            height: "28%",
+            height: "32%",
             background:
-              "linear-gradient(to bottom, transparent 0%, rgba(10,10,10,0.9) 100%)",
+              "linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%)",
             zIndex: 2,
           }}
         />
 
-        {/* ── Top fade — softens the hat brim / nav boundary ───────────────── */}
+        {/* ── Top fade — softens transition under the nav ── */}
         <div
           aria-hidden="true"
           className="absolute top-0 left-0 right-0 pointer-events-none"
           style={{
-            height: "12%",
+            height: "14%",
             background:
-              "linear-gradient(to bottom, rgba(10,10,10,0.45) 0%, transparent 100%)",
+              "linear-gradient(to bottom, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 100%)",
             zIndex: 2,
           }}
         />
 
-        {/* ── Content ──────────────────────────────────────────────────────── */}
+        {/* ── Content (editorial type on paper, no card) ── */}
         <motion.div
           className="relative flex flex-col items-center text-center w-full max-w-2xl mx-auto"
-          style={{ gap: 20, zIndex: 10 }}
+          style={{ gap: "clamp(14px, 1.8vw, 22px)", zIndex: 10 }}
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
-          {/* Frosted glass panel — Apple editorial card */}
-          <motion.div
-            variants={panelVariants}
-            className="w-full"
+          {/* Est. label */}
+          <motion.p
+            variants={labelVariants}
+            className="m-0"
             style={{
-              background: "rgba(8, 8, 8, 0.52)",
-              backdropFilter: "blur(18px)",
-              WebkitBackdropFilter: "blur(18px)",
-              border: "1px solid rgba(255,255,255,0.07)",
-              borderRadius: 3,
-              padding: "clamp(28px, 4vw, 52px) clamp(28px, 6vw, 72px) clamp(24px, 3.5vw, 44px)",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "clamp(12px, 1.8vw, 20px)",
+              fontSize: 11,
+              color: INK,
+              letterSpacing: "0.45em",
+              fontWeight: 500,
+              fontFamily: "var(--font-body, sans-serif)",
+              textTransform: "uppercase",
             }}
           >
-            {/* Est. label */}
-            <motion.p
-              variants={labelVariants}
-              className="m-0"
-              style={{
-                fontSize: 11,
-                color: "#D97706",
-                letterSpacing: "0.45em",
-                fontWeight: 500,
-                fontFamily: "var(--font-body, sans-serif)",
-                textTransform: "uppercase",
-              }}
-            >
-              EST. 2013
-            </motion.p>
+            EST. 2013
+          </motion.p>
 
-            {/* Wordmark logo */}
-            <motion.h1 variants={logoVariants} className="m-0" style={{ lineHeight: 1 }}>
-              <span className="sr-only">Viera Amber</span>
-              <img
-                src={logoSrc}
-                alt=""
-                aria-hidden="true"
-                draggable={false}
-                className="select-none"
-                style={{
-                  width: "clamp(180px, 36vw, 480px)",
-                  height: "auto",
-                  display: "block",
-                }}
-              />
-            </motion.h1>
-
-            {/* Gold divider */}
-            <motion.div
-              variants={dividerVariants}
+          {/* Wordmark logo — forced to pure black */}
+          <motion.h1 variants={logoVariants} className="m-0" style={{ lineHeight: 1 }}>
+            <span className="sr-only">Viera Amber</span>
+            <img
+              src={logoSrc}
+              alt=""
               aria-hidden="true"
+              draggable={false}
+              className="select-none"
               style={{
-                width: 44,
-                height: 1,
-                background:
-                  "linear-gradient(90deg, transparent 0%, #D97706 50%, transparent 100%)",
-                transformOrigin: "center",
+                width: "clamp(180px, 36vw, 480px)",
+                height: "auto",
+                display: "block",
+                filter: "brightness(0) saturate(0)",
               }}
             />
+          </motion.h1>
 
-            {/* Tagline */}
-            <motion.p
-              variants={textVariants}
-              className="m-0"
-              style={{
-                fontSize: "clamp(13px, 1.5vw, 17px)",
-                color: "rgba(255,255,255,0.82)",
-                maxWidth: 420,
-                lineHeight: 1.75,
-                fontWeight: 300,
-                fontFamily: "var(--font-body, sans-serif)",
-              }}
-            >
-              A creative &amp; impact-driven ecosystem for feminine empowerment.
-            </motion.p>
-          </motion.div>
+          {/* Hairline divider */}
+          <motion.div
+            variants={dividerVariants}
+            aria-hidden="true"
+            style={{
+              width: 44,
+              height: 1,
+              backgroundColor: INK,
+              transformOrigin: "center",
+            }}
+          />
 
-          {/* "For her, by her." — Apple editorial pull-quote outside the card */}
+          {/* Tagline */}
+          <motion.p
+            variants={textVariants}
+            className="m-0"
+            style={{
+              fontSize: "clamp(13px, 1.5vw, 17px)",
+              color: MUTED,
+              maxWidth: 420,
+              lineHeight: 1.75,
+              fontWeight: 300,
+              fontFamily: "var(--font-body, sans-serif)",
+            }}
+          >
+            A creative &amp; impact-driven ecosystem for feminine empowerment.
+          </motion.p>
+
+          {/* "For her, by her." — solid ink, Playfair italic */}
           <motion.p
             variants={taglineVariants}
             className="m-0"
             style={{
               fontSize: "clamp(16px, 2vw, 24px)",
-              background: "linear-gradient(135deg, #D97706 0%, #ED155D 80%)",
-              backgroundClip: "text",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
+              color: INK,
               fontWeight: 400,
               fontFamily: "var(--font-display, serif)",
               fontStyle: "italic",
@@ -333,11 +272,12 @@ const HeroSection = () => {
             For her, by her.
           </motion.p>
 
-          {/* CTA */}
+          {/* CTA — black pill, white text */}
           <motion.div variants={ctaVariants}>
             <button
               type="button"
-              className="rounded-full px-8 py-3 font-body uppercase tracking-widest text-xs min-h-[44px] bg-brand-gold text-brand-dark hover:opacity-90 transition-opacity"
+              className="rounded-full px-8 py-3 font-body uppercase tracking-widest text-xs min-h-[44px] transition-opacity hover:opacity-85"
+              style={{ backgroundColor: INK, color: PAPER }}
               onClick={handleScroll}
               aria-label="Scroll down to explore the Viera Amber ecosystem"
             >
@@ -349,7 +289,7 @@ const HeroSection = () => {
           <motion.div
             animate={reduced ? undefined : { y: [0, 9, 0] }}
             transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" as const }}
-            className="absolute"
+            className="hero-scroll-indicator absolute"
             style={{ bottom: "-4rem", left: "50%", transform: "translateX(-50%)" }}
             aria-hidden="true"
           >
@@ -357,11 +297,12 @@ const HeroSection = () => {
               style={{
                 width: 22,
                 height: 38,
-                border: "1.5px solid rgba(217,119,6,0.35)",
+                border: `1.5px solid ${INK}`,
                 borderRadius: 11,
                 display: "flex",
                 justifyContent: "center",
                 paddingTop: 7,
+                opacity: 0.55,
               }}
             >
               <motion.div
@@ -370,7 +311,7 @@ const HeroSection = () => {
                 style={{
                   width: 2,
                   height: 6,
-                  background: "#D97706",
+                  background: INK,
                   borderRadius: 1,
                 }}
               />
