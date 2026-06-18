@@ -6,8 +6,8 @@ import NavBar from "@/components/NavBar";
 import { fadeIn, fadeSlideUp, staggerContainer, cardItem, scaleXRule, inViewProps, useReducedVariants } from "@/lib/animations";
 import { supabase } from "@/lib/supabase";
 
-const vivaHeroLeft  = "/viva/look-2.jpeg";  // hot-pink structured crop
-const vivaHeroRight = "/viva/look-1.jpeg";  // olive woven kimono
+const vivaHeroLeft  = "/viva/look-1.jpeg";  // olive kimono — left flank
+const vivaHeroRight = "/viva/look-2.jpeg";  // hot-pink crop — right flank
 
 const ALABASTER  = "#FAF9F6";
 const CREAM      = "#F5EDE6";
@@ -117,23 +117,22 @@ const VIVAPage = () => {
           background: "radial-gradient(ellipse 90% 45% at 50% -2%, rgba(212,175,55,0.14) 0%, transparent 65%)",
         }} />
 
-        {/* Editorial flanking models */}
+        {/* Editorial flanking models — white bg dissolves into burgundy via multiply */}
         <motion.img
           src={vivaHeroLeft}
           alt=""
           aria-hidden="true"
           draggable={false}
-          initial={{ opacity: 0, x: reduced ? 0 : -60, scaleX: -1 }}
-          animate={{ opacity: 1, x: 0, scaleX: -1 }}
-          transition={{ duration: d(1.2), delay: d(0.35), ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, x: reduced ? 0 : -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: d(1.2), delay: d(0.3), ease: [0.16, 1, 0.3, 1] }}
           className="hidden md:block"
           style={{
-            position: "absolute", left: "-2%", bottom: 0,
-            height: "clamp(820px, 112vh, 1100px)", width: "auto",
-            transformOrigin: "bottom left",
+            position: "absolute", left: "-3%", bottom: 0,
+            height: "clamp(860px, 118vh, 1160px)", width: "auto",
+            mixBlendMode: "multiply",
             pointerEvents: "none", userSelect: "none",
             zIndex: 1,
-            filter: "drop-shadow(0 40px 80px rgba(0,0,0,0.5))",
           }}
         />
         <motion.img
@@ -141,17 +140,16 @@ const VIVAPage = () => {
           alt=""
           aria-hidden="true"
           draggable={false}
-          initial={{ opacity: 0, x: reduced ? 0 : 60 }}
+          initial={{ opacity: 0, x: reduced ? 0 : 50 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: d(1.2), delay: d(0.35), ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: d(1.2), delay: d(0.3), ease: [0.16, 1, 0.3, 1] }}
           className="hidden md:block"
           style={{
-            position: "absolute", right: "-2%", bottom: 0,
-            height: "clamp(820px, 112vh, 1100px)", width: "auto",
-            transformOrigin: "bottom right",
+            position: "absolute", right: "-3%", bottom: 0,
+            height: "clamp(860px, 118vh, 1160px)", width: "auto",
+            mixBlendMode: "multiply",
             pointerEvents: "none", userSelect: "none",
             zIndex: 1,
-            filter: "drop-shadow(0 40px 80px rgba(0,0,0,0.5))",
           }}
         />
 
