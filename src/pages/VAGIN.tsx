@@ -262,7 +262,7 @@ const VAGINPage = () => {
   const rightV = useReducedVariants(slideInRight);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#FAFAFA" }}>
+    <div className="min-h-screen vagin-type" style={{ backgroundColor: "#FAFAFA" }}>
       <NavBar />
       <main>
 
@@ -348,7 +348,7 @@ const VAGINPage = () => {
                 >
                   <h1
                     className="font-display m-0"
-                    style={{ fontSize: "clamp(30px, 4.5vw, 56px)", fontWeight: 700, color: "#FFFFFF", lineHeight: 1.04 }}
+                    style={{ fontSize: "clamp(32px, 4.8vw, 60px)", fontWeight: 800, color: "#FFFFFF", lineHeight: 1.02, letterSpacing: "-0.03em" }}
                   >
                     One girl<br />at a time.
                   </h1>
@@ -678,7 +678,7 @@ const VAGINPage = () => {
                   className="flex flex-col"
                   style={{ background: `${s.accent}14`, border: `1px solid ${s.accent}38`, borderLeft: `4px solid ${s.accent}`, borderRadius: 14, padding: "32px 28px", gap: 14, backdropFilter: "blur(4px)" }}
                 >
-                  <span className="font-display" style={{ fontSize: "clamp(44px, 6vw, 68px)", fontWeight: 700, color: s.accent, lineHeight: 1 }}>{s.stat}</span>
+                  <span className="font-display" style={{ fontSize: "clamp(44px, 6vw, 68px)", fontWeight: 800, color: s.accent, lineHeight: 1, letterSpacing: "-0.03em" }}>{s.stat}</span>
                   <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 16, color: "rgba(17,17,17,0.8)", lineHeight: 1.7, margin: 0 }}>{s.body}</p>
                   <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: "rgba(17,17,17,0.5)", letterSpacing: "0.12em", textTransform: "uppercase" }}>Source: {s.source}</span>
                 </motion.div>
@@ -815,7 +815,7 @@ const VAGINPage = () => {
                   <span aria-hidden="true" className="flex items-center justify-center" style={{ width: 44, height: 44, borderRadius: 12, background: `${PINK}15`, border: `1px solid ${PINK}38`, backdropFilter: "blur(4px)" }}>
                     <s.Icon size={22} color={PINK} strokeWidth={1.75} />
                   </span>
-                  <span className="font-display" style={{ fontSize: "clamp(34px, 4vw, 46px)", fontWeight: 700, color: PINK, lineHeight: 1 }} aria-live="polite">
+                  <span className="font-display" style={{ fontSize: "clamp(34px, 4vw, 46px)", fontWeight: 800, color: PINK, lineHeight: 1, letterSpacing: "-0.02em" }} aria-live="polite">
                     {s.val.toLocaleString()}{s.suffix}
                   </span>
                   <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(17,17,17,0.55)" }}>{s.label}</span>

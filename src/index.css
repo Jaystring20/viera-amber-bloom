@@ -132,6 +132,15 @@
     font-weight: 700;
   }
 
+  /* VAGIN page — bold geometric sans voice (Poppins), scoped so VIVA and the
+     main site keep their Playfair serif. Bolder + legible, like a modern
+     advocacy/impact site. */
+  .vagin-type :is(h1, h2, h3, h4, h5, h6),
+  .vagin-type .font-display {
+    font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.02em;
+  }
+
   /* Typography hierarchy */
   h1 {
     font-size: clamp(32px, 5vw, 56px);
