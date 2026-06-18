@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -34,6 +36,21 @@
     --vagin-pink: #ED155D;
     --viva-wine: #6E0025;
     --viva-gold: #D4AF37;
+
+    /* Theme: Light (Illustrations, VAM, VASH, Contact) */
+    --theme-light-bg: #FAFAFA;
+    --theme-light-bg-secondary: #F5F4F2;
+    --theme-light-text: #111111;
+    --theme-light-text-secondary: #666666;
+    --theme-light-text-dim: #888888;
+    --theme-light-border: #EBEBEB;
+    --theme-light-border-subtle: #E8E8E8;
+
+    /* Theme: VAGIN (purple/pink) — placeholders pending confirmation */
+    --theme-vagin-purple: #6B2C91;
+    --theme-vagin-pink: #E8A0BF;
+    --theme-vagin-bg: #FAFAFA;
+    --theme-vagin-text: #111111;
 
     /* Semantic HSL tokens (Tailwind) */
     --background: 0 0% 4%;            /* #0A0A0A */

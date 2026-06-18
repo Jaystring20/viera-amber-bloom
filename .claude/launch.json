@@ -1,1 +1,11 @@
-version:0.0.1 configurations:[name:viera-amber-dev] configurations:[runtimeExecutable:bun] configurations:[runtimeArgs:[run] configurations:[dev]] configurations:[port:8080]
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "viera-amber-dev",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "dev"],
+      "port": 8080
+    }
+  ]
+}

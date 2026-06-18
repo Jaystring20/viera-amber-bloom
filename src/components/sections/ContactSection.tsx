@@ -55,13 +55,11 @@ const ContactSection = () => {
   const fadeVariants = useReducedVariants(fadeIn);
 
   const inputStyle: React.CSSProperties = {
-    background: "rgba(17, 17, 17, 0.6)",
-    backdropFilter: "blur(10px)",
-    WebkitBackdropFilter: "blur(10px)",
-    border: "1px solid rgba(217, 119, 6, 0.15)",
+    background: "#FFFFFF",
+    border: "1px solid #E8E8E8",
     borderRadius: 8,
     padding: "12px 14px",
-    color: "#FAFAFA",
+    color: "#111111",
     fontFamily: "DM Sans, system-ui, sans-serif",
     fontSize: 13,
     outline: "none",
@@ -70,12 +68,12 @@ const ContactSection = () => {
   };
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    e.target.style.borderColor = "rgba(217, 119, 6, 0.4)";
-    e.target.style.background = "rgba(17, 17, 17, 0.75)";
+    e.target.style.borderColor = "#D97706";
+    e.target.style.background = "#FFFFFF";
   };
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    e.target.style.borderColor = "rgba(217, 119, 6, 0.15)";
-    e.target.style.background = "rgba(17, 17, 17, 0.6)";
+    e.target.style.borderColor = "#E8E8E8";
+    e.target.style.background = "#FFFFFF";
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,8 +103,8 @@ const ContactSection = () => {
   return (
     <div
       style={{
-        backgroundColor: "#050505",
-        borderTop: "1px solid #1A1A1A",
+        backgroundColor: "#FAFAFA",
+        borderTop: "1px solid #EBEBEB",
       }}
       className="w-full py-20"
     >
@@ -148,7 +146,7 @@ const ContactSection = () => {
               style={{
                 fontSize: "clamp(24px, 3vw, 40px)",
                 fontWeight: 700,
-                color: "#FAFAFA",
+                color: "#111111",
                 margin: 0,
                 lineHeight: 1.2,
               }}
@@ -161,7 +159,7 @@ const ContactSection = () => {
                 fontFamily: "DM Sans, system-ui, sans-serif",
                 fontWeight: 300,
                 fontSize: 14,
-                color: "#888888",
+                color: "#666666",
                 lineHeight: 1.7,
                 margin: 0,
               }}
@@ -252,8 +250,7 @@ const ContactSection = () => {
                     }
                     style={{
                       ...inputStyle,
-                      color: form.subject ? "#FAFAFA" : "#888888",
-                      backgroundColor: "#111111",
+                      color: form.subject ? "#111111" : "#888888",
                     }}
                     onFocus={handleFocus}
                     onBlur={handleBlur}
@@ -262,7 +259,7 @@ const ContactSection = () => {
                       I'm reaching out about...
                     </option>
                     {INQUIRY_OPTIONS.map((opt) => (
-                      <option key={opt} value={opt} style={{ color: "#FAFAFA" }}>
+                      <option key={opt} value={opt} style={{ color: "#111111" }}>
                         {opt}
                       </option>
                     ))}
@@ -357,7 +354,7 @@ const ContactSection = () => {
                     style={{
                       fontSize: 20,
                       fontWeight: 700,
-                      color: "#FAFAFA",
+                      color: "#111111",
                       margin: 0,
                     }}
                   >
@@ -368,7 +365,7 @@ const ContactSection = () => {
                       fontFamily: "DM Sans, system-ui, sans-serif",
                       fontWeight: 300,
                       fontSize: 14,
-                      color: "#888888",
+                      color: "#666666",
                       margin: 0,
                       maxWidth: 320,
                     }}

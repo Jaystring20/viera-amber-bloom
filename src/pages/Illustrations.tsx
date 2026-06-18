@@ -28,13 +28,13 @@ const Illustrations = () => {
   const cardVariants = useReducedVariants(cardItem);
 
   return (
-    <div className="min-h-screen bg-brand-dark">
+    <div className="min-h-screen" style={{ backgroundColor: "#FAFAFA" }}>
       <NavBar />
       <main className="pt-20">
         {/* ── Brand Film opener ───────────────────────────────────── */}
         <section
           aria-label="Brand Film"
-          style={{ backgroundColor: "#000" }}
+          style={{ backgroundColor: "#FAFAFA" }}
         >
           {/* Cinematic header above the film */}
           <div
@@ -45,7 +45,7 @@ const Illustrations = () => {
               style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
                 fontSize: 10,
-                color: "#D97706",
+                color: "#111111",
                 letterSpacing: "4px",
                 textTransform: "uppercase",
                 fontWeight: 400,
@@ -59,7 +59,7 @@ const Illustrations = () => {
               style={{
                 fontSize: "clamp(22px, 3.5vw, 40px)",
                 fontWeight: 700,
-                color: "#FAFAFA",
+                color: "#111111",
                 margin: 0,
                 lineHeight: 1.1,
               }}
@@ -82,7 +82,7 @@ const Illustrations = () => {
           ref={appsRef}
           id="applications"
           className="w-full py-20"
-          style={{ backgroundColor: "#000000" }}
+          style={{ backgroundColor: "#FAFAFA" }}
           aria-label="Commercial Applications"
         >
           <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
@@ -94,7 +94,7 @@ const Illustrations = () => {
                 style={{
                   fontFamily: "DM Sans, system-ui, sans-serif",
                   fontSize: 11,
-                  color: "#C8A96E",
+                  color: "#111111",
                   letterSpacing: "4px",
                   textTransform: "uppercase",
                   fontWeight: 400,
@@ -112,7 +112,7 @@ const Illustrations = () => {
                 style={{
                   fontSize: "clamp(26px, 4vw, 48px)",
                   fontWeight: 700,
-                  color: "#FAFAFA",
+                  color: "#111111",
                   margin: 0,
                   lineHeight: 1.1,
                 }}
@@ -148,15 +148,15 @@ const Illustrations = () => {
                   whileHover={reduced ? {} : { y: -3 }}
                   transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
                   style={{
-                    backgroundColor: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    backgroundColor: "#FFFFFF",
+                    border: "1px solid #EBEBEB",
                     borderRadius: 4,
                     padding: "28px 24px",
                   }}
                 >
                   <h3
                     className="font-display"
-                    style={{ fontSize: 20, fontWeight: 700, color: "#FAFAFA", marginBottom: 10 }}
+                    style={{ fontSize: 20, fontWeight: 700, color: "#111111", marginBottom: 10 }}
                   >
                     {app.title}
                   </h3>
@@ -165,7 +165,7 @@ const Illustrations = () => {
                       fontFamily: "DM Sans, system-ui, sans-serif",
                       fontWeight: 300,
                       fontSize: 13,
-                      color: "rgba(250,250,250,0.6)",
+                      color: "#666666",
                       lineHeight: 1.65,
                       margin: 0,
                     }}
@@ -183,7 +183,7 @@ const Illustrations = () => {
           ref={processRef}
           id="process"
           className="w-full py-20"
-          style={{ backgroundColor: "#0A0A0A", borderTop: "1px solid #1A1A1A" }}
+          style={{ backgroundColor: "#F5F4F2", borderTop: "1px solid #EBEBEB" }}
           aria-label="Our Process"
         >
           <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
@@ -195,7 +195,7 @@ const Illustrations = () => {
                 style={{
                   fontFamily: "DM Sans, system-ui, sans-serif",
                   fontSize: 11,
-                  color: "#C8A96E",
+                  color: "#111111",
                   letterSpacing: "4px",
                   textTransform: "uppercase",
                   fontWeight: 400,
@@ -213,7 +213,7 @@ const Illustrations = () => {
                 style={{
                   fontSize: "clamp(26px, 4vw, 48px)",
                   fontWeight: 700,
-                  color: "#FAFAFA",
+                  color: "#111111",
                   margin: 0,
                   lineHeight: 1.1,
                 }}
@@ -239,8 +239,8 @@ const Illustrations = () => {
                   key={step.num}
                   variants={cardVariants}
                   style={{
-                    backgroundColor: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    backgroundColor: "#FFFFFF",
+                    border: "1px solid #EBEBEB",
                     borderRadius: 4,
                     padding: "28px 24px",
                   }}
@@ -250,7 +250,7 @@ const Illustrations = () => {
                       fontFamily: "DM Sans, system-ui, sans-serif",
                       fontWeight: 700,
                       fontSize: 10,
-                      color: "#C8A96E",
+                      color: "#111111",
                       letterSpacing: "3px",
                       display: "block",
                       marginBottom: 12,
@@ -260,7 +260,7 @@ const Illustrations = () => {
                   </span>
                   <h3
                     className="font-display"
-                    style={{ fontSize: 17, fontWeight: 700, color: "#FAFAFA", marginBottom: 10 }}
+                    style={{ fontSize: 17, fontWeight: 700, color: "#111111", marginBottom: 10 }}
                   >
                     {step.title}
                   </h3>

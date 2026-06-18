@@ -90,7 +90,7 @@ const config = {
       },
       fontFamily: {
         display: ["Playfair Display", "Georgia", "serif"],
-        body: ["DM Sans", "system-ui", "sans-serif"],
+        body: ["Montserrat", "system-ui", "sans-serif"],
       },
       zIndex: {
         hide: "-1",
