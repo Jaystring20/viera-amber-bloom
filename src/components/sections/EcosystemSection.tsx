@@ -31,8 +31,8 @@ const ARMS: Arm[] = [
   {
     number: "01",
     title: "Illustrations & Designs",
-    accent: "#D97706",
-    text: "#F59E0B",
+    accent: "#0A0A0A",
+    text: "#0A0A0A",
     tag: "Creative",
     blurb: "Narrative fashion illustration — art that heals, inspires, and sells.",
     target: "illustrations",
@@ -44,8 +44,8 @@ const ARMS: Arm[] = [
   {
     number: "02",
     title: "VAGIN",
-    accent: "#62017F",
-    text: "#C77DFF",
+    accent: "#0A0A0A",
+    text: "#0A0A0A",
     tag: "Impact",
     blurb: "Girls' Initiative — SRHR for 3,000+ girls. SDG 3 & 5.",
     target: "vagin",
@@ -57,8 +57,8 @@ const ARMS: Arm[] = [
   {
     number: "03",
     title: "VIVA",
-    accent: "#6E0025",
-    text: "#EC7A93",
+    accent: "#0A0A0A",
+    text: "#0A0A0A",
     tag: "Fashion",
     blurb: "Structured yet fluid wearable art for the modern woman.",
     target: "viva",
@@ -70,8 +70,8 @@ const ARMS: Arm[] = [
   {
     number: "04",
     title: "VAM",
-    accent: "#7C3AED",
-    text: "#A78BFA",
+    accent: "#0A0A0A",
+    text: "#0A0A0A",
     tag: "Education",
     blurb: "Masterclass turning creative ideas into independent careers.",
     target: "vam",
@@ -83,8 +83,8 @@ const ARMS: Arm[] = [
   {
     number: "05",
     title: "VASH",
-    accent: "#0B7B8C",
-    text: "#2DD4BF",
+    accent: "#0A0A0A",
+    text: "#0A0A0A",
     tag: "Commerce",
     blurb: "The shop — wearable art, brushes, references. The commercial engine.",
     target: "shop",
@@ -125,7 +125,7 @@ const EcosystemSection = () => {
   return (
     <div
       className="relative w-full overflow-hidden"
-      style={{ backgroundColor: "#0F172A", paddingBottom: "clamp(60px, 8vw, 90px)" }}
+      style={{ backgroundColor: "#FFFFFF", paddingBottom: "clamp(60px, 8vw, 90px)" }}
       aria-label="The Viera Amber Ecosystem"
     >
       {/* Ambient brand wash */}
@@ -134,7 +134,7 @@ const EcosystemSection = () => {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(60% 50% at 50% 0%, rgba(217,119,6,0.07) 0%, transparent 70%), linear-gradient(135deg, rgba(98,1,127,0.05) 0%, rgba(15,23,42,1) 60%)",
+            "radial-gradient(60% 50% at 50% 0%, rgba(0,0,0,0.04) 0%, transparent 70%)",
         }}
       />
 
@@ -174,7 +174,7 @@ const EcosystemSection = () => {
           <motion.p
             variants={fadeUp}
             className="font-body uppercase m-0"
-            style={{ fontSize: 11, color: "#D97706", letterSpacing: "0.4em", fontWeight: 500 }}
+            style={{ fontSize: 11, color: "#0A0A0A", letterSpacing: "0.4em", fontWeight: 500 }}
           >
             The Ecosystem
           </motion.p>
@@ -186,7 +186,7 @@ const EcosystemSection = () => {
             className="font-display m-0"
             style={{
               fontSize: "clamp(28px, 4vw, 52px)",
-              color: "#FAFAFA",
+              color: "#0A0A0A",
               fontWeight: 700,
               lineHeight: 1.15,
               maxWidth: 800,
@@ -197,7 +197,7 @@ const EcosystemSection = () => {
           <motion.p
             variants={fadeUp}
             className="font-body m-0"
-            style={{ fontSize: 16, color: "#C0B5A0", fontWeight: 300, maxWidth: 600, lineHeight: 1.7 }}
+            style={{ fontSize: 16, color: "#555555", fontWeight: 300, maxWidth: 600, lineHeight: 1.7 }}
           >
             Art. Impact. Fashion. Education. Commerce. One flowing current, all rooted in the
             same conviction: creativity is the most powerful form of empowerment.
@@ -244,12 +244,12 @@ const EcosystemSection = () => {
           <motion.div
             animate={reduced ? { height: 44 } : { height: [44, 60, 44] }}
             transition={reduced ? { duration: 0 } : { duration: 2.2, repeat: Infinity, ease: "easeInOut" as const }}
-            style={{ width: 1, backgroundColor: "#D97706" }}
+            style={{ width: 1, backgroundColor: "#0A0A0A" }}
             aria-hidden="true"
           />
           <p
             className="font-body uppercase m-0"
-            style={{ fontSize: 12, color: "#D97706", letterSpacing: "0.18em", fontWeight: 400 }}
+            style={{ fontSize: 12, color: "#0A0A0A", letterSpacing: "0.18em", fontWeight: 400 }}
           >
             ↓ Scroll to explore each world
           </p>
@@ -277,8 +277,8 @@ const ViewToggle = ({ view, onChange }: { view: View; onChange: (v: View) => voi
         padding: 4,
         gap: 4,
         borderRadius: 999,
-        background: "rgba(20,20,28,0.6)",
-        border: "1px solid rgba(217,119,6,0.25)",
+        background: "#FFFFFF",
+        border: "1px solid #0A0A0A",
       }}
     >
       {opts.map((o) => {
@@ -293,7 +293,7 @@ const ViewToggle = ({ view, onChange }: { view: View; onChange: (v: View) => voi
             style={{
               border: 0,
               background: "transparent",
-              color: active ? "#0A0A0A" : "#C0B5A0",
+              color: active ? "#0A0A0A" : "#555555",
               fontSize: 11,
               letterSpacing: "0.12em",
               fontWeight: 600,
@@ -308,7 +308,7 @@ const ViewToggle = ({ view, onChange }: { view: View; onChange: (v: View) => voi
               <motion.span
                 layoutId="ecoTogglePill"
                 className="absolute inset-0"
-                style={{ background: "#D97706", borderRadius: 999, zIndex: -1 }}
+                style={{ background: "#0A0A0A", borderRadius: 999, zIndex: -1 }}
                 transition={{ type: "spring" as const, stiffness: 380, damping: 30 }}
               />
             )}
@@ -354,11 +354,11 @@ const FlowView = ({
         >
           <defs>
             <linearGradient id="ecoFlowGrad" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#D97706" />
-              <stop offset="27%" stopColor="#62017F" />
-              <stop offset="52%" stopColor="#6E0025" />
-              <stop offset="75%" stopColor="#7C3AED" />
-              <stop offset="100%" stopColor="#0B7B8C" />
+              <stop offset="0%" stopColor="#0A0A0A" />
+              <stop offset="27%" stopColor="#0A0A0A" />
+              <stop offset="52%" stopColor="#0A0A0A" />
+              <stop offset="75%" stopColor="#0A0A0A" />
+              <stop offset="100%" stopColor="#0A0A0A" />
             </linearGradient>
           </defs>
           <path
@@ -377,7 +377,7 @@ const FlowView = ({
             strokeWidth={3}
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
-            style={{ filter: "drop-shadow(0 0 6px rgba(217,119,6,0.35))" }}
+            style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.15))" }}
             initial={{ pathLength: reduced ? 1 : 0 }}
             whileInView={{ pathLength: 1 }}
             viewport={{ once: true, amount: 0.2 }}
@@ -408,7 +408,7 @@ const FlowView = ({
             bottom: 12,
             width: 2,
             background:
-              "linear-gradient(to bottom, #D97706 0%, #62017F 27%, #6E0025 52%, #7C3AED 75%, #0B7B8C 100%)",
+              "linear-gradient(to bottom, #0A0A0A 0%, #0A0A0A 100%)",
             opacity: 0.5,
           }}
         />
@@ -462,7 +462,7 @@ const FlowNode = ({
           height: 22,
           borderRadius: 999,
           background: arm.accent,
-          border: "2px solid rgba(255,255,255,0.9)",
+          border: "2px solid #FFFFFF", outline: "1px solid #0A0A0A",
           boxShadow: `0 0 16px ${arm.accent}, 0 0 34px ${arm.accent}88`,
         }}
       />
@@ -476,13 +476,13 @@ const FlowNode = ({
           width: 248,
           transform: "translateX(-50%)",
           ...(labelAbove ? { bottom: GAP + 11 } : { top: GAP + 11 }),
-          background: "rgba(18, 18, 26, 0.78)",
+          background: "#FFFFFF",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
           border: `1px solid ${arm.text}55`,
           borderRadius: 14,
           padding: "18px 20px",
-          boxShadow: "0 12px 36px rgba(0,0,0,0.4)",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
           textAlign: "center",
         }}
       >
@@ -519,11 +519,11 @@ const FlowNode = ({
           <span className="font-body" style={{ fontSize: 11, color: arm.text, fontWeight: 700, letterSpacing: "1px" }}>
             {arm.number}
           </span>
-          <h3 className="font-display m-0" style={{ fontSize: 17, color: "#FAFAFA", fontWeight: 700, lineHeight: 1.25 }}>
+          <h3 className="font-display m-0" style={{ fontSize: 17, color: "#0A0A0A", fontWeight: 700, lineHeight: 1.25 }}>
             {arm.title}
           </h3>
         </div>
-        <p className="font-body m-0" style={{ fontSize: 12.5, color: "#A6ADBB", fontWeight: 300, lineHeight: 1.5 }}>
+        <p className="font-body m-0" style={{ fontSize: 12.5, color: "#555555", fontWeight: 300, lineHeight: 1.5 }}>
           {arm.blurb}
         </p>
       </motion.div>
@@ -560,7 +560,7 @@ const SpineNode = ({
           height: 18,
           borderRadius: 999,
           background: arm.accent,
-          border: "2px solid rgba(255,255,255,0.85)",
+          border: "2px solid #FFFFFF", outline: "1px solid #0A0A0A",
           boxShadow: `0 0 12px ${arm.accent}, 0 0 24px ${arm.accent}77`,
         }}
       />
@@ -570,7 +570,7 @@ const SpineNode = ({
         aria-label={`${arm.title} — ${arm.tag}. Jump to section.`}
         className="text-left w-full bg-transparent border-0 cursor-pointer"
         style={{
-          background: "rgba(20, 20, 28, 0.6)",
+          background: "#FFFFFF",
           border: `1px solid ${arm.text}40`,
           borderRadius: 12,
           padding: "16px 18px",
@@ -588,7 +588,7 @@ const SpineNode = ({
           <span className="font-body" style={{ fontSize: 11, color: arm.text, fontWeight: 700, letterSpacing: "1px" }}>
             {arm.number}
           </span>
-          <h3 className="font-display m-0" style={{ fontSize: 16, color: "#FAFAFA", fontWeight: 700, lineHeight: 1.2 }}>
+          <h3 className="font-display m-0" style={{ fontSize: 16, color: "#0A0A0A", fontWeight: 700, lineHeight: 1.2 }}>
             {arm.title}
           </h3>
           <span
@@ -607,7 +607,7 @@ const SpineNode = ({
             {arm.tag}
           </span>
         </div>
-        <p className="font-body m-0" style={{ fontSize: 13, color: "#A6ADBB", fontWeight: 300, lineHeight: 1.55 }}>
+        <p className="font-body m-0" style={{ fontSize: 13, color: "#555555", fontWeight: 300, lineHeight: 1.55 }}>
           {arm.blurb}
         </p>
       </button>
@@ -687,7 +687,7 @@ const Connector = ({ reduced }: { reduced: boolean }) => (
       animate: { opacity: 1, scale: 1, transition: { duration: reduced ? 0 : 0.4 } },
     }}
   >
-    <ArrowRight size={20} color="#D97706" strokeWidth={2} />
+    <ArrowRight size={20} color="#0A0A0A" strokeWidth={2} />
   </motion.div>
 );
 
@@ -701,7 +701,7 @@ const DownConnector = ({ reduced }: { reduced: boolean }) => (
       animate: { opacity: 1, y: 0, transition: { duration: reduced ? 0 : 0.4 } },
     }}
   >
-    <ChevronDown size={22} color="#D97706" strokeWidth={2} />
+    <ChevronDown size={22} color="#0A0A0A" strokeWidth={2} />
   </motion.div>
 );
 
@@ -725,14 +725,14 @@ const EcoCard = ({
       className="group text-left cursor-pointer flex flex-col"
       style={{
         width: stack ? "100%" : 268,
-        background: "rgba(18, 18, 26, 0.72)",
+        background: "#FFFFFF",
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
         border: `1px solid ${arm.text}33`,
         borderTop: `3px solid ${arm.accent}`,
         borderRadius: 14,
         padding: "24px 22px",
-        boxShadow: "0 12px 36px rgba(0,0,0,0.32)",
+        boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
       }}
       variants={{
         initial: { opacity: 0, y: 26 },
@@ -770,14 +770,14 @@ const EcoCard = ({
         <span className="font-body" style={{ fontSize: 12, color: arm.text, fontWeight: 700, letterSpacing: "1px" }}>
           {arm.number}
         </span>
-        <h3 className="font-display m-0" style={{ fontSize: 19, color: "#FAFAFA", fontWeight: 700, lineHeight: 1.25 }}>
+        <h3 className="font-display m-0" style={{ fontSize: 19, color: "#0A0A0A", fontWeight: 700, lineHeight: 1.25 }}>
           {arm.title}
         </h3>
       </div>
 
       <p
         className="font-body m-0"
-        style={{ fontSize: 13.5, color: "#A6ADBB", fontWeight: 300, lineHeight: 1.6, flex: 1, marginBottom: 18 }}
+        style={{ fontSize: 13.5, color: "#555555", fontWeight: 300, lineHeight: 1.6, flex: 1, marginBottom: 18 }}
       >
         {arm.blurb}
       </p>
