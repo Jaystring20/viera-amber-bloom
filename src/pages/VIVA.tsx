@@ -5,8 +5,11 @@ import { useNavigate } from "react-router-dom";
 import NavBar from "@/components/NavBar";
 import { fadeIn, fadeSlideUp, staggerContainer, cardItem, scaleXRule, inViewProps, useReducedVariants } from "@/lib/animations";
 import { supabase } from "@/lib/supabase";
-import vivaHeroLeft from "@/assets/viva-hero-left.png.asset.json";
-import vivaHeroRight from "@/assets/viva-hero-right.png.asset.json";
+
+// TODO: Export hero images from Lovable and place in /public/viva/
+// Then uncomment these paths:
+// const vivaHeroLeft = "/viva/hero-left.png";
+// const vivaHeroRight = "/viva/hero-right.png";
 
 const ALABASTER  = "#FAF9F6";
 const CREAM      = "#F5EDE6";
@@ -116,9 +119,10 @@ const VIVAPage = () => {
           background: "radial-gradient(ellipse 90% 45% at 50% -2%, rgba(212,175,55,0.14) 0%, transparent 65%)",
         }} />
 
-        {/* Editorial flanking models — pink LEFT (flipped, arm reaches right), olive RIGHT (natural, arm reaches left) */}
+        {/* Editorial flanking models — COMMENTED OUT: waiting for Lovable image exports */}
+        {/* TODO: Replace with actual image paths once exported from Lovable
         <motion.img
-          src={vivaHeroLeft.url}
+          src="/viva/hero-left.png"
           alt=""
           aria-hidden="true"
           draggable={false}
@@ -138,7 +142,7 @@ const VIVAPage = () => {
           }}
         />
         <motion.img
-          src={vivaHeroRight.url}
+          src="/viva/hero-right.png"
           alt=""
           aria-hidden="true"
           draggable={false}
@@ -156,8 +160,7 @@ const VIVAPage = () => {
             filter: "drop-shadow(0 40px 60px rgba(0,0,0,0.4))",
           }}
         />
-
-
+        */}
 
         <div className="relative mx-auto px-6" style={{ maxWidth: 680, zIndex: 2 }}>
           <div
