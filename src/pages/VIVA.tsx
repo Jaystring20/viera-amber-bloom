@@ -6,8 +6,8 @@ import NavBar from "@/components/NavBar";
 import { fadeIn, fadeSlideUp, staggerContainer, cardItem, scaleXRule, inViewProps, useReducedVariants } from "@/lib/animations";
 import { supabase } from "@/lib/supabase";
 
-const vivaHeroLeft  = "/viva/look-1.jpeg";  // olive kimono — left flank
-const vivaHeroRight = "/viva/look-2.jpeg";  // hot-pink crop — right flank
+const vivaHeroLeft  = "/viva/hero-left.png";  // Look 1 — olive kimono — left flank
+const vivaHeroRight = "/viva/hero-right.png"; // Look 2 — hot-pink crop — right flank
 
 const ALABASTER  = "#FAF9F6";
 const CREAM      = "#F5EDE6";
@@ -32,9 +32,29 @@ const COMING = [
 ];
 
 const PILLARS = [
-  { heading: "Structured Fluidity",  body: "Tailored lines paired with flowing fabrics. Precision and grace in one silhouette — the garments hold shape and invite movement at once." },
-  { heading: "Artistic Agency",       body: "VIVA translates internal confidence into a vivid exterior statement. Every touchpoint is deliberate, curated, gallery-grade — the wardrobe as manifesto." },
-  { heading: "Sacred Identity",       body: "The 'Batya' collection draws from spiritual lineage. Garments that say: I know who I am and whose I am." },
+  { heading: "Structured Fluidity", line: "Where precision meets the body in motion.", numeral: "I" },
+  { heading: "Artistic Agency",     line: "Every garment is a declaration.",             numeral: "II" },
+  { heading: "Sacred Identity",     line: "Dressed in who you are — and whose you are.", numeral: "III" },
+];
+
+const PILLAR_ICONS = [
+  // Structured Fluidity — straight line bisecting a wave
+  <svg key="fluidity" width="44" height="28" viewBox="0 0 44 28" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round">
+    <line x1="0" y1="14" x2="44" y2="14" strokeOpacity="0.35"/>
+    <path d="M0 5 C5.5 5 5.5 23 11 23 C16.5 23 16.5 5 22 5 C27.5 5 27.5 23 33 23 C38.5 23 38.5 5 44 5" fill="none"/>
+  </svg>,
+  // Artistic Agency — starburst / asterisk
+  <svg key="agency" width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round">
+    <line x1="16" y1="2"    x2="16" y2="30"/>
+    <line x1="2"  y1="16"   x2="30" y2="16"/>
+    <line x1="5.4" y1="5.4" x2="26.6" y2="26.6"/>
+    <line x1="26.6" y1="5.4" x2="5.4" y2="26.6"/>
+  </svg>,
+  // Sacred Identity — minimal crown
+  <svg key="identity" width="36" height="28" viewBox="0 0 36 28" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 24 L6 8 L13 17 L18 3 L23 17 L30 8 L33 24 Z"/>
+    <line x1="3" y1="24" x2="33" y2="24"/>
+  </svg>,
 ];
 
 const enquiryInputStyle: React.CSSProperties = {
@@ -313,44 +333,113 @@ const VIVAPage = () => {
       </section>
 
       {/* ═══════════════════════════════════════════════════════
-          PILLARS — warm cream contrast break
+          PHILOSOPHY — editorial triptych, visual-first
           ═══════════════════════════════════════════════════════ */}
-      <section className="w-full py-20" style={{ background: CREAM, position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: BURGUNDY, opacity: 0.45 }} />
+      <section className="w-full" style={{ background: CREAM, position: "relative", overflow: "hidden" }}>
+        {/* Top rule */}
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: BURGUNDY, opacity: 0.18 }} />
 
-        <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
+        {/* Section header — centred editorial */}
+        <div className="mx-auto px-6" style={{ maxWidth: 1100, paddingTop: 80, paddingBottom: 64, textAlign: "center" }}>
           <motion.p
             variants={fadeVariants} initial="hidden"
             animate={pillarsInView ? "visible" : "hidden"}
-            style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: BURGUNDY, letterSpacing: "5px", textTransform: "uppercase", marginBottom: 10, opacity: 0.68 }}
+            style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 9, color: BURGUNDY, letterSpacing: "6px", textTransform: "uppercase", marginBottom: 18, opacity: 0.55 }}
           >The VIVA Philosophy</motion.p>
 
           <motion.h2
             variants={slideUpVariants} initial="hidden"
             animate={pillarsInView ? "visible" : "hidden"}
-            style={{ fontFamily: CORMORANT, fontSize: "clamp(26px, 4vw, 44px)", fontWeight: 700, color: DARK_TEXT, marginBottom: 52, lineHeight: 1.15 }}
+            style={{ fontFamily: CORMORANT, fontSize: "clamp(30px, 4.5vw, 56px)", fontWeight: 400, fontStyle: "italic", color: DARK_TEXT, margin: "0 auto 0", lineHeight: 1.1, maxWidth: 640 }}
           >
             She wears her confidence out loud.
           </motion.h2>
-
-          <motion.div
-            ref={pillarsRef}
-            variants={staggerVariants} initial="hidden"
-            animate={pillarsInView ? "visible" : "hidden"}
-            className="grid gap-10"
-            style={{ gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}
-          >
-            {PILLARS.map((p, i) => (
-              <motion.div key={p.heading} variants={cardVariants}
-                style={{ borderTop: `2px solid ${BURGUNDY}`, paddingTop: 22 }}
-              >
-                <span style={{ fontFamily: "DM Sans", fontSize: 9, color: BURGUNDY, letterSpacing: "3px", textTransform: "uppercase", opacity: 0.65 }}>0{i + 1}</span>
-                <h3 style={{ fontFamily: CORMORANT, fontSize: 22, fontWeight: 700, color: DARK_TEXT, margin: "8px 0 12px" }}>{p.heading}</h3>
-                <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 13.5, color: `rgba(34,26,26,0.62)`, lineHeight: 1.8, margin: 0 }}>{p.body}</p>
-              </motion.div>
-            ))}
-          </motion.div>
         </div>
+
+        {/* Divider rule */}
+        <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
+          <div style={{ height: 1, background: BURGUNDY, opacity: 0.12 }} />
+        </div>
+
+        {/* Three pillars triptych */}
+        <motion.div
+          ref={pillarsRef}
+          variants={staggerVariants} initial="hidden"
+          animate={pillarsInView ? "visible" : "hidden"}
+          className="mx-auto grid grid-cols-1 md:grid-cols-3"
+          style={{ maxWidth: 1100 }}
+        >
+          {PILLARS.map((p, i) => (
+            <motion.div
+              key={p.heading}
+              variants={cardVariants}
+              className={i < 2 ? "md:border-r border-b md:border-b-0" : ""}
+              style={{
+                padding: "clamp(40px, 5vw, 72px) clamp(24px, 3.5vw, 52px)",
+                borderColor: "rgba(110,0,37,0.12)",
+                position: "relative",
+                textAlign: "center",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 0,
+              }}
+            >
+              {/* Roman numeral watermark */}
+              <div aria-hidden="true" style={{
+                position: "absolute",
+                bottom: "10%",
+                right: i === 2 ? "6%" : "auto",
+                left: i === 0 ? "6%" : "auto",
+                ...(i === 1 ? { left: "50%", transform: "translateX(-50%)" } : {}),
+                fontFamily: CORMORANT,
+                fontSize: "clamp(80px, 11vw, 130px)",
+                fontWeight: 700,
+                color: BURGUNDY,
+                opacity: 0.045,
+                lineHeight: 1,
+                pointerEvents: "none",
+                userSelect: "none",
+              }}>
+                {p.numeral}
+              </div>
+
+              {/* Icon mark */}
+              <div style={{ color: BURGUNDY, opacity: 0.7, marginBottom: 28 }}>
+                {PILLAR_ICONS[i]}
+              </div>
+
+              {/* Gold rule */}
+              <div style={{ width: 28, height: 1, background: GOLD, opacity: 0.55, marginBottom: 28 }} />
+
+              {/* Pillar heading */}
+              <h3 style={{
+                fontFamily: CORMORANT,
+                fontSize: "clamp(20px, 2.2vw, 27px)",
+                fontWeight: 600,
+                color: DARK_TEXT,
+                margin: "0 0 20px",
+                lineHeight: 1.15,
+                letterSpacing: "0.02em",
+              }}>{p.heading}</h3>
+
+              {/* Single evocative line */}
+              <p style={{
+                fontFamily: CORMORANT,
+                fontStyle: "italic",
+                fontSize: "clamp(14px, 1.35vw, 17px)",
+                color: BURGUNDY,
+                opacity: 0.72,
+                margin: 0,
+                lineHeight: 1.65,
+                maxWidth: 220,
+              }}>{p.line}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Bottom rule */}
+        <div style={{ height: 1, background: BURGUNDY, opacity: 0.1 }} />
       </section>
 
       {/* ═══════════════════════════════════════════════════════
