@@ -193,7 +193,7 @@ const VAGINSection = () => {
   };
 
   return (
-    <div style={{ backgroundColor: "#1A0025", position: "relative" }} className="w-full py-20">
+    <div style={{ backgroundColor: "#FAFAFA", position: "relative" }} className="w-full py-20">
       {/* Left accent bar */}
       <div
         aria-hidden="true"
@@ -220,7 +220,7 @@ const VAGINSection = () => {
             <img
               src="/vagin-logo.webp"
               alt="VAGIN — Girls' Initiative"
-              style={{ height: 90, width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 18px rgba(237,21,93,0.35)) drop-shadow(0 2px 6px rgba(0,0,0,0.5))" }}
+              style={{ height: 90, width: "auto", objectFit: "contain" }}
             />
           </motion.div>
 
@@ -238,7 +238,7 @@ const VAGINSection = () => {
             animate={headerInView ? "visible" : "hidden"}
             transition={{ delay: reduced ? 0 : 0.15 }}
             className="font-display"
-            style={{ fontSize: "clamp(26px, 4vw, 48px)", fontWeight: 700, color: "#FAFAFA", margin: 0, lineHeight: 1.1 }}
+            style={{ fontSize: "clamp(26px, 4vw, 48px)", fontWeight: 700, color: "#111111", margin: 0, lineHeight: 1.1 }}
           >
             One girl at a time.
           </motion.h2>
@@ -252,7 +252,7 @@ const VAGINSection = () => {
               fontFamily: "DM Sans, system-ui, sans-serif",
               fontWeight: 300,
               fontSize: 15,
-              color: "rgba(250,250,250,0.65)",
+              color: "rgba(17,17,17,0.7)",
               maxWidth: 560,
               lineHeight: 1.7,
               margin: 0,
@@ -286,7 +286,7 @@ const VAGINSection = () => {
             <div
               className="absolute inset-0"
               style={{
-                background: "linear-gradient(135deg, rgba(10,10,10,0.1) 0%, rgba(98,1,127,0.3) 100%)",
+                background: "linear-gradient(135deg, rgba(250,250,250,0.05) 0%, rgba(98,1,127,0.2) 100%)",
               }}
             />
             {/* centered motif */}
@@ -308,7 +308,7 @@ const VAGINSection = () => {
               </span>
               <p
                 className="font-display"
-                style={{ fontSize: 22, color: "#FAFAFA", fontWeight: 700, margin: 0, lineHeight: 1.3 }}
+                style={{ fontSize: 22, color: "#111111", fontWeight: 700, margin: 0, lineHeight: 1.3 }}
               >
                 Real girls. Real change.
               </p>
@@ -316,7 +316,7 @@ const VAGINSection = () => {
                 style={{
                   fontFamily: "DM Sans, system-ui, sans-serif",
                   fontSize: 13,
-                  color: "rgba(250,250,250,0.72)",
+                  color: "rgba(17,17,17,0.8)",
                   marginTop: 8,
                   maxWidth: 320,
                   lineHeight: 1.6,
@@ -331,15 +331,15 @@ const VAGINSection = () => {
               style={{
                 left: 18,
                 bottom: 18,
-                background: "rgba(10,10,10,0.65)",
+                background: "rgba(255,255,255,0.9)",
                 backdropFilter: "blur(8px)",
-                border: "1px solid rgba(255,255,255,0.15)",
+                border: "1px solid rgba(237,21,93,0.2)",
                 borderRadius: 999,
                 padding: "8px 16px",
                 fontFamily: "DM Sans, system-ui, sans-serif",
                 fontSize: 11,
                 letterSpacing: "0.06em",
-                color: "#FAFAFA",
+                color: "#111111",
                 fontWeight: 500,
               }}
             >
@@ -357,7 +357,7 @@ const VAGINSection = () => {
           >
             <p
               className="font-body uppercase"
-              style={{ fontSize: 11, color: "#ED155D", letterSpacing: "0.3em", fontWeight: 500, margin: 0 }}
+              style={{ fontSize: 11, color: "#ED155D", letterSpacing: "0.3em", fontWeight: 500, margin: 0, marginTop: 8 }}
             >
               Our Impact
             </p>
@@ -412,7 +412,7 @@ const VAGINSection = () => {
                 fontFamily: "DM Sans, system-ui, sans-serif",
                 fontWeight: 300,
                 fontSize: 13.5,
-                color: "rgba(250,250,250,0.6)",
+                color: "rgba(17,17,17,0.7)",
                 lineHeight: 1.7,
                 margin: 0,
                 marginTop: 4,

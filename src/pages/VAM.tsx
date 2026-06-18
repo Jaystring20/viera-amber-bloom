@@ -142,7 +142,7 @@ const VAMPage = () => {
       {/* ── Hero ──────────────────────────────────────────────────────── */}
       <section
         style={{
-          background: `linear-gradient(135deg, ${DARK} 0%, #111111 100%)`,
+          background: `linear-gradient(135deg, #FAFAFA 0%, #FFFFFF 100%)`,
           paddingTop: 120,
           paddingBottom: 80,
           position: "relative",
@@ -227,7 +227,7 @@ const VAMPage = () => {
               style={{
                 fontSize: "clamp(32px, 6vw, 68px)",
                 fontWeight: 700,
-                color: "#FAFAFA",
+                color: "#111111",
                 margin: 0,
                 lineHeight: 1.1,
               }}
@@ -246,7 +246,7 @@ const VAMPage = () => {
               style={{
                 fontStyle: "italic",
                 fontSize: "clamp(16px, 2vw, 22px)",
-                color: "rgba(250,250,250,0.5)",
+                color: "rgba(17,17,17,0.6)",
                 maxWidth: 440,
                 lineHeight: 1.55,
                 margin: 0,
@@ -267,7 +267,7 @@ const VAMPage = () => {
                   key={label}
                   style={{
                     border: "1px solid rgba(217,119,6,0.25)",
-                    color: "rgba(250,250,250,0.55)",
+                    color: "rgba(17,17,17,0.65)",
                     fontFamily: "DM Sans, system-ui, sans-serif",
                     fontSize: 12,
                     padding: "6px 14px",
@@ -403,7 +403,7 @@ const VAMPage = () => {
       </section>
 
       {/* ── What You Get ─────────────────────────────────────────────── */}
-      <section className="w-full py-20" style={{ background: DARK }}>
+      <section className="w-full py-20" style={{ background: "#F8F8F8" }}>
         <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
           <motion.div
             ref={includesRef}
@@ -423,14 +423,14 @@ const VAMPage = () => {
               </p>
               <h2 className="font-display" style={{
                 fontSize: "clamp(26px, 4vw, 42px)",
-                fontWeight: 700, color: "#FAFAFA", margin: "0 0 16px 0", lineHeight: 1.2,
+                fontWeight: 700, color: DARK, margin: "0 0 16px 0", lineHeight: 1.2,
               }}>
                 Everything you need to level up.
               </h2>
               <p style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
                 fontSize: 14, fontWeight: 300,
-                color: "rgba(250,250,250,0.5)", lineHeight: 1.75, margin: 0,
+                color: "#666", lineHeight: 1.75, margin: 0,
               }}>
                 VAM is structured to give you the full picture — not just skills,
                 but the confidence, community, and career foundation that comes with them.
@@ -449,7 +449,7 @@ const VAMPage = () => {
                   className="flex items-center gap-3"
                   style={{
                     padding: "14px 18px",
-                    background: "rgba(255,255,255,0.04)",
+                    background: "rgba(217,119,6,0.05)",
                     border: "1px solid rgba(217,119,6,0.15)",
                     borderRadius: 6,
                   }}
@@ -466,7 +466,7 @@ const VAMPage = () => {
                   </div>
                   <span style={{
                     fontFamily: "DM Sans, system-ui, sans-serif",
-                    fontSize: 13, color: "rgba(250,250,250,0.82)",
+                    fontSize: 13, color: "#333",
                   }}>
                     {item}
                   </span>
@@ -745,14 +745,14 @@ const VAMPage = () => {
 
       {/* ── Footer ───────────────────────────────────────────────────── */}
       <footer style={{
-        background: DARK,
-        borderTop: "1px solid #1A1A1A",
+        background: "#FAFAFA",
+        borderTop: "1px solid #EFEFEF",
         padding: "28px 24px",
         textAlign: "center",
       }}>
         <p style={{
           fontFamily: "DM Sans, system-ui, sans-serif",
-          fontSize: 12, color: "#333", margin: 0, letterSpacing: "1px",
+          fontSize: 12, color: "#888", margin: 0, letterSpacing: "1px",
         }}>
           © {new Date().getFullYear()} Viera Amber. All rights reserved.
         </p>

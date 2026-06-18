@@ -190,22 +190,22 @@ const VIVAPage = () => {
   };
 
   return (
-    <div style={{ backgroundColor: BURGUNDY, minHeight: "100vh" }}>
+    <div style={{ backgroundColor: "#FAFAFA", minHeight: "100vh" }}>
       <NavBar />
 
       {/* ═══════════════════════════════════════════════════════
-          HERO — deep burgundy, Daughters of Adonai centred portrait
+          HERO — white dominant with burgundy accents
           ═══════════════════════════════════════════════════════ */}
-      <section style={{ position: "relative", overflow: "visible", background: BURGUNDY, minHeight: "clamp(900px, 115vh, 1240px)" }}>
-        {/* Subtle crosshatch grain */}
+      <section style={{ position: "relative", overflow: "visible", background: "#FFFFFF", minHeight: "clamp(900px, 115vh, 1240px)" }}>
+        {/* Subtle grain */}
         <div aria-hidden="true" style={{
           position: "absolute", inset: 0, pointerEvents: "none",
-          backgroundImage: "repeating-linear-gradient(45deg, rgba(0,0,0,0.018) 0px, rgba(0,0,0,0.018) 1px, transparent 1px, transparent 12px)",
+          backgroundImage: "repeating-linear-gradient(45deg, rgba(0,0,0,0.005) 0px, rgba(0,0,0,0.005) 1px, transparent 1px, transparent 12px)",
         }} />
-        {/* Gold glow from top — warmth */}
+        {/* Subtle gold glow from top */}
         <div aria-hidden="true" style={{
           position: "absolute", inset: 0, pointerEvents: "none",
-          background: "radial-gradient(ellipse 90% 45% at 50% -2%, rgba(212,175,55,0.14) 0%, transparent 65%)",
+          background: "radial-gradient(ellipse 90% 45% at 50% -2%, rgba(212,175,55,0.08) 0%, transparent 65%)",
         }} />
 
         {/* Editorial flanking models — white bg dissolves into burgundy via multiply */}
@@ -336,7 +336,7 @@ const VIVAPage = () => {
                 fontFamily: CORMORANT,
                 fontStyle: "italic",
                 fontSize: "clamp(18px, 2.5vw, 28px)",
-                color: `rgba(250,249,246,0.82)`,
+                color: BURGUNDY,
                 fontWeight: 400,
                 margin: 0,
               }}
@@ -350,7 +350,7 @@ const VIVAPage = () => {
                 fontFamily: "DM Sans, system-ui, sans-serif",
                 fontWeight: 300,
                 fontSize: 14,
-                color: `rgba(250,249,246,0.42)`,
+                color: `rgba(34,26,26,0.65)`,
                 lineHeight: 1.8,
                 margin: 0,
                 maxWidth: 360,

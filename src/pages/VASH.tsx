@@ -95,7 +95,7 @@ const VASHPage = () => {
       {/* ── Hero ──────────────────────────────────────────────────────── */}
       <section
         style={{
-          background: `linear-gradient(135deg, ${DARK} 0%, #0a1a1e 60%, #0d2428 100%)`,
+          background: `linear-gradient(135deg, #FAFAFA 0%, #FFFFFF 60%, #F8F8F8 100%)`,
           paddingTop: 120,
           paddingBottom: 80,
           position: "relative",
@@ -170,14 +170,14 @@ const VASHPage = () => {
               style={{
                 fontSize: "clamp(36px, 7vw, 80px)",
                 fontWeight: 700,
-                color: "#FAFAFA",
+                color: "#111111",
                 margin: 0,
                 lineHeight: 1.1,
               }}
             >
               Art you can
               <br />
-              <span style={{ color: TEAL_LIGHT }}>live with.</span>
+              <span style={{ color: TEAL }}>live with.</span>
             </motion.h1>
 
             <motion.p
@@ -189,7 +189,7 @@ const VASHPage = () => {
                 fontFamily: "DM Sans, system-ui, sans-serif",
                 fontWeight: 300,
                 fontSize: 15,
-                color: "rgba(250,250,250,0.5)",
+                color: "rgba(17,17,17,0.65)",
                 maxWidth: 440,
                 lineHeight: 1.8,
                 margin: 0,
@@ -469,7 +469,7 @@ const VASHPage = () => {
       <section
         id="vash-notify"
         className="w-full py-20"
-        style={{ background: DARK }}
+        style={{ background: "#1A1A1A" }}
       >
         <div className="mx-auto px-6" style={{ maxWidth: 560 }}>
           <motion.div
@@ -604,14 +604,14 @@ const VASHPage = () => {
 
       {/* ── Footer ───────────────────────────────────────────────────── */}
       <footer style={{
-        background: "#030A0B",
-        borderTop: "1px solid rgba(11,123,140,0.15)",
+        background: "#FAFAFA",
+        borderTop: "1px solid #EFEFEF",
         padding: "28px 24px",
         textAlign: "center",
       }}>
         <p style={{
           fontFamily: "DM Sans, system-ui, sans-serif",
-          fontSize: 12, color: "rgba(11,123,140,0.35)", margin: 0, letterSpacing: "1px",
+          fontSize: 12, color: "#888", margin: 0, letterSpacing: "1px",
         }}>
           © {new Date().getFullYear()} Viera Amber. All rights reserved.
         </p>
