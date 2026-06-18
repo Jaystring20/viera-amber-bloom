@@ -9,9 +9,9 @@ const GOLD_DIM = "rgba(217,119,6,0.10)";
 
 const NAV_LINKS = [
   { label: "Illustrations", href: "/illustrations", isRoute: true },
-  { label: "VAGIN", href: "/vagin", isRoute: true },
-  { label: "VIVA", href: "/viva", isRoute: true },
-  { label: "VAM", href: "/vam", isRoute: true },
+  { label: "VAGIN", href: "/vagin", isRoute: true, fullName: "Viera Amber Girls' Initiative" },
+  { label: "VIVA", href: "/viva", isRoute: true, fullName: "Fashion & Wearable Art" },
+  { label: "VAM", href: "/vam", isRoute: true, fullName: "Viera Amber Masterclass" },
   { label: "Shop", href: "/vash", isRoute: true },
   { label: "Contact", href: "#contact" },
 ];
@@ -323,11 +323,7 @@ const NavBar = () => {
                           display: "flex",
                           alignItems: "center",
                           gap: 10,
-                          fontSize: 13,
-                          letterSpacing: "1.5px",
-                          fontWeight: active ? 600 : 400,
                           fontFamily: "DM Sans, system-ui, sans-serif",
-                          textTransform: "uppercase",
                           color: active ? GOLD : "rgba(250,250,250,0.82)",
                           background: active ? GOLD_DIM : "transparent",
                           padding: "11px 16px",
@@ -349,10 +345,26 @@ const NavBar = () => {
                         {active && (
                           <span style={{
                             width: 3, height: 14, borderRadius: 2,
-                            background: GOLD, flexShrink: 0,
+                            background: GOLD, flexShrink: 0, alignSelf: "flex-start", marginTop: 3,
                           }} />
                         )}
-                        {l.label}
+                        <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                          <span style={{
+                            fontSize: 13,
+                            letterSpacing: "1.5px",
+                            fontWeight: active ? 600 : 400,
+                            textTransform: "uppercase",
+                          }}>{l.label}</span>
+                          {"fullName" in l && l.fullName && (
+                            <span style={{
+                              fontSize: 10,
+                              fontWeight: 300,
+                              letterSpacing: "0.3px",
+                              textTransform: "none",
+                              color: active ? "rgba(217,119,6,0.65)" : "rgba(250,250,250,0.35)",
+                            }}>({l.fullName})</span>
+                          )}
+                        </span>
                       </a>
                     </motion.li>
                   );
