@@ -82,10 +82,12 @@ const useCountUp = (target: number, inView: boolean, duration = 2000): number =>
 
 // ─── Reusable eyebrow + heading ───────────────────────────────────────────────
 const SectionHead = ({
-  eyebrow, heading, body, inView, reduced, accentColor = PINK,
-}: { eyebrow: string; heading: string; body?: string; inView: boolean; reduced: boolean; accentColor?: string }) => {
+  eyebrow, heading, body, inView, reduced, accentColor = PINK, scheme = "light",
+}: { eyebrow: string; heading: string; body?: string; inView: boolean; reduced: boolean; accentColor?: string; scheme?: "light" | "dark" }) => {
   const headV = useReducedVariants(fadeSlideUp);
   const fadeV = useReducedVariants(fadeIn);
+  const headingColor = scheme === "dark" ? "#FAFAFA" : "#111111";
+  const bodyColor = scheme === "dark" ? "rgba(250,250,250,0.65)" : "rgba(17,17,17,0.65)";
   return (
     <div className="flex flex-col items-center text-center mb-12" style={{ gap: 16 }}>
       <motion.p
@@ -96,13 +98,13 @@ const SectionHead = ({
         variants={headV} initial="hidden" animate={inView ? "visible" : "hidden"}
         transition={{ delay: reduced ? 0 : 0.1 }}
         className="font-display"
-        style={{ fontSize: "clamp(26px, 4vw, 48px)", fontWeight: 700, color: "#111111", margin: 0, lineHeight: 1.12, maxWidth: 760 }}
+        style={{ fontSize: "clamp(26px, 4vw, 48px)", fontWeight: 700, color: headingColor, margin: 0, lineHeight: 1.12, maxWidth: 760 }}
       >{heading}</motion.h2>
       {body && (
         <motion.p
           variants={fadeV} initial="hidden" animate={inView ? "visible" : "hidden"}
           transition={{ delay: reduced ? 0 : 0.2 }}
-          style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 15, color: "rgba(17,17,17,0.65)", maxWidth: 600, lineHeight: 1.75, margin: 0 }}
+          style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 15, color: bodyColor, maxWidth: 600, lineHeight: 1.75, margin: 0 }}
         >{body}</motion.p>
       )}
     </div>
@@ -528,7 +530,7 @@ const VAGINPage = () => {
         {/* ── GALLERY CAROUSEL ──────────────────────────────────────────────── */}
         <section
           className="w-full py-20"
-          style={{ background: `linear-gradient(135deg, #FAFAFA 0%, rgba(237,21,93,0.03) 60%, rgba(98,1,127,0.02) 100%)`, borderTop: `1px solid ${PINK}15` }}
+          style={{ background: `linear-gradient(135deg, rgba(98,1,127,0.09) 0%, #F8F5FF 20%, #FAFAFA 55%, rgba(237,21,93,0.08) 100%)`, borderTop: `1px solid ${PURPLE}30` }}
           aria-label="Community Impact Gallery"
         >
           <div className="mx-auto px-6 mb-10" style={{ maxWidth: 1200 }}>
@@ -539,12 +541,12 @@ const VAGINPage = () => {
               viewport={{ once: true, amount: 0.3 }}
               className="text-center"
             >
-              <p className="font-body uppercase m-0" style={{ fontSize: 11, color: PINK, letterSpacing: "0.4em", marginBottom: 12 }}>See the Impact</p>
+              <p className="font-body uppercase m-0" style={{ fontSize: 11, color: PURPLE, letterSpacing: "0.4em", marginBottom: 12 }}>See the Impact</p>
               <h2 className="font-display m-0" style={{ fontSize: "clamp(26px, 4vw, 44px)", fontWeight: 700, color: "#111111", lineHeight: 1.15, marginBottom: 8 }}>
                 Girls changing their stories
               </h2>
-              <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 14, color: "rgba(17,17,17,0.6)", margin: 0 }}>
-                Hover to pause · More photos being added
+              <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 14, color: "rgba(17,17,17,0.65)", margin: 0 }}>
+                Hover to pause · Photos from Nigeria &amp; Malawi
               </p>
             </motion.div>
           </div>
@@ -563,7 +565,7 @@ const VAGINPage = () => {
         <section
           ref={missionRef}
           className="w-full py-20"
-          style={{ background: `linear-gradient(145deg, #FAFAFA 0%, rgba(98,1,127,0.04) 50%, rgba(237,21,93,0.03) 100%)` }}
+          style={{ background: `linear-gradient(145deg, rgba(98,1,127,0.08) 0%, #FAFAFA 30%, rgba(237,21,93,0.07) 70%, rgba(98,1,127,0.09) 100%)` }}
           aria-label="The Mission"
         >
           <div className="mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center" style={{ maxWidth: 1100 }}>
@@ -606,13 +608,13 @@ const VAGINPage = () => {
                 className="w-full h-full object-cover"
                 style={{ minHeight: 360 }}
               />
-              <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(250,250,250,0.05) 0%, rgba(98,1,127,0.35) 100%)" }} />
+              <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(13,0,21,0.58) 0%, rgba(98,1,127,0.68) 100%)" }} />
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-8">
-                <span aria-hidden="true" className="flex items-center justify-center" style={{ width: 76, height: 76, borderRadius: 22, background: "rgba(237,21,93,0.15)", border: "1px solid rgba(237,21,93,0.4)", marginBottom: 20, backdropFilter: "blur(8px)" }}>
+                <span aria-hidden="true" className="flex items-center justify-center" style={{ width: 76, height: 76, borderRadius: 22, background: "rgba(237,21,93,0.22)", border: "1px solid rgba(237,21,93,0.55)", marginBottom: 20, backdropFilter: "blur(10px)" }}>
                   <Users size={36} color={PINK_LIGHT} strokeWidth={1.5} />
                 </span>
-                <p className="font-display" style={{ fontSize: 24, color: "#111111", fontWeight: 700, margin: 0, lineHeight: 1.3 }}>Real girls. Real change.</p>
-                <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13.5, color: "rgba(17,17,17,0.75)", marginTop: 10, maxWidth: 340, lineHeight: 1.65 }}>
+                <p className="font-display" style={{ fontSize: 24, color: "#FAFAFA", fontWeight: 700, margin: 0, lineHeight: 1.3 }}>Real girls. Real change.</p>
+                <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13.5, color: "rgba(250,250,250,0.85)", marginTop: 10, maxWidth: 340, lineHeight: 1.65 }}>
                   Operating in Nigeria and Malawi, reaching one classroom at a time.
                 </p>
               </div>
@@ -626,7 +628,7 @@ const VAGINPage = () => {
         {/* ── WHY SRHR ───────────────────────────────────────────────────── */}
         <section
           className="w-full py-20"
-          style={{ background: `linear-gradient(160deg, #FFFFFF 0%, rgba(237,21,93,0.025) 40%, rgba(98,1,127,0.03) 70%, #FAFAFA 100%)`, borderTop: `1px solid ${PINK}18` }}
+          style={{ background: `linear-gradient(160deg, rgba(237,21,93,0.07) 0%, #FFFFFF 25%, rgba(98,1,127,0.08) 60%, rgba(237,21,93,0.06) 100%)`, borderTop: `1px solid ${PINK}35` }}
           aria-label="Why SRHR?"
         >
           <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
@@ -674,7 +676,7 @@ const VAGINPage = () => {
                   key={s.stat}
                   variants={cardItem}
                   className="flex flex-col"
-                  style={{ background: `${s.accent}08`, border: `1px solid ${s.accent}22`, borderLeft: `4px solid ${s.accent}`, borderRadius: 14, padding: "32px 28px", gap: 14, backdropFilter: "blur(4px)" }}
+                  style={{ background: `${s.accent}14`, border: `1px solid ${s.accent}38`, borderLeft: `4px solid ${s.accent}`, borderRadius: 14, padding: "32px 28px", gap: 14, backdropFilter: "blur(4px)" }}
                 >
                   <span className="font-display" style={{ fontSize: "clamp(44px, 6vw, 68px)", fontWeight: 700, color: s.accent, lineHeight: 1 }}>{s.stat}</span>
                   <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 16, color: "rgba(17,17,17,0.8)", lineHeight: 1.7, margin: 0 }}>{s.body}</p>
@@ -690,7 +692,7 @@ const VAGINPage = () => {
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.6 }}
               className="p-7 rounded-xl"
-              style={{ background: `${PINK}0A`, border: `1px solid ${PINK}28`, backdropFilter: "blur(6px)" }}
+              style={{ background: `${PINK}18`, border: `1px solid ${PINK}48`, backdropFilter: "blur(6px)" }}
             >
               <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: PINK, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600, margin: 0, marginBottom: 12 }}>
                 What girls in low-resourced settings face
@@ -714,7 +716,7 @@ const VAGINPage = () => {
         {/* ── WHY ART ────────────────────────────────────────────────────── */}
         <section
           className="w-full py-20"
-          style={{ background: `linear-gradient(150deg, #FAFAFA 0%, rgba(98,1,127,0.05) 60%, rgba(199,125,255,0.02) 100%)`, borderTop: `1px solid ${PURPLE}18` }}
+          style={{ background: `linear-gradient(150deg, rgba(98,1,127,0.09) 0%, #F8F5FF 18%, #FAFAFA 50%, rgba(98,1,127,0.1) 78%, rgba(199,125,255,0.05) 100%)`, borderTop: `1px solid ${PURPLE}35` }}
           aria-label="Why Art?"
         >
           <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
@@ -741,7 +743,7 @@ const VAGINPage = () => {
                     { cite: "Hartley et al., 2023", finding: "Art-based SRHR teaching increases participation and recall in young women." },
                     { cite: "Widarini et al., 2019", finding: "Art improved adolescents' knowledge and attitudes towards premarital sex and health decision-making." },
                   ].map((r) => (
-                    <div key={r.cite} style={{ background: `${PURPLE}0C`, border: `1px solid ${PURPLE_LIGHT}28`, borderRadius: 10, padding: "14px 18px", backdropFilter: "blur(4px)" }}>
+                    <div key={r.cite} style={{ background: `${PURPLE}1A`, border: `1px solid ${PURPLE_LIGHT}50`, borderRadius: 10, padding: "14px 18px", backdropFilter: "blur(4px)" }}>
                       <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: PURPLE, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 600, margin: 0, marginBottom: 4 }}>{r.cite}</p>
                       <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 13.5, color: "rgba(17,17,17,0.75)", lineHeight: 1.6, margin: 0 }}>{r.finding}</p>
                     </div>
@@ -763,7 +765,7 @@ const VAGINPage = () => {
                     key={m.title}
                     variants={cardItem}
                     className="flex items-start"
-                    style={{ gap: 16, background: i % 2 === 0 ? `${PINK}08` : `${PURPLE}08`, border: `1px solid ${i % 2 === 0 ? PINK : PURPLE}20`, borderRadius: 12, padding: "18px 20px", backdropFilter: "blur(4px)" }}
+                    style={{ gap: 16, background: i % 2 === 0 ? `${PINK}16` : `${PURPLE}14`, border: `1px solid ${i % 2 === 0 ? PINK : PURPLE}38`, borderRadius: 12, padding: "18px 20px", backdropFilter: "blur(4px)" }}
                   >
                     <span className="flex-shrink-0 flex items-center justify-center" style={{ width: 40, height: 40, borderRadius: 10, background: i % 2 === 0 ? `${PINK}15` : `${PURPLE}12`, border: `1px solid ${i % 2 === 0 ? PINK : PURPLE}33` }}>
                       <m.Icon size={18} color={i % 2 === 0 ? PINK : PURPLE} strokeWidth={1.75} />
@@ -783,7 +785,7 @@ const VAGINPage = () => {
         <section
           ref={impactRef}
           className="w-full py-20"
-          style={{ background: `linear-gradient(135deg, #F5F5F5 0%, rgba(237,21,93,0.04) 40%, rgba(98,1,127,0.03) 100%)`, borderTop: `1px solid ${PINK}18`, borderBottom: `1px solid ${PINK}18` }}
+          style={{ background: `linear-gradient(135deg, rgba(237,21,93,0.08) 0%, #F8F8F8 28%, rgba(98,1,127,0.09) 65%, rgba(237,21,93,0.08) 100%)`, borderTop: `1px solid ${PINK}35`, borderBottom: `1px solid ${PINK}35` }}
           aria-label="Our Impact"
         >
           <div className="mx-auto px-6" style={{ maxWidth: 1000 }}>
@@ -808,7 +810,7 @@ const VAGINPage = () => {
                   key={s.label}
                   variants={cardV}
                   className="flex flex-col items-center text-center"
-                  style={{ background: `${PINK}08`, border: `1px solid ${PINK}22`, borderRadius: 14, padding: "32px 20px", gap: 12, backdropFilter: "blur(4px)" }}
+                  style={{ background: `${PINK}15`, border: `1px solid ${PINK}40`, borderRadius: 14, padding: "32px 20px", gap: 12, backdropFilter: "blur(4px)" }}
                 >
                   <span aria-hidden="true" className="flex items-center justify-center" style={{ width: 44, height: 44, borderRadius: 12, background: `${PINK}15`, border: `1px solid ${PINK}38`, backdropFilter: "blur(4px)" }}>
                     <s.Icon size={22} color={PINK} strokeWidth={1.75} />
@@ -848,18 +850,22 @@ const VAGINPage = () => {
         {/* ── PROGRAMS ───────────────────────────────────────────────────── */}
         <section
           ref={programsRef}
-          className="w-full py-20"
-          style={{ background: `linear-gradient(135deg, #FAFAFA 0%, rgba(98,1,127,0.06) 50%, rgba(237,21,93,0.04) 100%)`, borderTop: `1px solid ${PURPLE}20` }}
+          className="w-full py-20 relative overflow-hidden"
+          style={{ background: `linear-gradient(135deg, #1A002E 0%, ${PURPLE} 40%, #0E001C 70%, #1C0030 100%)`, borderTop: `1px solid ${PURPLE_LIGHT}30` }}
           aria-label="The Programs"
         >
-          <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
+          {/* Ambient glows */}
+          <div aria-hidden="true" className="absolute pointer-events-none" style={{ left: -120, top: -80, width: 420, height: 420, borderRadius: "50%", background: "radial-gradient(circle, rgba(199,125,255,0.12) 0%, transparent 65%)", filter: "blur(2px)" }} />
+          <div aria-hidden="true" className="absolute pointer-events-none" style={{ right: -80, bottom: -60, width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle, rgba(237,21,93,0.1) 0%, transparent 65%)", filter: "blur(2px)" }} />
+          <div className="relative mx-auto px-6" style={{ maxWidth: 1100, zIndex: 1 }}>
             <SectionHead
               eyebrow="The Programs"
               heading="Two ways we change the story."
               body="Education and access, working together — one teaches, one equips."
               inView={programsInView}
               reduced={!!reduced}
-              accentColor={PURPLE}
+              accentColor={PURPLE_LIGHT}
+              scheme="dark"
             />
             <motion.div
               variants={staggerV}
@@ -893,7 +899,7 @@ const VAGINPage = () => {
         <section
           ref={curriculumRef}
           className="w-full py-20"
-          style={{ background: `linear-gradient(145deg, #FFFFFF 0%, rgba(237,21,93,0.04) 45%, rgba(98,1,127,0.05) 75%, #F8F8F8 100%)`, borderTop: `1px solid ${PINK}18` }}
+          style={{ background: `linear-gradient(145deg, rgba(237,21,93,0.08) 0%, #FFFFFF 25%, rgba(98,1,127,0.09) 60%, rgba(237,21,93,0.07) 100%)`, borderTop: `1px solid ${PINK}35` }}
           aria-label="VaginART Curriculum"
         >
           <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
@@ -918,7 +924,7 @@ const VAGINPage = () => {
                   variants={cardV}
                   whileHover={reduced ? {} : { y: -4 }}
                   transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
-                  style={{ background: "rgba(237,21,93,0.04)", border: "1px solid rgba(237,21,93,0.12)", borderRadius: 14, padding: "26px 22px" }}
+                  style={{ background: `${c.color}14`, border: `1px solid ${c.color}35`, borderRadius: 14, padding: "26px 22px" }}
                 >
                   <span aria-hidden="true" className="flex items-center justify-center" style={{ width: 46, height: 46, borderRadius: 12, background: `${c.color}15`, border: `1px solid ${c.color}33`, marginBottom: 16 }}>
                     <c.Icon size={22} color={c.color} strokeWidth={1.75} />
@@ -1591,18 +1597,25 @@ const ProgramBlock = ({
   <motion.div
     variants={cardV}
     className="flex flex-col"
-    style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderTop: `3px solid ${accent}`, borderRadius: 16, padding: "34px 30px" }}
+    style={{
+      background: `linear-gradient(135deg, ${accent}22 0%, rgba(255,255,255,0.08) 100%)`,
+      border: `1px solid ${accentText}55`,
+      borderTop: `3px solid ${accent}`,
+      borderRadius: 16,
+      padding: "34px 30px",
+      backdropFilter: "blur(8px)",
+    }}
   >
     <div className="flex items-center" style={{ gap: 14, marginBottom: 18 }}>
-      <span aria-hidden="true" className="flex items-center justify-center" style={{ width: 52, height: 52, borderRadius: 14, background: `${accent}22`, border: `1px solid ${accentText}55` }}>
-        <Icon size={26} color="#FAFAFA" strokeWidth={1.75} />
+      <span aria-hidden="true" className="flex items-center justify-center" style={{ width: 52, height: 52, borderRadius: 14, background: `${accent}30`, border: `1px solid ${accentText}70` }}>
+        <Icon size={26} color={accentText} strokeWidth={1.75} />
       </span>
-      <span className="font-body uppercase" style={{ fontSize: 10, color: accentText, letterSpacing: "0.16em", border: `1px solid ${accentText}`, borderRadius: 999, padding: "3px 11px", fontWeight: 600 }}>
+      <span className="font-body uppercase" style={{ fontSize: 10, color: accentText, letterSpacing: "0.16em", border: `1px solid ${accentText}80`, borderRadius: 999, padding: "3px 11px", fontWeight: 600 }}>
         {tag}
       </span>
     </div>
     <h3 className="font-display" style={{ fontSize: 26, fontWeight: 700, color: "#FAFAFA", marginBottom: 12 }}>{title}</h3>
-    <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 14.5, color: "rgba(250,250,250,0.65)", lineHeight: 1.75, margin: 0 }}>{body}</p>
+    <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 14.5, color: "rgba(250,250,250,0.72)", lineHeight: 1.75, margin: 0 }}>{body}</p>
   </motion.div>
 );
 
