@@ -213,8 +213,11 @@ export const CollectionGallery = ({ collection, onClose }: CollectionGalleryProp
                   {/* CTA */}
                   <button
                     onClick={() => {
-                      console.log("Commission:", selectedItem.title);
-                      // Will wire to VASH in next phase
+                      const whatsappNumber = "2348074022917";
+                      const message = `Hi, I'd like to commission: ${selectedItem.title}\n\n${selectedItem.story}`;
+                      const encodedMessage = encodeURIComponent(message);
+                      const whatsappLink = `https://wa.me/${whatsappNumber}/?text=${encodedMessage}`;
+                      window.open(whatsappLink, "_blank");
                     }}
                     style={{
                       fontFamily: "Montserrat, system-ui, sans-serif",
