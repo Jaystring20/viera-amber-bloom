@@ -586,7 +586,7 @@ const VAGINPage = () => {
                 <span className="inline-flex items-center" style={{ gap: 8, background: "rgba(98,1,127,0.08)", border: `1px solid ${PURPLE_LIGHT}55`, borderRadius: 999, padding: "8px 16px", fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, color: PURPLE, fontWeight: 600 }}>
                   <Target size={15} strokeWidth={2} /> SDG 3 &amp; 5
                 </span>
-                <span className="inline-flex items-center" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 999, padding: "8px 16px", fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, color: "rgba(250,250,250,0.7)", fontWeight: 500 }}>
+                <span className="inline-flex items-center" style={{ background: `${PURPLE}10`, border: `1px solid ${PURPLE}30`, borderRadius: 999, padding: "8px 16px", fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, color: PURPLE_MEDIUM, fontWeight: 500 }}>
                   Founded March 2022
                 </span>
               </div>
@@ -816,7 +816,7 @@ const VAGINPage = () => {
                   <span className="font-display" style={{ fontSize: "clamp(34px, 4vw, 46px)", fontWeight: 700, color: PINK, lineHeight: 1 }} aria-live="polite">
                     {s.val.toLocaleString()}{s.suffix}
                   </span>
-                  <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(250,250,250,0.55)" }}>{s.label}</span>
+                  <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(17,17,17,0.55)" }}>{s.label}</span>
                 </motion.div>
               ))}
             </motion.div>
@@ -828,16 +828,16 @@ const VAGINPage = () => {
               animate={impactInView ? "visible" : "hidden"}
               transition={{ delay: reduced ? 0 : 0.35 }}
               className="mt-8 p-6 rounded-xl"
-              style={{ background: "rgba(237,21,93,0.07)", border: "1px solid rgba(237,21,93,0.22)" }}
+              style={{ background: `linear-gradient(135deg, ${PURPLE} 0%, ${PINK} 100%)`, border: `1px solid ${PINK}40` }}
             >
-              <p className="m-0" style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: PINK, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600, marginBottom: 14 }}>
+              <p className="m-0" style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: "rgba(255,255,255,0.85)", letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600, marginBottom: 14 }}>
                 Project 2029 — Our 5-Year Vision
               </p>
               <div className="grid grid-cols-3 gap-4 text-center">
                 {[["50K+", "Girls by 2029"], ["5", "Countries"], ["2K+", "Girls/Year"]].map(([val, lbl]) => (
                   <div key={lbl}>
-                    <p className="font-display m-0" style={{ fontSize: 28, fontWeight: 700, color: "#FAFAFA", marginBottom: 4 }}>{val}</p>
-                    <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, color: "rgba(250,250,250,0.7)", margin: 0 }}>{lbl}</p>
+                    <p className="font-display m-0" style={{ fontSize: 28, fontWeight: 700, color: "#FFFFFF", marginBottom: 4 }}>{val}</p>
+                    <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, color: "rgba(255,255,255,0.75)", margin: 0 }}>{lbl}</p>
                   </div>
                 ))}
               </div>
@@ -849,7 +849,7 @@ const VAGINPage = () => {
         <section
           ref={programsRef}
           className="w-full py-20"
-          style={{ backgroundColor: "#FAFAFA" }}
+          style={{ background: `linear-gradient(135deg, #FAFAFA 0%, rgba(98,1,127,0.06) 50%, rgba(237,21,93,0.04) 100%)`, borderTop: `1px solid ${PURPLE}20` }}
           aria-label="The Programs"
         >
           <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
@@ -893,7 +893,7 @@ const VAGINPage = () => {
         <section
           ref={curriculumRef}
           className="w-full py-20"
-          style={{ background: "linear-gradient(135deg, #F8F8F8 0%, #FFFFFF 100%)", borderTop: "1px solid rgba(217,119,6,0.08)" }}
+          style={{ background: `linear-gradient(145deg, #FFFFFF 0%, rgba(237,21,93,0.04) 45%, rgba(98,1,127,0.05) 75%, #F8F8F8 100%)`, borderTop: `1px solid ${PINK}18` }}
           aria-label="VaginART Curriculum"
         >
           <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
@@ -936,8 +936,8 @@ const VAGINPage = () => {
           ref={vaginartDeepRef}
           className="w-full py-24 relative overflow-hidden"
           style={{
-            background: "linear-gradient(160deg, #FFFFFF 0%, #FAFAFA 45%, #F8F8F8 70%, #FAFAFA 100%)",
-            borderTop: "1px solid rgba(98,1,127,0.28)",
+            background: `linear-gradient(160deg, #0E0028 0%, ${PURPLE} 35%, #1A0035 65%, #0A0018 100%)`,
+            borderTop: `1px solid ${PURPLE_LIGHT}30`,
           }}
           aria-label="VaginART Program"
         >
