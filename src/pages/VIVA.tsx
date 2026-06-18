@@ -1,10 +1,22 @@
 import { useRef, useState } from "react";
 import { motion, useInView, useReducedMotion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Send } from "lucide-react";
+import { ArrowLeft, Send, ShoppingBag, X, Plus, Minus, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "@/components/NavBar";
 import { fadeIn, fadeSlideUp, staggerContainer, cardItem, scaleXRule, inViewProps, useReducedVariants } from "@/lib/animations";
 import { supabase } from "@/lib/supabase";
+
+declare global {
+  interface Window {
+    PaystackPop: {
+      setup(opts: {
+        key: string; email: string; amount: number; currency: string; ref?: string;
+        callback(r: { reference: string }): void;
+        onClose(): void;
+      }): { openIframe(): void };
+    };
+  }
+}
 
 const vivaHeroLeft  = "/viva/hero-left.png";  // Look 1 — olive kimono — left flank
 const vivaHeroRight = "/viva/hero-right.png"; // Look 2 — hot-pink crop — right flank
@@ -24,6 +36,17 @@ const LOOKBOOK = [
   { title: "The Bold",     mood: "Vivid Authority",   photo: "/viva/look-2.jpeg", desc: "Hot-pink structured crop · Wide-leg denim · Statement earrings" },
   { title: "The Artist",   mood: "Chromatic Freedom", photo: "/viva/look-3.jpeg", desc: "Chartreuse palazzo · Structured crop · Layered gold jewellery" },
 ];
+
+const SHOP_PRODUCTS = [
+  { id: "heritage", title: "The Heritage",  subtitle: "Look 01 · Batya Collection",        type: "garment" as const, badge: "Made to Order", photo: "/viva/look-1.jpeg", priceNGN: 180000, priceUSD: 115, desc: "Olive woven kimono · wide-leg pleated denim · gold cuffs. Bespoke fit, made to your measurements." },
+  { id: "bold",     title: "The Bold",      subtitle: "Look 02 · Batya Collection",        type: "garment" as const, badge: "Limited",       photo: "/viva/look-2.jpeg", priceNGN: 195000, priceUSD: 126, desc: "Hot-pink structured crop · wide-leg denim · statement earrings. Confidence, personalised." },
+  { id: "artist",   title: "The Artist",    subtitle: "Look 03 · Batya Collection",        type: "garment" as const, badge: "Made to Order", photo: "/viva/look-3.jpeg", priceNGN: 188000, priceUSD: 121, desc: "Chartreuse palazzo · structured crop · layered gold jewellery. Chromatic freedom in fabric." },
+  { id: "print-01", title: "Batya No.1",    subtitle: "Fashion Illustration · A3 Giclée", type: "print"   as const, badge: "Edition / 30", photo: "/viva/look-4.jpeg", priceNGN: 35000,  priceUSD: 22,  desc: "Archival giclée on 300gsm cotton rag. Signed + numbered. Ships in a protective tube." },
+  { id: "print-02", title: "Heritage Print",subtitle: "Fashion Illustration · A3 Giclée", type: "print"   as const, badge: "Edition / 30", photo: "/viva/look-1.jpeg", priceNGN: 35000,  priceUSD: 22,  desc: "The Heritage silhouette in ink and gouache. Signed by Viera Amber. Edition of 30." },
+] as const;
+
+type ShopProduct = typeof SHOP_PRODUCTS[number];
+type CartItem = { product: ShopProduct; qty: number };
 
 // Upcoming pieces (no photo yet)
 const COMING = [
@@ -76,10 +99,12 @@ const VIVAPage = () => {
 
   const pillarsRef  = useRef<HTMLDivElement>(null);
   const lookbookRef = useRef<HTMLDivElement>(null);
+  const shopRef     = useRef<HTMLDivElement>(null);
   const enquiryRef  = useRef<HTMLDivElement>(null);
 
   const pillarsInView  = useInView(pillarsRef,  inViewProps);
   const lookbookInView = useInView(lookbookRef, inViewProps);
+  const shopInView     = useInView(shopRef,     inViewProps);
   const enquiryInView  = useInView(enquiryRef,  inViewProps);
 
   const fadeVariants    = useReducedVariants(fadeIn);
@@ -92,6 +117,52 @@ const VIVAPage = () => {
 
   const [form, setForm] = useState({ name: "", email: "", interest: "", message: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
+
+  // Shop state
+  const [currency, setCurrency]           = useState<"NGN" | "USD">("NGN");
+  const [cart, setCart]                   = useState<CartItem[]>([]);
+  const [cartOpen, setCartOpen]           = useState(false);
+  const [checkoutEmail, setCheckoutEmail] = useState("");
+  const [payStatus, setPayStatus]         = useState<"idle" | "loading" | "success" | "error">("idle");
+
+  const cartCount = cart.reduce((s, i) => s + i.qty, 0);
+  const cartTotal = cart.reduce((s, i) => s + (currency === "NGN" ? i.product.priceNGN : i.product.priceUSD) * i.qty, 0);
+
+  const addToCart = (product: ShopProduct) => {
+    setCart(prev => {
+      const hit = prev.find(i => i.product.id === product.id);
+      return hit ? prev.map(i => i.product.id === product.id ? { ...i, qty: i.qty + 1 } : i) : [...prev, { product, qty: 1 }];
+    });
+    setCartOpen(true);
+  };
+
+  const removeFromCart = (id: string) => setCart(prev => prev.filter(i => i.product.id !== id));
+
+  const updateQty = (id: string, delta: number) =>
+    setCart(prev => prev.flatMap(i => {
+      if (i.product.id !== id) return [i];
+      const q = i.qty + delta;
+      return q < 1 ? [] : [{ ...i, qty: q }];
+    }));
+
+  const handlePaystack = () => {
+    if (!checkoutEmail || cart.length === 0) return;
+    if (typeof window.PaystackPop === "undefined") {
+      alert("Payment system is loading — please try again in a moment.");
+      return;
+    }
+    setPayStatus("loading");
+    const handler = window.PaystackPop.setup({
+      key: "pk_test_REPLACE_WITH_YOUR_PAYSTACK_PUBLIC_KEY",
+      email: checkoutEmail,
+      amount: cartTotal * 100,
+      currency,
+      ref: `VIVA-${Date.now()}`,
+      callback: (_response) => { setPayStatus("success"); setCart([]); },
+      onClose: () => setPayStatus("idle"),
+    });
+    handler.openIframe();
+  };
 
   const handleEnquiry = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -567,6 +638,130 @@ const VIVAPage = () => {
       </section>
 
       {/* ═══════════════════════════════════════════════════════
+          SHOP — garments + illustration prints, Paystack checkout
+          ═══════════════════════════════════════════════════════ */}
+      <section id="viva-shop" className="w-full" style={{ background: ALABASTER, paddingTop: 80, paddingBottom: 80 }}>
+        <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
+
+          {/* Header row */}
+          <div className="flex items-start justify-between flex-wrap gap-4" style={{ marginBottom: 48 }}>
+            <div>
+              <p style={{ fontFamily: "DM Sans", fontSize: 10, color: BURGUNDY, opacity: 0.55, letterSpacing: "5px", textTransform: "uppercase", margin: "0 0 8px 0" }}>The Shop</p>
+              <h2 style={{ fontFamily: CORMORANT, fontSize: "clamp(28px, 4.5vw, 52px)", fontWeight: 700, color: DARK_TEXT, margin: 0, lineHeight: 1.1 }}>
+                Shop the Collection
+              </h2>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              {/* Currency toggle */}
+              <div style={{ display: "flex", border: `1px solid ${BURG_ALPHA}`, borderRadius: 6, overflow: "hidden" }}>
+                {(["NGN", "USD"] as const).map((c) => (
+                  <button key={c} onClick={() => setCurrency(c)} style={{
+                    fontFamily: "DM Sans", fontSize: 10, letterSpacing: "2px", fontWeight: 600,
+                    padding: "8px 16px", border: "none", cursor: "pointer",
+                    background: currency === c ? BURGUNDY : "transparent",
+                    color: currency === c ? ALABASTER : BURGUNDY,
+                    transition: "all 0.2s",
+                  }}>{c}</button>
+                ))}
+              </div>
+              {/* Cart button */}
+              <button onClick={() => setCartOpen(true)} style={{
+                position: "relative", background: BURGUNDY, border: "none", borderRadius: 6,
+                padding: "9px 14px", cursor: "pointer", display: "flex", alignItems: "center", gap: 7,
+                fontFamily: "DM Sans", fontSize: 10, letterSpacing: "2px", color: GOLD, textTransform: "uppercase",
+              }}>
+                <ShoppingBag size={14} />
+                Cart
+                {cartCount > 0 && (
+                  <span style={{
+                    position: "absolute", top: -7, right: -7, width: 18, height: 18,
+                    borderRadius: "50%", background: GOLD, color: DARK_TEXT,
+                    fontSize: 9, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center",
+                  }}>{cartCount}</span>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* GARMENTS */}
+          <p style={{ fontFamily: "DM Sans", fontSize: 9, color: BURGUNDY, opacity: 0.45, letterSpacing: "4px", textTransform: "uppercase", margin: "0 0 20px 0", borderBottom: `1px solid ${BURG_ALPHA}`, paddingBottom: 10 }}>Garments</p>
+          <div ref={shopRef} className="grid gap-6 mb-16" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(270px, 1fr))" }}>
+            {SHOP_PRODUCTS.filter(p => p.type === "garment").map((product, i) => (
+              <motion.div key={product.id}
+                initial={{ opacity: 0, y: 24 }}
+                animate={shopInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                whileHover={reduced ? {} : { y: -5, transition: { duration: 0.2 } }}
+                style={{ background: "#fff", borderRadius: 6, overflow: "hidden", border: `1px solid ${BURG_ALPHA}`, boxShadow: "0 2px 18px rgba(110,0,37,0.07)" }}
+              >
+                <div style={{ aspectRatio: "3/4", overflow: "hidden", position: "relative" }}>
+                  <img src={product.photo} alt={product.title} loading="lazy"
+                    style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block", transition: "transform 0.55s ease" }}
+                    onMouseEnter={(e) => { if (!reduced) (e.currentTarget as HTMLImageElement).style.transform = "scale(1.05)"; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLImageElement).style.transform = "scale(1)"; }} />
+                  <span style={{ position: "absolute", top: 12, left: 12, fontFamily: "DM Sans", fontSize: 8, letterSpacing: "2px", textTransform: "uppercase", background: "rgba(110,0,37,0.88)", color: GOLD, padding: "4px 9px", borderRadius: 2 }}>{product.badge}</span>
+                </div>
+                <div style={{ padding: "18px 20px 20px" }}>
+                  <p style={{ fontFamily: "DM Sans", fontSize: 9, color: BURGUNDY, opacity: 0.45, letterSpacing: "3px", textTransform: "uppercase", margin: "0 0 5px 0" }}>{product.subtitle}</p>
+                  <h3 style={{ fontFamily: CORMORANT, fontSize: 22, fontWeight: 700, color: DARK_TEXT, margin: "0 0 8px 0" }}>{product.title}</h3>
+                  <p style={{ fontFamily: "DM Sans", fontSize: 12, color: `rgba(34,26,26,0.5)`, lineHeight: 1.65, margin: "0 0 16px 0" }}>{product.desc}</p>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div>
+                      <span style={{ fontFamily: CORMORANT, fontSize: 22, fontWeight: 700, color: BURGUNDY }}>
+                        {currency === "NGN" ? `₦${product.priceNGN.toLocaleString()}` : `$${product.priceUSD}`}
+                      </span>
+                      <span style={{ fontFamily: "DM Sans", fontSize: 9, color: `rgba(110,0,37,0.35)`, marginLeft: 6 }}>
+                        {currency === "NGN" ? `/ $${product.priceUSD}` : `/ ₦${product.priceNGN.toLocaleString()}`}
+                      </span>
+                    </div>
+                    <motion.button onClick={() => addToCart(product)}
+                      whileHover={reduced ? {} : { scale: 1.05 }} whileTap={reduced ? {} : { scale: 0.97 }}
+                      style={{ fontFamily: "DM Sans", fontSize: 9, letterSpacing: "2px", textTransform: "uppercase", fontWeight: 600, background: BURGUNDY, color: GOLD, border: "none", borderRadius: 4, padding: "9px 16px", cursor: "pointer" }}>
+                      + Add
+                    </motion.button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* PRINTS */}
+          <p style={{ fontFamily: "DM Sans", fontSize: 9, color: BURGUNDY, opacity: 0.45, letterSpacing: "4px", textTransform: "uppercase", margin: "0 0 20px 0", borderBottom: `1px solid ${BURG_ALPHA}`, paddingBottom: 10 }}>Illustration Prints</p>
+          <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
+            {SHOP_PRODUCTS.filter(p => p.type === "print").map((product, i) => (
+              <motion.div key={product.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={shopInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6, delay: i * 0.1 + 0.3 }}
+                whileHover={reduced ? {} : { y: -4, transition: { duration: 0.2 } }}
+                style={{ background: "#fff", borderRadius: 6, overflow: "hidden", border: `1px solid ${BURG_ALPHA}`, boxShadow: "0 2px 12px rgba(110,0,37,0.06)", display: "flex" }}
+              >
+                <div style={{ width: 110, flexShrink: 0, overflow: "hidden" }}>
+                  <img src={product.photo} alt={product.title} loading="lazy"
+                    style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block" }} />
+                </div>
+                <div style={{ padding: "16px 18px 18px", flex: 1 }}>
+                  <span style={{ fontFamily: "DM Sans", fontSize: 7.5, letterSpacing: "2px", textTransform: "uppercase", background: `rgba(212,175,55,0.14)`, color: `rgba(110,0,37,0.75)`, padding: "3px 8px", borderRadius: 2, display: "inline-block", marginBottom: 8 }}>{product.badge}</span>
+                  <h3 style={{ fontFamily: CORMORANT, fontSize: 18, fontWeight: 700, color: DARK_TEXT, margin: "0 0 4px 0" }}>{product.title}</h3>
+                  <p style={{ fontFamily: "DM Sans", fontSize: 10, color: `rgba(34,26,26,0.4)`, lineHeight: 1.5, margin: "0 0 14px 0" }}>{product.subtitle}</p>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <span style={{ fontFamily: CORMORANT, fontSize: 19, fontWeight: 700, color: BURGUNDY }}>
+                      {currency === "NGN" ? `₦${product.priceNGN.toLocaleString()}` : `$${product.priceUSD}`}
+                    </span>
+                    <motion.button onClick={() => addToCart(product)}
+                      whileHover={reduced ? {} : { scale: 1.05 }} whileTap={reduced ? {} : { scale: 0.97 }}
+                      style={{ fontFamily: "DM Sans", fontSize: 8, letterSpacing: "2px", textTransform: "uppercase", fontWeight: 600, background: BURGUNDY, color: GOLD, border: "none", borderRadius: 4, padding: "7px 13px", cursor: "pointer" }}>
+                      + Add
+                    </motion.button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════
           ENQUIRY — deep burgundy accent
           ═══════════════════════════════════════════════════════ */}
       <section
@@ -699,6 +894,155 @@ const VIVAPage = () => {
           © {new Date().getFullYear()} Viera Amber. All rights reserved.
         </p>
       </footer>
+
+      {/* ═══════════════════════════════════════════════════════
+          CART DRAWER — slide-in from right, Paystack checkout
+          ═══════════════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {cartOpen && (
+          <>
+            <motion.div key="cart-backdrop"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setCartOpen(false)}
+              style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.58)", zIndex: 200 }}
+            />
+            <motion.aside key="cart-drawer" role="dialog" aria-label="Shopping cart"
+              initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
+              transition={{ type: "spring", stiffness: 300, damping: 32 }}
+              style={{
+                position: "fixed", top: 0, right: 0, bottom: 0,
+                width: "min(440px, 100vw)", background: BURGUNDY, zIndex: 201,
+                display: "flex", flexDirection: "column",
+                boxShadow: "-24px 0 72px rgba(0,0,0,0.55)",
+              }}
+            >
+              {/* Drawer header */}
+              <div style={{ padding: "20px 24px", borderBottom: `1px solid ${GOLD_ALPHA}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <ShoppingBag size={16} style={{ color: GOLD }} />
+                  <span style={{ fontFamily: CORMORANT, fontSize: 20, fontWeight: 700, color: ALABASTER }}>Your Cart</span>
+                  {cartCount > 0 && (
+                    <span style={{ fontFamily: "DM Sans", fontSize: 9, letterSpacing: "1px", background: `rgba(212,175,55,0.18)`, color: GOLD, padding: "2px 8px", borderRadius: 20 }}>
+                      {cartCount} item{cartCount !== 1 ? "s" : ""}
+                    </span>
+                  )}
+                </div>
+                <button onClick={() => setCartOpen(false)}
+                  style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(250,249,246,0.38)", padding: 4 }}>
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Cart items */}
+              <div style={{ flex: 1, overflowY: "auto", padding: "12px 24px" }}>
+                {cart.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: "64px 0" }}>
+                    <ShoppingBag size={32} style={{ color: `rgba(212,175,55,0.22)`, display: "block", margin: "0 auto 14px" }} />
+                    <p style={{ fontFamily: CORMORANT, fontSize: 18, color: `rgba(250,249,246,0.38)`, margin: "0 0 6px 0" }}>Your cart is empty.</p>
+                    <p style={{ fontFamily: "DM Sans", fontSize: 12, color: `rgba(250,249,246,0.22)`, margin: 0 }}>Add something beautiful.</p>
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 0, paddingTop: 8 }}>
+                    {cart.map(({ product, qty }) => (
+                      <div key={product.id} style={{ display: "flex", gap: 14, alignItems: "flex-start", paddingBottom: 18, marginBottom: 18, borderBottom: `1px solid ${GOLD_ALPHA}` }}>
+                        <div style={{ width: 66, height: 82, flexShrink: 0, borderRadius: 3, overflow: "hidden" }}>
+                          <img src={product.photo} alt={product.title}
+                            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }} />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <p style={{ fontFamily: CORMORANT, fontSize: 16, color: ALABASTER, margin: "0 0 2px 0", fontWeight: 600 }}>{product.title}</p>
+                          <p style={{ fontFamily: "DM Sans", fontSize: 10, color: `rgba(212,175,55,0.5)`, margin: "0 0 12px 0" }}>{product.subtitle}</p>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 0, border: `1px solid ${GOLD_ALPHA}`, borderRadius: 4 }}>
+                              <button onClick={() => updateQty(product.id, -1)}
+                                style={{ background: "none", border: "none", color: GOLD, cursor: "pointer", padding: "5px 10px", lineHeight: 1 }}>
+                                <Minus size={10} />
+                              </button>
+                              <span style={{ fontFamily: "DM Sans", fontSize: 12, color: ALABASTER, minWidth: 18, textAlign: "center" }}>{qty}</span>
+                              <button onClick={() => updateQty(product.id, 1)}
+                                style={{ background: "none", border: "none", color: GOLD, cursor: "pointer", padding: "5px 10px", lineHeight: 1 }}>
+                                <Plus size={10} />
+                              </button>
+                            </div>
+                            <span style={{ fontFamily: CORMORANT, fontSize: 17, color: GOLD, fontWeight: 700 }}>
+                              {currency === "NGN" ? `₦${(product.priceNGN * qty).toLocaleString()}` : `$${product.priceUSD * qty}`}
+                            </span>
+                          </div>
+                        </div>
+                        <button onClick={() => removeFromCart(product.id)}
+                          style={{ background: "none", border: "none", cursor: "pointer", color: `rgba(250,249,246,0.2)`, padding: 2, marginTop: 2, flexShrink: 0 }}>
+                          <X size={13} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Cart footer — total + Paystack */}
+              {cart.length > 0 && (
+                <div style={{ padding: "20px 24px", borderTop: `1px solid ${GOLD_ALPHA}` }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 20 }}>
+                    <span style={{ fontFamily: "DM Sans", fontSize: 10, color: `rgba(212,175,55,0.5)`, letterSpacing: "2px", textTransform: "uppercase" }}>Total</span>
+                    <span style={{ fontFamily: CORMORANT, fontSize: 26, color: GOLD, fontWeight: 700 }}>
+                      {currency === "NGN" ? `₦${cartTotal.toLocaleString()}` : `$${cartTotal}`}
+                    </span>
+                  </div>
+
+                  <AnimatePresence mode="wait">
+                    {payStatus === "success" ? (
+                      <motion.div key="pay-success"
+                        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                        style={{ textAlign: "center", padding: "16px 0" }}
+                      >
+                        <div style={{ width: 44, height: 44, borderRadius: "50%", border: `1px solid ${GOLD}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: GOLD, margin: "0 auto 12px" }}>✓</div>
+                        <p style={{ fontFamily: CORMORANT, fontSize: 20, color: ALABASTER, margin: "0 0 6px 0", fontWeight: 700 }}>Payment confirmed!</p>
+                        <p style={{ fontFamily: "DM Sans", fontSize: 12, color: `rgba(250,249,246,0.42)`, margin: 0 }}>Check your email for order details.</p>
+                      </motion.div>
+                    ) : (
+                      <motion.div key="pay-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                        <div style={{ marginBottom: 12 }}>
+                          <label style={{ fontFamily: "DM Sans", fontSize: 9, color: `rgba(212,175,55,0.55)`, letterSpacing: "2px", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
+                            Email for receipt *
+                          </label>
+                          <input type="email" value={checkoutEmail}
+                            onChange={(e) => setCheckoutEmail(e.target.value)}
+                            placeholder="you@example.com"
+                            style={{ ...enquiryInputStyle, fontSize: 12 }}
+                            onFocus={(e) => (e.target.style.borderColor = GOLD)}
+                            onBlur={(e) => (e.target.style.borderColor = "rgba(250,249,246,0.22)")}
+                          />
+                        </div>
+                        <motion.button onClick={handlePaystack}
+                          disabled={!checkoutEmail || payStatus === "loading"}
+                          whileHover={!checkoutEmail || payStatus === "loading" ? {} : { opacity: 0.88 }}
+                          whileTap={!checkoutEmail || payStatus === "loading" ? {} : { scale: 0.98 }}
+                          style={{
+                            width: "100%", padding: "14px",
+                            fontFamily: "DM Sans", fontSize: 10, letterSpacing: "2.5px", textTransform: "uppercase", fontWeight: 600,
+                            background: !checkoutEmail || payStatus === "loading" ? "rgba(212,175,55,0.38)" : GOLD,
+                            color: DARK_TEXT, border: "none", borderRadius: 6,
+                            cursor: !checkoutEmail ? "not-allowed" : "pointer",
+                            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                          }}
+                        >
+                          <CreditCard size={13} />
+                          {payStatus === "loading" ? "Opening Paystack..." : `Pay ${currency === "NGN" ? `₦${cartTotal.toLocaleString()}` : `$${cartTotal}`} via Paystack`}
+                        </motion.button>
+                        {payStatus === "error" && (
+                          <p style={{ fontFamily: "DM Sans", fontSize: 11, color: "#FFAAAA", margin: "10px 0 0 0", textAlign: "center" }}>
+                            Payment failed. Try again or email admin@vieraamber.com
+                          </p>
+                        )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
