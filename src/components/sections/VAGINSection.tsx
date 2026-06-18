@@ -218,11 +218,20 @@ const VAGINSection = () => {
         {/* ── Header ──────────────────────────────────────────────── */}
         <div ref={headerRef} className="flex flex-col items-center text-center mb-14" style={{ gap: 18 }}>
 
-          {/* VAGIN Logo */}
+          {/* VAGIN Logo — white logo on a brand badge so it reads on the light section */}
           <motion.div
             variants={fadeVariants}
             initial="hidden"
             animate={headerInView ? "visible" : "hidden"}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "20px 34px",
+              borderRadius: 24,
+              background: "linear-gradient(135deg, #62017F 0%, #6B2C91 50%, #ED155D 100%)",
+              boxShadow: "0 18px 48px rgba(98,1,127,0.28), 0 0 0 1px rgba(237,21,93,0.15)",
+            }}
           >
             <img
               src="/vagin-logo.webp"
