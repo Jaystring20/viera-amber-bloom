@@ -6,10 +6,8 @@ import NavBar from "@/components/NavBar";
 import { fadeIn, fadeSlideUp, staggerContainer, cardItem, scaleXRule, inViewProps, useReducedVariants } from "@/lib/animations";
 import { supabase } from "@/lib/supabase";
 
-// TODO: Export hero images from Lovable and place in /public/viva/
-// Then uncomment these paths:
-// const vivaHeroLeft = "/viva/hero-left.png";
-// const vivaHeroRight = "/viva/hero-right.png";
+const vivaHeroLeft  = "/viva/look-2.jpeg";  // hot-pink structured crop
+const vivaHeroRight = "/viva/look-1.jpeg";  // olive woven kimono
 
 const ALABASTER  = "#FAF9F6";
 const CREAM      = "#F5EDE6";
@@ -107,7 +105,7 @@ const VIVAPage = () => {
       {/* ═══════════════════════════════════════════════════════
           HERO — deep burgundy, Daughters of Adonai centred portrait
           ═══════════════════════════════════════════════════════ */}
-      <section style={{ position: "relative", overflow: "hidden", background: BURGUNDY, minHeight: "clamp(900px, 115vh, 1240px)" }}>
+      <section style={{ position: "relative", overflow: "visible", background: BURGUNDY, minHeight: "clamp(900px, 115vh, 1240px)" }}>
         {/* Subtle crosshatch grain */}
         <div aria-hidden="true" style={{
           position: "absolute", inset: 0, pointerEvents: "none",
@@ -119,30 +117,27 @@ const VIVAPage = () => {
           background: "radial-gradient(ellipse 90% 45% at 50% -2%, rgba(212,175,55,0.14) 0%, transparent 65%)",
         }} />
 
-        {/* Editorial flanking models — COMMENTED OUT: waiting for Lovable image exports */}
-        {/* TODO: Replace with actual image paths once exported from Lovable
+        {/* Editorial flanking models */}
         <motion.img
-          src="/viva/hero-left.png"
+          src={vivaHeroLeft}
           alt=""
           aria-hidden="true"
           draggable={false}
-          initial={{ opacity: 0, x: reduced ? 0 : -60 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0, x: reduced ? 0 : -60, scaleX: -1 }}
+          animate={{ opacity: 1, x: 0, scaleX: -1 }}
           transition={{ duration: d(1.2), delay: d(0.35), ease: [0.16, 1, 0.3, 1] }}
           className="hidden md:block"
           style={{
-            position: "absolute", left: "-4%", bottom: 0,
-            height: "clamp(820px, 120vh, 1180px)", width: "auto",
-            objectFit: "contain", objectPosition: "bottom left",
-            transform: "scaleX(-1)",
+            position: "absolute", left: "-2%", bottom: 0,
+            height: "clamp(820px, 112vh, 1100px)", width: "auto",
             transformOrigin: "bottom left",
             pointerEvents: "none", userSelect: "none",
             zIndex: 1,
-            filter: "drop-shadow(0 40px 60px rgba(0,0,0,0.4))",
+            filter: "drop-shadow(0 40px 80px rgba(0,0,0,0.5))",
           }}
         />
         <motion.img
-          src="/viva/hero-right.png"
+          src={vivaHeroRight}
           alt=""
           aria-hidden="true"
           draggable={false}
@@ -151,16 +146,14 @@ const VIVAPage = () => {
           transition={{ duration: d(1.2), delay: d(0.35), ease: [0.16, 1, 0.3, 1] }}
           className="hidden md:block"
           style={{
-            position: "absolute", right: "-4%", bottom: 0,
-            height: "clamp(820px, 120vh, 1180px)", width: "auto",
-            objectFit: "contain", objectPosition: "bottom right",
+            position: "absolute", right: "-2%", bottom: 0,
+            height: "clamp(820px, 112vh, 1100px)", width: "auto",
             transformOrigin: "bottom right",
             pointerEvents: "none", userSelect: "none",
             zIndex: 1,
-            filter: "drop-shadow(0 40px 60px rgba(0,0,0,0.4))",
+            filter: "drop-shadow(0 40px 80px rgba(0,0,0,0.5))",
           }}
         />
-        */}
 
         <div className="relative mx-auto px-6" style={{ maxWidth: 680, zIndex: 2 }}>
           <div
