@@ -54,7 +54,7 @@ const VIVASection = () => {
           src="/viva-logo.svg" alt="VIVA by Viera Amber"
           initial={{ opacity: 0, scale: reduced ? 1 : 0.88 }}
           animate={heroInView ? { opacity: 1, scale: 1 } : { opacity: 0 }}
-          transition={{ duration: d(0.9), ease: "easeOut", delay: d(0.2) }}
+          transition={{ duration: d(0.9), ease: "easeOut" as const, delay: d(0.2) }}
           style={{ height: "clamp(52px, 8.5vw, 100px)", width: "auto", filter: "drop-shadow(0 0 22px rgba(212,175,55,0.2))", marginBottom: 18, display: "block", margin: "0 auto 18px" }}
           draggable={false}
         />

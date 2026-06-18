@@ -78,7 +78,7 @@ const BrandFilm = ({ variant, onTimeUpdate, onPlayStateChange }: BrandFilmProps)
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: 0.7, ease: "easeOut" }}
+      transition={{ duration: 0.7, ease: "easeOut" as const }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={() => setHovered(false)}
       style={{

@@ -16,12 +16,12 @@ const Footer = () => {
   const isInView = useInView(footerRef, { once: true, amount: 0.3 });
   const d = (s: number) => (reduced ? 0 : s);
 
-  const itemVariants = {
+  const itemVariants: import("framer-motion").Variants = {
     initial: { opacity: 0, y: 20 },
     animate: {
       opacity: 1,
       y: 0,
-      transition: { duration: d(0.5), ease: "easeOut" },
+      transition: { duration: d(0.5), ease: "easeOut" as const },
     },
   };
 

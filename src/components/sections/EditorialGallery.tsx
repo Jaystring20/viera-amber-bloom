@@ -106,7 +106,7 @@ const Lightbox = ({
         onClick={(e) => e.stopPropagation()}
         initial={{ opacity: 0, y: reduced ? 0 : 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: reduced ? 0 : 0.3, ease: "easeOut" }}
+        transition={{ duration: reduced ? 0 : 0.3, ease: "easeOut" as const }}
       >
         <img
           src={art.image}
@@ -185,7 +185,7 @@ const Tile = ({
       initial={{ opacity: 0, y: reduced ? 0 : 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-      transition={{ duration: reduced ? 0 : 0.5, ease: "easeOut" }}
+      transition={{ duration: reduced ? 0 : 0.5, ease: "easeOut" as const }}
       whileHover={reduced ? {} : { y: -4 }}
     >
       <img
@@ -258,7 +258,7 @@ const FeatureBand = ({ art, onOpen }: { art: Artwork; onOpen: () => void }) => {
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: "0px 0px -15% 0px" }}
-      transition={{ duration: reduced ? 0 : 0.6, ease: "easeOut" }}
+      transition={{ duration: reduced ? 0 : 0.6, ease: "easeOut" as const }}
     >
       <motion.img
         src={art.image}
@@ -325,7 +325,7 @@ const ChapterIntro = ({ chapter }: { chapter: Chapter }) => {
         initial={{ opacity: 0, y: reduced ? 0 : 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: reduced ? 0 : 0.5, ease: "easeOut" }}
+        transition={{ duration: reduced ? 0 : 0.5, ease: "easeOut" as const }}
       >
         <span
           className="font-display"

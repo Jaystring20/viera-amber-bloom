@@ -146,7 +146,7 @@ const Illustrations = () => {
                   key={app.title}
                   variants={cardVariants}
                   whileHover={reduced ? {} : { y: -3 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
                   style={{
                     backgroundColor: "rgba(255,255,255,0.05)",
                     border: "1px solid rgba(255,255,255,0.1)",

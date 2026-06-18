@@ -263,7 +263,7 @@ const VASHPage = () => {
                   key={cat.title}
                   variants={cardVariants}
                   whileHover={reduced ? {} : { y: -4, borderColor: TEAL }}
-                  transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                  transition={{ type: "spring" as const, stiffness: 300, damping: 22 }}
                   style={{
                     background: "#FAFAFA",
                     border: `1px solid #EBEBEB`,
@@ -388,7 +388,7 @@ const VASHPage = () => {
                 key={piece.title}
                 variants={cardVariants}
                 whileHover={reduced ? {} : { y: -4, scale: 1.01 }}
-                transition={{ type: "spring", stiffness: 280, damping: 22 }}
+                transition={{ type: "spring" as const, stiffness: 280, damping: 22 }}
                 style={{
                   background: "#FFFFFF",
                   border: "1px solid #E0EBEC",
