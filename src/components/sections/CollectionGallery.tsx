@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Artwork } from "@/lib/gallery-data";
 
 export interface CollectionItem {
   id: string;
@@ -11,11 +12,9 @@ export interface CollectionItem {
 }
 
 export interface Collection {
-  id: string;
   name: string;
-  description: string;
-  items: CollectionItem[];
-  theme?: "dark" | "light";
+  count: number;
+  artworks: Artwork[];
 }
 
 interface CollectionGalleryProps {
@@ -25,11 +24,11 @@ interface CollectionGalleryProps {
 
 export const CollectionGallery = ({ collection, onClose }: CollectionGalleryProps) => {
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
-  const [selectedItem, setSelectedItem] = useState<CollectionItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Artwork | null>(null);
   const reduced = useReducedMotion();
 
-  const currentItem = collection.items[currentItemIndex];
-  const itemCount = collection.items.length;
+  const currentItem = collection.artworks[currentItemIndex];
+  const itemCount = collection.artworks.length;
 
   const navigate = (direction: "next" | "prev") => {
     if (direction === "next") {
@@ -92,7 +91,7 @@ export const CollectionGallery = ({ collection, onClose }: CollectionGalleryProp
 
         {/* Gallery grid with featured item */}
         <div className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
-          {collection.items.map((item, idx) => (
+          {collection.artworks.map((item, idx) => (
             <motion.button
               key={item.id}
               onClick={() => setSelectedItem(item)}
@@ -106,7 +105,7 @@ export const CollectionGallery = ({ collection, onClose }: CollectionGalleryProp
               }}
             >
               <img
-                src={`/artworks/${item.image}`}
+                src={item.image}
                 alt={item.title}
                 style={{
                   width: "100%",
@@ -177,7 +176,7 @@ export const CollectionGallery = ({ collection, onClose }: CollectionGalleryProp
                 {/* Image */}
                 <div style={{ aspectRatio: "1", width: "100%", overflow: "hidden" }}>
                   <img
-                    src={`/artworks/${selectedItem.image}`}
+                    src={selectedItem.image}
                     alt={selectedItem.title}
                     style={{ width: "100%", height: "100%", objectFit: "cover" }}
                   />
@@ -197,7 +196,7 @@ export const CollectionGallery = ({ collection, onClose }: CollectionGalleryProp
                     {selectedItem.title}
                   </h3>
 
-                  {selectedItem.description && (
+                  {selectedItem.story && (
                     <p
                       style={{
                         fontFamily: "Montserrat, system-ui, sans-serif",
@@ -207,7 +206,7 @@ export const CollectionGallery = ({ collection, onClose }: CollectionGalleryProp
                         margin: "0 0 24px 0",
                       }}
                     >
-                      {selectedItem.description}
+                      {selectedItem.story}
                     </p>
                   )}
 

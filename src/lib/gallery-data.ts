@@ -20,6 +20,16 @@ export type ChapterId =
   | "fivefor5"
   | "speaks";
 
+export type CollectionId =
+  | "couture-gowns"
+  | "bridal-designs"
+  | "lagos-culture"
+  | "conceptual-bags"
+  | "jacqueline-portraits"
+  | "romantic-lifestyle"
+  | "#sorosoke-campaign"
+  | "standalone";
+
 export interface Artwork {
   id: string;
   n: number;
@@ -29,6 +39,8 @@ export interface Artwork {
   medium: Medium;
   image: string;
   feature?: boolean;
+  collection?: CollectionId;
+  umbrella?: "fashion" | "lifestyle";
 }
 
 export interface Chapter {
@@ -123,6 +135,8 @@ const mk = (
   chapter: ChapterId,
   medium: Medium,
   feature = false,
+  collection?: CollectionId,
+  umbrella?: "fashion" | "lifestyle",
 ): Artwork => ({
   id: `art-${String(n).padStart(4, "0")}`,
   n,
@@ -132,98 +146,128 @@ const mk = (
   medium,
   image: img(n),
   feature,
+  collection,
+  umbrella,
 });
 
 export const ARTWORKS: Artwork[] = [
   // ── 01 · The Named Muses ───────────────────────────────────────────────
-  mk(24, "The Hatmaker", "She chose the hat before she chose the room. Presence was never something she asked for — it was something she wore.", "muses", "Portrait", true),
-  mk(64, "Jacqueline", "Under the brim of her hat she keeps her own counsel — and her own crown.", "muses", "Portrait"),
-  mk(65, "Wandé", "Wrapped in colour and palm-shade, she answers to no season but her own.", "muses", "Portrait"),
-  mk(66, "Céline", "Two buns, one bow, zero apologies — softness sharpened to a point.", "muses", "Portrait"),
-  mk(67, "Ifeyinwa", "Her name means love; her gold hoops make sure the room remembers it.", "muses", "Portrait"),
-  mk(21, "Marigold", "She blooms loud and on purpose, the way marigolds refuse to be overlooked.", "muses", "Portrait"),
-  mk(70, "Setting", "Caught mid-transformation — rollers in, certainty already on.", "muses", "Portrait"),
-  mk(72, "Rush Hour", "Boardroom shoulders, danfo in hand — she carries the whole city to the meeting.", "muses", "Portrait"),
+  mk(24, "The Hatmaker", "She chose the hat before she chose the room. Presence was never something she asked for — it was something she wore.", "muses", "Portrait", true, "jacqueline-portraits", "lifestyle"),
+  mk(64, "Jacqueline", "Under the brim of her hat she keeps her own counsel — and her own crown.", "muses", "Portrait", false, "jacqueline-portraits", "lifestyle"),
+  mk(65, "Wandé", "Wrapped in colour and palm-shade, she answers to no season but her own.", "muses", "Portrait", false, "standalone", "lifestyle"),
+  mk(66, "Céline", "Two buns, one bow, zero apologies — softness sharpened to a point.", "muses", "Portrait", false, "jacqueline-portraits", "lifestyle"),
+  mk(67, "Ifeyinwa", "Her name means love; her gold hoops make sure the room remembers it.", "muses", "Portrait", false, "jacqueline-portraits", "lifestyle"),
+  mk(21, "Marigold", "She blooms loud and on purpose, the way marigolds refuse to be overlooked.", "muses", "Portrait", false, "standalone", "fashion"),
+  mk(70, "Setting", "Caught mid-transformation — rollers in, certainty already on.", "muses", "Portrait", false, "standalone", "lifestyle"),
+  mk(72, "Rush Hour", "Boardroom shoulders, danfo in hand — she carries the whole city to the meeting.", "muses", "Portrait", false, "standalone", "lifestyle"),
 
   // ── 02 · The Atelier ───────────────────────────────────────────────────
   // Named ready-to-wear line (real garment names + notes taken from the design plates).
-  mk(36, "The Ada-Set", "Àda — first of her time, leader of her tribe. An Aso-oke statement blazer and flowing maxi for the woman who wants more, even on a Monday.", "atelier", "Fashion Design", true),
-  mk(37, "The Ulu Shorts", "Cuffs in the last place you'd expect them — multi-coloured Aso-oke shorts and a cropped blazer, cut for daring, unconventional women.", "atelier", "Fashion Design"),
-  mk(38, "The Ibari-Set", "Magenta on a midweek mission — a corseted set for the woman sealing the contract and making friends while she's at it.", "atelier", "Fashion Design"),
-  mk(39, "The Yéwándé 3-Piece", "Three pieces, three lives — a mix-and-match cropped blazer, short and pant for the girl who refuses to be read just one way.", "atelier", "Fashion Design"),
-  mk(40, "The Kikelomo Dress", "The Friday little black dress — detachable taffeta bubble sleeves that move between classy and carefree, because Fridays should be easy.", "atelier", "Fashion Design"),
+  mk(36, "The Ada-Set", "Àda — first of her time, leader of her tribe. An Aso-oke statement blazer and flowing maxi for the woman who wants more, even on a Monday.", "atelier", "Fashion Design", true, "bridal-designs", "fashion"),
+  mk(37, "The Ulu Shorts", "Cuffs in the last place you'd expect them — multi-coloured Aso-oke shorts and a cropped blazer, cut for daring, unconventional women.", "atelier", "Fashion Design", false, "fashion-collections", "fashion"),
+  mk(38, "The Ibari-Set", "Magenta on a midweek mission — a corseted set for the woman sealing the contract and making friends while she's at it.", "atelier", "Fashion Design", false, "fashion-collections", "fashion"),
+  mk(39, "The Yéwándé 3-Piece", "Three pieces, three lives — a mix-and-match cropped blazer, short and pant for the girl who refuses to be read just one way.", "atelier", "Fashion Design", false, "bridal-designs", "fashion"),
+  mk(40, "The Kikelomo Dress", "The Friday little black dress — detachable taffeta bubble sleeves that move between classy and carefree, because Fridays should be easy.", "atelier", "Fashion Design", false, "fashion-collections", "fashion"),
 
   // ── 03 · Lagos Icons ───────────────────────────────────────────────────
-  mk(29, "Danfo", "The yellow bus that runs the city, shrunk to fit on your shoulder.", "lagos", "Product", true),
-  mk(30, "Last Bus to Oshodi", "Conductor's call and rush-hour chaos, stitched into a clutch.", "lagos", "Product"),
-  mk(28, "Under Lock", "A handbag that guards its secrets like a Lagos landlady guards her gate.", "lagos", "Product"),
-  mk(31, "Tin Tomato", "Every Nigerian kitchen's hero, recast in hardware and shine.", "lagos", "Product"),
-  mk(32, "Agege", "Soft, sweet, everywhere by morning — the people's loaf as luxury.", "lagos", "Product"),
-  mk(33, "The Daily", "Yesterday's headlines, tomorrow's accessory — news you can carry.", "lagos", "Product"),
-  mk(71, "Nala", "Pantry staple to power accessory — flavour you wear.", "lagos", "Product"),
-  mk(62, "Driver's Seat", "She holds the wheel; the bag just makes it official.", "lagos", "Product"),
-  mk(63, "Driver's Seat II", "Same control, cleaner backdrop — the city in her rear-view.", "lagos", "Product"),
-  mk(57, "Exhibit 1", "Evidence of a woman who walks in on her own terms.", "lagos", "Footwear"),
-  mk(58, "Exhibit 2", "Gilded, strapped, sentence pending — guilty of glamour.", "lagos", "Footwear"),
-  mk(59, "Exhibit 3", "Streetwear with a fare-stage attitude.", "lagos", "Footwear"),
-  mk(60, "Exhibit 4", "Boots built for arriving, never for waiting.", "lagos", "Footwear"),
-  mk(61, "Exhibit 5", "Elevation — literal and otherwise.", "lagos", "Footwear"),
+  mk(29, "Danfo", "The yellow bus that runs the city, shrunk to fit on your shoulder.", "lagos", "Product", true, "lagos-culture", "fashion"),
+  mk(30, "Last Bus to Oshodi", "Conductor's call and rush-hour chaos, stitched into a clutch.", "lagos", "Product", false, "lagos-culture", "fashion"),
+  mk(28, "Under Lock", "A handbag that guards its secrets like a Lagos landlady guards her gate.", "lagos", "Product", false, "conceptual-bags", "fashion"),
+  mk(31, "Tin Tomato", "Every Nigerian kitchen's hero, recast in hardware and shine.", "lagos", "Product", false, "lagos-culture", "fashion"),
+  mk(32, "Agege", "Soft, sweet, everywhere by morning — the people's loaf as luxury.", "lagos", "Product", false, "lagos-culture", "fashion"),
+  mk(33, "The Daily", "Yesterday's headlines, tomorrow's accessory — news you can carry.", "lagos", "Product", false, "lagos-culture", "fashion"),
+  mk(71, "Nala", "Pantry staple to power accessory — flavour you wear.", "lagos", "Product", false, "lagos-culture", "fashion"),
+  mk(62, "Driver's Seat", "She holds the wheel; the bag just makes it official.", "lagos", "Product", false, "conceptual-bags", "fashion"),
+  mk(63, "Driver's Seat II", "Same control, cleaner backdrop — the city in her rear-view.", "lagos", "Product", false, "conceptual-bags", "fashion"),
+  mk(57, "Exhibit 1", "Evidence of a woman who walks in on her own terms.", "lagos", "Footwear", false, "standalone", "fashion"),
+  mk(58, "Exhibit 2", "Gilded, strapped, sentence pending — guilty of glamour.", "lagos", "Footwear", false, "standalone", "fashion"),
+  mk(59, "Exhibit 3", "Streetwear with a fare-stage attitude.", "lagos", "Footwear", false, "standalone", "fashion"),
+  mk(60, "Exhibit 4", "Boots built for arriving, never for waiting.", "lagos", "Footwear", false, "standalone", "fashion"),
+  mk(61, "Exhibit 5", "Elevation — literal and otherwise.", "lagos", "Footwear", false, "standalone", "fashion"),
 
   // ── 04 · Heritage & Regalia ────────────────────────────────────────────
-  mk(44, "Trial by Fire", "She walks out of the flames dressed in her grandmother's courage.", "heritage", "Couture", true),
-  mk(3, "Morning Veil", "She wears white like a sunrise wears the sky — quietly, completely.", "heritage", "Couture"),
-  mk(41, "Aso-Ibora Mesh", "The Saturday-morning cover cloth — the wrapper of chores and childhood, remade in mesh as something worth being seen in.", "heritage", "Fashion Design"),
-  mk(42, "The Omo-Oba Regalia", "Daughter of the King of kings — regalia for those who carry their Father's presence in every stride. Ọmọ-ọba: child of royalty.", "heritage", "Fashion Design"),
-  mk(47, "The Oracle", "Wrapped in dusk and prophecy, she speaks only when it matters.", "heritage", "Couture"),
-  mk(48, "Forest Hymn", "Earth tones and evening air — a hymn to where she comes from.", "heritage", "Couture"),
-  mk(50, "Coronation", "No one handed her the crown; she drew it and put it on herself.", "heritage", "Couture"),
-  mk(51, "High Priestess", "Robed in light, keeper of rites no one taught her — she remembered.", "heritage", "Couture"),
-  mk(68, "The Red Room", "Behind the velvet rope, she is the exhibit and the curator both.", "heritage", "Couture"),
+  mk(44, "Trial by Fire", "She walks out of the flames dressed in her grandmother's courage.", "heritage", "Couture", true, "couture-gowns", "fashion"),
+  mk(3, "Morning Veil", "She wears white like a sunrise wears the sky — quietly, completely.", "heritage", "Couture", false, "bridal-designs", "fashion"),
+  mk(41, "Aso-Ibora Mesh", "The Saturday-morning cover cloth — the wrapper of chores and childhood, remade in mesh as something worth being seen in.", "heritage", "Fashion Design", false, "bridal-designs", "fashion"),
+  mk(42, "The Omo-Oba Regalia", "Daughter of the King of kings — regalia for those who carry their Father's presence in every stride. Ọmọ-ọba: child of royalty.", "heritage", "Fashion Design", false, "bridal-designs", "fashion"),
+  mk(47, "The Oracle", "Wrapped in dusk and prophecy, she speaks only when it matters.", "heritage", "Couture", false, "couture-gowns", "fashion"),
+  mk(48, "Forest Hymn", "Earth tones and evening air — a hymn to where she comes from.", "heritage", "Couture", false, "couture-gowns", "fashion"),
+  mk(50, "Coronation", "No one handed her the crown; she drew it and put it on herself.", "heritage", "Couture", false, "couture-gowns", "fashion"),
+  mk(51, "High Priestess", "Robed in light, keeper of rites no one taught her — she remembered.", "heritage", "Couture", false, "couture-gowns", "fashion"),
+  mk(68, "The Red Room", "Behind the velvet rope, she is the exhibit and the curator both.", "heritage", "Couture", false, "couture-gowns", "fashion"),
 
   // ── 05 · Wearable Confidence ───────────────────────────────────────────
-  mk(73, "The Golden Hour", "Light gathers at the seams; this is what confidence looks like at dusk.", "wearable", "Couture", true),
-  mk(1, "Pink Means Business", "Soft colour, hard entrance — she made pink a power move.", "wearable", "Couture"),
-  mk(2, "On Her Own Time", "The clock runs behind her, not the other way around.", "wearable", "Couture"),
-  mk(4, "First Bloom", "Structured at the shoulder, blooming everywhere else.", "wearable", "Couture"),
-  mk(8, "Plume", "Feathered and fearless, she trails drama like perfume.", "wearable", "Couture"),
-  mk(9, "Limited Edition", "Numbered, signed, one of one — like the woman it was drawn for.", "wearable", "Couture"),
-  mk(10, "Polka & Poise", "Dots that dare you to underestimate the woman wearing them.", "wearable", "Couture"),
-  mk(13, "Midnight Toast", "Sparkler high, hem heavy with gold — here's to her.", "wearable", "Couture"),
-  mk(22, "On the Prowl", "She wears the print the way she enters a room: already winning.", "wearable", "Couture"),
-  mk(34, "Sunday Best", "Quiet florals for a woman who knows she's the loudest thing in the room.", "wearable", "Couture"),
-  mk(43, "Candy Stripe", "Sweet on the surface, steel underneath.", "wearable", "Couture"),
-  mk(45, "Cloud Nine", "Yards of white like weather; she is the forecast.", "wearable", "Couture"),
-  mk(46, "Nightshade", "Beautiful, a little dangerous, entirely in bloom.", "wearable", "Couture"),
-  mk(49, "Ember", "Still glowing long after the room thought she'd cooled.", "wearable", "Couture"),
-  mk(69, "Smoke & Rose", "Ash-grey drape, rose-red nerve.", "wearable", "Couture"),
+  mk(73, "The Golden Hour", "Light gathers at the seams; this is what confidence looks like at dusk.", "wearable", "Couture", true, "couture-gowns", "fashion"),
+  mk(1, "Pink Means Business", "Soft colour, hard entrance — she made pink a power move.", "wearable", "Couture", false, "couture-gowns", "fashion"),
+  mk(2, "On Her Own Time", "The clock runs behind her, not the other way around.", "wearable", "Couture", false, "couture-gowns", "fashion"),
+  mk(4, "First Bloom", "Structured at the shoulder, blooming everywhere else.", "wearable", "Couture", false, "couture-gowns", "fashion"),
+  mk(8, "Plume", "Feathered and fearless, she trails drama like perfume.", "wearable", "Couture", false, "couture-gowns", "fashion"),
+  mk(9, "Limited Edition", "Numbered, signed, one of one — like the woman it was drawn for.", "wearable", "Couture", false, "couture-gowns", "fashion"),
+  mk(10, "Polka & Poise", "Dots that dare you to underestimate the woman wearing them.", "wearable", "Couture", false, "couture-gowns", "fashion"),
+  mk(13, "Midnight Toast", "Sparkler high, hem heavy with gold — here's to her.", "wearable", "Couture", false, "couture-gowns", "fashion"),
+  mk(22, "On the Prowl", "She wears the print the way she enters a room: already winning.", "wearable", "Couture", false, "couture-gowns", "fashion"),
+  mk(34, "Sunday Best", "Quiet florals for a woman who knows she's the loudest thing in the room.", "wearable", "Couture", false, "couture-gowns", "fashion"),
+  mk(43, "Candy Stripe", "Sweet on the surface, steel underneath.", "wearable", "Couture", false, "couture-gowns", "fashion"),
+  mk(45, "Cloud Nine", "Yards of white like weather; she is the forecast.", "wearable", "Couture", false, "couture-gowns", "fashion"),
+  mk(46, "Nightshade", "Beautiful, a little dangerous, entirely in bloom.", "wearable", "Couture", false, "couture-gowns", "fashion"),
+  mk(49, "Ember", "Still glowing long after the room thought she'd cooled.", "wearable", "Couture", false, "couture-gowns", "fashion"),
+  mk(69, "Smoke & Rose", "Ash-grey drape, rose-red nerve.", "wearable", "Couture", false, "couture-gowns", "fashion"),
 
   // ── 06 · The #5for5 Collection (#EndSARS) ──────────────────────────────
   // The five demands of #EndSARS, worn. Notes are the artist's own captions.
-  mk(52, "Release Them", "#5for5, demand one: the immediate release of all arrested protesters — worn like a verdict in END SARS sashes.", "fivefor5", "Campaign", true),
-  mk(53, "White Robes", "For the civilian soldiers who never came home — now in white, remembered in every hallelujah chorus.", "fivefor5", "Campaign"),
-  mk(54, "Served Hot", "Justice for every life taken — and the demand that it be served hot.", "fivefor5", "Campaign"),
-  mk(55, "Same Old Disguise", "Fine cloth, fine name — but the same old person still hides underneath. Reform, not rebranding.", "fivefor5", "Campaign"),
-  mk(56, "Pay Them Well", "Even the police know how to wear starched agbada — so pay them well, and let them protect, not prey.", "fivefor5", "Campaign"),
+  mk(52, "Release Them", "#5for5, demand one: the immediate release of all arrested protesters — worn like a verdict in END SARS sashes.", "fivefor5", "Campaign", true, "#sorosoke-campaign", "lifestyle"),
+  mk(53, "White Robes", "For the civilian soldiers who never came home — now in white, remembered in every hallelujah chorus.", "fivefor5", "Campaign", false, "#sorosoke-campaign", "lifestyle"),
+  mk(54, "Served Hot", "Justice for every life taken — and the demand that it be served hot.", "fivefor5", "Campaign", false, "#sorosoke-campaign", "lifestyle"),
+  mk(55, "Same Old Disguise", "Fine cloth, fine name — but the same old person still hides underneath. Reform, not rebranding.", "fivefor5", "Campaign", false, "#sorosoke-campaign", "lifestyle"),
+  mk(56, "Pay Them Well", "Even the police know how to wear starched agbada — so pay them well, and let them protect, not prey.", "fivefor5", "Campaign", false, "#sorosoke-campaign", "lifestyle"),
 
   // ── 07 · She Speaks ────────────────────────────────────────────────────
-  mk(6, "New Chapter", "She closed the book the world wrote for her and opened a blank one.", "speaks", "Couture", true),
-  mk(26, "Unsilenced", "The tape was meant to quiet her. Read it again.", "speaks", "Campaign", true),
-  mk(15, "Embrace Equity", "Not the same start for everyone — the same chance to finish.", "speaks", "Campaign"),
-  mk(16, "One of a Kind", "Mass-produced was never on the table.", "speaks", "Campaign"),
-  mk(17, "Inspire Inclusion", "Pull up a chair; better yet, build a longer table.", "speaks", "Campaign"),
-  mk(18, "Break the Bias", "Arms crossed, mind open, line drawn.", "speaks", "Campaign"),
-  mk(25, "First Light", "Before she was anyone's anything, she was someone's whole morning.", "speaks", "Campaign"),
-  mk(20, "Season's Cards", "A tree built from every kind word she kept.", "speaks", "Campaign"),
-  mk(19, "Sweet Talk", "A little colour, a little candy, a lot of intention.", "speaks", "Campaign"),
-  mk(35, "Miss Dior", "An homage in ink — couture seen through her own eyes.", "speaks", "Campaign"),
-  mk(7, "The Last Word", "She lets you finish. Then she finishes it.", "speaks", "Couture"),
-  mk(11, "Return to Sender", "Every letter she sends is addressed, first, to herself.", "speaks", "Couture"),
-  mk(12, "Off Duty", "Even at rest, she's the most interesting thing in the frame.", "speaks", "Couture"),
-  mk(14, "Quarter Past Her", "Time keeps her schedule now.", "speaks", "Couture"),
-  mk(23, "The Queen's Game", "She moves last, and she moves everything.", "speaks", "Couture"),
-  mk(27, "Forward Only", "The sign said it; she'd already decided it.", "speaks", "Couture"),
-  mk(5, "Love, Medium-Rare", "Appetite without apology — she takes her pleasures seriously.", "speaks", "Campaign"),
+  mk(6, "New Chapter", "She closed the book the world wrote for her and opened a blank one.", "speaks", "Couture", true, "couture-gowns", "fashion"),
+  mk(26, "Unsilenced", "The tape was meant to quiet her. Read it again.", "speaks", "Campaign", true, "#sorosoke-campaign", "lifestyle"),
+  mk(15, "Embrace Equity", "Not the same start for everyone — the same chance to finish.", "speaks", "Campaign", false, "#sorosoke-campaign", "lifestyle"),
+  mk(16, "One of a Kind", "Mass-produced was never on the table.", "speaks", "Campaign", false, "#sorosoke-campaign", "lifestyle"),
+  mk(17, "Inspire Inclusion", "Pull up a chair; better yet, build a longer table.", "speaks", "Campaign", false, "#sorosoke-campaign", "lifestyle"),
+  mk(18, "Break the Bias", "Arms crossed, mind open, line drawn.", "speaks", "Campaign", false, "#sorosoke-campaign", "lifestyle"),
+  mk(25, "First Light", "Before she was anyone's anything, she was someone's whole morning.", "speaks", "Campaign", false, "#sorosoke-campaign", "lifestyle"),
+  mk(20, "Season's Cards", "A tree built from every kind word she kept.", "speaks", "Campaign", false, "#sorosoke-campaign", "lifestyle"),
+  mk(19, "Sweet Talk", "A little colour, a little candy, a lot of intention.", "speaks", "Campaign", false, "#sorosoke-campaign", "lifestyle"),
+  mk(35, "Miss Dior", "An homage in ink — couture seen through her own eyes.", "speaks", "Campaign", false, "#sorosoke-campaign", "lifestyle"),
+  mk(7, "The Last Word", "She lets you finish. Then she finishes it.", "speaks", "Couture", false, "couture-gowns", "fashion"),
+  mk(11, "Return to Sender", "Every letter she sends is addressed, first, to herself.", "speaks", "Couture", false, "couture-gowns", "fashion"),
+  mk(12, "Off Duty", "Even at rest, she's the most interesting thing in the frame.", "speaks", "Couture", false, "couture-gowns", "fashion"),
+  mk(14, "Quarter Past Her", "Time keeps her schedule now.", "speaks", "Couture", false, "couture-gowns", "fashion"),
+  mk(23, "The Queen's Game", "She moves last, and she moves everything.", "speaks", "Couture", false, "couture-gowns", "fashion"),
+  mk(27, "Forward Only", "The sign said it; she'd already decided it.", "speaks", "Couture", false, "couture-gowns", "fashion"),
+  mk(5, "Love, Medium-Rare", "Appetite without apology — she takes her pleasures seriously.", "speaks", "Campaign", false, "#sorosoke-campaign", "lifestyle"),
 ];
+
+// Collection helpers
+export const getArtworksByCollection = (collectionId: CollectionId): Artwork[] => {
+  return ARTWORKS.filter(art => art.collection === collectionId);
+};
+
+export const getArtworksByUmbrella = (umbrella: "fashion" | "lifestyle"): Artwork[] => {
+  return ARTWORKS.filter(art => art.umbrella === umbrella);
+};
+
+export const getCollectionMetadata = (collectionId: CollectionId) => {
+  const artworks = getArtworksByCollection(collectionId);
+  const names: Record<CollectionId, string> = {
+    "couture-gowns": "Couture Gowns",
+    "bridal-designs": "Bridal Designs",
+    "lagos-culture": "Lagos Icons",
+    "conceptual-bags": "Conceptual Bags",
+    "jacqueline-portraits": "Jacqueline Portraits",
+    "romantic-lifestyle": "Romantic Lifestyle",
+    "#sorosoke-campaign": "#SOROSOKE Campaign",
+    "standalone": "Standalone Works",
+  };
+  return {
+    name: names[collectionId],
+    count: artworks.length,
+    artworks,
+  };
+};
 
 // Back-compat aliases for earlier imports.
 export type GalleryArtwork = Artwork;

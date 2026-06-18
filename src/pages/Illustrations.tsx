@@ -4,8 +4,10 @@ import EditorialGallery from "@/components/sections/EditorialGallery";
 import BrandFilm from "@/components/BrandFilm";
 import RotatingHeroCarousel from "@/components/sections/RotatingHeroCarousel";
 import CategoryThumbnailNav from "@/components/sections/CategoryThumbnailNav";
+import CollectionGallery from "@/components/sections/CollectionGallery";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useRef, useState } from "react";
+import { ARTWORKS, getCollectionMetadata, CollectionId } from "@/lib/gallery-data";
 import {
   fadeSlideUp,
   fadeIn,
@@ -43,10 +45,17 @@ const Illustrations = () => {
         <CategoryThumbnailNav
           onCategorySelect={(category) => {
             setSelectedCategory(category.id);
-            // Will scroll to collections section in next phase
           }}
           selectedId={selectedCategory || undefined}
         />
+
+        {/* ── Collection Gallery (shown when category selected) ───────────────────────────────────── */}
+        {selectedCategory && (
+          <CollectionGallery
+            collection={getCollectionMetadata(selectedCategory as CollectionId)}
+            onClose={() => setSelectedCategory(null)}
+          />
+        )}
 
         {/* ── Brand Film / Video Carousel (moved lower) ───────────────────────────────────── */}
         <section
