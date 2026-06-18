@@ -219,27 +219,28 @@ export const RotatingHeroCarousel = ({ onCategorySelect }: RotatingHeroCarouselP
                 {current.name}
               </motion.h2>
 
-              {/* CTA */}
+              {/* CTA - refined with Paper.Penie styling */}
               <motion.button
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.3, duration: 0.4 }}
                 onClick={() => onCategorySelect?.(current)}
-                whileHover={reduced ? {} : { scale: 1.05 }}
-                whileTap={reduced ? {} : { scale: 0.95 }}
+                whileHover={reduced ? {} : { scale: 1.02, y: -2 }}
+                whileTap={reduced ? {} : { scale: 0.98 }}
                 style={{
                   fontFamily: "Montserrat, system-ui, sans-serif",
                   fontSize: 12,
                   fontWeight: 600,
                   letterSpacing: "1px",
                   textTransform: "uppercase",
-                  padding: "12px 32px",
+                  padding: "14px 36px",
                   background: current.type === "fashion" ? "#6B2C91" : "#0B7B8C",
                   color: "#FFFFFF",
                   border: "none",
-                  borderRadius: 6,
+                  borderRadius: 4,
                   cursor: "pointer",
-                  transition: "all 0.2s",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)",
+                  transition: "all 300ms cubic-bezier(0.4, 0, 0.2, 1)",
                 }}
               >
                 Explore {current.name}

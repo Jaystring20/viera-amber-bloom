@@ -106,13 +106,105 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: 'Montserrat', system-ui, sans-serif;
     font-weight: 400;
+    font-size: 14px;
+    line-height: 1.65;
     -webkit-font-smoothing: antialiased;
+    position: relative;
+  }
+
+  /* Subtle grain texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' seed='2' /%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
+    z-index: -1;
   }
 
   h1, h2, h3, h4, h5, h6, .font-display {
     font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 700;
+  }
+
+  /* Typography hierarchy */
+  h1 {
+    font-size: clamp(32px, 5vw, 56px);
+    line-height: 1.15;
+    letter-spacing: 0.5px;
+  }
+
+  h2 {
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.2;
+    letter-spacing: 0.5px;
+  }
+
+  h3 {
+    font-size: 24px;
+    line-height: 1.25;
+    letter-spacing: 0.3px;
+  }
+
+  /* Labels and small text */
+  label, .label-sm {
+    font-family: 'Montserrat', system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #666666;
+  }
+
+  /* Spacing system tokens (8px base) */
+  :root {
+    --spacing-xs: 8px;
+    --spacing-sm: 12px;
+    --spacing-md: 16px;
+    --spacing-lg: 20px;
+    --spacing-xl: 24px;
+    --spacing-2xl: 32px;
+    --spacing-3xl: 40px;
+    --spacing-4xl: 48px;
+    --spacing-5xl: 56px;
+    --spacing-6xl: 64px;
+
+    /* Micro-interaction timing */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Shadows for depth */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+    /* Border colors refined */
+    --border-light: #EBEBEB;
+    --border-subtle: #E8E8E8;
+  }
+
+  /* Button and interactive element base styles */
+  button, [role="button"], a {
+    transition: var(--transition-base);
+  }
+
+  button:disabled, [role="button"][aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Focus states for accessibility */
+  button:focus-visible, [role="button"]:focus-visible, a:focus-visible {
+    outline: 2px solid #111111;
+    outline-offset: 4px;
+    border-radius: 2px;
   }
 
   @media (prefers-reduced-motion: reduce) {
