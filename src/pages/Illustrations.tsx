@@ -2,8 +2,10 @@ import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import EditorialGallery from "@/components/sections/EditorialGallery";
 import BrandFilm from "@/components/BrandFilm";
+import RotatingHeroCarousel from "@/components/sections/RotatingHeroCarousel";
+import CategoryThumbnailNav from "@/components/sections/CategoryThumbnailNav";
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   fadeSlideUp,
   fadeIn,
@@ -15,6 +17,7 @@ import {
 
 const Illustrations = () => {
   const reduced = useReducedMotion();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const appsRef = useRef<HTMLDivElement>(null);
   const processRef = useRef<HTMLDivElement>(null);
@@ -31,19 +34,32 @@ const Illustrations = () => {
     <div className="min-h-screen" style={{ backgroundColor: "#FAFAFA" }}>
       <NavBar />
       <main className="pt-20">
-        {/* ── Brand Film opener ───────────────────────────────────── */}
+        {/* ── Rotating Hero Carousel ───────────────────────────────────── */}
+        <RotatingHeroCarousel onCategorySelect={(category) => {
+          setSelectedCategory(category.id);
+        }} />
+
+        {/* ── Category Thumbnail Navigation ───────────────────────────────────── */}
+        <CategoryThumbnailNav
+          onCategorySelect={(category) => {
+            setSelectedCategory(category.id);
+            // Will scroll to collections section in next phase
+          }}
+          selectedId={selectedCategory || undefined}
+        />
+
+        {/* ── Brand Film / Video Carousel (moved lower) ───────────────────────────────────── */}
         <section
           aria-label="Brand Film"
           style={{ backgroundColor: "#FAFAFA" }}
         >
-          {/* Cinematic header above the film */}
           <div
             className="mx-auto px-6 pt-12 pb-6 flex flex-col items-center text-center"
             style={{ maxWidth: 1100, gap: 10 }}
           >
             <p
               style={{
-                fontFamily: "DM Sans, system-ui, sans-serif",
+                fontFamily: "Montserrat, system-ui, sans-serif",
                 fontSize: 10,
                 color: "#111111",
                 letterSpacing: "4px",
@@ -52,9 +68,9 @@ const Illustrations = () => {
                 margin: 0,
               }}
             >
-              The Collection
+              Behind the Work
             </p>
-            <h1
+            <h2
               className="font-display"
               style={{
                 fontSize: "clamp(22px, 3.5vw, 40px)",
@@ -64,11 +80,10 @@ const Illustrations = () => {
                 lineHeight: 1.1,
               }}
             >
-              Every piece tells a story.
-            </h1>
+              See the process unfold.
+            </h2>
           </div>
 
-          {/* Full-width film container */}
           <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 48px" }}>
             <BrandFilm variant="page" />
           </div>
