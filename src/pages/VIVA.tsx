@@ -524,8 +524,8 @@ const VIVAPage = () => {
             animate={lookbookInView ? "visible" : "hidden"}
             style={{ marginBottom: 56 }}
           >
-            <p style={{ fontFamily: "DM Sans", fontSize: 10, color: BURGUNDY, opacity: 0.55, letterSpacing: "5px", textTransform: "uppercase", margin: "0 0 10px 0" }}>The Collection</p>
-            <h2 style={{ fontFamily: CORMORANT, fontSize: "clamp(28px, 4.5vw, 52px)", fontWeight: 700, color: DARK_TEXT, margin: 0, lineHeight: 1.1 }}>
+            <p style={{ fontFamily: "DM Sans", fontSize: 10, color: BURGUNDY, letterSpacing: "5px", textTransform: "uppercase", margin: "0 0 10px 0" }}>The Collection</p>
+            <h2 style={{ fontFamily: CORMORANT, fontSize: "clamp(28px, 4.5vw, 52px)", fontWeight: 700, color: BURGUNDY, margin: 0, lineHeight: 1.1 }}>
               Batya Lookbook
             </h2>
           </motion.div>
@@ -646,8 +646,8 @@ const VIVAPage = () => {
           {/* Header row */}
           <div className="flex items-start justify-between flex-wrap gap-4" style={{ marginBottom: 48 }}>
             <div>
-              <p style={{ fontFamily: "DM Sans", fontSize: 10, color: BURGUNDY, opacity: 0.55, letterSpacing: "5px", textTransform: "uppercase", margin: "0 0 8px 0" }}>The Shop</p>
-              <h2 style={{ fontFamily: CORMORANT, fontSize: "clamp(28px, 4.5vw, 52px)", fontWeight: 700, color: DARK_TEXT, margin: 0, lineHeight: 1.1 }}>
+              <p style={{ fontFamily: "DM Sans", fontSize: 10, color: BURGUNDY, letterSpacing: "5px", textTransform: "uppercase", margin: "0 0 8px 0" }}>The Shop</p>
+              <h2 style={{ fontFamily: CORMORANT, fontSize: "clamp(28px, 4.5vw, 52px)", fontWeight: 700, color: BURGUNDY, margin: 0, lineHeight: 1.1 }}>
                 Shop the Collection
               </h2>
             </div>
@@ -684,7 +684,7 @@ const VIVAPage = () => {
           </div>
 
           {/* GARMENTS */}
-          <p style={{ fontFamily: "DM Sans", fontSize: 9, color: BURGUNDY, opacity: 0.45, letterSpacing: "4px", textTransform: "uppercase", margin: "0 0 20px 0", borderBottom: `1px solid ${BURG_ALPHA}`, paddingBottom: 10 }}>Garments</p>
+          <p style={{ fontFamily: "DM Sans", fontSize: 9, color: BURGUNDY, letterSpacing: "4px", textTransform: "uppercase", margin: "0 0 20px 0", borderBottom: `1px solid ${BURG_ALPHA}`, paddingBottom: 10 }}>Garments</p>
           <div ref={shopRef} className="grid gap-6 mb-16" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(270px, 1fr))" }}>
             {SHOP_PRODUCTS.filter(p => p.type === "garment").map((product, i) => (
               <motion.div key={product.id}
@@ -726,7 +726,7 @@ const VIVAPage = () => {
           </div>
 
           {/* PRINTS */}
-          <p style={{ fontFamily: "DM Sans", fontSize: 9, color: BURGUNDY, opacity: 0.45, letterSpacing: "4px", textTransform: "uppercase", margin: "0 0 20px 0", borderBottom: `1px solid ${BURG_ALPHA}`, paddingBottom: 10 }}>Illustration Prints</p>
+          <p style={{ fontFamily: "DM Sans", fontSize: 9, color: BURGUNDY, letterSpacing: "4px", textTransform: "uppercase", margin: "0 0 20px 0", borderBottom: `1px solid ${BURG_ALPHA}`, paddingBottom: 10 }}>Illustration Prints</p>
           <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
             {SHOP_PRODUCTS.filter(p => p.type === "print").map((product, i) => (
               <motion.div key={product.id}

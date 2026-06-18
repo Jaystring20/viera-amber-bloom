@@ -13,6 +13,13 @@ import {
   useReducedVariants,
 } from "@/lib/animations";
 
+const PINK = "#ED155D";
+const PURPLE = "#62017F";
+const PURPLE_LIGHT = "#C77DFF";
+const PURPLE_MEDIUM = "#6B2C91";
+const PINK_LIGHT = "#F472B6";
+const PINK_VERY_LIGHT = "#FFB6D9";
+
 // ─── Count-up hook ────────────────────────────────────────────────────────────
 const useCountUp = (target: number, inView: boolean, duration = 2000): number => {
   const [count, setCount] = useState(0);
@@ -68,15 +75,15 @@ const StatTile = ({ Icon, value, suffix = "", label, inView }: StatTileProps) =>
           width: 38,
           height: 38,
           borderRadius: 10,
-          background: "rgba(237,21,93,0.12)",
-          border: "1px solid rgba(237,21,93,0.3)",
+          background: `${PINK}1F`,
+          border: `1px solid ${PINK}4D`,
         }}
       >
-        <Icon size={19} color="#F472B6" strokeWidth={1.75} />
+        <Icon size={19} color={PINK_LIGHT} strokeWidth={1.75} />
       </span>
       <span
         className="font-display"
-        style={{ fontSize: "clamp(28px, 3.4vw, 40px)", fontWeight: 700, color: "#ED155D", lineHeight: 1 }}
+        style={{ fontSize: "clamp(28px, 3.4vw, 40px)", fontWeight: 700, color: PINK, lineHeight: 1 }}
         aria-live="polite"
         aria-atomic="true"
       >
@@ -333,7 +340,7 @@ const VAGINSection = () => {
                 bottom: 18,
                 background: "rgba(255,255,255,0.9)",
                 backdropFilter: "blur(8px)",
-                border: "1px solid rgba(237,21,93,0.2)",
+                border: `1px solid ${PINK}33`,
                 borderRadius: 999,
                 padding: "8px 16px",
                 fontFamily: "DM Sans, system-ui, sans-serif",
@@ -343,7 +350,7 @@ const VAGINSection = () => {
                 fontWeight: 500,
               }}
             >
-              <span style={{ color: "#ED155D", fontWeight: 700 }}>1,500+</span> lives changed
+              <span style={{ color: PINK, fontWeight: 700 }}>1,500+</span> lives changed
             </div>
           </motion.div>
 
@@ -357,7 +364,7 @@ const VAGINSection = () => {
           >
             <p
               className="font-body uppercase"
-              style={{ fontSize: 11, color: "#ED155D", letterSpacing: "0.3em", fontWeight: 500, margin: 0, marginTop: 8 }}
+              style={{ fontSize: 11, color: PINK, letterSpacing: "0.3em", fontWeight: 500, margin: 0, marginTop: 8 }}
             >
               Our Impact
             </p>
@@ -378,13 +385,13 @@ const VAGINSection = () => {
                 className="inline-flex items-center"
                 style={{
                   gap: 8,
-                  background: "rgba(98,1,127,0.18)",
-                  border: "1px solid rgba(199,125,255,0.4)",
+                  background: `${PURPLE_LIGHT}2E`,
+                  border: `1px solid ${PURPLE_LIGHT}66`,
                   borderRadius: 999,
                   padding: "8px 16px",
                   fontFamily: "DM Sans, system-ui, sans-serif",
                   fontSize: 12,
-                  color: "#C77DFF",
+                  color: PURPLE_LIGHT,
                   fontWeight: 600,
                 }}
               >
@@ -435,7 +442,7 @@ const VAGINSection = () => {
         >
           <ProgramCard
             Icon={Palette}
-            accent="#62017F"
+            accent={PURPLE}
             title="VaginART"
             body="Digital illustration and visual templates as stigma-free tools to teach adolescent girls about puberty, hygiene, and personal wellness with clarity and dignity."
             onLearn={() => navigate("/vagin")}
@@ -443,7 +450,7 @@ const VAGINSection = () => {
           />
           <ProgramCard
             Icon={Droplets}
-            accent="#ED155D"
+            accent={PINK}
             title="PAD KOLO Project"
             body="Tackling period poverty through menstrual health support and micro-savings. WhatsApp-enabled school distribution tracked via an impact dashboard — one pad at a time."
             onLearn={() => navigate("/vagin")}
@@ -467,7 +474,7 @@ const VAGINSection = () => {
               letterSpacing: "1px",
               textTransform: "uppercase",
               fontWeight: 600,
-              background: "linear-gradient(135deg, #62017F 0%, #ED155D 100%)",
+              background: `linear-gradient(135deg, ${PURPLE} 0%, ${PINK} 100%)`,
               color: "#FAFAFA",
               border: "none",
               borderRadius: 999,
@@ -492,8 +499,8 @@ const VAGINSection = () => {
               textTransform: "uppercase",
               fontWeight: 500,
               backgroundColor: "transparent",
-              color: "#ED155D",
-              border: "1px solid #ED155D",
+              color: PINK,
+              border: `1px solid ${PINK}`,
               borderRadius: 999,
               padding: "13px 30px",
               cursor: "pointer",

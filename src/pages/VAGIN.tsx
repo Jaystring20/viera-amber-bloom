@@ -56,7 +56,9 @@ import {
 const PINK = "#ED155D";
 const PURPLE = "#62017F";
 const PURPLE_LIGHT = "#C77DFF";
+const PURPLE_MEDIUM = "#6B2C91";
 const PINK_LIGHT = "#F472B6";
+const PINK_VERY_LIGHT = "#FFB6D9";
 
 // ─── Count-up hook ────────────────────────────────────────────────────────────
 const useCountUp = (target: number, inView: boolean, duration = 2000): number => {
@@ -80,15 +82,15 @@ const useCountUp = (target: number, inView: boolean, duration = 2000): number =>
 
 // ─── Reusable eyebrow + heading ───────────────────────────────────────────────
 const SectionHead = ({
-  eyebrow, heading, body, inView, reduced,
-}: { eyebrow: string; heading: string; body?: string; inView: boolean; reduced: boolean }) => {
+  eyebrow, heading, body, inView, reduced, accentColor = PINK,
+}: { eyebrow: string; heading: string; body?: string; inView: boolean; reduced: boolean; accentColor?: string }) => {
   const headV = useReducedVariants(fadeSlideUp);
   const fadeV = useReducedVariants(fadeIn);
   return (
     <div className="flex flex-col items-center text-center mb-12" style={{ gap: 16 }}>
       <motion.p
         variants={fadeV} initial="hidden" animate={inView ? "visible" : "hidden"}
-        style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: PINK, letterSpacing: "4px", textTransform: "uppercase", fontWeight: 400, margin: 0 }}
+        style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: accentColor, letterSpacing: "4px", textTransform: "uppercase", fontWeight: 400, margin: 0 }}
       >{eyebrow}</motion.p>
       <motion.h2
         variants={headV} initial="hidden" animate={inView ? "visible" : "hidden"}
@@ -857,6 +859,7 @@ const VAGINPage = () => {
               body="Education and access, working together — one teaches, one equips."
               inView={programsInView}
               reduced={!!reduced}
+              accentColor={PURPLE}
             />
             <motion.div
               variants={staggerV}
@@ -900,6 +903,7 @@ const VAGINPage = () => {
               body="A visual-first curriculum that turns hard conversations into clear, beautiful learning."
               inView={curriculumInView}
               reduced={!!reduced}
+              accentColor={PURPLE_LIGHT}
             />
             <motion.div
               variants={staggerV}
