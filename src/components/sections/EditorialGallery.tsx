@@ -466,9 +466,9 @@ const FilterBar = ({
     <div
       className="sticky top-20 z-30 -mx-6 px-6 py-3 mb-10 flex gap-2 overflow-x-auto"
       style={{
-        backgroundColor: "rgba(10,10,10,0.85)",
+        backgroundColor: "rgba(250,250,250,0.95)",
         backdropFilter: "blur(10px)",
-        borderBottom: "1px solid #1A1A1A",
+        borderBottom: "1px solid #EBEBEB",
       }}
     >
       {options.map((opt) => {
@@ -489,9 +489,9 @@ const FilterBar = ({
               minHeight: 40,
               borderRadius: 999,
               cursor: "pointer",
-              border: `1px solid ${isActive ? GOLD : "rgba(255,255,255,0.14)"}`,
-              backgroundColor: isActive ? GOLD : "transparent",
-              color: isActive ? "#0A0A0A" : "#A0A0A0",
+              border: `1px solid ${isActive ? "#111111" : "#CCCCCC"}`,
+              backgroundColor: isActive ? "#111111" : "transparent",
+              color: isActive ? "#FFFFFF" : "#666666",
               transition: reduced ? "none" : "all 0.25s ease",
             }}
           >
@@ -572,7 +572,7 @@ const EditorialGallery = () => {
     <section
       id="gallery"
       className="w-full py-16 md:py-24"
-      style={{ backgroundColor: "#000", borderTop: "1px solid #1A1A1A" }}
+      style={{ backgroundColor: "#FAFAFA", borderTop: "1px solid #EBEBEB" }}
       aria-label="The Collection"
     >
       <div className="mx-auto px-6" style={{ maxWidth: 1180 }}>
@@ -583,7 +583,7 @@ const EditorialGallery = () => {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: reduced ? 0 : 0.5 }}
-            style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: GOLD, letterSpacing: "4px", textTransform: "uppercase", margin: 0 }}
+            style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: "#111111", letterSpacing: "4px", textTransform: "uppercase", margin: 0, fontWeight: 600 }}
           >
             The Collection
           </motion.p>
@@ -593,16 +593,16 @@ const EditorialGallery = () => {
             viewport={{ once: true }}
             transition={{ duration: reduced ? 0 : 0.6 }}
             className="font-display"
-            style={{ fontSize: "clamp(28px, 4.5vw, 54px)", fontWeight: 700, color: "#FAFAFA", margin: 0, lineHeight: 1.05, maxWidth: 720 }}
+            style={{ fontSize: "clamp(28px, 4.5vw, 54px)", fontWeight: 700, color: "#111111", margin: 0, lineHeight: 1.05, maxWidth: 720 }}
           >
-            Six chapters, {artworks.length} women, one voice.
+            Illustrated Stories. Unlimited Artistry.
           </motion.h2>
           <motion.p
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: reduced ? 0 : 0.6, delay: reduced ? 0 : 0.15 }}
-            style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 15, color: "#888", maxWidth: 540, lineHeight: 1.7, margin: 0 }}
+            style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 15, color: "#666666", maxWidth: 540, lineHeight: 1.7, margin: 0 }}
           >
             Read it like a story, or filter by craft. Either way, every piece begins with a woman who already knew her worth.
           </motion.p>
