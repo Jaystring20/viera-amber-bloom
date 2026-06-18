@@ -288,37 +288,33 @@ const CollectionPage = () => {
                   </p>
                 )}
 
-                <button
+                <motion.button
                   onClick={() => {
                     const whatsappNumber = "2348074022917";
-                    const message = `Hi, I'"'"'d like to commission: ${selectedItem.title}\n\n${selectedItem.story}`;
+                    const message = `Hi, I'd like to commission: ${selectedItem.title}\n\n${selectedItem.story}`;
                     const encodedMessage = encodeURIComponent(message);
                     const whatsappLink = `https://wa.me/${whatsappNumber}/?text=${encodedMessage}`;
                     window.open(whatsappLink, "_blank");
                   }}
+                  whileHover={reduced ? {} : { scale: 1.02 }}
+                  whileTap={reduced ? {} : { scale: 0.98 }}
                   style={{
                     fontFamily: "Montserrat, system-ui, sans-serif",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    letterSpacing: "1px",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: "1.5px",
                     textTransform: "uppercase",
-                    padding: "12px 32px",
+                    padding: "12px 40px",
                     background: "#111111",
                     color: "#FFFFFF",
-                    border: "none",
-                    borderRadius: 6,
+                    border: "2px solid #111111",
+                    borderRadius: 2,
                     cursor: "pointer",
-                    transition: "background 0.2s",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#333333";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "#111111";
+                    transition: "all 0.3s",
                   }}
                 >
                   Commission This Style
-                </button>
+                </motion.button>
               </div>
             </motion.div>
           </motion.div>

@@ -7,7 +7,7 @@ export interface HeroCategory {
   name: string;
   subcategories: string[];
   image: string;
-  type: "fashion" | "lifestyle";
+  theme: string;
 }
 
 export const HERO_CATEGORIES: HeroCategory[] = [
@@ -16,43 +16,58 @@ export const HERO_CATEGORIES: HeroCategory[] = [
     name: "Couture Gowns",
     subcategories: [],
     image: "artwork_0001.webp",
-    type: "fashion",
+    theme: "Elegance",
   },
   {
     id: "bridal-designs",
     name: "Bridal Designs",
     subcategories: [],
     image: "artwork_0036.webp",
-    type: "fashion",
+    theme: "Romance",
   },
   {
     id: "lagos-culture",
     name: "Lagos Icons",
     subcategories: [],
     image: "artwork_0029.webp",
-    type: "fashion",
+    theme: "Heritage",
   },
   {
     id: "conceptual-bags",
     name: "Conceptual Bags",
     subcategories: [],
     image: "artwork_0028.webp",
-    type: "fashion",
+    theme: "Innovation",
   },
   {
     id: "jacqueline-portraits",
     name: "Jacqueline Portraits",
     subcategories: [],
     image: "artwork_0024.webp",
-    type: "lifestyle",
+    theme: "Portraiture",
   },
   {
     id: "#sorosoke-campaign",
     name: "#SOROSOKE Campaign",
     subcategories: [],
     image: "artwork_0052.webp",
-    type: "lifestyle",
+    theme: "Movement",
   },
+];
+
+const SCROLL_WORDS = [
+  "Couture",
+  "Bridal",
+  "Heritage",
+  "Wearable",
+  "Movement",
+  "Story",
+  "Artistry",
+  "Soul",
+  "Vision",
+  "Craft",
+  "Culture",
+  "Expression",
 ];
 
 interface RotatingHeroCarouselProps {
@@ -118,7 +133,8 @@ export const RotatingHeroCarousel = ({ onCategorySelect }: RotatingHeroCarouselP
     <div
       className="relative w-full overflow-hidden"
       style={{
-        minHeight: "700px",
+        minHeight: "800px",
+        backgroundColor: "#FAFAFA",
       }}
     >
       {/* Featured image - full background */}
@@ -137,7 +153,7 @@ export const RotatingHeroCarousel = ({ onCategorySelect }: RotatingHeroCarouselP
         aria-hidden="true"
       />
 
-      {/* Gradient overlay - bottom to top for text contrast */}
+      {/* Strong dark overlay - sophisticated contrast */}
       <motion.div
         key={`overlay-${currentIndex}`}
         initial={{ opacity: 0 }}
@@ -146,13 +162,13 @@ export const RotatingHeroCarousel = ({ onCategorySelect }: RotatingHeroCarouselP
         transition={{ duration: 0.6 }}
         className="absolute inset-0"
         style={{
-          background: "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0) 100%)",
+          background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.2) 70%, transparent 100%)",
         }}
         aria-hidden="true"
       />
 
       {/* Content - centered text overlay */}
-      <div className="relative z-10 h-full flex items-center justify-center px-6">
+      <div className="relative z-10 h-full flex flex-col items-center justify-center px-6" style={{ minHeight: "700px" }}>
         <AnimatePresence initial={false} custom={direction} mode="wait">
           <motion.div
             key={`carousel-${currentIndex}`}
@@ -167,49 +183,51 @@ export const RotatingHeroCarousel = ({ onCategorySelect }: RotatingHeroCarouselP
             }}
             className="flex flex-col items-center justify-center text-center"
           >
-            <div style={{ maxWidth: 700 }}>
-              {/* Category type label */}
+            <div style={{ maxWidth: 800 }}>
+              {/* Theme label - subtle, black on white, minimal */}
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
                 style={{
                   fontFamily: "Montserrat, system-ui, sans-serif",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  letterSpacing: "2px",
+                  fontSize: 11,
+                  fontWeight: 500,
+                  letterSpacing: "3px",
                   textTransform: "uppercase",
-                  color: current.type === "fashion" ? "#FFB6D9" : "#7FE8D8",
-                  marginBottom: 16,
+                  color: "#FFFFFF",
+                  marginBottom: 20,
+                  opacity: 0.8,
                 }}
               >
-                {current.type === "fashion" ? "Fashion Illustration" : "Lifestyle Illustration"}
+                {current.theme}
               </motion.p>
 
-              {/* Category name - white for contrast on dark overlay */}
+              {/* Category name - stark white, elegant serif */}
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
                 className="font-display"
                 style={{
-                  fontSize: "clamp(44px, 7vw, 72px)",
+                  fontSize: "clamp(48px, 8vw, 84px)",
                   fontWeight: 700,
                   color: "#FFFFFF",
-                  marginBottom: 28,
-                  lineHeight: 1.1,
+                  marginBottom: 32,
+                  lineHeight: 1.05,
+                  letterSpacing: "-1px",
                 }}
               >
                 {current.name}
               </motion.h1>
 
-              {/* CTA button */}
+              {/* CTA button - strict black */}
               <motion.button
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.3, duration: 0.4 }}
                 onClick={() => onCategorySelect?.(current)}
-                whileHover={reduced ? {} : { scale: 1.05, y: -3 }}
+                whileHover={reduced ? {} : { scale: 1.05, y: -2 }}
                 whileTap={reduced ? {} : { scale: 0.95 }}
                 style={{
                   fontFamily: "Montserrat, system-ui, sans-serif",
@@ -217,70 +235,129 @@ export const RotatingHeroCarousel = ({ onCategorySelect }: RotatingHeroCarouselP
                   fontWeight: 600,
                   letterSpacing: "1.5px",
                   textTransform: "uppercase",
-                  padding: "16px 48px",
-                  background: current.type === "fashion" ? "#6B2C91" : "#0B7B8C",
+                  padding: "14px 44px",
+                  background: "#111111",
                   color: "#FFFFFF",
-                  border: "none",
-                  borderRadius: 4,
+                  border: "2px solid #111111",
+                  borderRadius: 2,
                   cursor: "pointer",
-                  boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
                   transition: "all 300ms cubic-bezier(0.4, 0, 0.2, 1)",
                 }}
               >
-                Explore {current.name}
+                Explore Collection
               </motion.button>
             </div>
           </motion.div>
         </AnimatePresence>
       </div>
 
-      {/* Navigation arrows */}
-      <button
+      {/* Word scroll carousel - below hero */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5, duration: 0.6 }}
+        className="relative z-5"
+        style={{
+          backgroundColor: "#FFFFFF",
+          padding: "24px 0",
+          borderTop: "1px solid #EBEBEB",
+          overflow: "hidden",
+        }}
+      >
+        <div style={{ position: "relative", width: "100%", overflow: "hidden" }}>
+          <motion.div
+            animate={{ x: [0, -2000] }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+            style={{
+              display: "flex",
+              gap: 32,
+              whiteSpace: "nowrap",
+              paddingLeft: 24,
+            }}
+          >
+            {/* First set of words */}
+            {SCROLL_WORDS.map((word, idx) => (
+              <motion.span
+                key={`word-1-${idx}`}
+                style={{
+                  fontFamily: "Montserrat, system-ui, sans-serif",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  color: "#111111",
+                  letterSpacing: "1px",
+                  textTransform: "uppercase",
+                  minWidth: "auto",
+                }}
+              >
+                {word} {idx < SCROLL_WORDS.length - 1 && "•"}
+              </motion.span>
+            ))}
+            {/* Second set for seamless loop */}
+            {SCROLL_WORDS.map((word, idx) => (
+              <motion.span
+                key={`word-2-${idx}`}
+                style={{
+                  fontFamily: "Montserrat, system-ui, sans-serif",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  color: "#111111",
+                  letterSpacing: "1px",
+                  textTransform: "uppercase",
+                  minWidth: "auto",
+                }}
+              >
+                {word} {idx < SCROLL_WORDS.length - 1 && "•"}
+              </motion.span>
+            ))}
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Navigation arrows - minimal black/white */}
+      <motion.button
         onClick={() => {
           handleNavClick();
           paginate(-1);
         }}
         aria-label="Previous category"
-        className="absolute left-6 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full transition-colors"
+        className="absolute left-6 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full transition-colors"
         style={{
-          background: "rgba(0,0,0,0.2)",
-          border: "1px solid rgba(0,0,0,0.3)",
+          background: "#FFFFFF",
+          border: "1px solid #111111",
           color: "#111111",
+          cursor: "pointer",
         }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = "rgba(0,0,0,0.4)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = "rgba(0,0,0,0.2)";
-        }}
+        whileHover={reduced ? {} : { scale: 1.1, backgroundColor: "#111111", color: "#FFFFFF" }}
+        whileTap={reduced ? {} : { scale: 0.95 }}
       >
-        <ChevronLeft size={24} />
-      </button>
+        <ChevronLeft size={20} />
+      </motion.button>
 
-      <button
+      <motion.button
         onClick={() => {
           handleNavClick();
           paginate(1);
         }}
         aria-label="Next category"
-        className="absolute right-6 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full transition-colors"
+        className="absolute right-6 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full transition-colors"
         style={{
-          background: "rgba(0,0,0,0.2)",
-          border: "1px solid rgba(0,0,0,0.3)",
+          background: "#FFFFFF",
+          border: "1px solid #111111",
           color: "#111111",
+          cursor: "pointer",
         }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = "rgba(0,0,0,0.4)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = "rgba(0,0,0,0.2)";
-        }}
+        whileHover={reduced ? {} : { scale: 1.1, backgroundColor: "#111111", color: "#FFFFFF" }}
+        whileTap={reduced ? {} : { scale: 0.95 }}
       >
-        <ChevronRight size={24} />
-      </button>
+        <ChevronRight size={20} />
+      </motion.button>
 
-      {/* Dot indicators */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+      {/* Dot indicators - black */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-3">
         {HERO_CATEGORIES.map((_, idx) => (
           <motion.button
             key={idx}
@@ -290,8 +367,8 @@ export const RotatingHeroCarousel = ({ onCategorySelect }: RotatingHeroCarouselP
               setCurrentIndex(idx);
             }}
             animate={{
-              width: idx === currentIndex ? 24 : 8,
-              background: idx === currentIndex ? "#111111" : "rgba(17,17,17,0.3)",
+              width: idx === currentIndex ? 28 : 8,
+              background: idx === currentIndex ? "#111111" : "#CCCCCC",
             }}
             transition={{ duration: 0.3 }}
             style={{

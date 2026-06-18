@@ -225,20 +225,20 @@ export const CategoryThumbnailNav = ({ onCategorySelect }: CategoryThumbnailNavP
                   className="group-hover:opacity-90"
                 />
 
-                {/* Category badge - top right */}
+                {/* Category badge - top right - black/white only */}
                 <div
                   style={{
                     position: "absolute",
                     top: 12,
                     right: 12,
-                    background: category.umbrella === "fashion" ? "#6B2C91" : "#0B7B8C",
+                    background: "#111111",
                     color: "#FFFFFF",
                     padding: "6px 12px",
-                    borderRadius: 4,
+                    borderRadius: 2,
                     fontFamily: "Montserrat, system-ui, sans-serif",
-                    fontSize: 10,
+                    fontSize: 9,
                     fontWeight: 600,
-                    letterSpacing: "1px",
+                    letterSpacing: "1.5px",
                     textTransform: "uppercase",
                     zIndex: 5,
                   }}
