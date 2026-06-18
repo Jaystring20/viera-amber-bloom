@@ -50,7 +50,7 @@ const Index = () => {
           id="shop"
           aria-label="Viera Amber Shop"
           className="w-full flex flex-col items-center justify-center py-20"
-          style={{ backgroundColor: "#0A0A0A", minHeight: "50vh" }}
+          style={{ backgroundColor: "#FAFAFA", minHeight: "50vh" }}
         >
           <div
             className="flex flex-col items-center text-center mx-auto px-6"
@@ -74,7 +74,7 @@ const Index = () => {
               style={{
                 fontSize: "clamp(24px, 3.5vw, 40px)",
                 fontWeight: 700,
-                color: "#FAFAFA",
+                color: "#0A0A0A",
                 margin: 0,
                 lineHeight: 1.15,
               }}
@@ -86,7 +86,7 @@ const Index = () => {
                 fontFamily: "DM Sans, system-ui, sans-serif",
                 fontWeight: 300,
                 fontSize: 14,
-                color: "#888888",
+                color: "#555555",
                 lineHeight: 1.7,
                 margin: 0,
               }}

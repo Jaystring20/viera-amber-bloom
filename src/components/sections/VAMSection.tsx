@@ -245,9 +245,10 @@ const VAMSection = () => {
           initial="hidden"
           animate={waitlistInView ? "visible" : "hidden"}
           style={{
-            backgroundColor: "#0A0A0A",
+            backgroundColor: "#F5F5F5",
             borderRadius: 4,
             padding: "clamp(28px, 5vw, 40px)",
+            border: "1px solid #EBEBEB",
           }}
           className="flex flex-col items-center text-center"
         >
@@ -256,7 +257,7 @@ const VAMSection = () => {
             style={{
               fontSize: 22,
               fontWeight: 700,
-              color: "#FAFAFA",
+              color: "#0A0A0A",
               marginBottom: 8,
             }}
           >
@@ -267,7 +268,7 @@ const VAMSection = () => {
               fontFamily: "DM Sans, system-ui, sans-serif",
               fontWeight: 300,
               fontSize: 13,
-              color: "#888888",
+              color: "#555555",
               marginBottom: 20,
             }}
           >
@@ -299,11 +300,11 @@ const VAMSection = () => {
                   required
                   style={{
                     flex: 1,
-                    backgroundColor: "#1A1A1A",
-                    border: "1px solid #2A2A2A",
+                    backgroundColor: "#FFFFFF",
+                    border: "1px solid #EBEBEB",
                     borderRadius: 2,
                     padding: "10px 14px",
-                    color: "#FAFAFA",
+                    color: "#0A0A0A",
                     fontFamily: "DM Sans, system-ui, sans-serif",
                     fontSize: 13,
                     outline: "none",
@@ -312,7 +313,7 @@ const VAMSection = () => {
                     (e.target.style.borderColor = "#D97706")
                   }
                   onBlur={(e) =>
-                    (e.target.style.borderColor = "#2A2A2A")
+                    (e.target.style.borderColor = "#EBEBEB")
                   }
                 />
                 <button

@@ -28,8 +28,8 @@ const FounderSection = () => {
   return (
     <div
       style={{
-        backgroundColor: "#0A0A0A",
-        borderTop: "1px solid #1A1A1A",
+        backgroundColor: "#FAFAFA",
+        borderTop: "1px solid #EBEBEB",
       }}
       className="w-full py-20"
     >
@@ -127,7 +127,7 @@ const FounderSection = () => {
               style={{
                 fontSize: "clamp(26px, 3.5vw, 42px)",
                 fontWeight: 700,
-                color: "#FAFAFA",
+                color: "#0A0A0A",
                 margin: 0,
                 lineHeight: 1.2,
               }}
@@ -141,7 +141,7 @@ const FounderSection = () => {
                 fontFamily: "DM Sans, system-ui, sans-serif",
                 fontWeight: 300,
                 fontSize: 14,
-                color: "#888888",
+                color: "#555555",
                 lineHeight: 1.8,
                 margin: 0,
               }}
@@ -159,7 +159,7 @@ const FounderSection = () => {
                 fontFamily: "DM Sans, system-ui, sans-serif",
                 fontWeight: 300,
                 fontSize: 14,
-                color: "#888888",
+                color: "#555555",
                 lineHeight: 1.8,
                 margin: 0,
               }}
@@ -187,7 +187,7 @@ const FounderSection = () => {
                     margin: 0,
                   }}
                 >
-                  <span style={{ color: "#444444" }}>— </span>
+                  <span style={{ color: "#555555" }}>— </span>
                   {award}
                 </motion.p>
               ))}

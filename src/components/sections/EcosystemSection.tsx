@@ -334,15 +334,14 @@ const FlowView = ({
 }) => {
   return (
     <>
-      {/* Desktop serpentine */}
+      {/* Desktop serpentine — visual only, no labels */}
       <motion.div
         className="eco-flow-desktop relative"
         style={{ marginTop: 60, height: "clamp(500px, 40vw, 560px)" }}
         initial="initial"
         whileInView="animate"
         viewport={{ once: true, amount: 0.2 }}
-        variants={{ initial: {}, animate: { transition: { staggerChildren: d(0.18), delayChildren: d(0.2) } } }}
-        aria-hidden="true"
+        variants={{ initial: {}, animate: { transition: { staggerChildren: d(0.15), delayChildren: d(0.2) } } }}
       >
         <svg
           className="absolute inset-0"
@@ -361,6 +360,7 @@ const FlowView = ({
               <stop offset="100%" stopColor="#0A0A0A" />
             </linearGradient>
           </defs>
+          {/* Base path — subtle background flow */}
           <path
             d={FLOW_PATH}
             fill="none"
@@ -368,23 +368,25 @@ const FlowView = ({
             strokeWidth={2}
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
-            opacity={0.25}
+            opacity={0.12}
           />
+          {/* Animated flow line */}
           <motion.path
             d={FLOW_PATH}
             fill="none"
             stroke="url(#ecoFlowGrad)"
-            strokeWidth={3}
+            strokeWidth={2.5}
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
-            style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.15))" }}
+            style={{ filter: "drop-shadow(0 1px 3px rgba(10,10,10,0.08))" }}
             initial={{ pathLength: reduced ? 1 : 0 }}
             whileInView={{ pathLength: 1 }}
             viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: d(1.8), ease: "easeInOut" as const }}
+            transition={{ duration: d(2.2), ease: "easeInOut" as const }}
           />
         </svg>
 
+        {/* Node dots positioned on the serpentine path */}
         {ARMS.map((arm) => (
           <FlowNode key={arm.number} arm={arm} reduced={reduced} onActivate={onActivate} />
         ))}
@@ -409,7 +411,7 @@ const FlowView = ({
             width: 2,
             background:
               "linear-gradient(to bottom, #0A0A0A 0%, #0A0A0A 100%)",
-            opacity: 0.5,
+            opacity: 0.3,
           }}
         />
         {ARMS.map((arm) => (
@@ -420,7 +422,7 @@ const FlowView = ({
   );
 };
 
-/* Desktop serpentine node: glowing dot ON the curve + larger fanned label */
+/* Desktop serpentine node: glowing dot ON the curve, subtle icon, no text labels */
 const FlowNode = ({
   arm,
   reduced,
@@ -430,103 +432,67 @@ const FlowNode = ({
   reduced: boolean;
   onActivate: (id: string) => void;
 }) => {
-  const labelAbove = arm.side === "top";
-  const GAP = 18;
   const { Icon } = arm;
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <motion.button
       type="button"
       onClick={() => onActivate(arm.target)}
+      onMouseEnter={() => !reduced && setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       aria-label={`${arm.title} — ${arm.tag}. Jump to section.`}
       className="absolute bg-transparent border-0 p-0 cursor-pointer"
       style={{ left: `${arm.x}%`, top: `${arm.y}%`, width: 0, height: 0, overflow: "visible" }}
       variants={{
-        initial: { opacity: 0, scale: 0.6 },
-        animate: { opacity: 1, scale: 1, transition: { type: "spring" as const, stiffness: 260, damping: 18 } },
+        initial: { opacity: 0, scale: 0.4 },
+        animate: { opacity: 1, scale: 1, transition: { type: "spring" as const, stiffness: 280, damping: 20 } },
       }}
-      whileHover={reduced ? undefined : "hover"}
-      whileTap={reduced ? undefined : { scale: 0.96 }}
+      whileTap={reduced ? undefined : { scale: 0.92 }}
     >
-      {/* Glowing node dot — center sits exactly on the anchor (x,y) */}
+      {/* Outer glow ring (on hover) */}
       <motion.span
         aria-hidden="true"
-        variants={{ hover: reduced ? {} : { scale: 1.3 } }}
-        transition={{ type: "spring" as const, stiffness: 300, damping: 18 }}
+        animate={{ scale: isHovered ? 1.5 : 1, opacity: isHovered ? 0.3 : 0 }}
+        transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
         style={{
           position: "absolute",
           left: 0,
           top: 0,
           transform: "translate(-50%, -50%)",
-          width: 22,
-          height: 22,
+          width: 56,
+          height: 56,
           borderRadius: 999,
-          background: arm.accent,
-          border: "2px solid #FFFFFF", outline: "1px solid #0A0A0A",
-          boxShadow: `0 0 16px ${arm.accent}, 0 0 34px ${arm.accent}88`,
+          border: `2px solid ${arm.accent}`,
+          pointerEvents: "none",
         }}
       />
 
-      {/* Label card — larger, fanned above/below the dot */}
-      <motion.div
-        variants={{ hover: reduced ? {} : { y: labelAbove ? -4 : 4 } }}
+      {/* Main glowing node dot — center sits exactly on the anchor (x,y) */}
+      <motion.span
+        aria-hidden="true"
+        animate={{ scale: isHovered ? 1.35 : 1 }}
+        transition={{ type: "spring" as const, stiffness: 320, damping: 20 }}
         style={{
           position: "absolute",
           left: 0,
-          width: 248,
-          transform: "translateX(-50%)",
-          ...(labelAbove ? { bottom: GAP + 11 } : { top: GAP + 11 }),
-          background: "#FFFFFF",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-          border: `1px solid ${arm.text}55`,
-          borderRadius: 14,
-          padding: "18px 20px",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
-          textAlign: "center",
+          top: 0,
+          transform: "translate(-50%, -50%)",
+          width: 28,
+          height: 28,
+          borderRadius: 999,
+          background: arm.accent,
+          border: "2.5px solid #FFFFFF",
+          outline: "1px solid #0A0A0A",
+          boxShadow: `0 0 18px ${arm.accent}, 0 0 40px ${arm.accent}66`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        <div className="flex items-center justify-center" style={{ gap: 10, marginBottom: 10 }}>
-          <span
-            aria-hidden="true"
-            className="flex items-center justify-center"
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 999,
-              background: `${arm.accent}22`,
-              border: `1px solid ${arm.text}66`,
-            }}
-          >
-            <Icon size={18} color={arm.text} strokeWidth={1.75} />
-          </span>
-          <span
-            className="font-body uppercase"
-            style={{
-              fontSize: 9,
-              color: arm.text,
-              letterSpacing: "0.14em",
-              border: `1px solid ${arm.text}`,
-              borderRadius: 999,
-              padding: "2px 9px",
-              fontWeight: 600,
-            }}
-          >
-            {arm.tag}
-          </span>
-        </div>
-        <div className="flex items-baseline justify-center" style={{ gap: 7, marginBottom: 7 }}>
-          <span className="font-body" style={{ fontSize: 11, color: arm.text, fontWeight: 700, letterSpacing: "1px" }}>
-            {arm.number}
-          </span>
-          <h3 className="font-display m-0" style={{ fontSize: 17, color: "#0A0A0A", fontWeight: 700, lineHeight: 1.25 }}>
-            {arm.title}
-          </h3>
-        </div>
-        <p className="font-body m-0" style={{ fontSize: 12.5, color: "#555555", fontWeight: 300, lineHeight: 1.5 }}>
-          {arm.blurb}
-        </p>
-      </motion.div>
+        {/* Icon inside the dot */}
+        <Icon size={14} color="#FFFFFF" strokeWidth={2.5} />
+      </motion.span>
     </motion.button>
   );
 };

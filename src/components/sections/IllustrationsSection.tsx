@@ -108,12 +108,12 @@ const CarouselCard = ({ card, isActive }: { card: PreviewCard; isActive: boolean
     <motion.article
       className="relative overflow-hidden cursor-pointer h-full"
       style={{
-        background: "rgba(26, 26, 26, 0.5)",
+        background: "rgba(255, 255, 255, 0.8)",
         backdropFilter: "blur(10px)",
         WebkitBackdropFilter: "blur(10px)",
-        border: "1px solid rgba(217, 119, 6, 0.1)",
+        border: "1px solid rgba(217, 119, 6, 0.15)",
         borderRadius: 12,
-        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.25)",
+        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08)",
       }}
       onClick={handleNavigate}
       onMouseEnter={() => !reduced && setIsHovered(true)}
@@ -157,7 +157,7 @@ const CarouselCard = ({ card, isActive }: { card: PreviewCard; isActive: boolean
           fontFamily: "DM Sans, system-ui, sans-serif",
           fontWeight: 500,
           backdropFilter: "blur(8px)",
-          backgroundColor: "rgba(0, 0, 0, 0.4)",
+          backgroundColor: "rgba(255, 255, 255, 0.9)",
         }}
       >
         {card.chapter.split(" ").slice(0, 2).join(" ")}
@@ -493,7 +493,7 @@ const IllustrationsSection = () => {
 
   return (
     <div
-      style={{ backgroundColor: "#000000" }}
+      style={{ backgroundColor: "#FAFAFA" }}
       className="w-full py-20"
     >
       <div
@@ -532,7 +532,7 @@ const IllustrationsSection = () => {
             style={{
               fontSize: "clamp(26px, 4vw, 48px)",
               fontWeight: 700,
-              color: "#FAFAFA",
+              color: "#0A0A0A",
               margin: 0,
               lineHeight: 1.1,
             }}
@@ -549,7 +549,7 @@ const IllustrationsSection = () => {
               fontFamily: "DM Sans, system-ui, sans-serif",
               fontWeight: 300,
               fontSize: 15,
-              color: "#888888",
+              color: "#555555",
               maxWidth: 520,
               lineHeight: 1.7,
               margin: 0,
@@ -605,7 +605,7 @@ const IllustrationsSection = () => {
               fontFamily: "DM Sans, system-ui, sans-serif",
               fontWeight: 300,
               fontSize: 13,
-              color: "#888888",
+              color: "#555555",
               margin: 0,
             }}
           >
