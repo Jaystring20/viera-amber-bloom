@@ -4,10 +4,9 @@ import EditorialGallery from "@/components/sections/EditorialGallery";
 import BrandFilm from "@/components/BrandFilm";
 import RotatingHeroCarousel from "@/components/sections/RotatingHeroCarousel";
 import CategoryThumbnailNav from "@/components/sections/CategoryThumbnailNav";
-import CollectionGallery from "@/components/sections/CollectionGallery";
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import { useRef, useState } from "react";
-import { ARTWORKS, getCollectionMetadata, CollectionId } from "@/lib/gallery-data";
+import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   fadeSlideUp,
   fadeIn,
@@ -19,7 +18,7 @@ import {
 
 const Illustrations = () => {
   const reduced = useReducedMotion();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const appsRef = useRef<HTMLDivElement>(null);
   const processRef = useRef<HTMLDivElement>(null);
@@ -32,30 +31,25 @@ const Illustrations = () => {
   const staggerVariants = useReducedVariants(staggerContainer);
   const cardVariants = useReducedVariants(cardItem);
 
+  const handleCategorySelect = (collectionId: string) => {
+    navigate(`/collections/${collectionId}`);
+  };
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#FAFAFA" }}>
       <NavBar />
       <main className="pt-20">
         {/* ── Rotating Hero Carousel ───────────────────────────────────── */}
         <RotatingHeroCarousel onCategorySelect={(category) => {
-          setSelectedCategory(category.id);
+          handleCategorySelect(category.id);
         }} />
 
         {/* ── Category Thumbnail Navigation ───────────────────────────────────── */}
         <CategoryThumbnailNav
           onCategorySelect={(category) => {
-            setSelectedCategory(category.id);
+            handleCategorySelect(category.id);
           }}
-          selectedId={selectedCategory || undefined}
         />
-
-        {/* ── Collection Gallery (shown when category selected) ───────────────────────────────────── */}
-        {selectedCategory && (
-          <CollectionGallery
-            collection={getCollectionMetadata(selectedCategory as CollectionId)}
-            onClose={() => setSelectedCategory(null)}
-          />
-        )}
 
         {/* ── Brand Film / Video Carousel (moved lower) ───────────────────────────────────── */}
         <section

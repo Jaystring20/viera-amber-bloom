@@ -11,86 +11,57 @@ export interface CategoryThumbnail {
 }
 
 export const CATEGORY_THUMBNAILS: CategoryThumbnail[] = [
-  // Fashion Illustration
+  // Fashion Illustration collections
   {
-    id: "fashion-collections",
-    name: "Fashion Collections",
+    id: "couture-gowns",
+    name: "Couture Gowns",
     umbrella: "fashion",
     image: "artwork_0001.webp",
-    pieceCount: 12,
+    pieceCount: 20,
   },
   {
     id: "bridal-designs",
     name: "Bridal Designs",
     umbrella: "fashion",
-    image: "artwork_0002.webp",
-    pieceCount: 8,
-  },
-  {
-    id: "jewelry",
-    name: "Jewelry",
-    umbrella: "fashion",
-    image: "artwork_0003.webp",
-    pieceCount: 6,
-  },
-  {
-    id: "shoes",
-    name: "Shoes",
-    umbrella: "fashion",
-    image: "artwork_0004.webp",
+    image: "artwork_0036.webp",
     pieceCount: 5,
   },
   {
-    id: "bags",
-    name: "Bags",
+    id: "lagos-culture",
+    name: "Lagos Icons",
     umbrella: "fashion",
-    image: "artwork_0005.webp",
-    pieceCount: 7,
+    image: "artwork_0029.webp",
+    pieceCount: 13,
   },
-  // Lifestyle Illustration
   {
-    id: "birthday",
-    name: "Birthday Illustrations",
+    id: "conceptual-bags",
+    name: "Conceptual Bags",
+    umbrella: "fashion",
+    image: "artwork_0028.webp",
+    pieceCount: 3,
+  },
+  // Lifestyle Illustration collections
+  {
+    id: "jacqueline-portraits",
+    name: "Jacqueline Portraits",
     umbrella: "lifestyle",
-    image: "artwork_0010.webp",
+    image: "artwork_0024.webp",
     pieceCount: 4,
   },
   {
-    id: "wedding-couple",
-    name: "Wedding/Couple Illustrations",
+    id: "#sorosoke-campaign",
+    name: "#SOROSOKE Campaign",
     umbrella: "lifestyle",
-    image: "artwork_0011.webp",
-    pieceCount: 9,
-  },
-  {
-    id: "book-covers",
-    name: "Book Covers",
-    umbrella: "lifestyle",
-    image: "artwork_0012.webp",
-    pieceCount: 3,
-  },
-  {
-    id: "bridal-showers",
-    name: "Bridal Showers",
-    umbrella: "lifestyle",
-    image: "artwork_0013.webp",
-    pieceCount: 5,
-  },
-  {
-    id: "wedding-programs",
-    name: "Wedding Programs",
-    umbrella: "lifestyle",
-    image: "artwork_0014.webp",
-    pieceCount: 6,
+    image: "artwork_0052.webp",
+    pieceCount: 12,
   },
 ];
 
 interface CategoryThumbnailNavProps {
   onCategorySelect?: (category: CategoryThumbnail) => void;
-  selectedId?: string;
 }
 
-export const CategoryThumbnailNav = ({ onCategorySelect, selectedId }: CategoryThumbnailNavProps) => {
+export const CategoryThumbnailNav = ({ onCategorySelect }: CategoryThumbnailNavProps) => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
@@ -231,7 +202,7 @@ export const CategoryThumbnailNav = ({ onCategorySelect, selectedId }: CategoryT
                   overflow: "hidden",
                   aspectRatio: "1",
                   marginBottom: 12,
-                  border: selectedId === category.id ? "2px solid #111111" : "1px solid #EBEBEB",
+                  border: "1px solid #EBEBEB",
                   transition: "border-color 0.2s",
                 }}
               >
@@ -253,6 +224,27 @@ export const CategoryThumbnailNav = ({ onCategorySelect, selectedId }: CategoryT
                   }}
                   className="group-hover:opacity-90"
                 />
+
+                {/* Category badge - top right */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 12,
+                    right: 12,
+                    background: category.umbrella === "fashion" ? "#6B2C91" : "#0B7B8C",
+                    color: "#FFFFFF",
+                    padding: "6px 12px",
+                    borderRadius: 4,
+                    fontFamily: "Montserrat, system-ui, sans-serif",
+                    fontSize: 10,
+                    fontWeight: 600,
+                    letterSpacing: "1px",
+                    textTransform: "uppercase",
+                    zIndex: 5,
+                  }}
+                >
+                  {category.umbrella === "fashion" ? "Fashion" : "Lifestyle"}
+                </div>
 
                 {/* Overlay on hover */}
                 <div
