@@ -194,9 +194,9 @@ const VIVAPage = () => {
       <NavBar />
 
       {/* ═══════════════════════════════════════════════════════
-          HERO — white dominant with burgundy accents
+          HERO — dominant burgundy background
           ═══════════════════════════════════════════════════════ */}
-      <section style={{ position: "relative", overflow: "visible", background: "#FFFFFF", minHeight: "clamp(900px, 115vh, 1240px)" }}>
+      <section style={{ position: "relative", overflow: "visible", background: `linear-gradient(135deg, ${BURGUNDY} 0%, #8B0A3A 50%, ${BURGUNDY} 100%)`, minHeight: "clamp(900px, 115vh, 1240px)" }}>
         {/* Subtle grain */}
         <div aria-hidden="true" style={{
           position: "absolute", inset: 0, pointerEvents: "none",
@@ -336,7 +336,7 @@ const VIVAPage = () => {
                 fontFamily: CORMORANT,
                 fontStyle: "italic",
                 fontSize: "clamp(18px, 2.5vw, 28px)",
-                color: BURGUNDY,
+                color: "#FFFFFF",
                 fontWeight: 400,
                 margin: 0,
               }}
@@ -350,7 +350,7 @@ const VIVAPage = () => {
                 fontFamily: "DM Sans, system-ui, sans-serif",
                 fontWeight: 300,
                 fontSize: 14,
-                color: `rgba(34,26,26,0.65)`,
+                color: `rgba(255,255,255,0.82)`,
                 lineHeight: 1.8,
                 margin: 0,
                 maxWidth: 360,

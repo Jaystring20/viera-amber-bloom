@@ -273,7 +273,7 @@ const VAGINPage = () => {
             minHeight: "92vh",
             paddingTop: 110,
             paddingBottom: 0,
-            background: "linear-gradient(160deg, #FFFFFF 0%, #FAFAFA 40%, #F5F5F5 70%, #FAFAFA 100%)",
+            background: `linear-gradient(135deg, ${PURPLE} 0%, ${PURPLE_MEDIUM} 50%, ${PINK} 100%)`,
           }}
         >
           {/* Backgrounds */}
@@ -346,7 +346,7 @@ const VAGINPage = () => {
                 >
                   <h1
                     className="font-display m-0"
-                    style={{ fontSize: "clamp(30px, 4.5vw, 56px)", fontWeight: 700, color: "#111111", lineHeight: 1.04 }}
+                    style={{ fontSize: "clamp(30px, 4.5vw, 56px)", fontWeight: 700, color: "#FFFFFF", lineHeight: 1.04 }}
                   >
                     One girl<br />at a time.
                   </h1>
@@ -363,7 +363,7 @@ const VAGINPage = () => {
                   fontFamily: "DM Sans, system-ui, sans-serif",
                   fontWeight: 300,
                   fontSize: "clamp(13px, 1.4vw, 16px)",
-                  color: "rgba(17,17,17,0.68)",
+                  color: "rgba(255,255,255,0.88)",
                   maxWidth: 500,
                   lineHeight: 1.82,
                 }}
