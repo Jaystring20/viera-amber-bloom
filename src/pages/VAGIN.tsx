@@ -528,7 +528,7 @@ const VAGINPage = () => {
         {/* ── GALLERY CAROUSEL ──────────────────────────────────────────────── */}
         <section
           className="w-full py-20"
-          style={{ backgroundColor: "#FAFAFA", borderTop: "1px solid rgba(237,21,93,0.1)" }}
+          style={{ background: `linear-gradient(135deg, #FAFAFA 0%, rgba(237,21,93,0.03) 60%, rgba(98,1,127,0.02) 100%)`, borderTop: `1px solid ${PINK}15` }}
           aria-label="Community Impact Gallery"
         >
           <div className="mx-auto px-6 mb-10" style={{ maxWidth: 1200 }}>
@@ -563,7 +563,7 @@ const VAGINPage = () => {
         <section
           ref={missionRef}
           className="w-full py-20"
-          style={{ backgroundColor: "#FAFAFA" }}
+          style={{ background: `linear-gradient(145deg, #FAFAFA 0%, rgba(98,1,127,0.04) 50%, rgba(237,21,93,0.03) 100%)` }}
           aria-label="The Mission"
         >
           <div className="mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center" style={{ maxWidth: 1100 }}>
@@ -626,7 +626,7 @@ const VAGINPage = () => {
         {/* ── WHY SRHR ───────────────────────────────────────────────────── */}
         <section
           className="w-full py-20"
-          style={{ background: "linear-gradient(160deg, #FFFFFF 0%, #F8F8F8 60%, #FAFAFA 100%)", borderTop: "1px solid rgba(237,21,93,0.1)" }}
+          style={{ background: `linear-gradient(160deg, #FFFFFF 0%, rgba(237,21,93,0.025) 40%, rgba(98,1,127,0.03) 70%, #FAFAFA 100%)`, borderTop: `1px solid ${PINK}18` }}
           aria-label="Why SRHR?"
         >
           <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
@@ -674,7 +674,7 @@ const VAGINPage = () => {
                   key={s.stat}
                   variants={cardItem}
                   className="flex flex-col"
-                  style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${s.accent}33`, borderLeft: `3px solid ${s.accent}`, borderRadius: 14, padding: "32px 28px", gap: 14 }}
+                  style={{ background: `${s.accent}08`, border: `1px solid ${s.accent}22`, borderLeft: `4px solid ${s.accent}`, borderRadius: 14, padding: "32px 28px", gap: 14, backdropFilter: "blur(4px)" }}
                 >
                   <span className="font-display" style={{ fontSize: "clamp(44px, 6vw, 68px)", fontWeight: 700, color: s.accent, lineHeight: 1 }}>{s.stat}</span>
                   <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 16, color: "rgba(17,17,17,0.8)", lineHeight: 1.7, margin: 0 }}>{s.body}</p>
@@ -690,7 +690,7 @@ const VAGINPage = () => {
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.6 }}
               className="p-7 rounded-xl"
-              style={{ background: "rgba(237,21,93,0.04)", border: "1px solid rgba(237,21,93,0.15)" }}
+              style={{ background: `${PINK}0A`, border: `1px solid ${PINK}28`, backdropFilter: "blur(6px)" }}
             >
               <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: PINK, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600, margin: 0, marginBottom: 12 }}>
                 What girls in low-resourced settings face
@@ -714,7 +714,7 @@ const VAGINPage = () => {
         {/* ── WHY ART ────────────────────────────────────────────────────── */}
         <section
           className="w-full py-20"
-          style={{ backgroundColor: "#FAFAFA", borderTop: "1px solid rgba(98,1,127,0.15)" }}
+          style={{ background: `linear-gradient(150deg, #FAFAFA 0%, rgba(98,1,127,0.05) 60%, rgba(199,125,255,0.02) 100%)`, borderTop: `1px solid ${PURPLE}18` }}
           aria-label="Why Art?"
         >
           <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
@@ -741,7 +741,7 @@ const VAGINPage = () => {
                     { cite: "Hartley et al., 2023", finding: "Art-based SRHR teaching increases participation and recall in young women." },
                     { cite: "Widarini et al., 2019", finding: "Art improved adolescents' knowledge and attitudes towards premarital sex and health decision-making." },
                   ].map((r) => (
-                    <div key={r.cite} style={{ background: "rgba(98,1,127,0.06)", border: "1px solid rgba(199,125,255,0.15)", borderRadius: 10, padding: "14px 18px" }}>
+                    <div key={r.cite} style={{ background: `${PURPLE}0C`, border: `1px solid ${PURPLE_LIGHT}28`, borderRadius: 10, padding: "14px 18px", backdropFilter: "blur(4px)" }}>
                       <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: PURPLE, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 600, margin: 0, marginBottom: 4 }}>{r.cite}</p>
                       <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 13.5, color: "rgba(17,17,17,0.75)", lineHeight: 1.6, margin: 0 }}>{r.finding}</p>
                     </div>
@@ -763,7 +763,7 @@ const VAGINPage = () => {
                     key={m.title}
                     variants={cardItem}
                     className="flex items-start"
-                    style={{ gap: 16, background: "rgba(237,21,93,0.04)", border: "1px solid rgba(237,21,93,0.12)", borderRadius: 12, padding: "18px 20px" }}
+                    style={{ gap: 16, background: i % 2 === 0 ? `${PINK}08` : `${PURPLE}08`, border: `1px solid ${i % 2 === 0 ? PINK : PURPLE}20`, borderRadius: 12, padding: "18px 20px", backdropFilter: "blur(4px)" }}
                   >
                     <span className="flex-shrink-0 flex items-center justify-center" style={{ width: 40, height: 40, borderRadius: 10, background: i % 2 === 0 ? `${PINK}15` : `${PURPLE}12`, border: `1px solid ${i % 2 === 0 ? PINK : PURPLE}33` }}>
                       <m.Icon size={18} color={i % 2 === 0 ? PINK : PURPLE} strokeWidth={1.75} />
@@ -783,7 +783,7 @@ const VAGINPage = () => {
         <section
           ref={impactRef}
           className="w-full py-20"
-          style={{ background: "linear-gradient(135deg, #F5F5F5 0%, #FFFFFF 100%)", borderTop: "1px solid rgba(237,21,93,0.12)", borderBottom: "1px solid rgba(237,21,93,0.12)" }}
+          style={{ background: `linear-gradient(135deg, #F5F5F5 0%, rgba(237,21,93,0.04) 40%, rgba(98,1,127,0.03) 100%)`, borderTop: `1px solid ${PINK}18`, borderBottom: `1px solid ${PINK}18` }}
           aria-label="Our Impact"
         >
           <div className="mx-auto px-6" style={{ maxWidth: 1000 }}>
@@ -808,10 +808,10 @@ const VAGINPage = () => {
                   key={s.label}
                   variants={cardV}
                   className="flex flex-col items-center text-center"
-                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(237,21,93,0.18)", borderRadius: 14, padding: "32px 20px", gap: 12 }}
+                  style={{ background: `${PINK}08`, border: `1px solid ${PINK}22`, borderRadius: 14, padding: "32px 20px", gap: 12, backdropFilter: "blur(4px)" }}
                 >
-                  <span aria-hidden="true" className="flex items-center justify-center" style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(237,21,93,0.12)", border: "1px solid rgba(237,21,93,0.3)" }}>
-                    <s.Icon size={22} color={PINK_LIGHT} strokeWidth={1.75} />
+                  <span aria-hidden="true" className="flex items-center justify-center" style={{ width: 44, height: 44, borderRadius: 12, background: `${PINK}15`, border: `1px solid ${PINK}38`, backdropFilter: "blur(4px)" }}>
+                    <s.Icon size={22} color={PINK} strokeWidth={1.75} />
                   </span>
                   <span className="font-display" style={{ fontSize: "clamp(34px, 4vw, 46px)", fontWeight: 700, color: PINK, lineHeight: 1 }} aria-live="polite">
                     {s.val.toLocaleString()}{s.suffix}
