@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { motion, useInView, useReducedMotion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Send, ShoppingBag, X, Plus, Minus, CreditCard } from "lucide-react";
+import { ArrowLeft, Send, ShoppingBag, X, Plus, Minus, CreditCard, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "@/components/NavBar";
 import { fadeIn, fadeSlideUp, staggerContainer, cardItem, scaleXRule, inViewProps, useReducedVariants } from "@/lib/animations";
@@ -385,6 +385,36 @@ const VIVAPage = () => {
                 marginTop: 4,
               }}
             >Enquire About a Commission</motion.a>
+
+            {/* Secondary CTA — Virtual Try-On */}
+            <motion.button
+              type="button"
+              onClick={() => navigate("/viva/try-on")}
+              variants={fadeVariants} initial="hidden" animate="visible"
+              transition={{ delay: d(1.42) }}
+              whileHover={reduced ? {} : { scale: 1.02 }}
+              whileTap={reduced ? {} : { scale: 0.97 }}
+              style={{
+                fontFamily: "DM Sans, system-ui, sans-serif",
+                fontSize: 10,
+                letterSpacing: "2.5px",
+                textTransform: "uppercase",
+                fontWeight: 500,
+                background: "transparent",
+                color: GOLD,
+                border: `1px solid ${GOLD}`,
+                borderRadius: 3,
+                padding: "12px 28px",
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                marginTop: 4,
+                marginLeft: 12,
+              }}
+            >
+              <Sparkles size={13} /> Try It On Virtually
+            </motion.button>
 
             {/* Stats strip */}
             <motion.div
