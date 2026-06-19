@@ -12,7 +12,7 @@ const NAV_LINKS = [
   { label: "VAGIN", href: "/vagin", isRoute: true, fullName: "Viera Amber Girls' Initiative" },
   { label: "VIVA", href: "/viva", isRoute: true, fullName: "Fashion & Wearable Art" },
   { label: "VAM", href: "/vam", isRoute: true, fullName: "Viera Amber Masterclass" },
-  { label: "Shop", href: "/vash", isRoute: true },
+  { label: "VASH", href: "/vash", isRoute: true },
   { label: "Contact", href: "#contact" },
 ];
 
