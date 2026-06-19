@@ -15,10 +15,11 @@ const QUICK_LINKS = [
 // Per sub-page footer brand mark. Image logos exist for Viera Amber, VAGIN, and
 // VIVA; VAM and VASH have no logo asset yet, so they render as wordmarks.
 const getFooterBrand = (pathname: string) => {
-  if (pathname === "/vagin") return { kind: "img" as const, src: "/vagin-logo.webp", alt: "VAGIN — Viera Amber Girls' Initiative", height: 58 };
-  if (pathname === "/viva") return { kind: "img" as const, src: "/viva-logo.svg", alt: "VIVA — Fashion & Wearable Art", height: 46 };
-  if (pathname === "/vam") return { kind: "text" as const, text: "VAM", sub: "Viera Amber Masterclass" };
-  if (pathname === "/vash") return { kind: "text" as const, text: "VASH", sub: "Viera Amber Shop" };
+  // startsWith so sub-routes inherit the brand (e.g. /viva/try-on, /vagin-dashboard).
+  if (pathname.startsWith("/vagin")) return { kind: "img" as const, src: "/vagin-logo.webp", alt: "VAGIN — Viera Amber Girls' Initiative", height: 58 };
+  if (pathname.startsWith("/viva")) return { kind: "img" as const, src: "/viva-logo.svg", alt: "VIVA — Fashion & Wearable Art", height: 46 };
+  if (pathname.startsWith("/vam")) return { kind: "text" as const, text: "VAM", sub: "Viera Amber Masterclass" };
+  if (pathname.startsWith("/vash")) return { kind: "text" as const, text: "VASH", sub: "Viera Amber Shop" };
   // Home + Illustrations + any other route
   return { kind: "img" as const, src: vieraAmberLogo, alt: "Viera Amber", height: 50 };
 };
