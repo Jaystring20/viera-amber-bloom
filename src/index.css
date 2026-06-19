@@ -141,6 +141,12 @@
     letter-spacing: -0.02em;
   }
 
+  /* Eyebrow labels use .font-body (Montserrat) — switch to Poppins on VAGIN
+     for full type consistency. */
+  .vagin-type .font-body {
+    font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+  }
+
   /* Typography hierarchy */
   h1 {
     font-size: clamp(32px, 5vw, 56px);
