@@ -381,7 +381,7 @@ const VAGINPage = () => {
                     className="font-display m-0"
                     style={{ fontSize: "clamp(32px, 4.8vw, 60px)", fontWeight: 800, color: "#FFFFFF", lineHeight: 1.02, letterSpacing: "-0.03em" }}
                   >
-                    One girl<br />at a time.
+                    For her,<br />by her.
                   </h1>
                 </motion.div>
               </div>
@@ -750,74 +750,6 @@ const VAGINPage = () => {
           </div>
         </section>
 
-        {/* ── WHY ART ────────────────────────────────────────────────────── */}
-        <section
-          className="w-full py-20"
-          style={{ background: `linear-gradient(150deg, rgba(98,1,127,0.09) 0%, #F8F5FF 18%, #FAFAFA 50%, rgba(98,1,127,0.1) 78%, rgba(199,125,255,0.05) 100%)`, borderTop: `1px solid ${PURPLE}35` }}
-          aria-label="Why Art?"
-        >
-          <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
-              {/* Left: explanation + research */}
-              <motion.div
-                initial={{ opacity: 0, x: -28 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.7, ease: "easeOut" as const }}
-              >
-                <p className="font-body uppercase m-0" style={{ fontSize: 11, color: PURPLE_LIGHT, letterSpacing: "0.4em", marginBottom: 14 }}>The Method</p>
-                <h2 className="font-display m-0" style={{ fontSize: "clamp(28px, 4.2vw, 48px)", fontWeight: 800, color: "#111111", lineHeight: 1.08, marginBottom: 20, letterSpacing: "-0.02em" }}>
-                  Why art is the right tool for this work.
-                </h2>
-                <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 15, color: "rgba(17,17,17,0.7)", lineHeight: 1.8, marginBottom: 18 }}>
-                  Research confirms what we've always believed: art-based teaching methodology
-                  for SRHR education <em style={{ color: "rgba(17,17,17,0.9)", fontStyle: "normal", fontWeight: 500 }}>increases participation and recall</em> among young women.
-                  Art does what lectures and pamphlets cannot — it makes difficult conversations safe,
-                  engaging, and memorable.
-                </p>
-                <div className="flex flex-col" style={{ gap: 10 }}>
-                  {[
-                    { cite: "Hartley et al., 2023", finding: "Art-based SRHR teaching increases participation and recall in young women." },
-                    { cite: "Widarini et al., 2019", finding: "Art improved adolescents' knowledge and attitudes towards premarital sex and health decision-making." },
-                  ].map((r) => (
-                    <div key={r.cite} style={{ background: `${PURPLE}1A`, border: `1px solid ${PURPLE_LIGHT}50`, borderRadius: 10, padding: "14px 18px", backdropFilter: "blur(4px)" }}>
-                      <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 11, color: PURPLE, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 600, margin: 0, marginBottom: 4 }}>{r.cite}</p>
-                      <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 13.5, color: "rgba(17,17,17,0.75)", lineHeight: 1.6, margin: 0 }}>{r.finding}</p>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Right: 5 art methods */}
-              <motion.div
-                variants={staggerContainer}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.2 }}
-                className="flex flex-col"
-                style={{ gap: 10 }}
-              >
-                {ART_METHODS.map((m, i) => (
-                  <motion.div
-                    key={m.title}
-                    variants={cardItem}
-                    className="flex items-start"
-                    style={{ gap: 16, background: i % 2 === 0 ? `${PINK}16` : `${PURPLE}14`, border: `1px solid ${i % 2 === 0 ? PINK : PURPLE}38`, borderRadius: 12, padding: "18px 20px", backdropFilter: "blur(4px)" }}
-                  >
-                    <span className="flex-shrink-0 flex items-center justify-center" style={{ width: 40, height: 40, borderRadius: 10, background: i % 2 === 0 ? `${PINK}15` : `${PURPLE}12`, border: `1px solid ${i % 2 === 0 ? PINK : PURPLE}33` }}>
-                      <m.Icon size={18} color={i % 2 === 0 ? PINK : PURPLE} strokeWidth={1.75} />
-                    </span>
-                    <div>
-                      <p className="font-display m-0" style={{ fontSize: 15, fontWeight: 700, color: "#111111", marginBottom: 4 }}>{m.title}</p>
-                      <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 13, color: "rgba(17,17,17,0.65)", lineHeight: 1.6, margin: 0 }}>{m.desc}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-            </div>
-          </div>
-        </section>
-
         {/* ── IMPACT band ────────────────────────────────────────────────── */}
         <section
           ref={impactRef}
@@ -889,6 +821,74 @@ const VAGINPage = () => {
                 ))}
               </div>
             </motion.div>
+          </div>
+        </section>
+
+        {/* ── WHY ART (The Method — leads directly into the Programs/VaginART) ─ */}
+        <section
+          className="w-full py-20"
+          style={{ background: `linear-gradient(150deg, rgba(98,1,127,0.09) 0%, #F8F5FF 18%, #FAFAFA 50%, rgba(98,1,127,0.1) 78%, rgba(199,125,255,0.05) 100%)`, borderTop: `1px solid ${PURPLE}35` }}
+          aria-label="Why Art?"
+        >
+          <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
+              {/* Left: explanation + research */}
+              <motion.div
+                initial={{ opacity: 0, x: -28 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.7, ease: "easeOut" as const }}
+              >
+                <p className="font-body uppercase m-0" style={{ fontSize: 11, color: PURPLE_LIGHT, letterSpacing: "0.4em", marginBottom: 14 }}>Our Method</p>
+                <h2 className="font-display m-0" style={{ fontSize: "clamp(28px, 4.2vw, 48px)", fontWeight: 800, color: "#111111", lineHeight: 1.08, marginBottom: 20, letterSpacing: "-0.02em" }}>
+                  Why art is the right tool for this work.
+                </h2>
+                <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 15, color: "rgba(17,17,17,0.7)", lineHeight: 1.8, marginBottom: 18 }}>
+                  Research confirms what we've always believed: art-based teaching methodology
+                  for SRHR education <em style={{ color: "rgba(17,17,17,0.9)", fontStyle: "normal", fontWeight: 500 }}>increases participation and recall</em> among young women.
+                  Art does what lectures and pamphlets cannot — it makes difficult conversations safe,
+                  engaging, and memorable. It is the foundation of our flagship program, <strong style={{ color: PURPLE, fontWeight: 600 }}>VaginART</strong>.
+                </p>
+                <div className="flex flex-col" style={{ gap: 10 }}>
+                  {[
+                    { cite: "Hartley et al., 2023", finding: "Art-based SRHR teaching increases participation and recall in young women." },
+                    { cite: "Widarini et al., 2019", finding: "Art improved adolescents' knowledge and attitudes towards premarital sex and health decision-making." },
+                  ].map((r) => (
+                    <div key={r.cite} style={{ background: `${PURPLE}1A`, border: `1px solid ${PURPLE_LIGHT}50`, borderRadius: 10, padding: "14px 18px", backdropFilter: "blur(4px)" }}>
+                      <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 11, color: PURPLE, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 600, margin: 0, marginBottom: 4 }}>{r.cite}</p>
+                      <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 13.5, color: "rgba(17,17,17,0.75)", lineHeight: 1.6, margin: 0 }}>{r.finding}</p>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Right: 5 art methods */}
+              <motion.div
+                variants={staggerContainer}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                className="flex flex-col"
+                style={{ gap: 10 }}
+              >
+                {ART_METHODS.map((m, i) => (
+                  <motion.div
+                    key={m.title}
+                    variants={cardItem}
+                    className="flex items-start"
+                    style={{ gap: 16, background: i % 2 === 0 ? `${PINK}16` : `${PURPLE}14`, border: `1px solid ${i % 2 === 0 ? PINK : PURPLE}38`, borderRadius: 12, padding: "18px 20px", backdropFilter: "blur(4px)" }}
+                  >
+                    <span className="flex-shrink-0 flex items-center justify-center" style={{ width: 40, height: 40, borderRadius: 10, background: i % 2 === 0 ? `${PINK}15` : `${PURPLE}12`, border: `1px solid ${i % 2 === 0 ? PINK : PURPLE}33` }}>
+                      <m.Icon size={18} color={i % 2 === 0 ? PINK : PURPLE} strokeWidth={1.75} />
+                    </span>
+                    <div>
+                      <p className="font-display m-0" style={{ fontSize: 15, fontWeight: 700, color: "#111111", marginBottom: 4 }}>{m.title}</p>
+                      <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 13, color: "rgba(17,17,17,0.65)", lineHeight: 1.6, margin: 0 }}>{m.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
           </div>
         </section>
 
@@ -1504,10 +1504,11 @@ const VAGINPage = () => {
           <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
             <SectionHead
               eyebrow="Get Involved"
-              heading="Change a girl's story with us."
+              heading="Change a story, one girl at a time."
               body="Whether you give, partner, or volunteer — every contribution keeps a girl in school."
               inView={involveInView}
               reduced={!!reduced}
+              scheme="dark"
             />
             <motion.div
               variants={staggerV}

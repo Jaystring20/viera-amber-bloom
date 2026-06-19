@@ -1,19 +1,34 @@
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
+import { useLocation } from "react-router-dom";
+import vieraAmberLogo from "@/assets/viera-amber-logo.png";
 
 const QUICK_LINKS = [
-  { label: "Illustrations", href: "#illustrations" },
-  { label: "VAGIN", href: "#vagin" },
-  { label: "VIVA", href: "#viva" },
-  { label: "VAM", href: "#vam" },
-  { label: "Shop", href: "#shop" },
+  { label: "Illustrations", href: "/illustrations" },
+  { label: "VAGIN", href: "/vagin" },
+  { label: "VIVA", href: "/viva" },
+  { label: "VAM", href: "/vam" },
+  { label: "VASH", href: "/vash" },
   { label: "Contact", href: "#contact" },
 ];
+
+// Per sub-page footer brand mark. Image logos exist for Viera Amber, VAGIN, and
+// VIVA; VAM and VASH have no logo asset yet, so they render as wordmarks.
+const getFooterBrand = (pathname: string) => {
+  if (pathname === "/vagin") return { kind: "img" as const, src: "/vagin-logo.webp", alt: "VAGIN — Viera Amber Girls' Initiative", height: 58 };
+  if (pathname === "/viva") return { kind: "img" as const, src: "/viva-logo.svg", alt: "VIVA — Fashion & Wearable Art", height: 46 };
+  if (pathname === "/vam") return { kind: "text" as const, text: "VAM", sub: "Viera Amber Masterclass" };
+  if (pathname === "/vash") return { kind: "text" as const, text: "VASH", sub: "Viera Amber Shop" };
+  // Home + Illustrations + any other route
+  return { kind: "img" as const, src: vieraAmberLogo, alt: "Viera Amber", height: 50 };
+};
 
 const Footer = () => {
   const reduced = useReducedMotion();
   const footerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(footerRef, { once: true, amount: 0.3 });
+  const location = useLocation();
+  const footerBrand = getFooterBrand(location.pathname);
   const d = (s: number) => (reduced ? 0 : s);
 
   const itemVariants: import("framer-motion").Variants = {
@@ -74,13 +89,28 @@ const Footer = () => {
           viewport={{ once: true }}
           variants={containerVariants}
         >
-          <motion.div
-            variants={itemVariants}
-            className="font-display text-brand-text"
-            style={{ fontSize: 18, letterSpacing: "4px" }}
-          >
-            VIERA AMBER
-          </motion.div>
+          {footerBrand.kind === "img" ? (
+            <motion.img
+              variants={itemVariants}
+              src={footerBrand.src}
+              alt={footerBrand.alt}
+              style={{ height: footerBrand.height, width: "auto", objectFit: "contain", display: "block" }}
+            />
+          ) : (
+            <motion.div variants={itemVariants}>
+              <div
+                className="font-display"
+                style={{ fontSize: 30, letterSpacing: "3px", fontWeight: 800, color: "#FAFAFA", lineHeight: 1 }}
+              >
+                {footerBrand.text}
+              </div>
+              <div
+                style={{ fontSize: 11, letterSpacing: "2px", textTransform: "uppercase", color: "#C0B5A0", marginTop: 6 }}
+              >
+                {footerBrand.sub}
+              </div>
+            </motion.div>
+          )}
           <motion.p
             variants={itemVariants}
             className="mt-4 italic font-display"
