@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { motion, useInView, useReducedMotion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Send, ShoppingBag, X, Plus, Minus, CreditCard, Sparkles } from "lucide-react";
+import { ArrowLeft, Send, ShoppingBag, X, Plus, Minus, CreditCard, Sparkles, Upload, AlertCircle, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "@/components/NavBar";
 import { fadeIn, fadeSlideUp, staggerContainer, cardItem, scaleXRule, inViewProps, useReducedVariants } from "@/lib/animations";
@@ -125,6 +125,15 @@ const VIVAPage = () => {
   const [checkoutEmail, setCheckoutEmail] = useState("");
   const [payStatus, setPayStatus]         = useState<"idle" | "loading" | "success" | "error">("idle");
 
+  // Try-On Modal state
+  const [tryOnModalOpen, setTryOnModalOpen]                 = useState(false);
+  const [selectedGarmentForTryOn, setSelectedGarmentForTryOn] = useState<ShopProduct | null>(null);
+  const [personPhotoPreview, setPersonPhotoPreview]         = useState<string | null>(null);
+  const [personPhotoFile, setPersonPhotoFile]               = useState<File | null>(null);
+  const [tryOnResult, setTryOnResult]                       = useState<string | null>(null);
+  const [tryOnStatus, setTryOnStatus]                       = useState<"idle" | "loading" | "done" | "error">("idle");
+  const [tryOnError, setTryOnError]                         = useState<string | null>(null);
+
   const cartCount = cart.reduce((s, i) => s + i.qty, 0);
   const cartTotal = cart.reduce((s, i) => s + (currency === "NGN" ? i.product.priceNGN : i.product.priceUSD) * i.qty, 0);
 
@@ -143,6 +152,107 @@ const VIVAPage = () => {
       if (i.product.id !== id) return [i];
       const q = i.qty + delta;
       return q < 1 ? [] : [{ ...i, qty: q }];
+
+  // Try-On Modal handlers
+  const openTryOnModal = (product: ShopProduct) => {
+    setSelectedGarmentForTryOn(product);
+    setTryOnModalOpen(true);
+    setPersonPhotoPreview(null);
+    setPersonPhotoFile(null);
+    setTryOnResult(null);
+    setTryOnStatus("idle");
+    setTryOnError(null);
+  };
+
+  const closeTryOnModal = () => {
+    setTryOnModalOpen(false);
+    setSelectedGarmentForTryOn(null);
+    setPersonPhotoPreview(null);
+    setPersonPhotoFile(null);
+    setTryOnResult(null);
+    setTryOnStatus("idle");
+    setTryOnError(null);
+  };
+
+  const handleTryOnPhotoSelect = (file: File | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setTryOnError("Please choose an image file (JPG or PNG).");
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      setTryOnError("Image is too large — please use one under 8MB.");
+      return;
+    }
+    setTryOnError(null);
+    setTryOnResult(null);
+    setTryOnStatus("idle");
+    setPersonPhotoFile(file);
+    setPersonPhotoPreview(URL.createObjectURL(file));
+  };
+
+  const fileToBase64 = (file: File): Promise<{ base64: string; mime: string }> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        const base64 = result.split(",")[1] ?? "";
+        resolve({ base64, mime: file.type || "image/jpeg" });
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+  const urlToBase64 = async (url: string): Promise<{ base64: string; mime: string }> => {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const dataUrl: string = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+    return { base64: dataUrl.split(",")[1] ?? "", mime: blob.type || "image/webp" };
+  };
+
+  const runTryOn = async () => {
+    if (!personPhotoFile || !selectedGarmentForTryOn) return;
+    setTryOnStatus("loading");
+    setTryOnError(null);
+    setTryOnResult(null);
+    try {
+      const person = await fileToBase64(personPhotoFile);
+      const garmentImg = await urlToBase64(selectedGarmentForTryOn.photo);
+
+      const { data, error: fnError } = await supabase.functions.invoke("virtual-tryon", {
+        body: {
+          personImageBase64: person.base64,
+          personMimeType: person.mime,
+          garmentImageBase64: garmentImg.base64,
+          garmentMimeType: garmentImg.mime,
+          garmentName: selectedGarmentForTryOn.title,
+        },
+      });
+
+      if (fnError) throw new Error(fnError.message || "Try-on request failed.");
+      if (data?.error) throw new Error(data.detail || data.error);
+      if (!data?.imageBase64) throw new Error("No image was returned. Please try again.");
+
+      setTryOnResult(`data:${data.mimeType || "image/png"};base64,${data.imageBase64}`);
+      setTryOnStatus("done");
+    } catch (e) {
+      setTryOnError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
+      setTryOnStatus("error");
+    }
+  };
+
+  const orderViaWhatsApp = () => {
+    if (!selectedGarmentForTryOn) return;
+    const message =
+      `Hi VIVA! I tried on "${selectedGarmentForTryOn.title}" using the virtual try-on and I love it. ` +
+      `I'd like to order it / ask about a made-to-measure fit.`;
+    window.open(`https://wa.me/2348074022917/?text=${encodeURIComponent(message)}`, "_blank");
+  };
     }));
 
   const handlePaystack = () => {
@@ -735,7 +845,7 @@ const VIVAPage = () => {
                   <p style={{ fontFamily: "DM Sans", fontSize: 9, color: BURGUNDY, opacity: 0.45, letterSpacing: "3px", textTransform: "uppercase", margin: "0 0 5px 0" }}>{product.subtitle}</p>
                   <h3 style={{ fontFamily: CORMORANT, fontSize: 22, fontWeight: 700, color: DARK_TEXT, margin: "0 0 8px 0" }}>{product.title}</h3>
                   <p style={{ fontFamily: "DM Sans", fontSize: 12, color: `rgba(34,26,26,0.5)`, lineHeight: 1.65, margin: "0 0 16px 0" }}>{product.desc}</p>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
                     <div>
                       <span style={{ fontFamily: CORMORANT, fontSize: 22, fontWeight: 700, color: BURGUNDY }}>
                         {currency === "NGN" ? `₦${product.priceNGN.toLocaleString()}` : `$${product.priceUSD}`}
@@ -750,6 +860,12 @@ const VIVAPage = () => {
                       + Add
                     </motion.button>
                   </div>
+                  <motion.button onClick={() => openTryOnModal(product)}
+                    whileHover={reduced ? {} : { scale: 1.02 }} whileTap={reduced ? {} : { scale: 0.97 }}
+                    className="w-full inline-flex items-center justify-center gap-2"
+                    style={{ fontFamily: "DM Sans", fontSize: 9, letterSpacing: "1.5px", textTransform: "uppercase", fontWeight: 600, background: "transparent", color: BURGUNDY, border: `1.5px solid ${BURGUNDY}`, borderRadius: 4, padding: "8px 12px", cursor: "pointer", transition: "all 0.2s" }}>
+                    <Sparkles size={12} /> Try On
+                  </motion.button>
                 </div>
               </motion.div>
             ))}
@@ -1072,6 +1188,191 @@ const VIVAPage = () => {
             </motion.aside>
           </>
         )}
+
+        {/* ═══════════════════════════════════════════════════════
+            TRY-ON MODAL — product photo upload + preview
+            ═══════════════════════════════════════════════════════ */}
+        <AnimatePresence>
+          {tryOnModalOpen && selectedGarmentForTryOn && (
+            <motion.div
+              key="try-on-modal"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={closeTryOnModal}
+              style={{
+                position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+                background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center",
+                zIndex: 1000, padding: 16,
+              }}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  background: "#fff", borderRadius: 16, overflow: "hidden",
+                  maxWidth: 600, width: "100%", maxHeight: "90vh", overflowY: "auto",
+                  boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+                }}
+              >
+                {/* Header */}
+                <div style={{ padding: "24px 28px", borderBottom: `1px solid ${BURG_ALPHA}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div>
+                    <p style={{ fontFamily: "DM Sans", fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: BURGUNDY, margin: 0, marginBottom: 4 }}>Try On</p>
+                    <h3 style={{ fontFamily: CORMORANT, fontSize: 24, fontWeight: 700, color: BURGUNDY, margin: 0 }}>
+                      {selectedGarmentForTryOn.title}
+                    </h3>
+                  </div>
+                  <motion.button
+                    onClick={closeTryOnModal}
+                    whileHover={reduced ? {} : { scale: 1.1 }}
+                    whileTap={reduced ? {} : { scale: 0.9 }}
+                    style={{ background: "transparent", border: "none", cursor: "pointer", padding: 8, display: "flex" }}
+                  >
+                    <X size={20} color={BURGUNDY} />
+                  </motion.button>
+                </div>
+
+                {/* Content */}
+                <div style={{ padding: "28px" }}>
+                  {/* Photo upload */}
+                  <div style={{ marginBottom: 24 }}>
+                    <p style={{ fontFamily: "DM Sans", fontSize: 11, letterSpacing: "1.5px", textTransform: "uppercase", color: BURGUNDY, fontWeight: 600, margin: "0 0 12px 0" }}>
+                      Your Photo
+                    </p>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleTryOnPhotoSelect(e.target.files?.[0])}
+                      style={{ display: "none" }}
+                      id="try-on-file-input"
+                    />
+                    <label
+                      htmlFor="try-on-file-input"
+                      style={{
+                        display: "block", width: "100%", aspectRatio: personPhotoPreview ? "auto" : "4/3",
+                        minHeight: 240, border: `2px dashed ${personPhotoPreview ? "transparent" : BURGUNDY}55`,
+                        borderRadius: 12, background: "#FAFAFA", cursor: "pointer", overflow: "hidden",
+                        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12,
+                        transition: "all 0.2s",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!personPhotoPreview) (e.currentTarget as HTMLLabelElement).style.borderColor = BURGUNDY;
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!personPhotoPreview) (e.currentTarget as HTMLLabelElement).style.borderColor = `${BURGUNDY}55`;
+                      }}
+                    >
+                      {personPhotoPreview ? (
+                        <img src={personPhotoPreview} alt="Your photo" style={{ width: "100%", height: "100%", maxHeight: 300, objectFit: "contain" }} />
+                      ) : (
+                        <>
+                          <Upload size={28} color={BURGUNDY} opacity="0.5" />
+                          <span style={{ fontFamily: "DM Sans", fontSize: 13, color: BURGUNDY, fontWeight: 600 }}>Upload your photo</span>
+                          <span style={{ fontFamily: "DM Sans", fontSize: 11, color: `rgba(110,0,37,0.45)` }}>JPG or PNG · under 8MB</span>
+                        </>
+                      )}
+                    </label>
+                    {personPhotoPreview && (
+                      <button
+                        onClick={() => {
+                          setPersonPhotoPreview(null);
+                          setPersonPhotoFile(null);
+                        }}
+                        style={{ marginTop: 8, fontFamily: "DM Sans", fontSize: 11, color: BURGUNDY, background: "transparent", border: "none", cursor: "pointer", textDecoration: "underline" }}
+                      >
+                        Change photo
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Error */}
+                  {tryOnError && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      style={{
+                        padding: "12px 14px", borderRadius: 8, background: "#FFEBEE", border: "1px solid #FFCDD2",
+                        marginBottom: 16, display: "flex", gap: 10, alignItems: "flex-start",
+                      }}
+                    >
+                      <AlertCircle size={16} color="#C62828" style={{ flexShrink: 0, marginTop: 2 }} />
+                      <span style={{ fontFamily: "DM Sans", fontSize: 12, color: "#C62828", lineHeight: 1.5 }}>{tryOnError}</span>
+                    </motion.div>
+                  )}
+
+                  {/* Try-On Button */}
+                  {!tryOnResult && (
+                    <motion.button
+                      onClick={runTryOn}
+                      disabled={!personPhotoFile || tryOnStatus === "loading"}
+                      whileHover={!personPhotoFile || tryOnStatus === "loading" ? {} : { scale: 1.02 }}
+                      whileTap={!personPhotoFile || tryOnStatus === "loading" ? {} : { scale: 0.98 }}
+                      style={{
+                        width: "100%", padding: "14px", marginBottom: 12,
+                        fontFamily: "DM Sans", fontSize: 12, letterSpacing: "1.5px", textTransform: "uppercase", fontWeight: 600,
+                        background: !personPhotoFile || tryOnStatus === "loading" ? `${BURGUNDY}4D` : BURGUNDY,
+                        color: "#FFFFFF", border: "none", borderRadius: 8, cursor: !personPhotoFile ? "not-allowed" : "pointer",
+                        display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                      }}
+                    >
+                      {tryOnStatus === "loading" ? (
+                        <>
+                          <RefreshCw size={14} className={reduced ? "" : "animate-spin"} /> Styling your look…
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles size={14} /> Try It On
+                        </>
+                      )}
+                    </motion.button>
+                  )}
+
+                  {/* Preview Result */}
+                  {tryOnStatus === "done" && tryOnResult && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                      <div style={{ marginBottom: 16, borderRadius: 10, overflow: "hidden", background: "#F5F5F5", display: "flex", alignItems: "center", justifyContent: "center", minHeight: 280 }}>
+                        <img src={tryOnResult} alt="Try-on result" style={{ width: "100%", maxHeight: 400, objectFit: "contain" }} />
+                      </div>
+                      <motion.button
+                        onClick={orderViaWhatsApp}
+                        whileHover={reduced ? {} : { scale: 1.02 }}
+                        whileTap={reduced ? {} : { scale: 0.98 }}
+                        style={{
+                          width: "100%", padding: "14px", marginBottom: 10,
+                          fontFamily: "DM Sans", fontSize: 12, letterSpacing: "1.5px", textTransform: "uppercase", fontWeight: 600,
+                          background: "#25D366", color: "#FFFFFF", border: "none", borderRadius: 8, cursor: "pointer",
+                          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                        }}
+                      >
+                        <Send size={14} /> Order on WhatsApp
+                      </motion.button>
+                      <button
+                        onClick={() => {
+                          setPersonPhotoPreview(null);
+                          setPersonPhotoFile(null);
+                          setTryOnResult(null);
+                          setTryOnStatus("idle");
+                        }}
+                        style={{
+                          width: "100%", padding: "12px",
+                          fontFamily: "DM Sans", fontSize: 11, letterSpacing: "1px", textTransform: "uppercase", fontWeight: 600,
+                          background: "transparent", color: BURGUNDY, border: `1px solid ${BURGUNDY}4D`, borderRadius: 8, cursor: "pointer",
+                        }}
+                      >
+                        Try Another Photo
+                      </button>
+                    </motion.div>
+                  )}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </AnimatePresence>
     </div>
   );
