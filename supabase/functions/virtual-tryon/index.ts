@@ -74,25 +74,31 @@ Deno.serve(async (req) => {
   }
 
   const prompt =
-    `You are a professional virtual try-on specialist performing face and garment composition.
+    `You are a professional virtual try-on specialist. Your task is to composite the user's face onto a model wearing a garment.
+
+CONTEXT:
+- FIRST IMAGE: The user's uploaded face and body photo (the ONLY image the user uploaded)
+- SECOND IMAGE: The product/garment image from the e-commerce page (already shows the garment the user selected)
 
 CRITICAL INSTRUCTIONS:
-1. FIRST IMAGE = The USER'S FACE and BODY to use (extract the person's face, skin tone, hair, facial features)
-2. SECOND IMAGE = GARMENT REFERENCE ONLY (extract only the clothing${garmentName ? ` — "${garmentName}"` : ""})
+1. Extract the user's FACE from the FIRST IMAGE (their uploaded photo)
+2. Extract the GARMENT from the SECOND IMAGE (the product photo)
+3. Composite: Place the user's face onto a body wearing the garment from the product image
+4. The goal: Show the user what they would look like wearing this specific garment${garmentName ? ` (${garmentName})` : ""}
 
-TASK:
-- Take the person's FACE from the FIRST image (the uploaded photo)
-- Place that face on a body wearing the garment from the SECOND image
-- Preserve all facial features, skin tone, hair color, and facial expression from the FIRST image
-- Use the person's body proportions from the FIRST image to naturally wear the garment
-- Match the garment's exact colors, patterns, fabric texture, fit, and silhouette from the SECOND image
-- Ensure realistic lighting, shadows, fabric draping, and natural fit
+EXECUTION:
+- Preserve all facial features, skin tone, hair color, and facial expression from the user's photo (FIRST IMAGE)
+- Use the user's body proportions from their uploaded photo to wear the garment naturally
+- Extract and apply the garment's exact colors, patterns, fabric texture, fit, and silhouette from the product image (SECOND IMAGE)
+- Maintain realistic lighting, shadows, fabric draping, and fit
 - Use a clean, neutral studio background (light gray or white)
-- Do NOT include the original model's face from the product image
-- Do NOT add text, watermarks, logos, or any additional elements
-- Output ONLY the final photorealistic composed image
 
-Result: A photorealistic image showing the user's uploaded face on a body wearing the selected garment from the product image.`;
+DO NOT:
+- Include the original model's face from the product image — replace it with the user's face
+- Return the unmodified product image
+- Add text, watermarks, logos, or any additional elements
+
+OUTPUT: A photorealistic image showing the user's face on a body wearing the${garmentName ? ` ${garmentName}` : " selected"} garment.`;
 
   const geminiBody = {
     contents: [
