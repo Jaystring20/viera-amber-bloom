@@ -74,10 +74,25 @@ Deno.serve(async (req) => {
   }
 
   const prompt =
-    `You are a professional fashion virtual try-on tool. Take the person in the FIRST image and dress them in the garment shown in the SECOND image${
-      garmentName ? ` ("${garmentName}")` : ""
-    }. ` +
-    `Render a single, photorealistic full-body result where the person is naturally wearing the garment: preserve the person's face, body shape, skin tone, hair, and pose; match the garment's exact colors, patterns, fabric texture, and silhouette; keep realistic lighting, shadows, draping, and fit. Use a clean, softly lit studio background. Do not add text, watermarks, or logos. Output only the final image.`;
+    `You are a professional virtual try-on specialist performing face and garment composition.
+
+CRITICAL INSTRUCTIONS:
+1. FIRST IMAGE = The USER'S FACE and BODY to use (extract the person's face, skin tone, hair, facial features)
+2. SECOND IMAGE = GARMENT REFERENCE ONLY (extract only the clothing${garmentName ? ` — "${garmentName}"` : ""})
+
+TASK:
+- Take the person's FACE from the FIRST image (the uploaded photo)
+- Place that face on a body wearing the garment from the SECOND image
+- Preserve all facial features, skin tone, hair color, and facial expression from the FIRST image
+- Use the person's body proportions from the FIRST image to naturally wear the garment
+- Match the garment's exact colors, patterns, fabric texture, fit, and silhouette from the SECOND image
+- Ensure realistic lighting, shadows, fabric draping, and natural fit
+- Use a clean, neutral studio background (light gray or white)
+- Do NOT include the original model's face from the product image
+- Do NOT add text, watermarks, logos, or any additional elements
+- Output ONLY the final photorealistic composed image
+
+Result: A photorealistic image showing the user's uploaded face on a body wearing the selected garment from the product image.`;
 
   const geminiBody = {
     contents: [
