@@ -1,38 +1,46 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useState } from "react";
+import { useRef } from "react";
 import {
   Palette,
   HeartHandshake,
   Shirt,
   GraduationCap,
   ShoppingBag,
-  ArrowRight,
-  ChevronDown,
   type LucideIcon,
 } from "lucide-react";
+
+/* ════════════════════════════════════════════════════════════════════════
+   BRAND COLORS — Each arm has a distinct identity
+   ════════════════════════════════════════════════════════════════════════ */
+const BRAND_COLORS = {
+  illustrations: { accent: "#D97706", text: "#D97706" }, // Gold
+  vagin: { accent: "#62017F", text: "#62017F" }, // Purple
+  viva: { accent: "#6E0025", text: "#6E0025" }, // Burgundy (center, primary)
+  vam: { accent: "#888888", text: "#888888" }, // Gray
+  vash: { accent: "#0B7B8C", text: "#0B7B8C" }, // Teal
+};
 
 type Arm = {
   number: string;
   title: string;
-  accent: string; // true brand hex — used for the dot, glow, and curve
-  text: string; // lightened, WCAG-legible variant — used for text, badges, borders on dark
+  accent: string;
   tag: string;
   blurb: string;
   target: string;
   Icon: LucideIcon;
-  /* serpentine anchor on desktop, expressed in viewBox % (0–100) */
+  /* serpentine position (viewBox 0-100) */
   x: number;
   y: number;
-  /* which side the label fans toward on desktop */
   side: "top" | "bottom";
+  /* size scale: 1 = primary (VIVA), 0.85 = secondary */
+  scale: number;
 };
 
 const ARMS: Arm[] = [
   {
     number: "01",
     title: "Illustrations & Designs",
-    accent: "#0A0A0A",
-    text: "#0A0A0A",
+    accent: BRAND_COLORS.illustrations.accent,
     tag: "Creative",
     blurb: "Narrative fashion illustration — art that heals, inspires, and sells.",
     target: "illustrations",
@@ -40,12 +48,12 @@ const ARMS: Arm[] = [
     x: 12,
     y: 28,
     side: "top",
+    scale: 0.85,
   },
   {
     number: "02",
     title: "VAGIN",
-    accent: "#0A0A0A",
-    text: "#0A0A0A",
+    accent: BRAND_COLORS.vagin.accent,
     tag: "Impact",
     blurb: "Girls' Initiative — SRHR for 3,000+ girls. SDG 3 & 5.",
     target: "vagin",
@@ -53,12 +61,12 @@ const ARMS: Arm[] = [
     x: 31,
     y: 72,
     side: "bottom",
+    scale: 0.85,
   },
   {
     number: "03",
     title: "VIVA",
-    accent: "#0A0A0A",
-    text: "#0A0A0A",
+    accent: BRAND_COLORS.viva.accent,
     tag: "Fashion",
     blurb: "Structured yet fluid wearable art for the modern woman.",
     target: "viva",
@@ -66,12 +74,12 @@ const ARMS: Arm[] = [
     x: 50,
     y: 28,
     side: "top",
+    scale: 1, // Primary center arm
   },
   {
     number: "04",
     title: "VAM",
-    accent: "#0A0A0A",
-    text: "#0A0A0A",
+    accent: BRAND_COLORS.vam.accent,
     tag: "Education",
     blurb: "Masterclass turning creative ideas into independent careers.",
     target: "vam",
@@ -79,12 +87,12 @@ const ARMS: Arm[] = [
     x: 69,
     y: 72,
     side: "bottom",
+    scale: 0.85,
   },
   {
     number: "05",
     title: "VASH",
-    accent: "#0A0A0A",
-    text: "#0A0A0A",
+    accent: BRAND_COLORS.vash.accent,
     tag: "Commerce",
     blurb: "The shop — wearable art, brushes, references. The commercial engine.",
     target: "shop",
@@ -92,19 +100,17 @@ const ARMS: Arm[] = [
     x: 88,
     y: 28,
     side: "top",
+    scale: 0.85,
   },
 ];
 
-/* Smooth serpentine through the 5 anchors (viewBox 0 0 100 100, preserveAspectRatio none). */
+/* Smooth serpentine S-curve through 5 anchors */
 const FLOW_PATH =
   "M12,28 C20,28 23,72 31,72 C39,72 42,28 50,28 C58,28 61,72 69,72 C77,72 80,28 88,28";
-
-type View = "flow" | "cards";
 
 const EcosystemSection = () => {
   const reduced = useReducedMotion();
   const d = (s: number) => (reduced ? 0 : s);
-  const [view, setView] = useState<View>("flow");
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -115,17 +121,25 @@ const EcosystemSection = () => {
 
   const headerVariants = {
     initial: { opacity: 0 },
-    animate: { opacity: 1, transition: { staggerChildren: d(0.1), delayChildren: d(0.1) } },
+    animate: {
+      opacity: 1,
+      transition: { staggerChildren: d(0.1), delayChildren: d(0.1) },
+    },
   };
+
   const fadeUp = {
     initial: { opacity: 0, y: 24 },
-    animate: { opacity: 1, y: 0, transition: { duration: d(0.6), ease: "easeOut" as const } },
+    animate: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: d(0.6), ease: "easeOut" as const },
+    },
   };
 
   return (
     <div
       className="relative w-full overflow-hidden"
-      style={{ backgroundColor: "#FFFFFF", paddingBottom: "clamp(60px, 8vw, 90px)" }}
+      style={{ backgroundColor: "#FFFFFF", paddingBottom: "clamp(80px, 10vw, 120px)" }}
       aria-label="The Viera Amber Ecosystem"
     >
       {/* Ambient brand wash */}
@@ -134,38 +148,28 @@ const EcosystemSection = () => {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(60% 50% at 50% 0%, rgba(0,0,0,0.04) 0%, transparent 70%)",
+            "radial-gradient(60% 50% at 50% 0%, rgba(0,0,0,0.03) 0%, transparent 70%)",
         }}
       />
 
       <style>{`
-        /* FLOW view: serpentine on desktop only (>=1100px); spine on tablet & mobile */
+        /* Desktop: serpentine flow only; mobile: vertical spine */
         .eco-flow-desktop { display: none; }
         .eco-flow-spine   { display: flex; }
-        /* CARDS view: connected rows on desktop only; responsive stack below */
-        .eco-cards-desktop { display: none; }
-        .eco-cards-stack   { display: grid; }
         @media (min-width: 1100px) {
           .eco-flow-desktop  { display: block; }
           .eco-flow-spine    { display: none; }
-          .eco-cards-desktop { display: flex; }
-          .eco-cards-stack   { display: none; }
-        }
-        /* stack: 1-col on phones, 2-col on tablets */
-        .eco-cards-stack { grid-template-columns: 1fr; }
-        @media (min-width: 640px) {
-          .eco-cards-stack { grid-template-columns: 1fr 1fr; }
         }
       `}</style>
 
       <div
         className="relative mx-auto"
-        style={{ maxWidth: 1300, padding: "clamp(60px, 8vw, 90px) clamp(24px, 5vw, 64px) 0" }}
+        style={{ maxWidth: 1400, padding: "clamp(80px, 10vw, 120px) clamp(24px, 5vw, 64px) 0" }}
       >
-        {/* ── Header ─────────────────────────────────────────────────────── */}
+        {/* ── HEADER ──────────────────────────────────────────────────────── */}
         <motion.div
           className="flex flex-col items-center text-center"
-          style={{ gap: 18 }}
+          style={{ gap: 24 }}
           initial="initial"
           whileInView="animate"
           viewport={{ once: true, amount: 0.4 }}
@@ -174,84 +178,157 @@ const EcosystemSection = () => {
           <motion.p
             variants={fadeUp}
             className="font-body uppercase m-0"
-            style={{ fontSize: 11, color: "#0A0A0A", letterSpacing: "0.4em", fontWeight: 500 }}
+            style={{
+              fontSize: 11,
+              color: "#0A0A0A",
+              letterSpacing: "0.5em",
+              fontWeight: 600,
+            }}
           >
             The Ecosystem
           </motion.p>
+
           <motion.h2
             variants={{
-              initial: { opacity: 0, y: 36 },
-              animate: { opacity: 1, y: 0, transition: { duration: d(0.7), ease: "easeOut" as const } },
+              initial: { opacity: 0, y: 40 },
+              animate: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: d(0.8), ease: "easeOut" as const },
+              },
             }}
             className="font-display m-0"
             style={{
-              fontSize: "clamp(28px, 4vw, 52px)",
+              fontSize: "clamp(32px, 5.5vw, 64px)",
               color: "#0A0A0A",
-              fontWeight: 700,
-              lineHeight: 1.15,
-              maxWidth: 800,
+              fontWeight: 800,
+              lineHeight: 1.1,
+              letterSpacing: "-0.025em",
+              maxWidth: 900,
             }}
           >
             One brand. Five expressions.
           </motion.h2>
+
           <motion.p
             variants={fadeUp}
             className="font-body m-0"
-            style={{ fontSize: 16, color: "#555555", fontWeight: 300, maxWidth: 600, lineHeight: 1.7 }}
+            style={{
+              fontSize: "clamp(15px, 1.8vw, 19px)",
+              color: "#555555",
+              fontWeight: 400,
+              maxWidth: 700,
+              lineHeight: 1.8,
+              letterSpacing: "0.3px",
+            }}
           >
             Art. Impact. Fashion. Education. Commerce. One flowing current, all rooted in the
             same conviction: creativity is the most powerful form of empowerment.
           </motion.p>
-
-          {/* ── Comparison toggle (temporary A/B control) ────────────────── */}
-          <ViewToggle view={view} onChange={setView} />
         </motion.div>
 
-        {/* ── Views ──────────────────────────────────────────────────────── */}
-        <AnimatePresence mode="wait">
-          {view === "flow" ? (
-            <motion.div
-              key="flow"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: d(0.35), ease: "easeOut" as const }}
-            >
-              <FlowView reduced={!!reduced} d={d} onActivate={scrollTo} />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="cards"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: d(0.35), ease: "easeOut" as const }}
-            >
-              <CardsView reduced={!!reduced} d={d} onActivate={scrollTo} />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* ── SERPENTINE FLOW (DESKTOP ONLY) ──────────────────────────────── */}
+        <motion.div
+          className="eco-flow-desktop relative"
+          style={{ marginTop: 80, height: "clamp(500px, 45vw, 620px)" }}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={{ initial: {}, animate: { transition: { staggerChildren: d(0.12), delayChildren: d(0.2) } } }}
+        >
+          <svg
+            className="absolute inset-0"
+            width="100%"
+            height="100%"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            style={{ overflow: "visible" }}
+          >
+            {/* Base path — subtle background */}
+            <path
+              d={FLOW_PATH}
+              fill="none"
+              stroke="#0A0A0A"
+              strokeWidth={1.5}
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+              opacity={0.08}
+            />
 
-        {/* ── Footer scroll cue ──────────────────────────────────────────── */}
+            {/* Animated flow line */}
+            <motion.path
+              d={FLOW_PATH}
+              fill="none"
+              stroke="#0A0A0A"
+              strokeWidth={2}
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+              initial={{ pathLength: reduced ? 1 : 0 }}
+              whileInView={{ pathLength: 1 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: d(2.4), ease: "easeInOut" as const }}
+            />
+          </svg>
+
+          {/* Flow nodes (dots on serpentine) */}
+          {ARMS.map((arm) => (
+            <FlowNode key={arm.number} arm={arm} reduced={reduced} onActivate={scrollTo} />
+          ))}
+        </motion.div>
+
+        {/* ── VERTICAL SPINE (MOBILE/TABLET) ──────────────────────────────── */}
+        <motion.ol
+          className="eco-flow-spine flex-col m-0 p-0 list-none relative mx-auto"
+          style={{ marginTop: 60, maxWidth: 560 }}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true, amount: 0.1 }}
+          variants={{ initial: {}, animate: { transition: { staggerChildren: d(0.14), delayChildren: d(0.15) } } }}
+        >
+          {/* Vertical connecting line */}
+          <div
+            aria-hidden="true"
+            className="absolute"
+            style={{
+              left: 19,
+              top: 20,
+              bottom: 20,
+              width: 1.5,
+              background: "#0A0A0A",
+              opacity: 0.12,
+            }}
+          />
+
+          {ARMS.map((arm) => (
+            <SpineNode key={arm.number} arm={arm} reduced={reduced} onActivate={scrollTo} />
+          ))}
+        </motion.ol>
+
+        {/* ── SCROLL CUE ──────────────────────────────────────────────────── */}
         <motion.div
           className="flex flex-col items-center"
-          style={{ marginTop: 48, gap: 14 }}
+          style={{ marginTop: 64, gap: 16 }}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: d(0.6), delay: d(0.2), ease: "easeOut" as const }}
+          transition={{ duration: d(0.6), delay: d(0.3), ease: "easeOut" as const }}
         >
           <motion.div
-            animate={reduced ? { height: 44 } : { height: [44, 60, 44] }}
-            transition={reduced ? { duration: 0 } : { duration: 2.2, repeat: Infinity, ease: "easeInOut" as const }}
-            style={{ width: 1, backgroundColor: "#0A0A0A" }}
+            animate={reduced ? { height: 48 } : { height: [48, 68, 48] }}
+            transition={reduced ? { duration: 0 } : { duration: 2.4, repeat: Infinity, ease: "easeInOut" as const }}
+            style={{ width: 1.5, backgroundColor: "#0A0A0A" }}
             aria-hidden="true"
           />
           <p
             className="font-body uppercase m-0"
-            style={{ fontSize: 12, color: "#0A0A0A", letterSpacing: "0.18em", fontWeight: 400 }}
+            style={{
+              fontSize: 11,
+              color: "#0A0A0A",
+              letterSpacing: "0.2em",
+              fontWeight: 600,
+            }}
           >
-            ↓ Scroll to explore each world
+            ↓ Scroll to explore
           </p>
         </motion.div>
       </div>
@@ -260,169 +337,8 @@ const EcosystemSection = () => {
 };
 
 /* ════════════════════════════════════════════════════════════════════════
-   View toggle — segmented control to A/B the two layouts
+   FLOW NODE — Desktop serpentine dot with icon
    ════════════════════════════════════════════════════════════════════════ */
-const ViewToggle = ({ view, onChange }: { view: View; onChange: (v: View) => void }) => {
-  const opts: { id: View; label: string }[] = [
-    { id: "flow", label: "Serpentine Flow" },
-    { id: "cards", label: "Connected Cards" },
-  ];
-  return (
-    <div
-      role="tablist"
-      aria-label="Ecosystem layout"
-      className="relative flex"
-      style={{
-        marginTop: 10,
-        padding: 4,
-        gap: 4,
-        borderRadius: 999,
-        background: "#FFFFFF",
-        border: "1px solid #0A0A0A",
-      }}
-    >
-      {opts.map((o) => {
-        const active = view === o.id;
-        return (
-          <button
-            key={o.id}
-            role="tab"
-            aria-selected={active}
-            onClick={() => onChange(o.id)}
-            className="relative font-body uppercase cursor-pointer"
-            style={{
-              border: 0,
-              background: "transparent",
-              color: active ? "#0A0A0A" : "#555555",
-              fontSize: 11,
-              letterSpacing: "0.12em",
-              fontWeight: 600,
-              padding: "9px 18px",
-              borderRadius: 999,
-              minHeight: 40,
-              zIndex: 1,
-              transition: "color 0.25s ease",
-            }}
-          >
-            {active && (
-              <motion.span
-                layoutId="ecoTogglePill"
-                className="absolute inset-0"
-                style={{ background: "#0A0A0A", borderRadius: 999, zIndex: -1 }}
-                transition={{ type: "spring" as const, stiffness: 380, damping: 30 }}
-              />
-            )}
-            {o.label}
-          </button>
-        );
-      })}
-    </div>
-  );
-};
-
-/* ════════════════════════════════════════════════════════════════════════
-   FLOW VIEW — serpentine (desktop) + vertical spine (tablet/mobile)
-   ════════════════════════════════════════════════════════════════════════ */
-const FlowView = ({
-  reduced,
-  d,
-  onActivate,
-}: {
-  reduced: boolean;
-  d: (s: number) => number;
-  onActivate: (id: string) => void;
-}) => {
-  return (
-    <>
-      {/* Desktop serpentine — visual only, no labels */}
-      <motion.div
-        className="eco-flow-desktop relative"
-        style={{ marginTop: 60, height: "clamp(500px, 40vw, 560px)" }}
-        initial="initial"
-        whileInView="animate"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={{ initial: {}, animate: { transition: { staggerChildren: d(0.15), delayChildren: d(0.2) } } }}
-      >
-        <svg
-          className="absolute inset-0"
-          width="100%"
-          height="100%"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          style={{ overflow: "visible" }}
-        >
-          <defs>
-            <linearGradient id="ecoFlowGrad" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#0A0A0A" />
-              <stop offset="27%" stopColor="#0A0A0A" />
-              <stop offset="52%" stopColor="#0A0A0A" />
-              <stop offset="75%" stopColor="#0A0A0A" />
-              <stop offset="100%" stopColor="#0A0A0A" />
-            </linearGradient>
-          </defs>
-          {/* Base path — subtle background flow */}
-          <path
-            d={FLOW_PATH}
-            fill="none"
-            stroke="url(#ecoFlowGrad)"
-            strokeWidth={2}
-            strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
-            opacity={0.12}
-          />
-          {/* Animated flow line */}
-          <motion.path
-            d={FLOW_PATH}
-            fill="none"
-            stroke="url(#ecoFlowGrad)"
-            strokeWidth={2.5}
-            strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
-            style={{ filter: "drop-shadow(0 1px 3px rgba(10,10,10,0.08))" }}
-            initial={{ pathLength: reduced ? 1 : 0 }}
-            whileInView={{ pathLength: 1 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: d(2.2), ease: "easeInOut" as const }}
-          />
-        </svg>
-
-        {/* Node dots positioned on the serpentine path */}
-        {ARMS.map((arm) => (
-          <FlowNode key={arm.number} arm={arm} reduced={reduced} onActivate={onActivate} />
-        ))}
-      </motion.div>
-
-      {/* Tablet/mobile vertical spine */}
-      <motion.ol
-        className="eco-flow-spine flex-col m-0 p-0 list-none relative mx-auto"
-        style={{ marginTop: 44, maxWidth: 560 }}
-        initial="initial"
-        whileInView="animate"
-        viewport={{ once: true, amount: 0.1 }}
-        variants={{ initial: {}, animate: { transition: { staggerChildren: d(0.12), delayChildren: d(0.1) } } }}
-      >
-        <div
-          aria-hidden="true"
-          className="absolute"
-          style={{
-            left: 19,
-            top: 12,
-            bottom: 12,
-            width: 2,
-            background:
-              "linear-gradient(to bottom, #0A0A0A 0%, #0A0A0A 100%)",
-            opacity: 0.3,
-          }}
-        />
-        {ARMS.map((arm) => (
-          <SpineNode key={arm.number} arm={arm} reduced={reduced} onActivate={onActivate} />
-        ))}
-      </motion.ol>
-    </>
-  );
-};
-
-/* Desktop serpentine node: glowing dot ON the curve, subtle icon, no text labels */
 const FlowNode = ({
   arm,
   reduced,
@@ -433,71 +349,68 @@ const FlowNode = ({
   onActivate: (id: string) => void;
 }) => {
   const { Icon } = arm;
-  const [isHovered, setIsHovered] = useState(false);
+  const dotSize = arm.scale === 1 ? 48 : 40;
+  const iconSize = arm.scale === 1 ? 24 : 20;
 
   return (
     <motion.button
       type="button"
       onClick={() => onActivate(arm.target)}
-      onMouseEnter={() => !reduced && setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       aria-label={`${arm.title} — ${arm.tag}. Jump to section.`}
       className="absolute bg-transparent border-0 p-0 cursor-pointer"
       style={{ left: `${arm.x}%`, top: `${arm.y}%`, width: 0, height: 0, overflow: "visible" }}
       variants={{
-        initial: { opacity: 0, scale: 0.4 },
-        animate: { opacity: 1, scale: 1, transition: { type: "spring" as const, stiffness: 280, damping: 20 } },
+        initial: { opacity: 0, scale: 0.3 },
+        animate: {
+          opacity: 1,
+          scale: 1,
+          transition: { type: "spring" as const, stiffness: 150, damping: 25 },
+        },
       }}
-      whileTap={reduced ? undefined : { scale: 0.92 }}
+      whileHover={{ scale: 1.15 }}
+      whileTap={{ scale: 0.95 }}
     >
-      {/* Outer glow ring (on hover) */}
-      <motion.span
+      {/* Glow ring */}
+      <motion.div
         aria-hidden="true"
-        animate={{ scale: isHovered ? 1.5 : 1, opacity: isHovered ? 0.3 : 0 }}
-        transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
         style={{
           position: "absolute",
-          left: 0,
-          top: 0,
-          transform: "translate(-50%, -50%)",
-          width: 56,
-          height: 56,
-          borderRadius: 999,
-          border: `2px solid ${arm.accent}`,
-          pointerEvents: "none",
+          width: dotSize + 16,
+          height: dotSize + 16,
+          left: -(dotSize + 16) / 2,
+          top: -(dotSize + 16) / 2,
+          borderRadius: "50%",
+          border: `1.5px solid ${arm.accent}`,
+          opacity: 0.2,
         }}
+        whileHover={{ opacity: 0.4 }}
       />
 
-      {/* Main glowing node dot — center sits exactly on the anchor (x,y) */}
-      <motion.span
-        aria-hidden="true"
-        animate={{ scale: isHovered ? 1.35 : 1 }}
-        transition={{ type: "spring" as const, stiffness: 320, damping: 20 }}
+      {/* Main dot */}
+      <div
         style={{
           position: "absolute",
-          left: 0,
-          top: 0,
-          transform: "translate(-50%, -50%)",
-          width: 28,
-          height: 28,
-          borderRadius: 999,
-          background: arm.accent,
-          border: "2.5px solid #FFFFFF",
-          outline: "1px solid #0A0A0A",
-          boxShadow: `0 0 18px ${arm.accent}, 0 0 40px ${arm.accent}66`,
+          width: dotSize,
+          height: dotSize,
+          left: -dotSize / 2,
+          top: -dotSize / 2,
+          borderRadius: "50%",
+          backgroundColor: arm.accent,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          boxShadow: `0 4px 12px ${arm.accent}33`,
         }}
       >
-        {/* Icon inside the dot */}
-        <Icon size={14} color="#FFFFFF" strokeWidth={2.5} />
-      </motion.span>
+        <Icon size={iconSize} color="#FFFFFF" strokeWidth={2.2} />
+      </div>
     </motion.button>
   );
 };
 
-/* Tablet/mobile spine node: dot on the spine + card to the right */
+/* ════════════════════════════════════════════════════════════════════════
+   SPINE NODE — Mobile vertical stack card
+   ════════════════════════════════════════════════════════════════════════ */
 const SpineNode = ({
   arm,
   reduced,
@@ -508,258 +421,93 @@ const SpineNode = ({
   onActivate: (id: string) => void;
 }) => {
   const { Icon } = arm;
+
   return (
     <motion.li
-      variants={{
-        initial: { opacity: 0, x: -16 },
-        animate: { opacity: 1, x: 0, transition: { duration: reduced ? 0 : 0.5, ease: "easeOut" as const } },
+      onClick={() => onActivate(arm.target)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") onActivate(arm.target);
       }}
-      style={{ position: "relative", paddingLeft: 52, paddingBottom: 24 }}
+      className="relative list-none cursor-pointer"
+      style={{
+        paddingLeft: 56,
+        paddingTop: 20,
+        paddingBottom: 20,
+      }}
+      variants={{
+        initial: { opacity: 0, x: -20 },
+        animate: {
+          opacity: 1,
+          x: 0,
+          transition: { type: "spring" as const, stiffness: 150, damping: 25 },
+        },
+      }}
+      whileHover={{ x: 8 }}
+      whileTap={{ scale: 0.98 }}
     >
-      <span
+      {/* Dot on spine */}
+      <div
         aria-hidden="true"
         style={{
           position: "absolute",
-          left: 11,
-          top: 18,
-          width: 18,
-          height: 18,
-          borderRadius: 999,
-          background: arm.accent,
-          border: "2px solid #FFFFFF", outline: "1px solid #0A0A0A",
-          boxShadow: `0 0 12px ${arm.accent}, 0 0 24px ${arm.accent}77`,
+          left: 12,
+          top: "50%",
+          transform: "translateY(-50%)",
+          width: 16,
+          height: 16,
+          borderRadius: "50%",
+          backgroundColor: arm.accent,
+          boxShadow: `0 2px 8px ${arm.accent}40`,
         }}
       />
-      <button
-        type="button"
-        onClick={() => onActivate(arm.target)}
-        aria-label={`${arm.title} — ${arm.tag}. Jump to section.`}
-        className="text-left w-full bg-transparent border-0 cursor-pointer"
-        style={{
-          background: "#FFFFFF",
-          border: `1px solid ${arm.text}40`,
-          borderRadius: 12,
-          padding: "16px 18px",
-          minHeight: 44,
-        }}
-      >
-        <div className="flex items-center" style={{ gap: 10, marginBottom: 7 }}>
-          <span
-            aria-hidden="true"
-            className="flex items-center justify-center"
-            style={{ width: 30, height: 30, borderRadius: 999, background: `${arm.accent}22`, border: `1px solid ${arm.text}55` }}
-          >
-            <Icon size={16} color={arm.text} strokeWidth={1.75} />
-          </span>
-          <span className="font-body" style={{ fontSize: 11, color: arm.text, fontWeight: 700, letterSpacing: "1px" }}>
-            {arm.number}
-          </span>
-          <h3 className="font-display m-0" style={{ fontSize: 16, color: "#0A0A0A", fontWeight: 700, lineHeight: 1.2 }}>
-            {arm.title}
-          </h3>
-          <span
-            className="font-body uppercase"
-            style={{
-              marginLeft: "auto",
-              fontSize: 8,
-              color: arm.text,
-              letterSpacing: "0.14em",
-              border: `1px solid ${arm.text}`,
-              borderRadius: 999,
-              padding: "2px 8px",
-              fontWeight: 600,
-            }}
-          >
-            {arm.tag}
-          </span>
-        </div>
-        <p className="font-body m-0" style={{ fontSize: 13, color: "#555555", fontWeight: 300, lineHeight: 1.55 }}>
-          {arm.blurb}
-        </p>
-      </button>
-    </motion.li>
-  );
-};
 
-/* ════════════════════════════════════════════════════════════════════════
-   CARDS VIEW (Option 3) — connected cards with flow connectors
-   ════════════════════════════════════════════════════════════════════════ */
-const CardsView = ({
-  reduced,
-  d,
-  onActivate,
-}: {
-  reduced: boolean;
-  d: (s: number) => number;
-  onActivate: (id: string) => void;
-}) => {
-  const stagger = {
-    initial: {},
-    animate: { transition: { staggerChildren: d(0.1), delayChildren: d(0.15) } },
-  };
-
-  return (
-    <div style={{ marginTop: 56 }}>
-      {/* Desktop: 3 + 2 connected rows */}
-      <motion.div
-        className="eco-cards-desktop flex-col items-center"
-        style={{ gap: 0 }}
-        initial="initial"
-        whileInView="animate"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={stagger}
-      >
-        <div className="flex items-stretch justify-center" style={{ gap: 0 }}>
-          <EcoCard arm={ARMS[0]} reduced={reduced} onActivate={onActivate} />
-          <Connector reduced={reduced} />
-          <EcoCard arm={ARMS[1]} reduced={reduced} onActivate={onActivate} />
-          <Connector reduced={reduced} />
-          <EcoCard arm={ARMS[2]} reduced={reduced} onActivate={onActivate} />
+      {/* Content */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <Icon size={20} color={arm.accent} strokeWidth={2} />
+          <div>
+            <p
+              style={{
+                fontSize: 11,
+                color: arm.accent,
+                letterSpacing: "0.15em",
+                fontWeight: 700,
+                textTransform: "uppercase",
+                margin: 0,
+              }}
+            >
+              {arm.tag}
+            </p>
+          </div>
         </div>
 
-        <DownConnector reduced={reduced} />
-
-        <div className="flex items-stretch justify-center" style={{ gap: 0 }}>
-          <EcoCard arm={ARMS[3]} reduced={reduced} onActivate={onActivate} />
-          <Connector reduced={reduced} />
-          <EcoCard arm={ARMS[4]} reduced={reduced} onActivate={onActivate} />
-        </div>
-      </motion.div>
-
-      {/* Tablet/mobile: responsive grid */}
-      <motion.div
-        className="eco-cards-stack"
-        style={{ gap: 16 }}
-        initial="initial"
-        whileInView="animate"
-        viewport={{ once: true, amount: 0.1 }}
-        variants={stagger}
-      >
-        {ARMS.map((arm) => (
-          <EcoCard key={arm.number} arm={arm} reduced={reduced} onActivate={onActivate} stack />
-        ))}
-      </motion.div>
-    </div>
-  );
-};
-
-const Connector = ({ reduced }: { reduced: boolean }) => (
-  <motion.div
-    aria-hidden="true"
-    className="flex items-center justify-center self-center"
-    style={{ width: 40, flexShrink: 0 }}
-    variants={{
-      initial: { opacity: 0, scale: 0.5 },
-      animate: { opacity: 1, scale: 1, transition: { duration: reduced ? 0 : 0.4 } },
-    }}
-  >
-    <ArrowRight size={20} color="#0A0A0A" strokeWidth={2} />
-  </motion.div>
-);
-
-const DownConnector = ({ reduced }: { reduced: boolean }) => (
-  <motion.div
-    aria-hidden="true"
-    className="flex items-center justify-center"
-    style={{ height: 36 }}
-    variants={{
-      initial: { opacity: 0, y: -6 },
-      animate: { opacity: 1, y: 0, transition: { duration: reduced ? 0 : 0.4 } },
-    }}
-  >
-    <ChevronDown size={22} color="#0A0A0A" strokeWidth={2} />
-  </motion.div>
-);
-
-const EcoCard = ({
-  arm,
-  reduced,
-  onActivate,
-  stack = false,
-}: {
-  arm: Arm;
-  reduced: boolean;
-  onActivate: (id: string) => void;
-  stack?: boolean;
-}) => {
-  const { Icon } = arm;
-  return (
-    <motion.button
-      type="button"
-      onClick={() => onActivate(arm.target)}
-      aria-label={`${arm.title} — ${arm.tag}. Jump to section.`}
-      className="group text-left cursor-pointer flex flex-col"
-      style={{
-        width: stack ? "100%" : 268,
-        background: "#FFFFFF",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        border: `1px solid ${arm.text}33`,
-        borderTop: `3px solid ${arm.accent}`,
-        borderRadius: 14,
-        padding: "24px 22px",
-        boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
-      }}
-      variants={{
-        initial: { opacity: 0, y: 26 },
-        animate: { opacity: 1, y: 0, transition: { duration: reduced ? 0 : 0.55, ease: "easeOut" as const } },
-      }}
-      whileHover={reduced ? undefined : { y: -6, scale: 1.02, transition: { type: "spring" as const, stiffness: 350, damping: 25 } }}
-      whileTap={reduced ? undefined : { scale: 0.98 }}
-    >
-      <div className="flex items-center" style={{ gap: 12, marginBottom: 16 }}>
-        <span
-          aria-hidden="true"
-          className="flex items-center justify-center"
-          style={{ width: 46, height: 46, borderRadius: 12, background: `${arm.accent}22`, border: `1px solid ${arm.text}55` }}
-        >
-          <Icon size={22} color={arm.text} strokeWidth={1.75} />
-        </span>
-        <span
-          className="font-body uppercase"
+        <h3
           style={{
-            marginLeft: "auto",
-            fontSize: 9,
-            color: arm.text,
-            letterSpacing: "0.14em",
-            border: `1px solid ${arm.text}`,
-            borderRadius: 999,
-            padding: "3px 10px",
-            fontWeight: 600,
+            fontSize: "clamp(16px, 1.5vw, 20px)",
+            color: "#0A0A0A",
+            fontWeight: 700,
+            margin: "4px 0 0 0",
+            fontFamily: "var(--font-display, serif)",
           }}
         >
-          {arm.tag}
-        </span>
-      </div>
-
-      <div className="flex items-baseline" style={{ gap: 8, marginBottom: 10 }}>
-        <span className="font-body" style={{ fontSize: 12, color: arm.text, fontWeight: 700, letterSpacing: "1px" }}>
-          {arm.number}
-        </span>
-        <h3 className="font-display m-0" style={{ fontSize: 19, color: "#0A0A0A", fontWeight: 700, lineHeight: 1.25 }}>
           {arm.title}
         </h3>
+
+        <p
+          style={{
+            fontSize: 14,
+            color: "#555555",
+            fontWeight: 400,
+            lineHeight: 1.6,
+            margin: "8px 0 0 0",
+          }}
+        >
+          {arm.blurb}
+        </p>
       </div>
-
-      <p
-        className="font-body m-0"
-        style={{ fontSize: 13.5, color: "#555555", fontWeight: 300, lineHeight: 1.6, flex: 1, marginBottom: 18 }}
-      >
-        {arm.blurb}
-      </p>
-
-      <span
-        className="font-body inline-flex items-center"
-        style={{ gap: 6, fontSize: 12, color: arm.text, fontWeight: 600, letterSpacing: "0.04em" }}
-      >
-        Explore
-        <ArrowRight
-          size={14}
-          strokeWidth={2}
-          className="transition-transform group-hover:translate-x-1"
-        />
-      </span>
-    </motion.button>
+    </motion.li>
   );
 };
 

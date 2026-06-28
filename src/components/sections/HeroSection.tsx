@@ -240,33 +240,34 @@ const HeroSection = () => {
             }}
           />
 
-          {/* Tagline */}
+          {/* Tagline — optimized for clarity & boldness */}
           <motion.p
             variants={textVariants}
             className="m-0"
             style={{
-              fontSize: "clamp(13px, 1.5vw, 17px)",
+              fontSize: "clamp(14px, 1.7vw, 19px)",
               color: MUTED,
-              maxWidth: 420,
-              lineHeight: 1.75,
-              fontWeight: 300,
+              maxWidth: 520,
+              lineHeight: 1.8,
+              fontWeight: 400,
               fontFamily: "var(--font-body, sans-serif)",
+              letterSpacing: "0.2px",
             }}
           >
             A creative &amp; impact-driven ecosystem for feminine empowerment.
           </motion.p>
 
-          {/* "For her, by her." — solid ink, Playfair italic */}
+          {/* "For her, by her." — bold Playfair italic, increased size */}
           <motion.p
             variants={taglineVariants}
             className="m-0"
             style={{
-              fontSize: "clamp(16px, 2vw, 24px)",
+              fontSize: "clamp(18px, 2.5vw, 32px)",
               color: INK,
-              fontWeight: 400,
+              fontWeight: 500,
               fontFamily: "var(--font-display, serif)",
               fontStyle: "italic",
-              letterSpacing: "0.01em",
+              letterSpacing: "-0.015em",
             }}
           >
             For her, by her.
