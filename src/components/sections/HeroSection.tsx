@@ -186,6 +186,17 @@ const HeroSection = () => {
           }}
         />
 
+        {/* ── Content scrim for text clarity ── */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            zIndex: 8,
+            background:
+              "radial-gradient(ellipse 600px 400px at 50% 50%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.85) 60%, transparent 100%)",
+          }}
+        />
+
         {/* ── Content (editorial type on paper, no card) ── */}
         <motion.div
           className="relative flex flex-col items-center text-center w-full max-w-2xl mx-auto"

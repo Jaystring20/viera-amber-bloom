@@ -1,5 +1,4 @@
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useRef } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   Palette,
   HeartHandshake,
@@ -13,11 +12,11 @@ import {
    BRAND COLORS — Each arm has a distinct identity
    ════════════════════════════════════════════════════════════════════════ */
 const BRAND_COLORS = {
-  illustrations: { accent: "#D97706", text: "#D97706" }, // Gold
-  vagin: { accent: "#62017F", text: "#62017F" }, // Purple
-  viva: { accent: "#6E0025", text: "#6E0025" }, // Burgundy (center, primary)
-  vam: { accent: "#888888", text: "#888888" }, // Gray
-  vash: { accent: "#0B7B8C", text: "#0B7B8C" }, // Teal
+  illustrations: { accent: "#D97706" }, // Gold
+  vagin: { accent: "#62017F" }, // Purple
+  viva: { accent: "#6E0025" }, // Burgundy (center, primary)
+  vam: { accent: "#888888" }, // Gray
+  vash: { accent: "#0B7B8C" }, // Teal
 };
 
 type Arm = {
@@ -215,7 +214,7 @@ const EcosystemSection = () => {
             className="font-body m-0"
             style={{
               fontSize: "clamp(15px, 1.8vw, 19px)",
-              color: "#555555",
+              color: "#333333",
               fontWeight: 400,
               maxWidth: 700,
               lineHeight: 1.8,
@@ -409,7 +408,7 @@ const FlowNode = ({
 };
 
 /* ════════════════════════════════════════════════════════════════════════
-   SPINE NODE — Mobile vertical stack card
+   SPINE NODE — Mobile vertical stack card (FIXED TEXT VISIBILITY)
    ════════════════════════════════════════════════════════════════════════ */
 const SpineNode = ({
   arm,
@@ -433,8 +432,9 @@ const SpineNode = ({
       className="relative list-none cursor-pointer"
       style={{
         paddingLeft: 56,
-        paddingTop: 20,
-        paddingBottom: 20,
+        paddingTop: 24,
+        paddingBottom: 24,
+        paddingRight: 16,
       }}
       variants={{
         initial: { opacity: 0, x: -20 },
@@ -463,45 +463,56 @@ const SpineNode = ({
         }}
       />
 
-      {/* Content */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {/* Content — ALL TEXT DARK FOR VISIBILITY */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {/* Tag with brand accent bar */}
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <Icon size={20} color={arm.accent} strokeWidth={2} />
-          <div>
-            <p
-              style={{
-                fontSize: 11,
-                color: arm.accent,
-                letterSpacing: "0.15em",
-                fontWeight: 700,
-                textTransform: "uppercase",
-                margin: 0,
-              }}
-            >
-              {arm.tag}
-            </p>
-          </div>
+          <div
+            aria-hidden="true"
+            style={{
+              width: 3,
+              height: 18,
+              borderRadius: 1.5,
+              backgroundColor: arm.accent,
+            }}
+          />
+          <p
+            style={{
+              fontSize: 10,
+              color: "#0A0A0A",
+              letterSpacing: "0.18em",
+              fontWeight: 700,
+              textTransform: "uppercase",
+              margin: 0,
+            }}
+          >
+            {arm.tag}
+          </p>
         </div>
 
+        {/* Title — DARK, BOLD, VISIBLE */}
         <h3
           style={{
-            fontSize: "clamp(16px, 1.5vw, 20px)",
+            fontSize: "clamp(17px, 1.6vw, 22px)",
             color: "#0A0A0A",
-            fontWeight: 700,
-            margin: "4px 0 0 0",
+            fontWeight: 800,
+            margin: "0",
             fontFamily: "var(--font-display, serif)",
+            letterSpacing: "-0.015em",
+            lineHeight: 1.2,
           }}
         >
           {arm.title}
         </h3>
 
+        {/* Blurb — DARK GRAY, READABLE */}
         <p
           style={{
             fontSize: 14,
-            color: "#555555",
+            color: "#333333",
             fontWeight: 400,
-            lineHeight: 1.6,
-            margin: "8px 0 0 0",
+            lineHeight: 1.7,
+            margin: "0",
           }}
         >
           {arm.blurb}
