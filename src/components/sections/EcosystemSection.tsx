@@ -6,6 +6,7 @@ import {
   GraduationCap,
   ShoppingBag,
   type LucideIcon,
+  ArrowRight,
 } from "lucide-react";
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -25,13 +26,12 @@ type Arm = {
   accent: string;
   tag: string;
   blurb: string;
+  narrative: string; // Longer story text
   target: string;
   Icon: LucideIcon;
-  /* serpentine position (viewBox 0-100) */
   x: number;
   y: number;
   side: "top" | "bottom";
-  /* size scale: 1 = primary (VIVA), 0.85 = secondary */
   scale: number;
 };
 
@@ -42,6 +42,7 @@ const ARMS: Arm[] = [
     accent: BRAND_COLORS.illustrations.accent,
     tag: "Creative",
     blurb: "Narrative fashion illustration — art that heals, inspires, and sells.",
+    narrative: "Hand-crafted illustrations that tell stories. From editorial campaigns to bespoke brand identity, we create visual narratives that make impossible look inevitable.",
     target: "illustrations",
     Icon: Palette,
     x: 12,
@@ -55,6 +56,7 @@ const ARMS: Arm[] = [
     accent: BRAND_COLORS.vagin.accent,
     tag: "Impact",
     blurb: "Girls' Initiative — SRHR for 3,000+ girls. SDG 3 & 5.",
+    narrative: "Sexual and Reproductive Health & Rights for teenage girls across Nigeria. We believe knowledge is power. Education transforms lives.",
     target: "vagin",
     Icon: HeartHandshake,
     x: 31,
@@ -68,12 +70,13 @@ const ARMS: Arm[] = [
     accent: BRAND_COLORS.viva.accent,
     tag: "Fashion",
     blurb: "Structured yet fluid wearable art for the modern woman.",
+    narrative: "Made-to-measure fashion where precision meets poetry. Each piece is a conversation between architect and dreamer. For women who refuse to choose.",
     target: "viva",
     Icon: Shirt,
     x: 50,
     y: 28,
     side: "top",
-    scale: 1, // Primary center arm
+    scale: 1,
   },
   {
     number: "04",
@@ -81,6 +84,7 @@ const ARMS: Arm[] = [
     accent: BRAND_COLORS.vam.accent,
     tag: "Education",
     blurb: "Masterclass turning creative ideas into independent careers.",
+    narrative: "Learn from Faith. Design thinking, illustration, business fundamentals. We teach you how to turn creative passion into sustainable income.",
     target: "vam",
     Icon: GraduationCap,
     x: 69,
@@ -94,6 +98,7 @@ const ARMS: Arm[] = [
     accent: BRAND_COLORS.vash.accent,
     tag: "Commerce",
     blurb: "The shop — wearable art, brushes, references. The commercial engine.",
+    narrative: "Curated tools for creators. Premium Procreate brushes, pose references, design assets, wearable art. Where art becomes accessible and sustainable.",
     target: "shop",
     Icon: ShoppingBag,
     x: 88,
@@ -103,7 +108,6 @@ const ARMS: Arm[] = [
   },
 ];
 
-/* Smooth serpentine S-curve through 5 anchors */
 const FLOW_PATH =
   "M12,28 C20,28 23,72 31,72 C39,72 42,28 50,28 C58,28 61,72 69,72 C77,72 80,28 88,28";
 
@@ -138,7 +142,7 @@ const EcosystemSection = () => {
   return (
     <div
       className="relative w-full overflow-hidden"
-      style={{ backgroundColor: "#FFFFFF", paddingBottom: "clamp(80px, 10vw, 120px)" }}
+      style={{ backgroundColor: "#FFFFFF", paddingBottom: "clamp(100px, 12vw, 160px)" }}
       aria-label="The Viera Amber Ecosystem"
     >
       {/* Ambient brand wash */}
@@ -152,18 +156,17 @@ const EcosystemSection = () => {
       />
 
       <style>{`
-        /* Desktop: serpentine flow only; mobile: vertical spine */
         .eco-flow-desktop { display: none; }
-        .eco-flow-spine   { display: flex; }
+        .eco-flow-cards   { display: grid; }
         @media (min-width: 1100px) {
-          .eco-flow-desktop  { display: block; }
-          .eco-flow-spine    { display: none; }
+          .eco-flow-desktop { display: block; }
+          .eco-flow-cards   { display: none; }
         }
       `}</style>
 
       <div
         className="relative mx-auto"
-        style={{ maxWidth: 1400, padding: "clamp(80px, 10vw, 120px) clamp(24px, 5vw, 64px) 0" }}
+        style={{ maxWidth: 1400, padding: "clamp(100px, 12vw, 160px) clamp(24px, 5vw, 64px) 0" }}
       >
         {/* ── HEADER ──────────────────────────────────────────────────────── */}
         <motion.div
@@ -226,87 +229,83 @@ const EcosystemSection = () => {
           </motion.p>
         </motion.div>
 
-        {/* ── SERPENTINE FLOW (DESKTOP ONLY) ──────────────────────────────── */}
+        {/* ── SERPENTINE WITH CARDS (DESKTOP) ──────────────────────────────────── */}
         <motion.div
           className="eco-flow-desktop relative"
-          style={{ marginTop: 80, height: "clamp(500px, 45vw, 620px)" }}
+          style={{ marginTop: 100 }}
           initial="initial"
           whileInView="animate"
           viewport={{ once: true, amount: 0.2 }}
-          variants={{ initial: {}, animate: { transition: { staggerChildren: d(0.12), delayChildren: d(0.2) } } }}
+          variants={{ initial: {}, animate: { transition: { staggerChildren: d(0.15), delayChildren: d(0.2) } } }}
         >
-          <svg
-            className="absolute inset-0"
-            width="100%"
-            height="100%"
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-            style={{ overflow: "visible" }}
-          >
-            {/* Base path — subtle background */}
-            <path
-              d={FLOW_PATH}
-              fill="none"
-              stroke="#0A0A0A"
-              strokeWidth={1.5}
-              strokeLinecap="round"
-              vectorEffect="non-scaling-stroke"
-              opacity={0.08}
-            />
+          {/* Serpentine SVG */}
+          <div style={{ height: "clamp(400px, 35vw, 500px)", marginBottom: 80 }}>
+            <svg
+              className="absolute inset-0"
+              width="100%"
+              height="100%"
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
+              style={{ overflow: "visible" }}
+            >
+              <path
+                d={FLOW_PATH}
+                fill="none"
+                stroke="#0A0A0A"
+                strokeWidth={1.5}
+                strokeLinecap="round"
+                vectorEffect="non-scaling-stroke"
+                opacity={0.08}
+              />
+              <motion.path
+                d={FLOW_PATH}
+                fill="none"
+                stroke="#0A0A0A"
+                strokeWidth={2}
+                strokeLinecap="round"
+                vectorEffect="non-scaling-stroke"
+                initial={{ pathLength: reduced ? 1 : 0 }}
+                whileInView={{ pathLength: 1 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: d(2.4), ease: "easeInOut" as const }}
+              />
+            </svg>
 
-            {/* Animated flow line */}
-            <motion.path
-              d={FLOW_PATH}
-              fill="none"
-              stroke="#0A0A0A"
-              strokeWidth={2}
-              strokeLinecap="round"
-              vectorEffect="non-scaling-stroke"
-              initial={{ pathLength: reduced ? 1 : 0 }}
-              whileInView={{ pathLength: 1 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: d(2.4), ease: "easeInOut" as const }}
-            />
-          </svg>
+            {ARMS.map((arm) => (
+              <FlowNode key={arm.number} arm={arm} reduced={reduced} onActivate={scrollTo} />
+            ))}
+          </div>
 
-          {/* Flow nodes (dots on serpentine) */}
-          {ARMS.map((arm) => (
-            <FlowNode key={arm.number} arm={arm} reduced={reduced} onActivate={scrollTo} />
-          ))}
+          {/* Cards below serpentine */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 24, marginTop: 60 }}>
+            {ARMS.map((arm) => (
+              <EcosystemCard key={arm.number} arm={arm} onActivate={scrollTo} reduced={reduced} />
+            ))}
+          </div>
         </motion.div>
 
-        {/* ── VERTICAL SPINE (MOBILE/TABLET) ──────────────────────────────── */}
-        <motion.ol
-          className="eco-flow-spine flex-col m-0 p-0 list-none relative mx-auto"
-          style={{ marginTop: 60, maxWidth: 560 }}
+        {/* ── CARD GRID (MOBILE/TABLET) ──────────────────────────────────── */}
+        <motion.div
+          className="eco-flow-cards"
+          style={{
+            gridTemplateColumns: "1fr",
+            gap: 32,
+            marginTop: 60,
+          }}
           initial="initial"
           whileInView="animate"
           viewport={{ once: true, amount: 0.1 }}
           variants={{ initial: {}, animate: { transition: { staggerChildren: d(0.14), delayChildren: d(0.15) } } }}
         >
-          {/* Vertical connecting line */}
-          <div
-            aria-hidden="true"
-            className="absolute"
-            style={{
-              left: 19,
-              top: 20,
-              bottom: 20,
-              width: 1.5,
-              background: "#0A0A0A",
-              opacity: 0.12,
-            }}
-          />
-
           {ARMS.map((arm) => (
-            <SpineNode key={arm.number} arm={arm} reduced={reduced} onActivate={scrollTo} />
+            <EcosystemCard key={arm.number} arm={arm} onActivate={scrollTo} reduced={reduced} />
           ))}
-        </motion.ol>
+        </motion.div>
 
         {/* ── SCROLL CUE ──────────────────────────────────────────────────── */}
         <motion.div
           className="flex flex-col items-center"
-          style={{ marginTop: 64, gap: 16 }}
+          style={{ marginTop: 80, gap: 16 }}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.6 }}
@@ -327,7 +326,7 @@ const EcosystemSection = () => {
               fontWeight: 600,
             }}
           >
-            ↓ Scroll to explore
+            ↓ Explore each world
           </p>
         </motion.div>
       </div>
@@ -336,7 +335,7 @@ const EcosystemSection = () => {
 };
 
 /* ════════════════════════════════════════════════════════════════════════
-   FLOW NODE — Desktop serpentine dot with icon
+   FLOW NODE — Desktop serpentine dot
    ════════════════════════════════════════════════════════════════════════ */
 const FlowNode = ({
   arm,
@@ -355,7 +354,7 @@ const FlowNode = ({
     <motion.button
       type="button"
       onClick={() => onActivate(arm.target)}
-      aria-label={`${arm.title} — ${arm.tag}. Jump to section.`}
+      aria-label={`${arm.title}. Jump to section.`}
       className="absolute bg-transparent border-0 p-0 cursor-pointer"
       style={{ left: `${arm.x}%`, top: `${arm.y}%`, width: 0, height: 0, overflow: "visible" }}
       variants={{
@@ -369,7 +368,6 @@ const FlowNode = ({
       whileHover={{ scale: 1.15 }}
       whileTap={{ scale: 0.95 }}
     >
-      {/* Glow ring */}
       <motion.div
         aria-hidden="true"
         style={{
@@ -385,7 +383,6 @@ const FlowNode = ({
         whileHover={{ opacity: 0.4 }}
       />
 
-      {/* Main dot */}
       <div
         style={{
           position: "absolute",
@@ -408,79 +405,76 @@ const FlowNode = ({
 };
 
 /* ════════════════════════════════════════════════════════════════════════
-   SPINE NODE — Mobile vertical stack card (FIXED TEXT VISIBILITY)
+   ECOSYSTEM CARD — Full narrative card with all text visible
    ════════════════════════════════════════════════════════════════════════ */
-const SpineNode = ({
+const EcosystemCard = ({
   arm,
-  reduced,
   onActivate,
+  reduced,
 }: {
   arm: Arm;
-  reduced: boolean;
   onActivate: (id: string) => void;
+  reduced: boolean;
 }) => {
   const { Icon } = arm;
 
   return (
-    <motion.li
+    <motion.div
       onClick={() => onActivate(arm.target)}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") onActivate(arm.target);
       }}
-      className="relative list-none cursor-pointer"
-      style={{
-        paddingLeft: 56,
-        paddingTop: 24,
-        paddingBottom: 24,
-        paddingRight: 16,
-      }}
+      className="cursor-pointer"
       variants={{
-        initial: { opacity: 0, x: -20 },
+        initial: { opacity: 0, y: 20 },
         animate: {
           opacity: 1,
-          x: 0,
+          y: 0,
           transition: { type: "spring" as const, stiffness: 150, damping: 25 },
         },
       }}
-      whileHover={{ x: 8 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={{ y: -8 }}
+      style={{
+        padding: 32,
+        borderRadius: 12,
+        border: `2px solid ${arm.accent}20`,
+        backgroundColor: "#FAFAFA",
+        display: "flex",
+        flexDirection: "column",
+        gap: 16,
+        transition: "border-color 0.3s ease",
+      }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLDivElement).style.borderColor = arm.accent;
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLDivElement).style.borderColor = `${arm.accent}20`;
+      }}
     >
-      {/* Dot on spine */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          left: 12,
-          top: "50%",
-          transform: "translateY(-50%)",
-          width: 16,
-          height: 16,
-          borderRadius: "50%",
-          backgroundColor: arm.accent,
-          boxShadow: `0 2px 8px ${arm.accent}40`,
-        }}
-      />
-
-      {/* Content — ALL TEXT DARK FOR VISIBILITY */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {/* Tag with brand accent bar */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div
-            aria-hidden="true"
-            style={{
-              width: 3,
-              height: 18,
-              borderRadius: 1.5,
-              backgroundColor: arm.accent,
-            }}
-          />
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+        <div
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: "50%",
+            backgroundColor: arm.accent,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          <Icon size={18} color="#FFFFFF" strokeWidth={2} />
+        </div>
+        <div>
           <p
             style={{
               fontSize: 10,
-              color: "#0A0A0A",
-              letterSpacing: "0.18em",
+              color: arm.accent,
+              letterSpacing: "0.2em",
               fontWeight: 700,
               textTransform: "uppercase",
               margin: 0,
@@ -489,36 +483,55 @@ const SpineNode = ({
             {arm.tag}
           </p>
         </div>
-
-        {/* Title — DARK, BOLD, VISIBLE */}
-        <h3
-          style={{
-            fontSize: "clamp(17px, 1.6vw, 22px)",
-            color: "#0A0A0A",
-            fontWeight: 800,
-            margin: "0",
-            fontFamily: "var(--font-display, serif)",
-            letterSpacing: "-0.015em",
-            lineHeight: 1.2,
-          }}
-        >
-          {arm.title}
-        </h3>
-
-        {/* Blurb — DARK GRAY, READABLE */}
-        <p
-          style={{
-            fontSize: 14,
-            color: "#333333",
-            fontWeight: 400,
-            lineHeight: 1.7,
-            margin: "0",
-          }}
-        >
-          {arm.blurb}
-        </p>
       </div>
-    </motion.li>
+
+      {/* Title */}
+      <h3
+        style={{
+          fontSize: "clamp(18px, 1.6vw, 24px)",
+          color: "#0A0A0A",
+          fontWeight: 800,
+          margin: "0",
+          fontFamily: "var(--font-display, serif)",
+          letterSpacing: "-0.015em",
+          lineHeight: 1.2,
+        }}
+      >
+        {arm.title}
+      </h3>
+
+      {/* Narrative — the story */}
+      <p
+        style={{
+          fontSize: 15,
+          color: "#333333",
+          fontWeight: 400,
+          lineHeight: 1.7,
+          margin: "0",
+        }}
+      >
+        {arm.narrative}
+      </p>
+
+      {/* CTA */}
+      <motion.div
+        style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}
+        whileHover={{ gap: 12 }}
+      >
+        <span
+          style={{
+            fontSize: 12,
+            color: arm.accent,
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: "0.1em",
+          }}
+        >
+          Explore
+        </span>
+        <ArrowRight size={16} color={arm.accent} strokeWidth={2.5} />
+      </motion.div>
+    </motion.div>
   );
 };
 
