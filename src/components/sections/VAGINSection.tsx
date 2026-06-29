@@ -200,23 +200,48 @@ const VAGINSection = () => {
   };
 
   return (
-    <div style={{ backgroundColor: "#FAFAFA", position: "relative" }} className="w-full py-20">
-      {/* Left accent bar */}
+    <div style={{ backgroundColor: "#FAFAFA", position: "relative" }} className="w-full">
+      {/* Smooth transition band from previous section */}
+      <div
+        aria-hidden="true"
+        style={{
+          height: 80,
+          background: "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(250,250,250,0.4) 50%, rgba(250,250,250,1) 100%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Left accent bar — stronger visual presence */}
       <div
         aria-hidden="true"
         style={{
           position: "absolute",
           top: 0,
           left: 0,
-          width: 4,
+          width: 6,
           height: "100%",
-          background: "linear-gradient(to bottom, #62017F, #ED155D)",
+          background: "linear-gradient(180deg, #62017F 0%, #6B2C91 25%, #ED155D 75%, #ED155D 100%)",
+          boxShadow: "4px 0 16px rgba(98,1,127,0.15)",
         }}
       />
 
-      <div className="mx-auto px-6" style={{ maxWidth: 1160 }}>
+      {/* Top accent gradient — visual distinction marker */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          top: 80,
+          left: 0,
+          right: 0,
+          height: 1,
+          background: "linear-gradient(90deg, transparent 0%, rgba(237,21,93,0.3) 25%, rgba(237,21,93,0.3) 75%, transparent 100%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      <div className="mx-auto px-6" style={{ maxWidth: 1160, paddingTop: 40, paddingBottom: 80 }}>
         {/* ── Header ──────────────────────────────────────────────── */}
-        <div ref={headerRef} className="flex flex-col items-center text-center mb-14" style={{ gap: 18 }}>
+        <div ref={headerRef} className="flex flex-col items-center text-center mb-16" style={{ gap: 20 }}>
 
           {/* VAGIN Logo — white logo on a brand badge so it reads on the light section */}
           <motion.div
@@ -227,25 +252,25 @@ const VAGINSection = () => {
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
-              padding: "20px 34px",
-              borderRadius: 24,
+              padding: "24px 42px",
+              borderRadius: 28,
               background: "linear-gradient(135deg, #62017F 0%, #6B2C91 50%, #ED155D 100%)",
-              boxShadow: "0 18px 48px rgba(98,1,127,0.28), 0 0 0 1px rgba(237,21,93,0.15)",
+              boxShadow: "0 24px 64px rgba(98,1,127,0.24), 0 0 0 1px rgba(237,21,93,0.2)",
             }}
           >
             <img
               src="/vagin-logo.webp"
               alt="VAGIN — Girls' Initiative"
-              style={{ height: 90, width: "auto", objectFit: "contain" }}
+              style={{ height: 100, width: "auto", objectFit: "contain" }}
             />
           </motion.div>
 
-          {/* thin pink rule */}
+          {/* Pink divider — visual rhythm */}
           <motion.div
             initial={{ scaleX: 0, opacity: 0 }}
             animate={headerInView ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0 }}
-            transition={reduced ? { duration: 0 } : { duration: 0.5, ease: "easeOut" as const, delay: 0.1 }}
-            style={{ width: 40, height: 1, background: "linear-gradient(90deg, transparent, #ED155D, transparent)", transformOrigin: "center" }}
+            transition={reduced ? { duration: 0 } : { duration: 0.6, ease: "easeOut" as const, delay: 0.12 }}
+            style={{ width: 56, height: 2.5, background: "linear-gradient(90deg, transparent 0%, #ED155D 25%, #ED155D 75%, transparent 100%)", transformOrigin: "center", borderRadius: 2 }}
           />
 
           <motion.h2
@@ -254,7 +279,7 @@ const VAGINSection = () => {
             animate={headerInView ? "visible" : "hidden"}
             transition={{ delay: reduced ? 0 : 0.15 }}
             className="font-display"
-            style={{ fontSize: "clamp(26px, 4vw, 48px)", fontWeight: 700, color: "#111111", margin: 0, lineHeight: 1.1 }}
+            style={{ fontSize: "clamp(28px, 4.2vw, 52px)", fontWeight: 800, color: "#0A0A0A", margin: 0, lineHeight: 1.15, letterSpacing: "-0.01em" }}
           >
             One girl at a time.
           </motion.h2>
@@ -266,12 +291,13 @@ const VAGINSection = () => {
             transition={{ delay: reduced ? 0 : 0.2 }}
             style={{
               fontFamily: "DM Sans, system-ui, sans-serif",
-              fontWeight: 300,
+              fontWeight: 400,
               fontSize: 15,
-              color: "rgba(17,17,17,0.7)",
+              color: "#333333",
               maxWidth: 560,
               lineHeight: 1.7,
               margin: 0,
+              letterSpacing: "0.3px",
             }}
           >
             The Viera Amber Girls' Initiative champions sexual and reproductive health and rights
