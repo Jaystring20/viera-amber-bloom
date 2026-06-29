@@ -472,10 +472,10 @@ const EcosystemCard = ({
         <div>
           <p
             style={{
-              fontSize: 10,
-              color: arm.accent,
+              fontSize: 11,
+              color: "#0A0A0A",
               letterSpacing: "0.2em",
-              fontWeight: 700,
+              fontWeight: 800,
               textTransform: "uppercase",
               margin: 0,
             }}
