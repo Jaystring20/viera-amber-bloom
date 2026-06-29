@@ -61,29 +61,30 @@ const StatTile = ({ Icon, value, suffix = "", label, inView }: StatTileProps) =>
       variants={useReducedVariants(cardItem)}
       className="flex flex-col"
       style={{
-        background: "rgba(255,255,255,0.04)",
-        border: "1px solid rgba(237,21,93,0.18)",
-        borderRadius: 12,
-        padding: "20px 18px",
-        gap: 10,
+        background: "#FFFFFF",
+        border: `1.5px solid ${PINK}22`,
+        borderRadius: 14,
+        padding: "24px 20px",
+        gap: 12,
+        boxShadow: "0 2px 8px rgba(237,21,93,0.08)",
       }}
     >
       <span
         aria-hidden="true"
         className="flex items-center justify-center"
         style={{
-          width: 38,
-          height: 38,
-          borderRadius: 10,
-          background: `${PINK}1F`,
-          border: `1px solid ${PINK}4D`,
+          width: 44,
+          height: 44,
+          borderRadius: 12,
+          background: `${PINK}12`,
+          border: `1.5px solid ${PINK}33`,
         }}
       >
-        <Icon size={19} color={PINK_LIGHT} strokeWidth={1.75} />
+        <Icon size={21} color={PINK} strokeWidth={1.75} />
       </span>
       <span
         className="font-display"
-        style={{ fontSize: "clamp(28px, 3.4vw, 40px)", fontWeight: 700, color: PINK, lineHeight: 1 }}
+        style={{ fontSize: "clamp(32px, 4vw, 44px)", fontWeight: 800, color: PINK, lineHeight: 1 }}
         aria-live="polite"
         aria-atomic="true"
       >
@@ -93,10 +94,11 @@ const StatTile = ({ Icon, value, suffix = "", label, inView }: StatTileProps) =>
       <span
         style={{
           fontFamily: "DM Sans, system-ui, sans-serif",
-          fontSize: 11,
-          letterSpacing: "1.5px",
+          fontSize: 12,
+          letterSpacing: "1px",
           textTransform: "uppercase",
-          color: "rgba(250,250,250,0.55)",
+          color: "#666666",
+          fontWeight: 600,
         }}
       >
         {label}
@@ -120,55 +122,57 @@ const ProgramCard = ({ Icon, accent, title, body, onLearn, reduced }: ProgramPro
     type="button"
     onClick={onLearn}
     variants={useReducedVariants(cardItem)}
-    whileHover={reduced ? {} : { y: -4 }}
-    whileTap={reduced ? {} : { scale: 0.985 }}
+    whileHover={reduced ? {} : { y: -6, boxShadow: "0 12px 32px rgba(98,1,127,0.12)" }}
+    whileTap={reduced ? {} : { scale: 0.98 }}
     transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
     className="group text-left cursor-pointer flex flex-col"
     style={{
-      backgroundColor: "rgba(255,255,255,0.05)",
-      border: "1px solid rgba(255,255,255,0.1)",
-      borderTop: `3px solid ${accent}`,
-      borderRadius: 12,
-      padding: "28px 24px",
+      backgroundColor: "#FFFFFF",
+      border: "1px solid rgba(98,1,127,0.08)",
+      borderTop: `4px solid ${accent}`,
+      borderRadius: 14,
+      padding: "32px 28px",
+      boxShadow: "0 4px 12px rgba(98,1,127,0.06)",
+      transition: "box-shadow 0.3s ease",
     }}
   >
     <span
       aria-hidden="true"
       className="flex items-center justify-center"
       style={{
-        width: 46,
-        height: 46,
+        width: 48,
+        height: 48,
         borderRadius: 12,
-        background: `${accent}22`,
-        border: `1px solid ${accent}55`,
-        marginBottom: 16,
+        background: `${accent}12`,
+        border: `1.5px solid ${accent}33`,
+        marginBottom: 18,
       }}
     >
-      <Icon size={22} color="#FAFAFA" strokeWidth={1.75} />
+      <Icon size={24} color={accent} strokeWidth={1.5} />
     </span>
-    <h3 className="font-display" style={{ fontSize: 20, fontWeight: 700, color: "#FAFAFA", marginBottom: 10 }}>
+    <h3 className="font-display" style={{ fontSize: 20, fontWeight: 700, color: "#0A0A0A", marginBottom: 12 }}>
       {title}
     </h3>
     <p
       style={{
         fontFamily: "DM Sans, system-ui, sans-serif",
-        fontWeight: 300,
-        fontSize: 13,
-        color: "rgba(250,250,250,0.6)",
-        lineHeight: 1.65,
+        fontWeight: 400,
+        fontSize: 14,
+        color: "#555555",
+        lineHeight: 1.7,
         margin: 0,
         flex: 1,
-        marginBottom: 16,
+        marginBottom: 18,
       }}
     >
       {body}
     </p>
     <span
       className="font-body inline-flex items-center"
-      style={{ gap: 6, fontSize: 12, color: "#F472B6", fontWeight: 600, letterSpacing: "0.04em" }}
+      style={{ gap: 6, fontSize: 13, color: accent, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase" }}
     >
       Learn more
-      <ArrowRight size={14} strokeWidth={2} className="transition-transform group-hover:translate-x-1" />
+      <ArrowRight size={14} strokeWidth={2.5} className="transition-transform group-hover:translate-x-1.5" />
     </span>
   </motion.button>
 );
@@ -399,7 +403,7 @@ const VAGINSection = () => {
           >
             <p
               className="font-body uppercase"
-              style={{ fontSize: 11, color: PINK, letterSpacing: "0.3em", fontWeight: 500, margin: 0, marginTop: 8 }}
+              style={{ fontSize: 12, color: PINK, letterSpacing: "0.3em", fontWeight: 700, margin: 0, marginTop: 8 }}
             >
               Our Impact
             </p>
@@ -420,29 +424,29 @@ const VAGINSection = () => {
                 className="inline-flex items-center"
                 style={{
                   gap: 8,
-                  background: `${PURPLE_LIGHT}2E`,
-                  border: `1px solid ${PURPLE_LIGHT}66`,
+                  background: `${PURPLE}15`,
+                  border: `1.5px solid ${PURPLE}33`,
                   borderRadius: 999,
-                  padding: "8px 16px",
+                  padding: "10px 18px",
                   fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: 12,
-                  color: PURPLE_LIGHT,
-                  fontWeight: 600,
+                  fontSize: 13,
+                  color: PURPLE,
+                  fontWeight: 700,
                 }}
               >
-                <Target size={15} strokeWidth={2} /> SDG 3 &amp; 5
+                <Target size={15} strokeWidth={2.5} /> SDG 3 &amp; 5
               </span>
               <span
                 className="inline-flex items-center"
                 style={{
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.12)",
+                  background: "#F3F3F3",
+                  border: "1.5px solid #E0E0E0",
                   borderRadius: 999,
-                  padding: "8px 16px",
+                  padding: "10px 18px",
                   fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: 12,
-                  color: "rgba(250,250,250,0.7)",
-                  fontWeight: 500,
+                  fontSize: 13,
+                  color: "#555555",
+                  fontWeight: 600,
                 }}
               >
                 Founded 2022
@@ -452,12 +456,13 @@ const VAGINSection = () => {
             <p
               style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
-                fontWeight: 300,
-                fontSize: 13.5,
-                color: "rgba(17,17,17,0.7)",
-                lineHeight: 1.7,
+                fontWeight: 400,
+                fontSize: 14,
+                color: "#555555",
+                lineHeight: 1.75,
                 margin: 0,
-                marginTop: 4,
+                marginTop: 8,
+                letterSpacing: "0.2px",
               }}
             >
               Two flagship programs power the mission — stigma-free health education and
@@ -498,51 +503,53 @@ const VAGINSection = () => {
           <motion.button
             type="button"
             onClick={() => navigate("/vagin")}
-            whileHover={reduced ? {} : { scale: 1.03 }}
-            whileTap={reduced ? {} : { scale: 0.97 }}
+            whileHover={reduced ? {} : { scale: 1.04, boxShadow: "0 12px 32px rgba(98,1,127,0.25)" }}
+            whileTap={reduced ? {} : { scale: 0.96 }}
             transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
             className="inline-flex items-center"
             style={{
-              gap: 8,
+              gap: 10,
               fontFamily: "DM Sans, system-ui, sans-serif",
-              fontSize: 12,
-              letterSpacing: "1px",
+              fontSize: 13,
+              letterSpacing: "1.2px",
               textTransform: "uppercase",
-              fontWeight: 600,
+              fontWeight: 700,
               background: `linear-gradient(135deg, ${PURPLE} 0%, ${PINK} 100%)`,
-              color: "#FAFAFA",
+              color: "#FFFFFF",
               border: "none",
               borderRadius: 999,
-              padding: "13px 30px",
+              padding: "14px 36px",
               cursor: "pointer",
               minHeight: 44,
+              boxShadow: "0 8px 24px rgba(98,1,127,0.2)",
             }}
           >
             Explore VAGIN
-            <ArrowRight size={15} strokeWidth={2.2} />
+            <ArrowRight size={16} strokeWidth={2.5} />
           </motion.button>
 
           <motion.button
             type="button"
             onClick={() => scrollTo("contact")}
-            whileHover={reduced ? {} : { opacity: 0.85 }}
+            whileHover={reduced ? {} : { backgroundColor: `${PINK}08` }}
             whileTap={reduced ? {} : { scale: 0.97 }}
             style={{
               fontFamily: "DM Sans, system-ui, sans-serif",
-              fontSize: 12,
-              letterSpacing: "1px",
+              fontSize: 13,
+              letterSpacing: "1.2px",
               textTransform: "uppercase",
-              fontWeight: 500,
+              fontWeight: 700,
               backgroundColor: "transparent",
               color: PINK,
-              border: `1px solid ${PINK}`,
+              border: `2px solid ${PINK}`,
               borderRadius: 999,
-              padding: "13px 30px",
+              padding: "12px 32px",
               cursor: "pointer",
               minHeight: 44,
+              transition: "all 0.3s ease",
             }}
           >
-            Become a Sponsor →
+            Become a Sponsor
           </motion.button>
         </div>
       </div>
