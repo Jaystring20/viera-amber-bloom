@@ -1,3 +1,4 @@
+import React from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   Palette,
@@ -114,6 +115,7 @@ const FLOW_PATH =
 const EcosystemSection = () => {
   const reduced = useReducedMotion();
   const d = (s: number) => (reduced ? 0 : s);
+  const [hoveredArm, setHoveredArm] = React.useState<string | null>(null);
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -236,10 +238,10 @@ const EcosystemSection = () => {
           initial="initial"
           whileInView="animate"
           viewport={{ once: true, amount: 0.2 }}
-          variants={{ initial: {}, animate: { transition: { staggerChildren: d(0.15), delayChildren: d(0.2) } } }}
+          variants={{ initial: {}, animate: { transition: { staggerChildren: d(0.12), delayChildren: d(0.1) } } }}
         >
-          {/* Serpentine SVG */}
-          <div style={{ height: "clamp(400px, 35vw, 500px)", marginBottom: 80 }}>
+          {/* Serpentine SVG + Accent Bars */}
+          <div style={{ height: "clamp(400px, 35vw, 500px)", marginBottom: 80, position: "relative" }}>
             <svg
               className="absolute inset-0"
               width="100%"
@@ -248,6 +250,7 @@ const EcosystemSection = () => {
               preserveAspectRatio="none"
               style={{ overflow: "visible" }}
             >
+              {/* Main curve (background) */}
               <path
                 d={FLOW_PATH}
                 fill="none"
@@ -257,6 +260,7 @@ const EcosystemSection = () => {
                 vectorEffect="non-scaling-stroke"
                 opacity={0.08}
               />
+              {/* Animated curve (foreground) */}
               <motion.path
                 d={FLOW_PATH}
                 fill="none"
@@ -269,17 +273,56 @@ const EcosystemSection = () => {
                 viewport={{ once: true, amount: 0.2 }}
                 transition={{ duration: d(2.4), ease: "easeInOut" as const }}
               />
+
+              {/* Vertical accent bars (from nodes toward cards) */}
+              {ARMS.map((arm) => (
+                <motion.line
+                  key={`bar-${arm.number}`}
+                  x1={arm.x}
+                  y1={arm.y}
+                  x2={arm.x}
+                  y2={90}
+                  stroke={arm.accent}
+                  strokeWidth={2.5}
+                  vectorEffect="non-scaling-stroke"
+                  opacity={hoveredArm === arm.target ? 1 : 0.35}
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  whileInView={{ pathLength: 1, opacity: hoveredArm === arm.target ? 1 : 0.35 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{
+                    pathLength: { duration: d(1.2), delay: d(0.4 + Number(arm.number) * 0.12), ease: "easeOut" },
+                    opacity: { duration: 0.3 },
+                  }}
+                  style={{ transition: "opacity 0.3s ease" }}
+                />
+              ))}
             </svg>
 
-            {ARMS.map((arm) => (
-              <FlowNode key={arm.number} arm={arm} reduced={reduced} onActivate={scrollTo} />
+            {ARMS.map((arm, idx) => (
+              <FlowNode
+                key={arm.number}
+                arm={arm}
+                reduced={reduced}
+                onActivate={scrollTo}
+                isHovered={hoveredArm === arm.target}
+                onHoverChange={(isHovered) => setHoveredArm(isHovered ? arm.target : null)}
+                index={idx}
+              />
             ))}
           </div>
 
           {/* Cards below serpentine */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 24, marginTop: 60 }}>
-            {ARMS.map((arm) => (
-              <EcosystemCard key={arm.number} arm={arm} onActivate={scrollTo} reduced={reduced} />
+            {ARMS.map((arm, idx) => (
+              <EcosystemCard
+                key={arm.number}
+                arm={arm}
+                onActivate={scrollTo}
+                reduced={reduced}
+                isHovered={hoveredArm === arm.target}
+                onHoverChange={(isHovered) => setHoveredArm(isHovered ? arm.target : null)}
+                index={idx}
+              />
             ))}
           </div>
         </motion.div>
@@ -335,16 +378,22 @@ const EcosystemSection = () => {
 };
 
 /* ════════════════════════════════════════════════════════════════════════
-   FLOW NODE — Desktop serpentine dot
+   FLOW NODE — Desktop serpentine dot with halo and synchronized hover
    ════════════════════════════════════════════════════════════════════════ */
 const FlowNode = ({
   arm,
   reduced,
   onActivate,
+  isHovered,
+  onHoverChange,
+  index,
 }: {
   arm: Arm;
   reduced: boolean;
   onActivate: (id: string) => void;
+  isHovered: boolean;
+  onHoverChange: (isHovered: boolean) => void;
+  index: number;
 }) => {
   const { Icon } = arm;
   const dotSize = arm.scale === 1 ? 48 : 40;
@@ -362,12 +411,31 @@ const FlowNode = ({
         animate: {
           opacity: 1,
           scale: 1,
-          transition: { type: "spring" as const, stiffness: 150, damping: 25 },
+          transition: { type: "spring" as const, stiffness: 150, damping: 25, delay: reduced ? 0 : index * 0.12 },
         },
       }}
-      whileHover={{ scale: 1.15 }}
+      onMouseEnter={() => onHoverChange(true)}
+      onMouseLeave={() => onHoverChange(false)}
+      whileHover={{ scale: 1.2 }}
       whileTap={{ scale: 0.95 }}
     >
+      {/* Gradient halo (background glow) */}
+      <motion.div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          width: dotSize + 32,
+          height: dotSize + 32,
+          left: -(dotSize + 32) / 2,
+          top: -(dotSize + 32) / 2,
+          borderRadius: "50%",
+          background: `radial-gradient(circle, ${arm.accent}30 0%, ${arm.accent}10 60%, transparent 100%)`,
+        }}
+        animate={{ opacity: isHovered ? 1 : 0.5 }}
+        transition={{ duration: 0.3 }}
+      />
+
+      {/* Outer ring (border) */}
       <motion.div
         aria-hidden="true"
         style={{
@@ -377,13 +445,15 @@ const FlowNode = ({
           left: -(dotSize + 16) / 2,
           top: -(dotSize + 16) / 2,
           borderRadius: "50%",
-          border: `1.5px solid ${arm.accent}`,
+          border: `2px solid ${arm.accent}`,
           opacity: 0.2,
         }}
-        whileHover={{ opacity: 0.4 }}
+        animate={{ opacity: isHovered ? 0.6 : 0.2, scale: isHovered ? 1.1 : 1 }}
+        transition={{ duration: 0.3 }}
       />
 
-      <div
+      {/* Main dot with icon */}
+      <motion.div
         style={{
           position: "absolute",
           width: dotSize,
@@ -397,24 +467,36 @@ const FlowNode = ({
           justifyContent: "center",
           boxShadow: `0 4px 12px ${arm.accent}33`,
         }}
+        animate={{
+          boxShadow: isHovered
+            ? `0 8px 24px ${arm.accent}66, 0 0 32px ${arm.accent}33`
+            : `0 4px 12px ${arm.accent}33`,
+        }}
+        transition={{ duration: 0.3 }}
       >
         <Icon size={iconSize} color="#FFFFFF" strokeWidth={2.2} />
-      </div>
+      </motion.div>
     </motion.button>
   );
 };
 
 /* ════════════════════════════════════════════════════════════════════════
-   ECOSYSTEM CARD — Full narrative card with all text visible
+   ECOSYSTEM CARD — Full narrative card with gradient band, icon badge, and sync hover
    ════════════════════════════════════════════════════════════════════════ */
 const EcosystemCard = ({
   arm,
   onActivate,
   reduced,
+  isHovered = false,
+  onHoverChange = () => {},
+  index = 0,
 }: {
   arm: Arm;
   onActivate: (id: string) => void;
   reduced: boolean;
+  isHovered?: boolean;
+  onHoverChange?: (isHovered: boolean) => void;
+  index?: number;
 }) => {
   const { Icon } = arm;
 
@@ -428,62 +510,85 @@ const EcosystemCard = ({
       }}
       className="cursor-pointer"
       variants={{
-        initial: { opacity: 0, y: 20 },
+        initial: { opacity: 0, y: 24 },
         animate: {
           opacity: 1,
           y: 0,
-          transition: { type: "spring" as const, stiffness: 150, damping: 25 },
+          transition: { type: "spring" as const, stiffness: 150, damping: 25, delay: reduced ? 0 : 0.5 + index * 0.1 },
         },
       }}
-      whileHover={{ y: -8 }}
+      onMouseEnter={() => onHoverChange(true)}
+      onMouseLeave={() => onHoverChange(false)}
+      animate={{
+        y: isHovered ? -12 : 0,
+        boxShadow: isHovered
+          ? `0 16px 40px ${arm.accent}22`
+          : `0 4px 12px ${arm.accent}11`,
+      }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
       style={{
-        padding: 32,
+        padding: "0 32px 32px 32px",
         borderRadius: 12,
-        border: `2px solid ${arm.accent}20`,
+        border: `2px solid ${isHovered ? arm.accent : `${arm.accent}15`}`,
         backgroundColor: "#FAFAFA",
         display: "flex",
         flexDirection: "column",
         gap: 16,
-        transition: "border-color 0.3s ease",
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLDivElement).style.borderColor = arm.accent;
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLDivElement).style.borderColor = `${arm.accent}20`;
+        overflow: "hidden",
       }}
     >
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-        <div
+      {/* Gradient band at top (echoes the node) */}
+      <motion.div
+        aria-hidden="true"
+        style={{
+          height: 8,
+          background: `linear-gradient(90deg, ${arm.accent} 0%, ${arm.accent}66 100%)`,
+          marginLeft: -32,
+          marginRight: -32,
+          marginTop: -32,
+          marginBottom: 8,
+        }}
+        animate={{ opacity: isHovered ? 1 : 0.7 }}
+        transition={{ duration: 0.3 }}
+      />
+      {/* Tag badge */}
+      <div>
+        <p
           style={{
-            width: 32,
-            height: 32,
-            borderRadius: "50%",
-            backgroundColor: arm.accent,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
+            fontSize: 11,
+            color: "#0A0A0A",
+            letterSpacing: "0.2em",
+            fontWeight: 800,
+            textTransform: "uppercase",
+            margin: 0,
           }}
         >
-          <Icon size={18} color="#FFFFFF" strokeWidth={2} />
-        </div>
-        <div>
-          <p
-            style={{
-              fontSize: 11,
-              color: "#0A0A0A",
-              letterSpacing: "0.2em",
-              fontWeight: 800,
-              textTransform: "uppercase",
-              margin: 0,
-            }}
-          >
-            {arm.tag}
-          </p>
-        </div>
+          {arm.tag}
+        </p>
       </div>
+
+      {/* Icon badge (echoes the node) — positioned top-right */}
+      <motion.div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          top: 48,
+          right: 24,
+          width: 56,
+          height: 56,
+          borderRadius: "50%",
+          backgroundColor: arm.accent,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: `0 4px 16px ${arm.accent}33`,
+          opacity: 0.8,
+        }}
+        animate={{ opacity: isHovered ? 1 : 0.6, scale: isHovered ? 1.1 : 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Icon size={28} color="#FFFFFF" strokeWidth={2} />
+      </motion.div>
 
       {/* Title */}
       <h3
