@@ -9,7 +9,7 @@ const GOLD_DIM = "rgba(217,119,6,0.10)";
 
 const NAV_LINKS = [
   { label: "Illustrations", href: "/illustrations", isRoute: true },
-  { label: "VAGIN", href: "/vagin", isRoute: true, fullName: "Viera Amber Girls' Initiative" },
+  { label: "VAGIN", href: "/vagin", isRoute: true, fullName: "Viera Amber's Girls' Initiative" },
   { label: "VIVA", href: "/viva", isRoute: true, fullName: "Fashion & Wearable Art" },
   { label: "VAM", href: "/vam", isRoute: true, fullName: "Viera Amber Masterclass" },
   { label: "VASH", href: "/vash", isRoute: true, fullName: "Viera Amber Shop" },

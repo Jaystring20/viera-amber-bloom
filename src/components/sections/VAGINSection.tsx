@@ -304,9 +304,9 @@ const VAGINSection = () => {
               letterSpacing: "0.3px",
             }}
           >
-            The Viera Amber Girls' Initiative champions sexual and reproductive health and rights
-            for young girls in underserved communities across Africa — through art,
-            education, and practical support.
+            Viera Amber's Girls' Initiative champions sexual and reproductive health and rights
+            for young girls in underserved communities globally, through art,
+            education and practical support.
           </motion.p>
         </div>
 
@@ -332,43 +332,45 @@ const VAGINSection = () => {
             <div
               className="absolute inset-0"
               style={{
-                background: "linear-gradient(135deg, rgba(250,250,250,0.05) 0%, rgba(98,1,127,0.2) 100%)",
+                background:
+                  "linear-gradient(to top, rgba(13,0,21,0.88) 0%, rgba(13,0,21,0.55) 38%, rgba(13,0,21,0.12) 70%, rgba(13,0,21,0.25) 100%)",
               }}
             />
-            {/* centered motif */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-8">
+            {/* bottom-anchored caption — readable over any photo */}
+            <div className="absolute inset-x-0 bottom-0 flex flex-col items-start text-left px-7" style={{ paddingBottom: 64 }}>
               <span
                 aria-hidden="true"
                 className="flex items-center justify-center"
                 style={{
-                  width: 72,
-                  height: 72,
-                  borderRadius: 20,
-                  background: "rgba(237,21,93,0.15)",
-                  border: "1px solid rgba(237,21,93,0.4)",
-                  marginBottom: 18,
+                  width: 48,
+                  height: 48,
+                  borderRadius: 14,
+                  background: "rgba(237,21,93,0.28)",
+                  border: "1px solid rgba(244,114,182,0.6)",
+                  marginBottom: 14,
                   backdropFilter: "blur(8px)",
                 }}
               >
-                <Users size={34} color="#F472B6" strokeWidth={1.5} />
+                <Users size={24} color="#FFD3E4" strokeWidth={1.75} />
               </span>
               <p
                 className="font-display"
-                style={{ fontSize: 22, color: "#111111", fontWeight: 700, margin: 0, lineHeight: 1.3 }}
+                style={{ fontSize: 24, color: "#FFFFFF", fontWeight: 700, margin: 0, lineHeight: 1.25, textShadow: "0 2px 12px rgba(0,0,0,0.4)" }}
               >
                 Real girls. Real change.
               </p>
               <p
                 style={{
                   fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: 13,
-                  color: "rgba(17,17,17,0.8)",
-                  marginTop: 8,
-                  maxWidth: 320,
+                  fontSize: 13.5,
+                  color: "rgba(255,255,255,0.85)",
+                  marginTop: 6,
+                  maxWidth: 340,
                   lineHeight: 1.6,
+                  textShadow: "0 1px 8px rgba(0,0,0,0.4)",
                 }}
               >
-                Operating in Nigeria and Malawi, reached one classroom at a time.
+                Operating globally, reached one classroom at a time.
               </p>
             </div>
             {/* bottom glass chip */}
@@ -389,7 +391,7 @@ const VAGINSection = () => {
                 fontWeight: 500,
               }}
             >
-              <span style={{ color: PINK, fontWeight: 700 }}>1,500+</span> lives changed
+              <span style={{ color: PINK, fontWeight: 700 }}>3,000+</span> lives changed
             </div>
           </motion.div>
 
@@ -414,7 +416,8 @@ const VAGINSection = () => {
               animate={missionInView ? "visible" : "hidden"}
               className="grid grid-cols-1 sm:grid-cols-3 gap-3"
             >
-              <StatTile Icon={Users} value={1500} suffix="+" label="Girls Reached" inView={missionInView} />
+              <StatTile Icon={Users} value={3000} suffix="+" label="Girls Reached" inView={missionInView} />
+              <StatTile Icon={School} value={7} suffix="+" label="Locations" inView={missionInView} />
               <StatTile Icon={Globe} value={2} suffix="" label="Countries" inView={missionInView} />
             </motion.div>
 
@@ -465,7 +468,7 @@ const VAGINSection = () => {
                 letterSpacing: "0.2px",
               }}
             >
-              Two flagship programs power the mission — stigma-free health education and
+              Two flagship programs power the mission: stigma-free health education and
               practical menstrual support that keeps girls in school.
             </p>
           </motion.div>
@@ -484,7 +487,7 @@ const VAGINSection = () => {
             Icon={Palette}
             accent={PURPLE}
             title="VaginART"
-            body="Digital illustration and visual templates as stigma-free tools to teach adolescent girls about puberty, hygiene, and personal wellness with clarity and dignity."
+            body="Digital illustration and visual templates as stigma-free tools to teach adolescent girls about their changing bodies and personal wellness with clarity and dignity."
             onLearn={() => navigate("/vagin")}
             reduced={!!reduced}
           />
@@ -492,7 +495,7 @@ const VAGINSection = () => {
             Icon={Droplets}
             accent={PINK}
             title="PAD KOLO Project"
-            body="Tackling period poverty through menstrual health support and micro-savings. WhatsApp-enabled school distribution tracked via an impact dashboard — one pad at a time."
+            body="Tackling period poverty through menstrual health support and micro-savings. Digital-enabled school distribution tracked via an impact dashboard, one pad at a time."
             onLearn={() => navigate("/vagin")}
             reduced={!!reduced}
           />

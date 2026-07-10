@@ -39,7 +39,9 @@ import {
   Smartphone,
   GraduationCap,
   TrendingUp,
+  Download,
 } from "lucide-react";
+import { useVaginImages } from "@/hooks/useVaginImages";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import {
@@ -143,17 +145,18 @@ const SectionHead = ({
 };
 
 // ─── Infinite carousel ────────────────────────────────────────────────────────
+// Images are slot keys resolved via useVaginImages (admin-swappable from the dashboard)
 const GALLERY_IMAGES = [
-  { src: "/vagin-images/vagin_team_01.webp", alt: "VAGIN team member at community event", location: "Nigeria" },
-  { src: "/vagin-images/vagin_malawi_01.webp", alt: "VAGIN community session in Malawi", location: "Malawi" },
-  { src: "/vagin-images/vagin_page_08_img_3.webp", alt: "Girls in community workshop", location: "Nigeria" },
-  { src: "/vagin-images/vagin_malawi_02.webp", alt: "Reaching girls across Malawi", location: "Malawi" },
-  { src: "/vagin-images/vagin_team_02.webp", alt: "Community outreach — two women making a difference", location: "Nigeria" },
-  { src: "/vagin-images/vagin_malawi_03.webp", alt: "SRHR education session, Malawi", location: "Malawi" },
-  { src: "/vagin-images/vagin_page_05_img_2.webp", alt: "Girls' gathering, VAGIN initiative", location: "Nigeria" },
-  { src: "/vagin-images/vagin_malawi_04.webp", alt: "Girls empowered through art and education, Malawi", location: "Malawi" },
-  { src: "/vagin-images/vagin_team_03.webp", alt: "VAGIN team at Clegg Girls Senior High School", location: "Nigeria" },
-  { src: "/vagin-images/vagin_page_06_img_1.webp", alt: "Active session — girls participating in SRHR education", location: "Malawi" },
+  { slot: "vagin_team_01", alt: "VAGIN team member at community event", location: "Nigeria" },
+  { slot: "vagin_malawi_01", alt: "VAGIN community session in Malawi", location: "Malawi" },
+  { slot: "vagin_page_08_img_3", alt: "Girls in community workshop", location: "Nigeria" },
+  { slot: "vagin_malawi_02", alt: "Reaching girls across Malawi", location: "Malawi" },
+  { slot: "vagin_team_02", alt: "Community outreach — two women making a difference", location: "Nigeria" },
+  { slot: "vagin_malawi_03", alt: "SRHR education session, Malawi", location: "Malawi" },
+  { slot: "vagin_page_05_img_2", alt: "Girls' gathering, VAGIN initiative", location: "Nigeria" },
+  { slot: "vagin_malawi_04", alt: "Girls empowered through art and education, Malawi", location: "Malawi" },
+  { slot: "vagin_team_03", alt: "VAGIN team at Clegg Girls Senior High School", location: "Nigeria" },
+  { slot: "vagin_page_06_img_1", alt: "Active session — girls participating in SRHR education", location: "Malawi" },
 ];
 
 const InfiniteCarousel = () => {
@@ -162,6 +165,7 @@ const InfiniteCarousel = () => {
   const [paused, setPaused] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
   const [trackWidth, setTrackWidth] = useState(0);
+  const { img: resolveImg } = useVaginImages();
 
   useEffect(() => {
     const measure = () => {
@@ -212,7 +216,7 @@ const InfiniteCarousel = () => {
             }}
           >
             <img
-              src={img.src}
+              src={resolveImg(img.slot)}
               alt={img.alt}
               className="w-full h-full object-cover"
               loading="lazy"
@@ -240,32 +244,33 @@ const InfiniteCarousel = () => {
 };
 
 const CURRICULUM = [
-  { Icon: Flower2, title: "Puberty Basics", desc: "Understanding the body's changes with clarity — no shame, no myths.", color: PINK },
+  { Icon: Flower2, title: "Puberty Basics", desc: "Understanding the body's changes with clarity. No shame, no myths.", color: PINK },
   { Icon: Shield, title: "Physical Safety", desc: "Protecting yourself with knowledge, boundaries, and confidence.", color: PURPLE_LIGHT },
   { Icon: Sparkles, title: "Hygiene & Wellness", desc: "Daily care practices for lifelong health and self-respect.", color: PINK },
   { Icon: HeartPulse, title: "Mental Health", desc: "Building confidence, self-love, and emotional resilience.", color: PURPLE_LIGHT },
 ];
 
 const CORE_VALUES = [
-  { Icon: Heart, title: "Faith", desc: "Rooted in Christian principles, we are guided by love, integrity, and service — upholding the dignity of every individual.", color: PINK },
-  { Icon: Scale, title: "Equity & Justice", desc: "Fair treatment and opportunities for all, ensuring marginalized voices — especially adolescent girls — are uplifted and heard.", color: PURPLE_LIGHT },
+  { Icon: Heart, title: "Faith", desc: "Rooted in Christian principles, we are guided by love, integrity and service, upholding the dignity of every individual.", color: PINK },
+  { Icon: Scale, title: "Equity & Justice", desc: "Fair treatment and opportunities for all, ensuring marginalized voices, especially adolescent girls, are uplifted and heard.", color: PURPLE_LIGHT },
   { Icon: BookOpen, title: "Empowerment", desc: "Equipping girls with the knowledge, skills, and resources to make informed decisions about their health and futures.", color: PINK },
   { Icon: Layers, title: "Inclusivity", desc: "Embracing every individual's uniqueness and creating safe, inclusive spaces where all girls can thrive.", color: PURPLE_LIGHT },
-  { Icon: Network, title: "Community-Centered", desc: "Believing in collective action — involving families, communities, and local stakeholders to advance girls' health and rights.", color: PINK },
-  { Icon: BadgeCheck, title: "Integrity", desc: "Committed to transparency, ethical conduct, and responsible stewardship — ensuring trust in all our partnerships.", color: PURPLE_LIGHT },
+  { Icon: Network, title: "Community-Centered", desc: "Believing in collective action, involving families, communities and local stakeholders to advance girls' health and rights.", color: PINK },
+  { Icon: BadgeCheck, title: "Integrity", desc: "Committed to transparency, ethical conduct and responsible stewardship, ensuring trust in all our partnerships.", color: PURPLE_LIGHT },
 ];
 
 const ART_METHODS = [
-  { Icon: PenLine, title: "Illustrations & Comics", desc: "Simple drawings and comics make puberty, menstruation, and consent relatable — shareable as printed handouts." },
-  { Icon: Mic2, title: "Drama & Skits", desc: "Short role-plays help girls explore SRHR topics hands-on — peer pressure, consent, and health decision-making." },
+  { Icon: PenLine, title: "Illustrations & Comics", desc: "Simple drawings and comics make puberty, menstruation and consent relatable, and they double as printed handouts." },
+  { Icon: Mic2, title: "Drama & Skits", desc: "Short role-plays help girls explore SRHR topics like peer pressure, consent and health decision-making." },
   { Icon: Music, title: "Songs & Poetry", desc: "Music and spoken word resonate deeply. Girls create pieces reflecting their thoughts on self-respect and body autonomy." },
-  { Icon: Brush, title: "Murals & Wall Art", desc: "School walls become ongoing SRHR resources — created with students, reinforcing health messages every day." },
+  { Icon: Brush, title: "Murals & Wall Art", desc: "School walls become ongoing SRHR resources, created with students and reinforcing health messages every day." },
   { Icon: Camera, title: "Photo Campaigns", desc: "Students capture what health and equality mean to them. Displayed in common areas, these foster pride and ownership." },
 ];
 
 const VAGINPage = () => {
   const reduced = useReducedMotion();
   const navigate = useNavigate();
+  const { img: vimg, bySection } = useVaginImages();
 
   const heroRef = useRef<HTMLDivElement>(null);
   const missionRef = useRef<HTMLDivElement>(null);
@@ -401,9 +406,9 @@ const VAGINPage = () => {
                   lineHeight: 1.82,
                 }}
               >
-                The Viera Amber Girls' Initiative (VAGIN) uses art-powered sexual and reproductive
+                Viera Amber's Girls' Initiative (VAGIN) uses art-powered sexual and reproductive
                 health rights (SRHR) education to reach adolescent girls in underserved communities
-                across Nigeria and Malawi — closing the gap between what girls need to know and what
+                globally, closing the gap between what girls need to know and what
                 they are actually taught, keeping them informed, protected, and in school.
               </motion.p>
 
@@ -418,7 +423,7 @@ const VAGINPage = () => {
               >
                 {[
                   { end: 3000, suffix: "+", staticVal: null, l: "Girls Reached" },
-                  { end: 2, suffix: "", staticVal: null, l: "Countries" },
+                  { end: 0, suffix: "", staticVal: "7+", l: "Locations in 2 Countries" },
                   { end: 0, suffix: "", staticVal: "March 2022", l: "Founded" },
                 ].map((c) => (
                   <span
@@ -488,9 +493,9 @@ const VAGINPage = () => {
                 style={{ gap: 10, marginTop: 8 }}
               >
                 {[
-                  { src: "/vagin-images/vagin_team_01.webp", alt: "VAGIN community event" },
-                  { src: "/vagin-images/vagin_team_02.webp", alt: "Community outreach" },
-                  { src: "/vagin-images/vagin_team_03.webp", alt: "Clegg Girls School" },
+                  { src: vimg("vagin_team_01"), alt: "VAGIN community event" },
+                  { src: vimg("vagin_team_02"), alt: "Community outreach" },
+                  { src: vimg("vagin_team_03"), alt: "Clegg Girls School" },
                 ].map((img) => (
                   <div
                     key={img.src}
@@ -525,7 +530,7 @@ const VAGINPage = () => {
                 className="absolute overflow-hidden group"
                 style={{ left: 24, top: 16, width: "54%", height: "74%", borderRadius: 20, border: "1.5px solid rgba(237,21,93,0.4)", transform: "rotate(-2deg)", boxShadow: "0 28px 72px rgba(0,0,0,0.75), 0 0 0 1px rgba(237,21,93,0.1), 0 0 48px rgba(98,1,127,0.25)", zIndex: 2 }}
               >
-                <img src="/vagin-images/vagin_team_01.webp" alt="VAGIN girls celebrating at community event" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" style={{ objectPosition: "center 25%" }} />
+                <img src={vimg("vagin_team_01")} alt="VAGIN girls celebrating at community event" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" style={{ objectPosition: "center 25%" }} />
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 55%, rgba(13,0,21,0.55) 100%)" }} />
               </motion.div>
 
@@ -537,7 +542,7 @@ const VAGINPage = () => {
                 className="absolute overflow-hidden group"
                 style={{ right: 0, top: 0, width: "43%", height: "46%", borderRadius: 16, border: "1.5px solid rgba(237,21,93,0.28)", transform: "rotate(2.5deg)", boxShadow: "0 18px 52px rgba(0,0,0,0.65)", zIndex: 2 }}
               >
-                <img src="/vagin-images/vagin_malawi_04.webp" alt="VAGIN girls in Malawi" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105" />
+                <img src={vimg("vagin_malawi_04")} alt="VAGIN girls in Malawi" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 40%, rgba(13,0,21,0.45) 100%)" }} />
                 <div className="absolute bottom-2.5 left-2.5" style={{ background: "rgba(10,10,10,0.75)", backdropFilter: "blur(8px)", border: "1px solid rgba(191,127,217,0.4)", borderRadius: 6, padding: "4px 9px" }}>
                   <span style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 9, color: "#CF9FE8", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 600 }}>Malawi</span>
@@ -552,7 +557,7 @@ const VAGINPage = () => {
                 className="absolute overflow-hidden group"
                 style={{ right: 0, bottom: 8, width: "43%", height: "47%", borderRadius: 16, border: "1.5px solid rgba(98,1,127,0.4)", transform: "rotate(-1.5deg)", boxShadow: "0 18px 52px rgba(0,0,0,0.65)", zIndex: 2 }}
               >
-                <img src="/vagin-images/vagin_team_03.webp" alt="VAGIN team at Clegg Girls Senior High School" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+                <img src={vimg("vagin_team_03")} alt="VAGIN team at Clegg Girls Senior High School" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105" loading="lazy" />
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(98,1,127,0.5) 0%, transparent 55%)" }} />
                 <div className="absolute bottom-3 left-3" style={{ background: "rgba(10,10,10,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(237,21,93,0.35)", borderRadius: 6, padding: "5px 10px" }}>
                   <span style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 9, color: PINK, letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 600 }}>Lagos, Nigeria</span>
@@ -607,7 +612,7 @@ const VAGINPage = () => {
             <motion.div variants={leftV} initial="hidden" animate={missionInView ? "visible" : "hidden"}>
               <p className="font-body uppercase m-0" style={{ fontSize: 11, color: PINK, letterSpacing: "0.3em", marginBottom: 16 }}>The Mission</p>
               <h2 className="font-display m-0" style={{ fontSize: "clamp(26px, 3.6vw, 42px)", fontWeight: 800, color: "#111111", lineHeight: 1.1, marginBottom: 18, letterSpacing: "-0.02em" }}>
-                Health, dignity, and rights — for every girl.
+                Health, dignity and rights for every girl.
               </h2>
               <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 15, color: "rgba(17,17,17,0.7)", lineHeight: 1.8, margin: 0, marginBottom: 14 }}>
                 Across underserved communities, too many girls miss school, opportunity, and
@@ -615,7 +620,7 @@ const VAGINPage = () => {
                 their own bodies. Period poverty and stigma keep them behind.
               </p>
               <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 15, color: "rgba(17,17,17,0.7)", lineHeight: 1.8, margin: 0 }}>
-                VAGIN exists to change that — pairing stigma-free, illustration-led education
+                VAGIN exists to change that by pairing stigma-free, illustration-led education
                 with practical menstrual support, so every girl can stay in school and in
                 control of her future.
               </p>
@@ -638,7 +643,7 @@ const VAGINPage = () => {
               style={{ borderRadius: 18, minHeight: 360, border: "1px solid rgba(237,21,93,0.2)" }}
             >
               <img
-                src="/vagin-images/vagin_team_02.webp"
+                src={vimg("vagin_team_02")}
                 alt="VAGIN community outreach"
                 className="w-full h-full object-cover"
                 style={{ minHeight: 360 }}
@@ -650,7 +655,7 @@ const VAGINPage = () => {
                 </span>
                 <p className="font-display" style={{ fontSize: 24, color: "#FAFAFA", fontWeight: 700, margin: 0, lineHeight: 1.3 }}>Real girls. Real change.</p>
                 <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 13.5, color: "rgba(250,250,250,0.85)", marginTop: 10, maxWidth: 340, lineHeight: 1.65 }}>
-                  Operating in Nigeria and Malawi, reaching one classroom at a time.
+                  Operating globally, reaching one classroom at a time.
                 </p>
               </div>
               <div className="absolute" style={{ left: 18, bottom: 18, background: "rgba(255,255,255,0.8)", backdropFilter: "blur(8px)", border: "1px solid rgba(237,21,93,0.2)", borderRadius: 999, padding: "8px 16px", fontFamily: "Poppins, system-ui, sans-serif", fontSize: 11, letterSpacing: "0.06em", color: "#111111", fontWeight: 500 }}>
@@ -680,7 +685,7 @@ const VAGINPage = () => {
               </h2>
               <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 15, color: "rgba(17,17,17,0.7)", maxWidth: 580, margin: "0 auto", lineHeight: 1.75 }}>
                 The numbers demand urgency. For adolescent girls in low-resourced settings,
-                access to SRHR information is not optional — it is the difference between
+                access to SRHR information is not optional. It is the difference between
                 reaching their full potential or facing a future of limited choices.
               </p>
             </motion.div>
@@ -704,7 +709,7 @@ const VAGINPage = () => {
                 {
                   end: 300,
                   suffix: " years",
-                  body: "is how long it will take to end child marriage at the current pace — if nothing changes.",
+                  body: "is how long it will take to end child marriage at the current pace, if nothing changes.",
                   source: "UN SDG Report, 2023",
                   accent: PURPLE_LIGHT,
                 },
@@ -772,7 +777,7 @@ const VAGINPage = () => {
             >
               {[
                 { Icon: Users, val: 3000, suffix: "+", count: true, label: "Girls Reached (Current)" },
-                { Icon: School, val: 2, suffix: "", count: true, label: "Countries Operating" },
+                { Icon: School, val: 7, suffix: "+", count: true, label: "Locations in 2 Countries" },
                 { Icon: Globe, val: 2022, suffix: "", count: false, label: "Founded" },
               ].map((s) => (
                 <motion.div
@@ -812,7 +817,7 @@ const VAGINPage = () => {
                 {[
                   { end: 50, suffix: "K+", lbl: "Girls by 2029" },
                   { end: 5, suffix: "", lbl: "Countries" },
-                  { end: 2, suffix: "K+", lbl: "Girls/Year" },
+                  { end: 10, suffix: "K+", lbl: "Girls/Year" },
                 ].map(({ end, suffix, lbl }) => (
                   <div key={lbl}>
                     <CountUp end={end} suffix={suffix} separator={false} className="font-display" style={{ fontSize: 28, fontWeight: 700, color: "#FFFFFF", marginBottom: 4, display: "block" }} />
@@ -846,8 +851,8 @@ const VAGINPage = () => {
                 <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 15, color: "rgba(17,17,17,0.7)", lineHeight: 1.8, marginBottom: 18 }}>
                   Research confirms what we've always believed: art-based teaching methodology
                   for SRHR education <em style={{ color: "rgba(17,17,17,0.9)", fontStyle: "normal", fontWeight: 500 }}>increases participation and recall</em> among young women.
-                  Art does what lectures and pamphlets cannot — it makes difficult conversations safe,
-                  engaging, and memorable. It is the foundation of our flagship program, <strong style={{ color: PURPLE, fontWeight: 600 }}>VaginART</strong>.
+                  Art does what lectures and pamphlets cannot. It makes difficult conversations safe,
+                  engaging and memorable. It is the foundation of our flagship program, <strong style={{ color: PURPLE, fontWeight: 600 }}>VaginART</strong>.
                 </p>
                 <div className="flex flex-col" style={{ gap: 10 }}>
                   {[
@@ -906,7 +911,7 @@ const VAGINPage = () => {
             <SectionHead
               eyebrow="The Programs"
               heading="Two ways we change the story."
-              body="Education and access, working together — one teaches, one equips."
+              body="Education and access, working together. One teaches, one equips."
               inView={programsInView}
               reduced={!!reduced}
               accentColor={PURPLE_LIGHT}
@@ -924,7 +929,7 @@ const VAGINPage = () => {
                 accentText={PURPLE_LIGHT}
                 tag="Education"
                 title="VaginART"
-                body="Stigma-free digital illustration and visual templates that teach adolescent girls about puberty, hygiene, and personal wellness — with clarity, warmth, and dignity. Art does what lectures can't: it makes the conversation safe."
+                body="Stigma-free digital illustration and visual templates that teach adolescent girls about their changing bodies and personal wellness, with warmth and dignity. Art does what lectures can't: it makes the conversation safe."
                 cardV={cardV}
               />
               <ProgramBlock
@@ -933,7 +938,7 @@ const VAGINPage = () => {
                 accentText={PINK_LIGHT}
                 tag="Access"
                 title="PAD KOLO Project"
-                body="Tackling period poverty head-on through menstrual health support paired with micro-savings. WhatsApp-enabled school distribution, tracked via an impact dashboard — keeping girls in school, one pad at a time."
+                body="Tackling period poverty through menstrual health support paired with micro-savings. Digital-enabled school distribution, tracked via an impact dashboard, keeping girls in school one pad at a time."
                 cardV={cardV}
               />
             </motion.div>
@@ -1013,7 +1018,7 @@ const VAGINPage = () => {
                 One session changes how a girl sees herself.
               </h2>
               <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 16, color: "rgba(250,250,250,0.6)", maxWidth: 600, margin: "0 auto", lineHeight: 1.8 }}>
-                VaginART sessions are 60–90 minute facilitated experiences that combine digital illustrations, guided discussion, and creative expression — built for schools, community halls, and after-school programs.
+                VaginART sessions are 30–60 minute facilitated experiences that combine digital illustrations, guided discussion and creative expression, built for schools, community halls and after-school programs.
               </p>
             </motion.div>
 
@@ -1029,11 +1034,12 @@ const VAGINPage = () => {
                   Icon: School,
                   num: "01",
                   title: "In-School Sessions",
-                  body: "60–90 minute facilitated classes, integrated into the school timetable. A trained VAGIN facilitator leads using digital slides, printed handouts, and group discussion.",
+                  body: "30–60 minute facilitated classes, integrated into the school timetable. A trained VAGIN facilitator leads using digital slides, printed handouts, and group discussion.",
                   accent: PURPLE,
                   accentText: PURPLE_LIGHT,
                   border: "rgba(98,1,127,0.35)",
                   bg: "rgba(98,1,127,0.1)",
+                  cta: null as null | { label: string; href: string },
                 },
                 {
                   Icon: Users,
@@ -1044,16 +1050,18 @@ const VAGINPage = () => {
                   accentText: PINK_LIGHT,
                   border: "rgba(237,21,93,0.3)",
                   bg: "rgba(237,21,93,0.08)",
+                  cta: null as null | { label: string; href: string },
                 },
                 {
                   Icon: BookOpen,
                   num: "03",
                   title: "Teacher Toolkits",
-                  body: "Downloadable digital kits that teachers and parents can use independently — illustrated slides, activity sheets, and facilitator notes. No external facilitator needed.",
+                  body: "Downloadable digital kits that teachers and parents can use independently: illustrated slides, activity sheets and facilitator notes. No external facilitator needed.",
                   accent: PURPLE_LIGHT,
                   accentText: PURPLE_LIGHT,
                   border: "rgba(199,125,255,0.3)",
                   bg: "rgba(199,125,255,0.07)",
+                  cta: { label: "Request the Toolkits", href: "#get-involved" },
                 },
               ].map((d) => (
                 <motion.div
@@ -1077,6 +1085,29 @@ const VAGINPage = () => {
                   </div>
                   <h3 className="font-display m-0" style={{ fontSize: 19, fontWeight: 700, color: "#FAFAFA", marginBottom: 10 }}>{d.title}</h3>
                   <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 13.5, color: "rgba(250,250,250,0.6)", lineHeight: 1.7, margin: 0 }}>{d.body}</p>
+                  {d.cta && (
+                    <a
+                      href={d.cta.href}
+                      className="inline-flex items-center"
+                      style={{
+                        gap: 7,
+                        marginTop: 16,
+                        fontFamily: "Poppins, system-ui, sans-serif",
+                        fontSize: 12,
+                        letterSpacing: "0.06em",
+                        textTransform: "uppercase",
+                        fontWeight: 600,
+                        color: d.accentText,
+                        background: `${d.accent}1F`,
+                        border: `1px solid ${d.accent}55`,
+                        borderRadius: 999,
+                        padding: "9px 18px",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <Download size={14} strokeWidth={2} /> {d.cta.label}
+                    </a>
+                  )}
                 </motion.div>
               ))}
             </motion.div>
@@ -1099,7 +1130,7 @@ const VAGINPage = () => {
                     {
                       num: "1",
                       title: "Open",
-                      body: "A welcome circle establishes ground rules — confidentiality, respect, and no wrong questions. Girls introduce themselves and set intentions for the session.",
+                      body: "A welcome circle establishes ground rules: confidentiality, respect and no wrong questions. Girls introduce themselves and set intentions for the session.",
                       color: PURPLE_LIGHT,
                     },
                     {
@@ -1111,7 +1142,7 @@ const VAGINPage = () => {
                     {
                       num: "3",
                       title: "Create",
-                      body: "Girls respond through drawing, writing, or short role-play. This expressive step locks in learning and gives girls a personal artifact — something theirs.",
+                      body: "Girls respond through drawing, writing, or short role-play. This expressive step locks in learning and gives girls a personal artifact, something theirs.",
                       color: PURPLE_LIGHT,
                     },
                   ].map((step, i) => (
@@ -1136,7 +1167,7 @@ const VAGINPage = () => {
                 style={{ position: "relative", borderRadius: 20, overflow: "hidden", aspectRatio: "4/5", border: "1.5px solid rgba(199,125,255,0.25)", boxShadow: "0 32px 80px rgba(0,0,0,0.7)" }}
               >
                 <img
-                  src="/vagin-images/vagin_page_06_img_1.webp"
+                  src={vimg("vagin_page_06_img_1")}
                   alt="Girls actively participating in a VaginART session, Malawi"
                   style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 30%" }}
                   loading="lazy"
@@ -1160,9 +1191,9 @@ const VAGINPage = () => {
               className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-16"
             >
               {[
-                { src: "/vagin-images/vagin_page_05_img_2.webp", alt: "Girls' gathering, VAGIN initiative, Nigeria", label: "Lagos, Nigeria" },
-                { src: "/vagin-images/vagin_team_02.webp", alt: "Community outreach — VAGIN team", label: "Community Session" },
-                { src: "/vagin-images/vagin_page_08_img_3.webp", alt: "Girls in community workshop", label: "Workshop Session" },
+                { src: vimg("vagin_page_05_img_2"), alt: "Girls' gathering, VAGIN initiative, Nigeria", label: "Lagos, Nigeria" },
+                { src: vimg("vagin_team_02"), alt: "Community outreach — VAGIN team", label: "Community Session" },
+                { src: vimg("vagin_page_08_img_3"), alt: "Girls in community workshop", label: "Workshop Session" },
               ].map((photo) => (
                 <motion.div
                   key={photo.src}
@@ -1194,9 +1225,9 @@ const VAGINPage = () => {
               {/* Stats */}
               <div className="flex flex-wrap justify-center" style={{ gap: "32px 48px" }}>
                 {[
-                  { end: 40, suffix: "+", staticVal: null, label: "Partner Schools" },
+                  { end: 7, suffix: "+", staticVal: null, label: "Partner Schools" },
                   { end: 5, suffix: "", staticVal: null, label: "Curriculum Topics" },
-                  { end: 0, suffix: "", staticVal: "60–90", label: "Minutes per Session" },
+                  { end: 0, suffix: "", staticVal: "30–60", label: "Minutes per Session" },
                   { end: 2, suffix: "", staticVal: null, label: "Countries Reached" },
                 ].map((s) => (
                   <div key={s.label} className="text-center">
@@ -1294,7 +1325,7 @@ const VAGINPage = () => {
                 No girl should miss school<br />because of her period.
               </h2>
               <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 16, color: "rgba(250,250,250,0.6)", maxWidth: 620, margin: "0 auto", lineHeight: 1.8 }}>
-                Period poverty is one of the leading causes of school absenteeism for adolescent girls across Nigeria and Malawi. PAD KOLO is VAGIN's answer — a community-powered model that pairs menstrual health access with financial inclusion.
+                Period poverty is one of the leading causes of school absenteeism for adolescent girls across underserved communities. PAD KOLO is VAGIN's answer, a community-powered model that pairs menstrual health access with financial inclusion.
               </p>
             </motion.div>
 
@@ -1316,7 +1347,7 @@ const VAGINPage = () => {
                     What does <span style={{ color: "#D97706" }}>"KOLO"</span> mean?
                   </h3>
                   <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 15, color: "rgba(250,250,250,0.72)", lineHeight: 1.85, margin: 0 }}>
-                    <span style={{ color: "#D97706", fontWeight: 600 }}>KOLO</span> is Yoruba for a <span style={{ color: "#D97706", fontWeight: 600 }}>savings pot</span> — a piggy bank. The PAD KOLO model turns menstrual health support into a community savings act: girls and their families contribute micro-amounts (as little as <span style={{ color: "#FAFAFA", fontWeight: 500 }}>₦50–₦200/month</span>). VAGIN matches those contributions with a sustainable supply of sanitary pads. Girls become <span style={{ color: "#FAFAFA", fontWeight: 500 }}>co-investors in their own health</span> — not passive recipients of charity. This ownership changes how girls relate to their own bodies and futures.
+                    <span style={{ color: "#D97706", fontWeight: 600 }}>KOLO</span> is Yoruba for a <span style={{ color: "#D97706", fontWeight: 600 }}>savings pot</span>, a piggy bank. The PAD KOLO model turns menstrual health support into a community savings act: girls and their families contribute micro-amounts (around <span style={{ color: "#FAFAFA", fontWeight: 500 }}>₦700–₦1,000/month</span>). VAGIN matches those contributions with a sustainable supply of sanitary pads. Girls become <span style={{ color: "#FAFAFA", fontWeight: 500 }}>co-investors in their own health</span>, not passive recipients of charity. This ownership changes how girls relate to their own bodies and futures.
                   </p>
                 </div>
               </div>
@@ -1330,9 +1361,9 @@ const VAGINPage = () => {
               className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-14"
             >
               {[
-                { step: "01", Icon: Coins, title: "KOLO Savings Pool", body: "Girls and their communities contribute small amounts each month. No amount is too small — the act of saving builds ownership, dignity, and collective responsibility.", accent: "#D97706" },
-                { step: "02", Icon: Smartphone, title: "WhatsApp Distribution", body: "Schools register on the VAGIN WhatsApp channel. Pad requests are placed, confirmed, and tracked digitally — ensuring accountability from order to delivery at the school gate.", accent: PINK },
-                { step: "03", Icon: GraduationCap, title: "Pads + Education", body: "Every pad distribution is paired with a VaginART session. Girls receive menstrual products and SRHR knowledge together — staying in school, informed, and in control.", accent: PURPLE_LIGHT },
+                { step: "01", Icon: Coins, title: "KOLO Savings Pool", body: "Girls and their communities contribute small amounts each month. The act of saving builds ownership, dignity and collective responsibility.", accent: "#D97706" },
+                { step: "02", Icon: Smartphone, title: "WhatsApp Distribution", body: "Schools register on the VAGIN WhatsApp channel. Pad requests are placed, confirmed and tracked digitally, ensuring accountability at every step.", accent: PINK },
+                { step: "03", Icon: GraduationCap, title: "Pads + Education", body: "Every pad distribution is paired with a VaginART session. Girls receive menstrual products and SRHR knowledge together, so they stay in school and in control.", accent: PURPLE_LIGHT },
               ].map((s) => (
                 <motion.div
                   key={s.step}
@@ -1371,8 +1402,8 @@ const VAGINPage = () => {
                 {[
                   { end: 3000, prefix: "", suffix: "+", staticVal: null, label: "Girls Supported" },
                   { end: 2, prefix: "", suffix: "", staticVal: null, label: "Countries" },
-                  { end: 50, prefix: "₦", suffix: "", staticVal: null, label: "Min. Monthly Savings" },
-                  { end: 0, prefix: "", suffix: "", staticVal: "2022", label: "Year Launched" },
+                  { end: 0, prefix: "", suffix: "", staticVal: "₦700–₦1,000", label: "Min. Monthly Savings / Girl" },
+                  { end: 0, prefix: "", suffix: "", staticVal: "2026", label: "Year Launched" },
                 ].map(({ end, prefix, suffix, staticVal, label }) => (
                   <div key={label} className="flex flex-col items-center" style={{ gap: 6 }}>
                     {staticVal ? (
@@ -1394,7 +1425,7 @@ const VAGINPage = () => {
               className="mb-12 relative overflow-hidden rounded-2xl"
               style={{ minHeight: 260, border: "1px solid rgba(237,21,93,0.2)" }}
             >
-              <img src="/vagin-images/vagin_malawi_02.webp" alt="PAD KOLO distribution in Malawi" className="w-full h-full object-cover" style={{ minHeight: 260, objectPosition: "center 40%" }} />
+              <img src={vimg("vagin_malawi_02")} alt="PAD KOLO distribution in Malawi" className="w-full h-full object-cover" style={{ minHeight: 260, objectPosition: "center 40%" }} />
               <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(13,0,21,0.92) 0%, rgba(13,0,21,0.7) 45%, rgba(13,0,21,0.2) 100%)" }} />
               <div className="absolute inset-0 flex flex-col justify-center px-10 py-8" style={{ maxWidth: 540 }}>
                 <Droplets size={28} color={PINK} strokeWidth={1.5} style={{ marginBottom: 16 }} />
@@ -1505,7 +1536,7 @@ const VAGINPage = () => {
             <SectionHead
               eyebrow="Get Involved"
               heading="Change a story, one girl at a time."
-              body="Whether you give, partner, or volunteer — every contribution keeps a girl in school."
+              body="Whether you give, partner, or volunteer, every contribution keeps a girl in school."
               inView={involveInView}
               reduced={!!reduced}
               scheme="dark"
@@ -1519,8 +1550,8 @@ const VAGINPage = () => {
             >
               {[
                 { Icon: Gift, title: "Become a Sponsor", desc: "Fund pads, curricula, and school programs that reach girls directly." },
-                { Icon: Handshake, title: "Partner With Us", desc: "Schools, NGOs, and brands — let's scale impact across more communities." },
-                { Icon: Users, title: "Volunteer", desc: "Lend your skills — illustration, teaching, logistics, or storytelling." },
+                { Icon: Handshake, title: "Partner With Us", desc: "Schools, NGOs, and brands. Let's scale impact across more communities." },
+                { Icon: Users, title: "Volunteer", desc: "Lend your skills in illustration, teaching, logistics, or storytelling." },
               ].map((c) => (
                 <motion.div
                   key={c.title}
@@ -1534,6 +1565,33 @@ const VAGINPage = () => {
                   <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 13.5, color: "rgba(250,250,250,0.6)", lineHeight: 1.65, margin: 0 }}>{c.desc}</p>
                 </motion.div>
               ))}
+            </motion.div>
+
+            {/* Meet the Team — the faces behind VAGIN */}
+            <motion.div
+              variants={fadeV}
+              initial="hidden"
+              animate={involveInView ? "visible" : "hidden"}
+              transition={{ delay: reduced ? 0 : 0.2 }}
+              className="mb-12"
+            >
+              <p className="font-body uppercase text-center" style={{ fontSize: 11, color: PINK, letterSpacing: "0.35em", marginBottom: 18 }}>Meet the Team</p>
+              <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
+                {(bySection("Meet the Team").length
+                  ? bySection("Meet the Team").map((r) => ({ src: r.image_url, alt: r.label, label: r.label }))
+                  : [
+                      { src: "/vagin-images/vagin_team_01.webp", alt: "VAGIN team member at a community event", label: "Community Outreach" },
+                      { src: "/vagin-images/vagin_team_03.webp", alt: "VAGIN team at Clegg Girls Senior High School", label: "Clegg Girls Senior High" },
+                      { src: "/vagin-images/vagin_malawi_02.webp", alt: "VAGIN field team in Malawi", label: "Field Team" },
+                    ]
+                ).map((t) => (
+                  <div key={t.src} className="relative overflow-hidden group" style={{ borderRadius: 14, aspectRatio: "4 / 3", border: "1px solid rgba(255,255,255,0.1)" }}>
+                    <img src={t.src} alt={t.alt} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <div aria-hidden="true" className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(10,10,10,0.78) 0%, transparent 55%)" }} />
+                    <span className="absolute" style={{ left: 14, bottom: 12, fontFamily: "Poppins, system-ui, sans-serif", fontSize: 11, letterSpacing: "0.08em", color: "#FAFAFA", fontWeight: 500 }}>{t.label}</span>
+                  </div>
+                ))}
+              </div>
             </motion.div>
 
             <div className="flex justify-center">

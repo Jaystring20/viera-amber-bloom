@@ -14,17 +14,17 @@ const PILLARS = [
   {
     num: "01",
     title: "Digital Design Systems",
-    body: "Procreate, Adobe, and visual language mastery. Build the technical foundation every serious creative needs to produce professional-grade work.",
+    body: "Procreate and illustration mastery. Build the technical foundation every serious creative needs to produce professional illustrations.",
   },
   {
     num: "02",
     title: "Fashion Illustration",
-    body: "Figure, fabric, colour, composition. Learn to illustrate the way Viera Amber does — with soul and structure in every stroke.",
+    body: "Figure, fabric, colour, composition. Learn to illustrate the way Viera Amber does, with soul and structure in every stroke.",
   },
   {
     num: "03",
     title: "Business of Creativity",
-    body: "Pricing, clientwork, digital product creation. Turn your art into a career — not just a passion. Build the income your talent deserves.",
+    body: "Pricing, clientwork, digital product creation. Turn your art into a career, not just a passion. Build the income your talent deserves.",
   },
 ];
 

@@ -438,6 +438,21 @@ const VIVAPage = () => {
               </div>
             </motion.div>
 
+            {/* Maiden collection label */}
+            <motion.p
+              variants={fadeVariants} initial="hidden" animate="visible"
+              transition={{ delay: d(1.02) }}
+              style={{
+                fontFamily: "DM Sans, system-ui, sans-serif",
+                fontSize: 11,
+                letterSpacing: "0.4em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.7)",
+                fontWeight: 500,
+                margin: "0 0 4px 0",
+              }}
+            >The Maiden Collection</motion.p>
+
             {/* Collection name */}
             <motion.p
               variants={fadeVariants} initial="hidden" animate="visible"
@@ -450,7 +465,7 @@ const VIVAPage = () => {
                 fontWeight: 400,
                 margin: 0,
               }}
-            >'Batya' — Daughters of Adonai</motion.p>
+            >Batya: Daughters of Adonai</motion.p>
 
             {/* Body */}
             <motion.p
@@ -532,7 +547,7 @@ const VIVAPage = () => {
               transition={{ delay: d(1.5) }}
               style={{ display: "flex", gap: 36, marginTop: 8 }}
             >
-              {[["Selective", "Commissions"], ["Bespoke", "Garments"], ["48hr", "Response"]].map(([val, lbl]) => (
+              {[["48–72hrs", "Delivery"], ["Made to Order", "Garments"], ["SDG", "Aligned"]].map(([val, lbl]) => (
                 <div key={lbl} style={{ textAlign: "center" }}>
                   <p style={{ fontFamily: CORMORANT, fontSize: 22, fontWeight: 700, color: GOLD, margin: 0, lineHeight: 1 }}>{val}</p>
                   <p style={{ fontFamily: "DM Sans", fontSize: 9, color: `rgba(212,175,55,0.38)`, margin: "5px 0 0 0", letterSpacing: "1.8px", textTransform: "uppercase" }}>{lbl}</p>
@@ -664,9 +679,9 @@ const VIVAPage = () => {
             animate={lookbookInView ? "visible" : "hidden"}
             style={{ marginBottom: 56 }}
           >
-            <p style={{ fontFamily: "DM Sans", fontSize: 10, color: BURGUNDY, letterSpacing: "5px", textTransform: "uppercase", margin: "0 0 10px 0" }}>The Collection</p>
+            <p style={{ fontFamily: "DM Sans", fontSize: 10, color: BURGUNDY, letterSpacing: "5px", textTransform: "uppercase", margin: "0 0 10px 0" }}>The Maiden Collection</p>
             <h2 style={{ fontFamily: CORMORANT, fontSize: "clamp(28px, 4.5vw, 52px)", fontWeight: 700, color: BURGUNDY, margin: 0, lineHeight: 1.1 }}>
-              Batya Lookbook
+              Batya: Daughters of Adonai Lookbook
             </h2>
           </motion.div>
 
@@ -933,7 +948,7 @@ const VIVAPage = () => {
             <motion.p variants={fadeVariants}
               style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 14, fontWeight: 300, color: `rgba(250,249,246,0.52)`, lineHeight: 1.75, margin: "0 0 32px 0" }}
             >
-              Commissions are taken on a selective basis. Tell us about what you have in mind — garment, illustration, or bespoke collaboration — and we'll be in touch within 48 hours.
+              Select a piece and we'll have it ready for you in 48 to 72 hours. Tell us what you have in mind, whether a garment, an illustration or a collaboration, and we'll be in touch.
             </motion.p>
 
             <AnimatePresence mode="wait">

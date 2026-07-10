@@ -555,8 +555,8 @@ const IllustrationsSection = () => {
               margin: 0,
             }}
           >
-            Every piece begins with a woman — her confidence, her defiance, her
-            joy. We illustrate what she already knows about herself.
+            Every piece begins with a woman who already knows her worth. We
+            give that certainty a face.
           </motion.p>
         </div>
 
@@ -599,18 +599,6 @@ const IllustrationsSection = () => {
             aria-hidden="true"
             style={{ width: 48, height: 1, backgroundColor: "#D97706" }}
           />
-
-          <p
-            style={{
-              fontFamily: "DM Sans, system-ui, sans-serif",
-              fontWeight: 300,
-              fontSize: 13,
-              color: "#555555",
-              margin: 0,
-            }}
-          >
-            73+ illustrations across 6+ chapters
-          </p>
 
           <div className="flex gap-3 flex-wrap justify-center">
             <motion.button

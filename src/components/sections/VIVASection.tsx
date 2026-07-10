@@ -66,10 +66,16 @@ const VIVASection = () => {
         />
 
         <motion.p
+          variants={fadeVariants} initial="hidden"
+          animate={heroInView ? "visible" : "hidden"} transition={{ delay: d(0.95) }}
+          style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, letterSpacing: "0.4em", textTransform: "uppercase", color: "rgba(250,245,246,0.65)", fontWeight: 500, margin: "0 auto 4px" }}
+        >The Maiden Collection</motion.p>
+
+        <motion.p
           className="font-display" variants={fadeVariants} initial="hidden"
           animate={heroInView ? "visible" : "hidden"} transition={{ delay: d(1.0) }}
           style={{ fontStyle: "italic", fontSize: "clamp(15px, 2vw, 22px)", color: "rgba(250,245,246,0.82)", fontWeight: 400, margin: "0 auto 10px", maxWidth: 340 }}
-        >'Batya' — Daughters of Adonai</motion.p>
+        >Batya: Daughters of Adonai</motion.p>
 
         <motion.p
           variants={fadeVariants} initial="hidden"

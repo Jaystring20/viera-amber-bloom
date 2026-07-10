@@ -4,7 +4,7 @@ import logoSrc from "@/assets/viera-amber-logo.png";
 
 const INK = "#0A0A0A";
 const PAPER = "#FFFFFF";
-const MUTED = "#444444";
+const MUTED = "#CFCFCF";
 
 const HeroSection = () => {
   const reduced = useReducedMotion();
@@ -141,9 +141,9 @@ const HeroSection = () => {
       <div
         ref={containerRef}
         className="hero-container relative w-full min-h-dvh overflow-hidden flex items-center justify-center px-4 sm:px-6"
-        style={{ backgroundColor: PAPER }}
+        style={{ backgroundColor: INK }}
       >
-        {/* ── Jacqueline portrait — high-contrast B&W, multiply-blended onto white paper ── */}
+        {/* ── Jacqueline portrait — high-contrast B&W on dark ground ── */}
         <div
           aria-hidden="true"
           className="absolute inset-0 pointer-events-none select-none overflow-hidden"
@@ -156,44 +156,44 @@ const HeroSection = () => {
             className="hero-artwork w-full h-full select-none"
             style={{
               objectFit: "cover",
-              filter: "grayscale(100%) contrast(1.28) brightness(1.02) saturate(0)",
-              mixBlendMode: "multiply",
+              filter: "grayscale(100%) contrast(1.18) brightness(0.6) saturate(0)",
+              opacity: 0.9,
             }}
           />
         </div>
 
-        {/* ── Soft white bottom fade — dissolves into the next white section ── */}
+        {/* ── Soft bottom fade — dissolves the dark hero into the white section below ── */}
         <div
           aria-hidden="true"
           className="hero-bottom-fade absolute bottom-0 left-0 right-0 pointer-events-none"
           style={{
-            height: "32%",
+            height: "34%",
             background:
-              "linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%)",
+              "linear-gradient(to bottom, rgba(10,10,10,0) 0%, rgba(10,10,10,0.55) 45%, rgba(255,255,255,1) 100%)",
             zIndex: 2,
           }}
         />
 
-        {/* ── Top fade — softens transition under the nav ── */}
+        {/* ── Top fade — deepens shadow under the nav ── */}
         <div
           aria-hidden="true"
           className="absolute top-0 left-0 right-0 pointer-events-none"
           style={{
-            height: "14%",
+            height: "18%",
             background:
-              "linear-gradient(to bottom, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 100%)",
+              "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%)",
             zIndex: 2,
           }}
         />
 
-        {/* ── Content scrim for text clarity ── */}
+        {/* ── Black glow behind the wordmark for text clarity ── */}
         <div
           aria-hidden="true"
           className="absolute inset-0 pointer-events-none"
           style={{
             zIndex: 8,
             background:
-              "radial-gradient(ellipse 600px 400px at 50% 50%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.85) 60%, transparent 100%)",
+              "radial-gradient(ellipse 660px 470px at 50% 48%, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.62) 52%, rgba(0,0,0,0) 100%)",
           }}
         />
 
@@ -211,7 +211,7 @@ const HeroSection = () => {
             className="m-0"
             style={{
               fontSize: 11,
-              color: INK,
+              color: PAPER,
               letterSpacing: "0.45em",
               fontWeight: 500,
               fontFamily: "var(--font-body, sans-serif)",
@@ -234,7 +234,7 @@ const HeroSection = () => {
                 width: "clamp(180px, 36vw, 480px)",
                 height: "auto",
                 display: "block",
-                filter: "brightness(0) saturate(0)",
+                filter: "brightness(0) invert(1)",
               }}
             />
           </motion.h1>
@@ -246,7 +246,7 @@ const HeroSection = () => {
             style={{
               width: 44,
               height: 1,
-              backgroundColor: INK,
+              backgroundColor: PAPER,
               transformOrigin: "center",
             }}
           />
@@ -274,7 +274,7 @@ const HeroSection = () => {
             className="m-0"
             style={{
               fontSize: "clamp(18px, 2.5vw, 32px)",
-              color: INK,
+              color: PAPER,
               fontWeight: 500,
               fontFamily: "var(--font-display, serif)",
               fontStyle: "italic",
@@ -284,12 +284,12 @@ const HeroSection = () => {
             For her, by her.
           </motion.p>
 
-          {/* CTA — black pill, white text */}
+          {/* CTA — white pill, black text (pops on dark ground) */}
           <motion.div variants={ctaVariants}>
             <button
               type="button"
               className="rounded-full px-8 py-3 font-body uppercase tracking-widest text-xs min-h-[44px] transition-opacity hover:opacity-85"
-              style={{ backgroundColor: INK, color: PAPER }}
+              style={{ backgroundColor: PAPER, color: INK }}
               onClick={handleScroll}
               aria-label="Scroll down to explore the Viera Amber ecosystem"
             >
@@ -309,7 +309,7 @@ const HeroSection = () => {
               style={{
                 width: 22,
                 height: 38,
-                border: `1.5px solid ${INK}`,
+                border: `1.5px solid ${PAPER}`,
                 borderRadius: 11,
                 display: "flex",
                 justifyContent: "center",
@@ -323,7 +323,7 @@ const HeroSection = () => {
                 style={{
                   width: 2,
                   height: 6,
-                  background: INK,
+                  background: PAPER,
                   borderRadius: 1,
                 }}
               />

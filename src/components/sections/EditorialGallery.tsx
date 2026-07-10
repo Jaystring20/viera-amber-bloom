@@ -604,7 +604,7 @@ const EditorialGallery = () => {
             transition={{ duration: reduced ? 0 : 0.6, delay: reduced ? 0 : 0.15 }}
             style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 15, color: "#666666", maxWidth: 540, lineHeight: 1.7, margin: 0 }}
           >
-            Read it like a story, or filter by craft. Either way, every piece begins with a woman who already knew her worth.
+            Every piece begins with a woman who already knew her worth.
           </motion.p>
         </div>
 

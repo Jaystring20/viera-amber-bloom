@@ -294,16 +294,6 @@ export const CategoryThumbnailNav = ({ onCategorySelect }: CategoryThumbnailNavP
                 >
                   {category.name}
                 </h3>
-                <p
-                  style={{
-                    fontFamily: "Montserrat, system-ui, sans-serif",
-                    fontSize: 11,
-                    color: "#888888",
-                    margin: 0,
-                  }}
-                >
-                  {category.pieceCount} pieces
-                </p>
               </div>
             </motion.button>
           ))}

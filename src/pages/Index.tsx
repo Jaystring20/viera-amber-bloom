@@ -31,7 +31,7 @@ const Index = () => {
         </section>
 
         {/* 04 — VAGIN */}
-        <section id="vagin" aria-label="Viera Amber Girls Initiative">
+        <section id="vagin" aria-label="Viera Amber's Girls' Initiative">
           <VAGINSection />
         </section>
 

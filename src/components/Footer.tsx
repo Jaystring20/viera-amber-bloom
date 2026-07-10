@@ -16,7 +16,7 @@ const QUICK_LINKS = [
 // VIVA; VAM and VASH have no logo asset yet, so they render as wordmarks.
 const getFooterBrand = (pathname: string) => {
   // startsWith so sub-routes inherit the brand (e.g. /viva/try-on, /vagin-dashboard).
-  if (pathname.startsWith("/vagin")) return { kind: "img" as const, src: "/vagin-logo.webp", alt: "VAGIN — Viera Amber Girls' Initiative", height: 58 };
+  if (pathname.startsWith("/vagin")) return { kind: "img" as const, src: "/vagin-logo.webp", alt: "VAGIN — Viera Amber's Girls' Initiative", height: 58 };
   if (pathname.startsWith("/viva")) return { kind: "img" as const, src: "/viva-logo.svg", alt: "VIVA — Fashion & Wearable Art", height: 46 };
   if (pathname.startsWith("/vam")) return { kind: "text" as const, text: "VAM", sub: "Viera Amber Masterclass" };
   if (pathname.startsWith("/vash")) return { kind: "text" as const, text: "VASH", sub: "Viera Amber Shop" };

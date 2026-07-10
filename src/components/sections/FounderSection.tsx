@@ -166,8 +166,8 @@ const FounderSection = () => {
             >
               Her visionary direction has driven Viera Amber from an aesthetic
               passion project in 2013 into a holistic mother brand that champions
-              female rights, medical education, and financial freedom for
-              adolescent girls and women globally.
+              femininity and health education for adolescent girls and women
+              globally.
             </motion.p>
 
             {/* Awards */}

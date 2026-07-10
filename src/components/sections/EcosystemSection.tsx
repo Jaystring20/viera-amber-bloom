@@ -24,6 +24,7 @@ const BRAND_COLORS = {
 type Arm = {
   number: string;
   title: string;
+  shortName: string; // Concise label shown next to the flow node
   accent: string;
   tag: string;
   blurb: string;
@@ -40,10 +41,11 @@ const ARMS: Arm[] = [
   {
     number: "01",
     title: "Illustrations & Designs",
+    shortName: "Illustrations",
     accent: BRAND_COLORS.illustrations.accent,
     tag: "Creative",
-    blurb: "Narrative fashion illustration — art that heals, inspires, and sells.",
-    narrative: "Hand-crafted illustrations that tell stories. From editorial campaigns to bespoke brand identity, we create visual narratives that make impossible look inevitable.",
+    blurb: "Narrative fashion illustration that moves people and sells.",
+    narrative: "Digital illustrations that tell stories. From editorial campaigns, to custom illustrations, to bespoke brand identity, we create visual narratives that make the impossible look inevitable.",
     target: "illustrations",
     Icon: Palette,
     x: 12,
@@ -54,10 +56,11 @@ const ARMS: Arm[] = [
   {
     number: "02",
     title: "VAGIN",
+    shortName: "VAGIN",
     accent: BRAND_COLORS.vagin.accent,
     tag: "Impact",
-    blurb: "Girls' Initiative — SRHR for 3,000+ girls. SDG 3 & 5.",
-    narrative: "Sexual and Reproductive Health & Rights for teenage girls across Nigeria. We believe knowledge is power. Education transforms lives.",
+    blurb: "Girls' Initiative. SRHR for 3,000+ girls. SDG 3 & 5.",
+    narrative: "Sexual and Reproductive Health & Rights for underserved adolescent girls globally. We believe knowledge is power, and education transforms lives.",
     target: "vagin",
     Icon: HeartHandshake,
     x: 31,
@@ -68,10 +71,11 @@ const ARMS: Arm[] = [
   {
     number: "03",
     title: "VIVA",
+    shortName: "VIVA",
     accent: BRAND_COLORS.viva.accent,
     tag: "Fashion",
     blurb: "Structured yet fluid wearable art for the modern woman.",
-    narrative: "Made-to-measure fashion where precision meets poetry. Each piece is a conversation between architect and dreamer. For women who refuse to choose.",
+    narrative: "Contemporary made to order fashion celebrating art, storytelling and feminine God-made identity. Every garment is crafted only after it is ordered, reducing waste and contributing to the SDGs.",
     target: "viva",
     Icon: Shirt,
     x: 50,
@@ -82,10 +86,11 @@ const ARMS: Arm[] = [
   {
     number: "04",
     title: "VAM",
+    shortName: "VAM",
     accent: BRAND_COLORS.vam.accent,
     tag: "Education",
     blurb: "Masterclass turning creative ideas into independent careers.",
-    narrative: "Learn from Faith. Design thinking, illustration, business fundamentals. We teach you how to turn creative passion into sustainable income.",
+    narrative: "Learn directly from founder Faith Adigwe. Master illustration, design thinking, and the business fundamentals that turn creative passion into sustainable income.",
     target: "vam",
     Icon: GraduationCap,
     x: 69,
@@ -96,10 +101,11 @@ const ARMS: Arm[] = [
   {
     number: "05",
     title: "VASH",
+    shortName: "VASH",
     accent: BRAND_COLORS.vash.accent,
     tag: "Commerce",
-    blurb: "The shop — wearable art, brushes, references. The commercial engine.",
-    narrative: "Curated tools for creators. Premium Procreate brushes, pose references, design assets, wearable art. Where art becomes accessible and sustainable.",
+    blurb: "The shop for wearable art, brushes and references. The commercial engine.",
+    narrative: "Curated tools for creators. Premium Procreate brushes, pose references, design assets and wearable art. Where art becomes accessible and sustainable.",
     target: "shop",
     Icon: ShoppingBag,
     x: 88,
@@ -476,6 +482,33 @@ const FlowNode = ({
       >
         <Icon size={iconSize} color="#FFFFFF" strokeWidth={2.2} />
       </motion.div>
+
+      {/* Name label — attached to the node so the map reads clearly */}
+      <motion.span
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          left: 0,
+          top: arm.side === "top" ? -(dotSize / 2 + 12) : dotSize / 2 + 12,
+          transform:
+            arm.side === "top" ? "translate(-50%, -100%)" : "translateX(-50%)",
+          whiteSpace: "nowrap",
+          fontFamily: "var(--font-body, sans-serif)",
+          fontSize: 12,
+          fontWeight: 700,
+          letterSpacing: "0.12em",
+          textTransform: "uppercase",
+          color: "#1A1A1A",
+          backgroundColor: "rgba(255,255,255,0.88)",
+          padding: "3px 9px",
+          borderRadius: 6,
+          boxShadow: `0 1px 6px rgba(0,0,0,0.06)`,
+        }}
+        animate={{ color: isHovered ? arm.accent : "#1A1A1A" }}
+        transition={{ duration: 0.3 }}
+      >
+        {arm.shortName}
+      </motion.span>
     </motion.button>
   );
 };

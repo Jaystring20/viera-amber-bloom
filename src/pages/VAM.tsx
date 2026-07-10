@@ -22,21 +22,21 @@ const PILLARS = [
     num: "01",
     icon: Monitor,
     title: "Digital Design Systems",
-    body: "Procreate, Adobe, and visual language mastery. Build the technical foundation every serious creative needs to produce professional-grade work.",
-    includes: ["Procreate fundamentals + advanced", "Adobe Illustrator & Photoshop", "Digital colour theory", "Building a visual style guide"],
+    body: "Procreate and illustration mastery. Build the technical foundation every serious creative needs to produce professional illustrations.",
+    includes: ["Procreate fundamentals + advanced", "Autodesk Sketchbook", "Building an illustration style guide"],
   },
   {
     num: "02",
     icon: Palette,
     title: "Fashion Illustration",
-    body: "Figure, fabric, colour, composition. Learn to illustrate the way Viera Amber does — with soul and structure in every stroke.",
+    body: "Figure, fabric, colour, composition. Learn to illustrate the way Viera Amber does, with soul and structure in every stroke.",
     includes: ["Fashion figure & croquis", "Fabric rendering techniques", "Colour palette construction", "From concept to final illustration"],
   },
   {
     num: "03",
     icon: Briefcase,
     title: "Business of Creativity",
-    body: "Pricing, clientwork, digital product creation. Turn your art into a career — not just a passion. Build the income your talent deserves.",
+    body: "Pricing, clientwork, digital product creation. Turn your art into a career, not just a passion. Build the income your talent deserves.",
     includes: ["Pricing your creative work", "Client management & contracts", "Digital product creation & sales", "Building your creative brand online"],
   },
 ];
@@ -60,8 +60,8 @@ const FOR_WHO = [
 
 const FAQS = [
   {
-    q: "When does the first cohort start?",
-    a: "We're announcing cohort dates to the waitlist first. Join to secure early-bird pricing and first access.",
+    q: "When does the next cohort start?",
+    a: "We announce new cohort dates to the waitlist first. Join to secure your spot and early pricing.",
   },
   {
     q: "Do I need prior experience?",
@@ -69,7 +69,7 @@ const FAQS = [
   },
   {
     q: "What tools do I need?",
-    a: "An iPad with Procreate and/or a laptop with Adobe Creative Cloud. We recommend both. A physical sketchbook is encouraged.",
+    a: "An iPad with Procreate and/or a tablet with Autodesk Sketchbook. A physical sketchbook is encouraged.",
   },
   {
     q: "Is this self-paced or live?",
@@ -432,8 +432,8 @@ const VAMPage = () => {
                 fontSize: 14, fontWeight: 300,
                 color: "#666", lineHeight: 1.75, margin: 0,
               }}>
-                VAM is structured to give you the full picture — not just skills,
-                but the confidence, community, and career foundation that comes with them.
+                VAM is structured to give you the full picture, not just skills,
+                but the confidence and career foundation that comes with them.
               </p>
             </motion.div>
 
@@ -522,7 +522,19 @@ const VAMPage = () => {
                 margin: "0 0 32px 0", maxWidth: 400,
               }}
             >
-              First cohort launching soon. Waitlist members get early access and first-look pricing before anyone else.
+              200+ illustrators trained. Secure your spot. Waitlist members get early access and first-look pricing before anyone else.
+            </motion.p>
+
+            <motion.p
+              variants={fadeVariants}
+              style={{
+                fontFamily: "DM Sans, system-ui, sans-serif",
+                fontSize: 13, fontWeight: 500,
+                color: DARK, lineHeight: 1.7,
+                margin: "-16px 0 28px 0", maxWidth: 400,
+              }}
+            >
+              Tuition: <span style={{ color: GOLD, fontWeight: 700 }}>$10 per hour</span> or <span style={{ color: GOLD, fontWeight: 700 }}>₦15,000 per hour</span>.
             </motion.p>
 
             <AnimatePresence mode="wait">
