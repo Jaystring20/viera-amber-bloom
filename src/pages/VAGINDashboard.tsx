@@ -6,10 +6,11 @@ import {
   LayoutDashboard, Droplets, Palette, School as SchoolIcon, LogOut,
   TrendingUp, Users, BookOpen, Coins,
   AlertCircle, RefreshCw, Plus, Pencil, Trash2, X,
-  GraduationCap, ClipboardList, CheckCircle2, Images, Camera,
+  GraduationCap, ClipboardList, CheckCircle2, Images, Camera, Bot,
 } from "lucide-react";
 import GalleryAdminTab from "@/components/admin/GalleryAdminTab";
 import VAGINImagesAdminTab from "@/components/admin/VAGINImagesAdminTab";
+import BotActivityTab from "@/components/admin/BotActivityTab";
 
 const PINK   = "#ED155D";
 const PURPLE = "#62017F";
@@ -23,7 +24,7 @@ interface Matron    { id: string; name: string; phone: string; school_id: string
 interface Distribution { id: string; school_id: string; distribution_date: string; girls_count: number; pads_count: number; savings_collected_ngn: number; distributed_by: string | null }
 interface Session      { id: string; school_id: string; session_date: string; topic: string; girls_attended: number; facilitator: string | null; delivery_format: string }
 interface Savings      { id: string; school_id: string; month: string; contributors: number; total_ngn: number }
-interface TxRow        { id: string; student_id: string | null; matron_id: string | null; type: string; pads_issued: number; amount_ngn: number; source: string; notes: string | null; created_at: string }
+interface TxRow        { id: string; student_id: string | null; matron_id: string | null; type: string; pads_issued: number; amount_ngn: number; source: string; notes: string | null; created_at: string; voided?: boolean; voided_reason?: string | null; flagged?: boolean }
 
 interface DashData {
   schools: SchoolRow[]; students: Student[]; matrons: Matron[];
@@ -277,7 +278,7 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
 // MAIN DASHBOARD
 // ══════════════════════════════════════════════════════════════════════════════
 const VAGINDashboard = () => {
-  type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions" | "gallery" | "vagin_images";
+  type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions" | "gallery" | "vagin_images" | "bot";
   type ModalType = "add-school" | "edit-school" | "add-student" | "edit-student" | "add-matron" | "edit-matron" | "add-distribution" | "add-session" | "confirm-delete" | null;
 
   const [authed, setAuthed]         = useState<boolean | null>(null);
@@ -342,6 +343,30 @@ const VAGINDashboard = () => {
   useEffect(() => { if (authed) fetchData(); }, [authed, fetchData]);
 
   const handleSignOut = async () => { await supabase.auth.signOut(); setAuthed(false); setData(null); };
+
+  // ── Void a transaction (reverses balances, keeps audit row) ────────────────
+  const voidTransaction = async (t: TxRow) => {
+    if (!window.confirm(`Void this ${t.type.replace(/_/g, " ")} transaction? Balances will be reversed; the audit row is kept.`)) return;
+    await supabase.from("vagin_transactions").update({ voided: true, voided_reason: "Admin void from dashboard" }).eq("id", t.id);
+    if (t.student_id) {
+      const { data: g } = await supabase.from("vagin_students").select("*").eq("id", t.student_id).maybeSingle();
+      if (g) {
+        const patch: Record<string, unknown> = {};
+        if (t.type === "paid_pads") {
+          patch.paid_pads_used = Math.max(0, (g.paid_pads_used ?? 0) - t.pads_issued);
+          patch.pads_received = Math.max(0, (g.pads_received ?? 0) - t.pads_issued);
+          patch.balance_ngn = (g.balance_ngn ?? 0) + (t.amount_ngn ?? 0);
+        } else if (t.type === "free_pads") {
+          patch.free_pads_used = Math.max(0, (g.free_pads_used ?? 0) - t.pads_issued);
+          patch.pads_received = Math.max(0, (g.pads_received ?? 0) - t.pads_issued);
+        } else if (t.type === "savings_deposit") {
+          patch.balance_ngn = (g.balance_ngn ?? 0) - (t.amount_ngn ?? 0);
+        }
+        if (Object.keys(patch).length) await supabase.from("vagin_students").update(patch).eq("id", g.id);
+      }
+    }
+    fetchData();
+  };
 
   // ── School CRUD ───────────────────────────────────────────────────────────
   const openAddSchool  = () => { setSchoolForm({ id: "", name: "", code: "", country: "Nigeria", city: "", state_region: "", contact_name: "" }); setModal("add-school"); };
@@ -513,6 +538,7 @@ const VAGINDashboard = () => {
     { id: "transactions"  as TabId, label: "Transactions",  Icon: ClipboardList },
     { id: "gallery"       as TabId, label: "Gallery CMS",   Icon: Images },
     { id: "vagin_images"  as TabId, label: "VAGIN Images",  Icon: Camera },
+    { id: "bot"           as TabId, label: "Bot Activity",  Icon: Bot },
   ] as const;
 
   const infoBox = (msg: React.ReactNode, color = PL) => (
@@ -776,16 +802,31 @@ const VAGINDashboard = () => {
                     </div>
                   ) : (
                     <Table
-                      headers={["Time", "Type", "Student", "Matron", "Pads", "Amount", "Source"]}
-                      rows={data.transactions.map(t => [
-                        fmtDate(t.created_at),
-                        <span key="type" style={{ fontSize: 11, padding: "3px 10px", borderRadius: 999, background: t.type === "pad_issue" ? "rgba(237,21,93,0.15)" : "rgba(217,119,6,0.12)", color: t.type === "pad_issue" ? PINK : GOLD, border: `1px solid ${t.type === "pad_issue" ? "rgba(237,21,93,0.3)" : "rgba(217,119,6,0.3)"}` }}>{t.type.replace(/_/g, " ")}</span>,
-                        studentName(t.student_id),
-                        matronName(t.matron_id),
-                        t.pads_issued || "—",
-                        t.amount_ngn ? fmtNGN(t.amount_ngn) : "—",
-                        <span key="src" style={{ fontSize: 11, padding: "3px 10px", borderRadius: 999, background: t.source === "whatsapp" ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.06)", color: t.source === "whatsapp" ? "#22C55E" : "rgba(250,250,250,0.5)", border: `1px solid ${t.source === "whatsapp" ? "rgba(34,197,94,0.25)" : "rgba(255,255,255,0.1)"}` }}>{t.source}</span>
-                      ])}
+                      headers={["Time", "Type", "Student", "Matron", "Pads", "Amount", "Source", "Status", ""]}
+                      rows={data.transactions.map(t => {
+                        const isBot = t.source === "whatsapp_bot" || t.source === "whatsapp";
+                        return [
+                        <span key="time" style={{ opacity: t.voided ? 0.4 : 1 }}>{fmtDate(t.created_at)}</span>,
+                        <span key="type" style={{ fontSize: 11, padding: "3px 10px", borderRadius: 999, background: t.type === "pad_issue" ? "rgba(237,21,93,0.15)" : "rgba(217,119,6,0.12)", color: t.type === "pad_issue" ? PINK : GOLD, border: `1px solid ${t.type === "pad_issue" ? "rgba(237,21,93,0.3)" : "rgba(217,119,6,0.3)"}`, textDecoration: t.voided ? "line-through" : "none", opacity: t.voided ? 0.5 : 1 }}>{t.type.replace(/_/g, " ")}</span>,
+                        <span key="stu" style={{ opacity: t.voided ? 0.4 : 1 }}>{studentName(t.student_id)}</span>,
+                        <span key="mat" style={{ opacity: t.voided ? 0.4 : 1 }}>{matronName(t.matron_id)}</span>,
+                        <span key="pads" style={{ opacity: t.voided ? 0.4 : 1 }}>{t.pads_issued || "—"}</span>,
+                        <span key="amt" style={{ opacity: t.voided ? 0.4 : 1 }}>{t.amount_ngn ? fmtNGN(t.amount_ngn) : "—"}</span>,
+                        <span key="src" style={{ fontSize: 11, padding: "3px 10px", borderRadius: 999, background: isBot ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.06)", color: isBot ? "#22C55E" : "rgba(250,250,250,0.5)", border: `1px solid ${isBot ? "rgba(34,197,94,0.25)" : "rgba(255,255,255,0.1)"}` }}>{t.source}</span>,
+                        <span key="status">
+                          {t.voided && <span title={t.voided_reason ?? undefined} style={{ fontSize: 10, padding: "2px 8px", borderRadius: 999, background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.35)", color: "#EF4444", textTransform: "uppercase", letterSpacing: "0.1em" }}>voided</span>}
+                          {!t.voided && t.flagged && <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 999, background: "rgba(217,119,6,0.14)", border: "1px solid rgba(217,119,6,0.4)", color: GOLD, textTransform: "uppercase", letterSpacing: "0.1em" }}>flagged</span>}
+                          {!t.voided && !t.flagged && <span style={{ color: "rgba(250,250,250,0.2)", fontSize: 11 }}>—</span>}
+                        </span>,
+                        <span key="act">
+                          {!t.voided && (
+                            <button onClick={() => voidTransaction(t)} title="Void this transaction (reverses balances, keeps the audit row)"
+                              style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 6, padding: "4px 10px", cursor: "pointer", color: "#EF4444", fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, fontWeight: 600 }}>
+                              Void
+                            </button>
+                          )}
+                        </span>,
+                      ]; })}
                     />
                   )}
                 </Card>
