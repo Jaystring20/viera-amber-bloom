@@ -75,7 +75,7 @@ const ARMS: Arm[] = [
     accent: BRAND_COLORS.viva.accent,
     tag: "Fashion",
     blurb: "Structured yet fluid wearable art for the modern woman.",
-    narrative: "Contemporary made to order fashion celebrating art, storytelling and feminine God-made identity. Every garment is crafted only after it is ordered, reducing waste and contributing to the SDGs.",
+    narrative: "Contemporary made-to-order fashion celebrating art, storytelling, and feminine identity rooted in faith. Every garment is made only after it's ordered, so nothing goes to waste.",
     target: "viva",
     Icon: Shirt,
     x: 50,
@@ -360,10 +360,8 @@ const EcosystemSection = () => {
           viewport={{ once: true, amount: 0.6 }}
           transition={{ duration: d(0.6), delay: d(0.3), ease: "easeOut" as const }}
         >
-          <motion.div
-            animate={reduced ? { height: 48 } : { height: [48, 68, 48] }}
-            transition={reduced ? { duration: 0 } : { duration: 2.4, repeat: Infinity, ease: "easeInOut" as const }}
-            style={{ width: 1.5, backgroundColor: "#0A0A0A" }}
+          <div
+            style={{ width: 1.5, height: 48, backgroundColor: "#0A0A0A" }}
             aria-hidden="true"
           />
           <p

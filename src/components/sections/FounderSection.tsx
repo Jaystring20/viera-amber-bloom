@@ -146,11 +146,11 @@ const FounderSection = () => {
                 margin: 0,
               }}
             >
-              An award-winning fashion designer, pharmacist and public health
-              specialist, digital illustrator, and social entrepreneur. Blending
-              global health metrics with creative storytelling, Faith has
-              pioneered structural methods that turn artwork into impactful
-              public advocacy.
+              An award winning fashion designer, pharmacist, public health
+              specialist, digital illustrator, and social entrepreneur. Faith
+              pairs public health training with a background in art to build
+              campaigns that actually change how people think about women's
+              health.
             </motion.p>
 
             <motion.p
@@ -164,10 +164,9 @@ const FounderSection = () => {
                 margin: 0,
               }}
             >
-              Her visionary direction has driven Viera Amber from an aesthetic
-              passion project in 2013 into a holistic mother brand that champions
-              femininity and health education for adolescent girls and women
-              globally.
+              She started Viera Amber as a passion project in 2013. It's grown
+              into a brand with five arms, all built around the same idea:
+              femininity and health education for girls and women, everywhere.
             </motion.p>
 
             {/* Awards */}

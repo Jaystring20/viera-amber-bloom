@@ -261,7 +261,7 @@ const CORE_VALUES = [
 
 const ART_METHODS = [
   { Icon: PenLine, title: "Illustrations & Comics", desc: "Simple drawings and comics make puberty, menstruation and consent relatable, and they double as printed handouts." },
-  { Icon: Mic2, title: "Drama & Skits", desc: "Short role-plays help girls explore SRHR topics like peer pressure, consent and health decision-making." },
+  { Icon: Mic2, title: "Drama & Skits", desc: "Short role-plays help girls work through SRHR topics like peer pressure, consent, and making healthy choices." },
   { Icon: Music, title: "Songs & Poetry", desc: "Music and spoken word resonate deeply. Girls create pieces reflecting their thoughts on self-respect and body autonomy." },
   { Icon: Brush, title: "Murals & Wall Art", desc: "School walls become ongoing SRHR resources, created with students and reinforcing health messages every day." },
   { Icon: Camera, title: "Photo Campaigns", desc: "Students capture what health and equality mean to them. Displayed in common areas, these foster pride and ownership." },
@@ -615,9 +615,10 @@ const VAGINPage = () => {
                 Health, dignity and rights for every girl.
               </h2>
               <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 15, color: "rgba(17,17,17,0.7)", lineHeight: 1.8, margin: 0, marginBottom: 14 }}>
-                Across underserved communities, too many girls miss school, opportunity, and
-                confidence for one reason: a lack of knowledge, products, and support around
-                their own bodies. Period poverty and stigma keep them behind.
+                In too many communities, girls miss school and lose confidence for one
+                reason: nobody taught them about their own bodies, and nobody gave them
+                the products to manage a normal month. Period poverty and stigma keep
+                them behind.
               </p>
               <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 15, color: "rgba(17,17,17,0.7)", lineHeight: 1.8, margin: 0 }}>
                 VAGIN exists to change that by pairing stigma-free, illustration-led education
@@ -857,7 +858,7 @@ const VAGINPage = () => {
                 <div className="flex flex-col" style={{ gap: 10 }}>
                   {[
                     { cite: "Hartley et al., 2023", finding: "Art-based SRHR teaching increases participation and recall in young women." },
-                    { cite: "Widarini et al., 2019", finding: "Art improved adolescents' knowledge and attitudes towards premarital sex and health decision-making." },
+                    { cite: "Widarini et al., 2019", finding: "Art improved adolescents' knowledge and attitudes towards premarital sex and health choices." },
                   ].map((r) => (
                     <div key={r.cite} style={{ background: `${PURPLE}1A`, border: `1px solid ${PURPLE_LIGHT}50`, borderRadius: 10, padding: "14px 18px", backdropFilter: "blur(4px)" }}>
                       <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 11, color: PURPLE, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 600, margin: 0, marginBottom: 4 }}>{r.cite}</p>
@@ -1362,7 +1363,7 @@ const VAGINPage = () => {
             >
               {[
                 { step: "01", Icon: Coins, title: "KOLO Savings Pool", body: "Girls and their communities contribute small amounts each month. The act of saving builds ownership, dignity and collective responsibility.", accent: "#D97706" },
-                { step: "02", Icon: Smartphone, title: "WhatsApp Distribution", body: "Schools register on the VAGIN WhatsApp channel. Pad requests are placed, confirmed and tracked digitally, ensuring accountability at every step.", accent: PINK },
+                { step: "02", Icon: Smartphone, title: "WhatsApp Distribution", body: "Schools register on the VAGIN WhatsApp channel. Pad requests are placed, confirmed, and tracked digitally, so every pad is accounted for.", accent: PINK },
                 { step: "03", Icon: GraduationCap, title: "Pads + Education", body: "Every pad distribution is paired with a VaginART session. Girls receive menstrual products and SRHR knowledge together, so they stay in school and in control.", accent: PURPLE_LIGHT },
               ].map((s) => (
                 <motion.div
@@ -1430,7 +1431,7 @@ const VAGINPage = () => {
               <div className="absolute inset-0 flex flex-col justify-center px-10 py-8" style={{ maxWidth: 540 }}>
                 <Droplets size={28} color={PINK} strokeWidth={1.5} style={{ marginBottom: 16 }} />
                 <p className="font-display m-0" style={{ fontSize: "clamp(17px, 2.6vw, 26px)", fontWeight: 700, color: "#FAFAFA", lineHeight: 1.35, marginBottom: 14 }}>
-                  "A pad is not just a pad —<br />it's a day of school, a chance at a future."
+                  "A pad means a girl stays in school today.<br />And a girl in school gets a future."
                 </p>
                 <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 13, color: "rgba(250,250,250,0.55)", margin: 0, letterSpacing: "0.08em" }}>
                   VAGIN Field Team — Malawi

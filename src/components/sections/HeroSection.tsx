@@ -265,7 +265,7 @@ const HeroSection = () => {
               letterSpacing: "0.2px",
             }}
           >
-            A creative &amp; impact-driven ecosystem for feminine empowerment.
+            A creative ecosystem built for feminine empowerment.
           </motion.p>
 
           {/* "For her, by her." — bold Playfair italic, increased size */}
@@ -297,10 +297,8 @@ const HeroSection = () => {
             </button>
           </motion.div>
 
-          {/* Scroll indicator */}
-          <motion.div
-            animate={reduced ? undefined : { y: [0, 9, 0] }}
-            transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" as const }}
+          {/* Scroll indicator — static, no continuous motion (reads as calmer, doesn't fight the eye) */}
+          <div
             className="hero-scroll-indicator absolute"
             style={{ bottom: "-4rem", left: "50%", transform: "translateX(-50%)" }}
             aria-hidden="true"
@@ -317,9 +315,7 @@ const HeroSection = () => {
                 opacity: 0.55,
               }}
             >
-              <motion.div
-                animate={reduced ? undefined : { opacity: [1, 0.2, 1], y: [0, 8, 0] }}
-                transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" as const }}
+              <div
                 style={{
                   width: 2,
                   height: 6,
@@ -328,7 +324,7 @@ const HeroSection = () => {
                 }}
               />
             </div>
-          </motion.div>
+          </div>
         </motion.div>
       </div>
     </>
