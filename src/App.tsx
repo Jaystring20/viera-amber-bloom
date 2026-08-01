@@ -11,7 +11,9 @@ import VIVAPage from "./pages/VIVA.tsx";
 import VivaTryOn from "./pages/VivaTryOn.tsx";
 import VAMPage from "./pages/VAM.tsx";
 import VASHPage from "./pages/VASH.tsx";
+import HeroLab from "./pages/HeroLab.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import MobileTabBar from "./components/MobileTabBar.tsx";
 
 const queryClient = new QueryClient();
 
@@ -30,9 +32,12 @@ const App = () => (
           <Route path="/viva/try-on" element={<VivaTryOn />} />
           <Route path="/vam" element={<VAMPage />} />
           <Route path="/vash" element={<VASHPage />} />
+          <Route path="/hero-lab" element={<HeroLab />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        {/* Inside the router: it reads the active route to light its tab. */}
+        <MobileTabBar />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

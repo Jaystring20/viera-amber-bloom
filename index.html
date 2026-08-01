@@ -2,10 +2,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- viewport-fit=cover lets env(safe-area-inset-*) resolve, so the mobile
+         tab bar can clear the iPhone home indicator instead of sitting under it. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Viera Amber — For her, by her.</title>
     <meta name="description" content="Viera Amber: a creative and impact-driven ecosystem for feminine empowerment.">
     <meta name="author" content="Viera Amber" />
+
+    <!-- ── PWA ──────────────────────────────────────────────────────────── -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <!-- Ink chrome on the light site: the status bar reads as an extension of
+         the wordmark rather than a browser artifact. -->
+    <meta name="theme-color" content="#0A0A0A" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Viera Amber" />
 
 
 
@@ -21,8 +34,16 @@
   <meta property="og:description" content="Viera Amber: a creative and impact-driven ecosystem for feminine empowerment.">
   <meta name="twitter:description" content="Viera Amber: a creative and impact-driven ecosystem for feminine empowerment.">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7c4d28f2-4591-4448-9aca-e628b13d2bd9/id-preview-bd9efdf2--f5a19f69-a853-4909-ad38-f9a0ed348dcb.lovable.app-1780463879326.png">
-  <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7c4d28f2-4591-4448-9aca-e628b13d2bd9/id-preview-bd9efdf2--f5a19f69-a853-4909-ad38-f9a0ed348dcb.lovable.app-1780463879326.png">
+  <!-- Share card. Absolute URLs are required: social scrapers do not resolve
+       relative paths. Regenerate with scripts/generate-og-image.py. -->
+  <meta property="og:url" content="https://vieraamber.com/">
+  <meta property="og:site_name" content="Viera Amber">
+  <meta property="og:image" content="https://vieraamber.com/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Viera Amber — For her, by her. A creative ecosystem built for feminine empowerment.">
+  <meta name="twitter:image" content="https://vieraamber.com/og-image.png">
+  <meta name="twitter:image:alt" content="Viera Amber — For her, by her. A creative ecosystem built for feminine empowerment.">
 </head>
 
   <body>

@@ -6,6 +6,16 @@
 
 @import './styles/brand-colors.css';
 
+/* ── Mobile tab bar clearance ──────────────────────────────────────────────
+   The tab bar is fixed, so without this the last section of every page (and
+   the footer) sits underneath it. 56px bar + the device's own safe-area
+   inset. Scoped below lg, which is exactly where the bar is rendered. */
+@media (max-width: 1023px) {
+  body {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
 /* Viera Amber Design System
    All colors expressed in HSL for token consistency with Tailwind.
 */
