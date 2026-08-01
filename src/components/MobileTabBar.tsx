@@ -47,8 +47,8 @@ const TABS: Tab[] = [
 const INK = "#0A0A0A";
 
 /* Surfaces where a marketing tab bar is noise: the admin dashboards are tools
-   with their own navigation, and the hero lab is a scratch page. */
-const HIDDEN_ON = ["/vagin-dashboard", "/vagin-user", "/hero-lab", "/viva/try-on"];
+   with their own navigation, and the try-on view is a focused full-screen task. */
+const HIDDEN_ON = ["/vagin-dashboard", "/vagin-user", "/viva/try-on"];
 
 const MobileTabBar = () => {
   const { pathname } = useLocation();
