@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, useInView, useReducedMotion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Send, ShoppingBag, X, Plus, Minus, CreditCard, Sparkles, Upload, AlertCircle, RefreshCw } from "lucide-react";
+import { ArrowLeft, Send, ShoppingBag, X, Plus, Minus, CreditCard, Sparkles, Upload, AlertCircle, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "@/components/NavBar";
 import { fadeIn, fadeSlideUp, staggerContainer, cardItem, scaleXRule, inViewProps, useReducedVariants } from "@/lib/animations";
@@ -38,15 +38,85 @@ const LOOKBOOK = [
 ];
 
 const SHOP_PRODUCTS = [
-  { id: "heritage", title: "The Heritage",  subtitle: "Look 01 · Batya Collection",        type: "garment" as const, badge: "Made to Order", photo: "/viva/look-1.webp", priceNGN: 180000, priceUSD: 115, desc: "Olive woven kimono · wide-leg pleated denim · gold cuffs. Bespoke fit, made to your measurements." },
-  { id: "bold",     title: "The Bold",      subtitle: "Look 02 · Batya Collection",        type: "garment" as const, badge: "Limited",       photo: "/viva/look-2.webp", priceNGN: 195000, priceUSD: 126, desc: "Hot-pink structured crop · wide-leg denim · statement earrings. Confidence, personalised." },
-  { id: "artist",   title: "The Artist",    subtitle: "Look 03 · Batya Collection",        type: "garment" as const, badge: "Made to Order", photo: "/viva/look-3.webp", priceNGN: 188000, priceUSD: 121, desc: "Chartreuse palazzo · structured crop · layered gold jewellery. Chromatic freedom in fabric." },
-  { id: "print-01", title: "Batya No.1",    subtitle: "Fashion Illustration · A3 Giclée", type: "print"   as const, badge: "Edition / 30", photo: "/viva/look-4.jpeg", priceNGN: 35000,  priceUSD: 22,  desc: "Archival giclée on 300gsm cotton rag. Signed + numbered. Ships in a protective tube." },
-  { id: "print-02", title: "Heritage Print",subtitle: "Fashion Illustration · A3 Giclée", type: "print"   as const, badge: "Edition / 30", photo: "/viva/look-1.webp", priceNGN: 35000,  priceUSD: 22,  desc: "The Heritage silhouette in ink and gouache. Signed by Viera Amber. Edition of 30." },
+  {
+    id: "heritage",
+    title: "The Heritage",
+    subtitle: "Look 01 · Batya Collection",
+    type: "garment" as const,
+    badge: "Made to Order",
+    images: ["/viva/look-1.webp", "/viva/look-2.webp", "/viva/look-3.webp"],
+    priceNGN: 180000,
+    priceUSD: 115,
+    desc: "Olive woven kimono · wide-leg pleated denim · gold cuffs. Bespoke fit, made to your measurements.",
+    fullDesc: "This Heritage piece combines traditional tailoring with modern sensibility. The olive woven kimono drapes beautifully over wide-leg pleated denim, finished with delicate gold cuffs. Every measurement is taken to perfection for your bespoke fit. Crafted to celebrate structured fluidity—where precision meets the body in motion.",
+    materials: "100% premium cotton kimono · sustainable denim · 18k gold-plated cuffs",
+    care: "Dry clean recommended. Gentle hand wash for delicate pieces. Store in cool, dry place."
+  },
+  {
+    id: "bold",
+    title: "The Bold",
+    subtitle: "Look 02 · Batya Collection",
+    type: "garment" as const,
+    badge: "Limited",
+    images: ["/viva/look-2.webp", "/viva/look-1.webp", "/viva/look-3.webp"],
+    priceNGN: 195000,
+    priceUSD: 126,
+    desc: "Hot-pink structured crop · wide-leg denim · statement earrings. Confidence, personalised.",
+    fullDesc: "The Bold is a declaration of artistic agency. The hot-pink structured crop defines your silhouette with precision tailoring, paired with comfortable wide-leg denim and statement-making earrings. This is fashion as confidence—personalised, powerful, and unapologetically you.",
+    materials: "Structured cotton blend crop · premium denim · statement jewelry",
+    care: "Machine wash cold. Line dry. Iron on low heat if needed."
+  },
+  {
+    id: "artist",
+    title: "The Artist",
+    subtitle: "Look 03 · Batya Collection",
+    type: "garment" as const,
+    badge: "Made to Order",
+    images: ["/viva/look-3.webp", "/viva/look-1.webp", "/viva/look-2.webp"],
+    priceNGN: 188000,
+    priceUSD: 121,
+    desc: "Chartreuse palazzo · structured crop · layered gold jewellery. Chromatic freedom in fabric.",
+    fullDesc: "Chromatic freedom is the heart of The Artist. The chartreuse palazzo pants flow with artistic fluidity, balanced by a structured crop top. Layered gold jewellery adds depth and dimension. This piece celebrates your identity as a creative force—dressed in who you are, and whose you are.",
+    materials: "Linen-blend palazzo pants · structured cotton crop · layered gold jewelry",
+    care: "Hand wash recommended. Lay flat to dry. Store jewelry separately."
+  },
+  {
+    id: "print-01",
+    title: "Batya No.1",
+    subtitle: "Fashion Illustration · A3 Giclée",
+    type: "print" as const,
+    badge: "Edition / 30",
+    images: ["/viva/look-4.jpeg", "/viva/look-1.webp"],
+    priceNGN: 35000,
+    priceUSD: 22,
+    desc: "Archival giclée on 300gsm cotton rag. Signed + numbered. Ships in a protective tube.",
+    fullDesc: "Batya No.1 is a limited-edition fashion illustration printed on archival-quality 300gsm cotton rag paper. Each print is hand-signed and numbered as part of the Daughters of Adonai series. Ships in a protective tube with certificate of authenticity.",
+    materials: "300gsm cotton rag paper · archival pigment inks · hand-signed and numbered",
+    care: "Frame under UV-protective glass. Keep away from direct sunlight to preserve colors."
+  },
+  {
+    id: "print-02",
+    title: "Heritage Print",
+    subtitle: "Fashion Illustration · A3 Giclée",
+    type: "print" as const,
+    badge: "Edition / 30",
+    images: ["/viva/look-1.webp", "/viva/look-4.jpeg"],
+    priceNGN: 35000,
+    priceUSD: 22,
+    desc: "The Heritage silhouette in ink and gouache. Signed by Viera Amber. Edition of 30.",
+    fullDesc: "The Heritage Print captures the essence of the iconic silhouette through ink and gouache artistry. This limited edition celebrates the craftsmanship and attention to detail that defines VIVA. Each piece is a gallery-worthy work created by Viera Amber herself.",
+    materials: "300gsm cotton rag paper · ink and gouache · hand-signed",
+    care: "Frame under glass. Avoid moisture. Display away from heat sources."
+  },
 ] as const;
 
 type ShopProduct = typeof SHOP_PRODUCTS[number];
 type CartItem = { product: ShopProduct; qty: number };
+
+// Carousel state for each product
+interface CarouselState {
+  [productId: string]: number; // current image index
+}
 
 // Upcoming pieces (no photo yet)
 const COMING = [
@@ -134,6 +204,13 @@ const VIVAPage = () => {
   const [tryOnStatus, setTryOnStatus]                       = useState<"idle" | "loading" | "done" | "error">("idle");
   const [tryOnError, setTryOnError]                         = useState<string | null>(null);
 
+  // Carousel state
+  const [carouselIndices, setCarouselIndices] = useState<CarouselState>({});
+
+  // Product detail modal state
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [selectedProductForDetail, setSelectedProductForDetail] = useState<ShopProduct | null>(null);
+
   const cartCount = cart.reduce((s, i) => s + i.qty, 0);
   const cartTotal = cart.reduce((s, i) => s + (currency === "NGN" ? i.product.priceNGN : i.product.priceUSD) * i.qty, 0);
 
@@ -152,6 +229,34 @@ const VIVAPage = () => {
       if (i.product.id !== id) return [i];
       const q = i.qty + delta;
       return q < 1 ? [] : [{ ...i, qty: q }];
+    }));
+
+  // Carousel functions
+  const getCarouselIndex = (productId: string) => carouselIndices[productId] ?? 0;
+
+  const nextImage = (productId: string, imageCount: number) => {
+    setCarouselIndices(prev => ({
+      ...prev,
+      [productId]: (getCarouselIndex(productId) + 1) % imageCount
+    }));
+  };
+
+  const prevImage = (productId: string, imageCount: number) => {
+    setCarouselIndices(prev => ({
+      ...prev,
+      [productId]: (getCarouselIndex(productId) - 1 + imageCount) % imageCount
+    }));
+  };
+
+  // Auto-play carousel effect
+  useEffect(() => {
+    const intervals = SHOP_PRODUCTS.filter(p => p.images.length > 1).map(product =>
+      setInterval(() => {
+        nextImage(product.id, product.images.length);
+      }, 2000)
+    );
+    return () => intervals.forEach(interval => clearInterval(interval));
+  }, []);
 
   // Try-On Modal handlers
   const openTryOnModal = (product: ShopProduct) => {
@@ -222,7 +327,8 @@ const VIVAPage = () => {
     setTryOnResult(null);
     try {
       const person = await fileToBase64(personPhotoFile);
-      const garmentImg = await urlToBase64(selectedGarmentForTryOn.photo);
+      const currentGarmentImage = selectedGarmentForTryOn.images[getCarouselIndex(selectedGarmentForTryOn.id)];
+      const garmentImg = await urlToBase64(currentGarmentImage);
 
       const { data, error: fnError } = await supabase.functions.invoke("virtual-tryon", {
         body: {
@@ -721,7 +827,10 @@ const VIVAPage = () => {
           {/* GARMENTS */}
           <p style={{ fontFamily: "DM Sans", fontSize: 9, color: BURGUNDY, letterSpacing: "4px", textTransform: "uppercase", margin: "0 0 20px 0", borderBottom: `1px solid ${BURG_ALPHA}`, paddingBottom: 10 }}>Garments</p>
           <div ref={shopRef} className="grid gap-6 mb-16" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(270px, 1fr))" }}>
-            {SHOP_PRODUCTS.filter(p => p.type === "garment").map((product, i) => (
+            {SHOP_PRODUCTS.filter(p => p.type === "garment").map((product, i) => {
+              const currentImageIndex = getCarouselIndex(product.id);
+              const currentImage = product.images[currentImageIndex];
+              return (
               <motion.div key={product.id}
                 initial={{ opacity: 0, y: 24 }}
                 animate={shopInView ? { opacity: 1, y: 0 } : {}}
@@ -729,12 +838,113 @@ const VIVAPage = () => {
                 whileHover={reduced ? {} : { y: -5, transition: { duration: 0.2 } }}
                 style={{ background: "#fff", borderRadius: 6, overflow: "hidden", border: `1px solid ${BURG_ALPHA}`, boxShadow: "0 2px 18px rgba(110,0,37,0.07)" }}
               >
-                <div style={{ aspectRatio: "3/4", overflow: "hidden", position: "relative" }}>
-                  <img src={product.photo} alt={product.title} loading="lazy"
-                    style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block", transition: "transform 0.55s ease" }}
-                    onMouseEnter={(e) => { if (!reduced) (e.currentTarget as HTMLImageElement).style.transform = "scale(1.05)"; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLImageElement).style.transform = "scale(1)"; }} />
+                <div style={{ aspectRatio: "3/4", overflow: "hidden", position: "relative", cursor: "pointer" }}
+                  onClick={() => {
+                    setSelectedProductForDetail(product);
+                    setDetailModalOpen(true);
+                  }}>
+                  <AnimatePresence mode="wait">
+                    <motion.img
+                      key={currentImage}
+                      src={currentImage}
+                      alt={product.title}
+                      loading="lazy"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block" }}
+                      onMouseEnter={(e) => { if (!reduced) (e.currentTarget as HTMLImageElement).style.transform = "scale(1.05)"; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLImageElement).style.transform = "scale(1)"; }}
+                    />
+                  </AnimatePresence>
                   <span style={{ position: "absolute", top: 12, left: 12, fontFamily: "DM Sans", fontSize: 8, letterSpacing: "2px", textTransform: "uppercase", background: "rgba(110,0,37,0.88)", color: GOLD, padding: "4px 9px", borderRadius: 2 }}>{product.badge}</span>
+
+                  {product.images.length > 1 && (
+                    <>
+                      {/* Left arrow */}
+                      <motion.button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          prevImage(product.id, product.images.length);
+                        }}
+                        whileHover={reduced ? {} : { scale: 1.1 }}
+                        whileTap={reduced ? {} : { scale: 0.95 }}
+                        style={{
+                          position: "absolute",
+                          left: 12,
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          background: "rgba(255,255,255,0.9)",
+                          border: "none",
+                          borderRadius: "50%",
+                          width: 36,
+                          height: 36,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "pointer",
+                          zIndex: 10,
+                          color: BURGUNDY,
+                        }}
+                      >
+                        <ChevronLeft size={18} />
+                      </motion.button>
+
+                      {/* Right arrow */}
+                      <motion.button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          nextImage(product.id, product.images.length);
+                        }}
+                        whileHover={reduced ? {} : { scale: 1.1 }}
+                        whileTap={reduced ? {} : { scale: 0.95 }}
+                        style={{
+                          position: "absolute",
+                          right: 12,
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          background: "rgba(255,255,255,0.9)",
+                          border: "none",
+                          borderRadius: "50%",
+                          width: 36,
+                          height: 36,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "pointer",
+                          zIndex: 10,
+                          color: BURGUNDY,
+                        }}
+                      >
+                        <ChevronRight size={18} />
+                      </motion.button>
+
+                      {/* Carousel indicator */}
+                      <div style={{
+                        position: "absolute",
+                        bottom: 12,
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        display: "flex",
+                        gap: 6,
+                        zIndex: 10,
+                      }}>
+                        {product.images.map((_, idx) => (
+                          <div
+                            key={idx}
+                            style={{
+                              width: 6,
+                              height: 6,
+                              borderRadius: "50%",
+                              background: idx === currentImageIndex ? BURGUNDY : "rgba(110,0,37,0.3)",
+                              transition: "all 0.3s",
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
                 <div style={{ padding: "18px 20px 20px" }}>
                   <p style={{ fontFamily: "DM Sans", fontSize: 9, color: BURGUNDY, opacity: 0.45, letterSpacing: "3px", textTransform: "uppercase", margin: "0 0 5px 0" }}>{product.subtitle}</p>
@@ -763,7 +973,8 @@ const VIVAPage = () => {
                   </motion.button>
                 </div>
               </motion.div>
-            ))}
+              );
+            })}
           </div>
 
           {/* PRINTS */}
@@ -778,7 +989,7 @@ const VIVAPage = () => {
                 style={{ background: "#fff", borderRadius: 6, overflow: "hidden", border: `1px solid ${BURG_ALPHA}`, boxShadow: "0 2px 12px rgba(110,0,37,0.06)", display: "flex" }}
               >
                 <div style={{ width: 110, flexShrink: 0, overflow: "hidden" }}>
-                  <img src={product.photo} alt={product.title} loading="lazy"
+                  <img src={product.images[0]} alt={product.title} loading="lazy"
                     style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block" }} />
                 </div>
                 <div style={{ padding: "16px 18px 18px", flex: 1 }}>
@@ -987,7 +1198,7 @@ const VIVAPage = () => {
                     {cart.map(({ product, qty }) => (
                       <div key={product.id} style={{ display: "flex", gap: 14, alignItems: "flex-start", paddingBottom: 18, marginBottom: 18, borderBottom: `1px solid ${GOLD_ALPHA}` }}>
                         <div style={{ width: 66, height: 82, flexShrink: 0, borderRadius: 3, overflow: "hidden" }}>
-                          <img src={product.photo} alt={product.title}
+                          <img src={product.images[0]} alt={product.title}
                             style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }} />
                         </div>
                         <div style={{ flex: 1 }}>
@@ -1268,6 +1479,233 @@ const VIVAPage = () => {
             </motion.div>
           )}
         </AnimatePresence>
+      </AnimatePresence>
+
+      {/* Product Detail Modal */}
+      <AnimatePresence>
+        {detailModalOpen && selectedProductForDetail && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setDetailModalOpen(false)}
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.5)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1000,
+              padding: 16,
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: "white",
+                borderRadius: 12,
+                maxWidth: 600,
+                maxHeight: "90vh",
+                overflow: "auto",
+                width: "100%",
+              }}
+            >
+              <div style={{ position: "sticky", top: 0, padding: 20, background: "white", borderBottom: `1px solid ${BURG_ALPHA}`, display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 10 }}>
+                <h2 style={{ fontFamily: CORMORANT, fontSize: 28, fontWeight: 700, color: BURGUNDY, margin: 0 }}>
+                  {selectedProductForDetail.title}
+                </h2>
+                <motion.button
+                  onClick={() => setDetailModalOpen(false)}
+                  whileHover={reduced ? {} : { scale: 1.1 }}
+                  whileTap={reduced ? {} : { scale: 0.95 }}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: 8,
+                    color: BURGUNDY,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <X size={24} />
+                </motion.button>
+              </div>
+
+              <div style={{ padding: 20 }}>
+                {/* Image Gallery */}
+                <div style={{ marginBottom: 24, borderRadius: 8, overflow: "hidden", aspectRatio: "3/4", background: "#F5F5F5", position: "relative" }}>
+                  <AnimatePresence mode="wait">
+                    <motion.img
+                      key={getCarouselIndex(selectedProductForDetail.id)}
+                      src={selectedProductForDetail.images[getCarouselIndex(selectedProductForDetail.id)]}
+                      alt={selectedProductForDetail.title}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  </AnimatePresence>
+
+                  {selectedProductForDetail.images.length > 1 && (
+                    <>
+                      <motion.button
+                        onClick={() => prevImage(selectedProductForDetail.id, selectedProductForDetail.images.length)}
+                        whileHover={reduced ? {} : { scale: 1.1 }}
+                        whileTap={reduced ? {} : { scale: 0.95 }}
+                        style={{
+                          position: "absolute",
+                          left: 12,
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          background: "rgba(255,255,255,0.9)",
+                          border: "none",
+                          borderRadius: "50%",
+                          width: 40,
+                          height: 40,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "pointer",
+                          zIndex: 10,
+                          color: BURGUNDY,
+                        }}
+                      >
+                        <ChevronLeft size={20} />
+                      </motion.button>
+
+                      <motion.button
+                        onClick={() => nextImage(selectedProductForDetail.id, selectedProductForDetail.images.length)}
+                        whileHover={reduced ? {} : { scale: 1.1 }}
+                        whileTap={reduced ? {} : { scale: 0.95 }}
+                        style={{
+                          position: "absolute",
+                          right: 12,
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          background: "rgba(255,255,255,0.9)",
+                          border: "none",
+                          borderRadius: "50%",
+                          width: 40,
+                          height: 40,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "pointer",
+                          zIndex: 10,
+                          color: BURGUNDY,
+                        }}
+                      >
+                        <ChevronRight size={20} />
+                      </motion.button>
+                    </>
+                  )}
+                </div>
+
+                {/* Product Info */}
+                <div style={{ marginBottom: 20 }}>
+                  <p style={{ fontFamily: "DM Sans", fontSize: 11, color: BURGUNDY, letterSpacing: "3px", textTransform: "uppercase", margin: "0 0 8px 0", opacity: 0.6 }}>
+                    {selectedProductForDetail.subtitle}
+                  </p>
+                  <p style={{ fontFamily: "DM Sans", fontSize: 14, letterSpacing: "2px", textTransform: "uppercase", color: BURGUNDY, margin: "0 0 12px 0", fontWeight: 600 }}>
+                    {selectedProductForDetail.badge}
+                  </p>
+                  <div style={{ marginBottom: 20 }}>
+                    <span style={{ fontFamily: CORMORANT, fontSize: 28, fontWeight: 700, color: BURGUNDY }}>
+                      {currency === "NGN" ? `₦${selectedProductForDetail.priceNGN.toLocaleString()}` : `$${selectedProductForDetail.priceUSD}`}
+                    </span>
+                    <span style={{ fontFamily: "DM Sans", fontSize: 11, color: `rgba(110,0,37,0.5)`, marginLeft: 12 }}>
+                      {currency === "NGN" ? `/ $${selectedProductForDetail.priceUSD}` : `/ ₦${selectedProductForDetail.priceNGN.toLocaleString()}`}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div style={{ marginBottom: 24 }}>
+                  <h3 style={{ fontFamily: CORMORANT, fontSize: 18, fontWeight: 700, color: BURGUNDY, marginBottom: 8 }}>About This Piece</h3>
+                  <p style={{ fontFamily: "DM Sans", fontSize: 14, lineHeight: 1.7, color: DARK_TEXT, margin: 0, marginBottom: 16 }}>
+                    {(selectedProductForDetail as any).fullDesc || selectedProductForDetail.desc}
+                  </p>
+                </div>
+
+                {/* Materials */}
+                {(selectedProductForDetail as any).materials && (
+                  <div style={{ marginBottom: 24 }}>
+                    <h3 style={{ fontFamily: CORMORANT, fontSize: 18, fontWeight: 700, color: BURGUNDY, marginBottom: 8 }}>Materials</h3>
+                    <p style={{ fontFamily: "DM Sans", fontSize: 14, lineHeight: 1.7, color: DARK_TEXT, margin: 0, marginBottom: 16 }}>
+                      {(selectedProductForDetail as any).materials}
+                    </p>
+                  </div>
+                )}
+
+                {/* Care Instructions */}
+                {(selectedProductForDetail as any).care && (
+                  <div style={{ marginBottom: 24 }}>
+                    <h3 style={{ fontFamily: CORMORANT, fontSize: 18, fontWeight: 700, color: BURGUNDY, marginBottom: 8 }}>Care Instructions</h3>
+                    <p style={{ fontFamily: "DM Sans", fontSize: 14, lineHeight: 1.7, color: DARK_TEXT, margin: 0, marginBottom: 16 }}>
+                      {(selectedProductForDetail as any).care}
+                    </p>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div style={{ display: "flex", gap: 12 }}>
+                  <motion.button
+                    onClick={() => {
+                      addToCart(selectedProductForDetail);
+                      setDetailModalOpen(false);
+                    }}
+                    whileHover={reduced ? {} : { scale: 1.02 }}
+                    whileTap={reduced ? {} : { scale: 0.98 }}
+                    style={{
+                      flex: 1,
+                      padding: "14px 16px",
+                      fontFamily: "DM Sans",
+                      fontSize: 12,
+                      letterSpacing: "2px",
+                      textTransform: "uppercase",
+                      fontWeight: 600,
+                      background: BURGUNDY,
+                      color: GOLD,
+                      border: "none",
+                      borderRadius: 6,
+                      cursor: "pointer",
+                    }}
+                  >
+                    + Add to Cart
+                  </motion.button>
+                  <motion.button
+                    onClick={() => openTryOnModal(selectedProductForDetail)}
+                    whileHover={reduced ? {} : { scale: 1.02 }}
+                    whileTap={reduced ? {} : { scale: 0.98 }}
+                    style={{
+                      flex: 1,
+                      padding: "14px 16px",
+                      fontFamily: "DM Sans",
+                      fontSize: 12,
+                      letterSpacing: "2px",
+                      textTransform: "uppercase",
+                      fontWeight: 600,
+                      background: "transparent",
+                      color: BURGUNDY,
+                      border: `1.5px solid ${BURGUNDY}`,
+                      borderRadius: 6,
+                      cursor: "pointer",
+                    }}
+                  >
+                    <Sparkles size={12} style={{ display: "inline", marginRight: 6 }} /> Try On
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
       </AnimatePresence>
     </div>
   );
