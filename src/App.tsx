@@ -12,6 +12,7 @@ import VivaTryOn from "./pages/VivaTryOn.tsx";
 import VAMPage from "./pages/VAM.tsx";
 import VASHPage from "./pages/VASH.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import AdminProducts from "./pages/AdminProducts.tsx";
 import MobileTabBar from "./components/MobileTabBar.tsx";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/viva/try-on" element={<VivaTryOn />} />
           <Route path="/vam" element={<VAMPage />} />
           <Route path="/vash" element={<VASHPage />} />
+          <Route path="/admin/products" element={<AdminProducts />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
