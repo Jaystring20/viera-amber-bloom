@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Droplets, Palette, School as SchoolIcon, LogOut,
   TrendingUp, Users, BookOpen, Coins,
   AlertCircle, RefreshCw, Plus, Pencil, Trash2, X,
-  GraduationCap, ClipboardList, CheckCircle2, Images, Camera, Bot,
+  GraduationCap, ClipboardList, CheckCircle2, Images, Camera, Bot, ShoppingBag,
 } from "lucide-react";
 import GalleryAdminTab from "@/components/admin/GalleryAdminTab";
 import VAGINImagesAdminTab from "@/components/admin/VAGINImagesAdminTab";
@@ -278,7 +278,7 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
 // MAIN DASHBOARD
 // ══════════════════════════════════════════════════════════════════════════════
 const VAGINDashboard = () => {
-  type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions" | "gallery" | "vagin_images" | "bot";
+  type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions" | "gallery" | "vagin_images" | "viva_products" | "bot";
   type ModalType = "add-school" | "edit-school" | "add-student" | "edit-student" | "add-matron" | "edit-matron" | "add-distribution" | "add-session" | "confirm-delete" | null;
 
   const [authed, setAuthed]         = useState<boolean | null>(null);
@@ -538,6 +538,7 @@ const VAGINDashboard = () => {
     { id: "transactions"  as TabId, label: "Transactions",  Icon: ClipboardList },
     { id: "gallery"       as TabId, label: "Gallery CMS",   Icon: Images },
     { id: "vagin_images"  as TabId, label: "VAGIN Images",  Icon: Camera },
+    { id: "viva_products" as TabId, label: "VIVA Products", Icon: ShoppingBag },
     { id: "bot"           as TabId, label: "Bot Activity",  Icon: Bot },
   ] as const;
 
@@ -831,6 +832,22 @@ const VAGINDashboard = () => {
                   )}
                 </Card>
                 {infoBox(<><strong>Phase 2 ready:</strong> Every pad issuance, savings deposit, and balance check from the WhatsApp bot will be automatically logged here with the student ID, matron name, and channel (whatsapp / manual). This is your full audit trail for donors and stakeholders.</>, "#22C55E")}
+              </motion.div>
+            )}
+
+            {activeTab === "viva_products" && (
+              <motion.div key="viva_products" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+                <Card title="VIVA Products Management">
+                  <div style={{ textAlign: "center", padding: "48px 24px" }}>
+                    <ShoppingBag size={40} color="rgba(250,250,250,0.2)" style={{ marginBottom: 16 }} />
+                    <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 16, color: "rgba(250,250,250,0.8)", margin: "0 0 12px", fontWeight: 500 }}>Manage VIVA Products</p>
+                    <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 14, color: "rgba(250,250,250,0.5)", margin: "0 0 24px", maxWidth: 500 }}>Create, edit, and manage your VIVA collection products. Add rich descriptions, pricing, images, and more.</p>
+                    <a href="/admin/products" style={{ display: "inline-block", padding: "12px 24px", backgroundColor: PURPLE, color: "#FAFAFA", textDecoration: "none", borderRadius: 8, fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 14, fontWeight: 600, transition: "all 0.2s", cursor: "pointer" }} onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#7F2BAA")} onMouseLeave={e => (e.currentTarget.style.backgroundColor = PURPLE)}>
+                      Open Products Dashboard
+                    </a>
+                  </div>
+                </Card>
+                {infoBox(<><strong>Product Management:</strong> Use the dedicated Products Dashboard to create and manage all VIVA garments and prints. Changes sync in real-time to the storefront.</>, "#D97706")}
               </motion.div>
             )}
 
