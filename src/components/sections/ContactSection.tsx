@@ -56,7 +56,7 @@ const ContactSection = () => {
 
   const inputStyle: React.CSSProperties = {
     background: "#FFFFFF",
-    border: "1px solid #E8E8E8",
+    border: "2px solid #E8E8E8",
     borderRadius: 8,
     padding: "12px 14px",
     color: "#111111",
@@ -65,15 +65,18 @@ const ContactSection = () => {
     outline: "none",
     width: "100%",
     transition: "all 0.2s",
+    boxShadow: "0 0 0 0 transparent",
   };
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     e.target.style.borderColor = "#D97706";
     e.target.style.background = "#FFFFFF";
+    e.target.style.boxShadow = "0 0 0 3px rgba(217, 119, 6, 0.1)";
   };
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     e.target.style.borderColor = "#E8E8E8";
     e.target.style.background = "#FFFFFF";
+    e.target.style.boxShadow = "0 0 0 0 transparent";
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
