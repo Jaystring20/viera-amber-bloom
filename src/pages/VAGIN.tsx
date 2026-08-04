@@ -125,7 +125,7 @@ const SectionHead = ({
     <div className="flex flex-col items-center text-center mb-12" style={{ gap: 16 }}>
       <motion.p
         variants={fadeV} initial="hidden" animate={inView ? "visible" : "hidden"}
-        style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 11, color: accentColor, letterSpacing: "4px", textTransform: "uppercase", fontWeight: 400, margin: 0 }}
+        style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 13, color: accentColor, letterSpacing: "4px", textTransform: "uppercase", fontWeight: 600, margin: 0 }}
       >{eyebrow}</motion.p>
       <motion.h2
         variants={headV} initial="hidden" animate={inView ? "visible" : "hidden"}
@@ -151,12 +151,12 @@ const GALLERY_IMAGES = [
   { slot: "vagin_malawi_01", alt: "VAGIN community session in Malawi", location: "Malawi" },
   { slot: "vagin_page_08_img_3", alt: "Girls in community workshop", location: "Nigeria" },
   { slot: "vagin_malawi_02", alt: "Reaching girls across Malawi", location: "Malawi" },
-  { slot: "vagin_team_02", alt: "Community outreach — two women making a difference", location: "Nigeria" },
+  { slot: "vagin_team_02", alt: "Community outreach. Two women making a difference", location: "Nigeria" },
   { slot: "vagin_malawi_03", alt: "SRHR education session, Malawi", location: "Malawi" },
   { slot: "vagin_page_05_img_2", alt: "Girls' gathering, VAGIN initiative", location: "Nigeria" },
   { slot: "vagin_malawi_04", alt: "Girls empowered through art and education, Malawi", location: "Malawi" },
   { slot: "vagin_team_03", alt: "VAGIN team at Clegg Girls Senior High School", location: "Nigeria" },
-  { slot: "vagin_page_06_img_1", alt: "Active session — girls participating in SRHR education", location: "Malawi" },
+  { slot: "vagin_page_06_img_1", alt: "Active session. Girls participating in SRHR education", location: "Malawi" },
 ];
 
 const InfiniteCarousel = () => {
@@ -211,7 +211,7 @@ const InfiniteCarousel = () => {
               flexShrink: 0,
               width: "clamp(260px, 28vw, 390px)",
               aspectRatio: "4/3",
-              borderRadius: 14,
+              borderRadius: 12,
               border: "1px solid rgba(237,21,93,0.18)",
             }}
           >
@@ -231,7 +231,7 @@ const InfiniteCarousel = () => {
                 className="absolute bottom-3 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                 style={{ transform: "translateY(4px)" }}
               >
-                <span style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 10, color: "rgba(250,250,250,0.85)", letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 500 }}>
+                <span style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 11, color: "rgba(250,250,250,0.85)", letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600 }}>
                   {img.location}
                 </span>
               </div>
@@ -305,7 +305,7 @@ const VAGINPage = () => {
         {/* ── HERO ───────────────────────────────────────────────────────── */}
         <section
           ref={heroRef}
-          aria-label="VAGIN — Girls' Initiative"
+          aria-label="VAGIN. Girls' Initiative"
           className="relative w-full overflow-hidden flex flex-col items-center justify-center"
           style={{
             minHeight: "92vh",
@@ -341,7 +341,7 @@ const VAGINPage = () => {
                 >
                   <img
                     src="/vagin-logo.webp"
-                    alt="VAGIN — Viera Amber Girls' Initiative"
+                    alt="VAGIN. Viera Amber Girls' Initiative"
                     style={{
                       height: "clamp(80px, 10vw, 115px)",
                       width: "auto",
@@ -443,7 +443,7 @@ const VAGINPage = () => {
                     ) : (
                       <CountUp end={c.end} suffix={c.suffix} className="font-display" style={{ fontSize: 14, fontWeight: 700, color: PINK }} />
                     )}
-                    <span style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(17,17,17,0.65)" }}>{c.l}</span>
+                    <span style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(17,17,17,0.65)", fontWeight: 500 }}>{c.l}</span>
                   </span>
                 ))}
               </motion.div>
@@ -581,7 +581,7 @@ const VAGINPage = () => {
               viewport={{ once: true, amount: 0.3 }}
               className="text-center"
             >
-              <p className="font-body uppercase m-0" style={{ fontSize: 11, color: PURPLE, letterSpacing: "0.4em", marginBottom: 12 }}>See the Impact</p>
+              <p className="font-body uppercase m-0" style={{ fontSize: 13, color: PURPLE, letterSpacing: "0.4em", marginBottom: 12, fontWeight: 600 }}>See the Impact</p>
               <h2 className="font-display m-0" style={{ fontSize: "clamp(28px, 4.2vw, 46px)", fontWeight: 800, color: "#111111", lineHeight: 1.08, marginBottom: 8, letterSpacing: "-0.02em" }}>
                 Girls changing their stories
               </h2>
@@ -610,7 +610,7 @@ const VAGINPage = () => {
         >
           <div className="mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center" style={{ maxWidth: 1100 }}>
             <motion.div variants={leftV} initial="hidden" animate={missionInView ? "visible" : "hidden"}>
-              <p className="font-body uppercase m-0" style={{ fontSize: 11, color: PINK, letterSpacing: "0.3em", marginBottom: 16 }}>The Mission</p>
+              <p className="font-body uppercase m-0" style={{ fontSize: 13, color: PINK, letterSpacing: "0.3em", marginBottom: 16, fontWeight: 600 }}>The Mission</p>
               <h2 className="font-display m-0" style={{ fontSize: "clamp(26px, 3.6vw, 42px)", fontWeight: 800, color: "#111111", lineHeight: 1.1, marginBottom: 18, letterSpacing: "-0.02em" }}>
                 Health, dignity and rights for every girl.
               </h2>
@@ -680,7 +680,7 @@ const VAGINPage = () => {
               viewport={{ once: true, amount: 0.3 }}
               className="text-center mb-14"
             >
-              <p className="font-body uppercase m-0" style={{ fontSize: 11, color: PINK, letterSpacing: "0.4em", marginBottom: 12 }}>The Problem</p>
+              <p className="font-body uppercase m-0" style={{ fontSize: 13, color: PINK, letterSpacing: "0.4em", marginBottom: 12, fontWeight: 600 }}>The Problem</p>
               <h2 className="font-display m-0" style={{ fontSize: "clamp(28px, 4.2vw, 50px)", fontWeight: 800, color: "#111111", lineHeight: 1.08, maxWidth: 700, margin: "0 auto", marginBottom: 16, letterSpacing: "-0.02em" }}>
                 Why SRHR matters right now.
               </h2>
@@ -724,11 +724,11 @@ const VAGINPage = () => {
                      redundant here: the statistic itself is already set in
                      the accent at 68px, so the card was stating its colour
                      twice. The 1px border carries it. */
-                  style={{ background: `${s.accent}14`, border: `1px solid ${s.accent}38`, borderRadius: 14, padding: "32px 28px", gap: 14, backdropFilter: "blur(4px)" }}
+                  style={{ background: `${s.accent}14`, border: `1px solid ${s.accent}38`, borderRadius: 12, padding: "32px 28px", gap: 14, backdropFilter: "blur(4px)" }}
                 >
                   <CountUp end={s.end} suffix={s.suffix} className="font-display" style={{ fontSize: "clamp(44px, 6vw, 68px)", fontWeight: 800, color: s.accent, lineHeight: 1, letterSpacing: "-0.03em" }} />
                   <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 16, color: "rgba(17,17,17,0.8)", lineHeight: 1.7, margin: 0 }}>{s.body}</p>
-                  <span style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 11, color: "rgba(17,17,17,0.5)", letterSpacing: "0.12em", textTransform: "uppercase" }}>Source: {s.source}</span>
+                  <span style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 12, color: "rgba(17,17,17,0.5)", letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 500 }}>Source: {s.source}</span>
                 </motion.div>
               ))}
             </motion.div>
@@ -742,7 +742,7 @@ const VAGINPage = () => {
               className="p-7 rounded-xl"
               style={{ background: `${PINK}18`, border: `1px solid ${PINK}48`, backdropFilter: "blur(6px)" }}
             >
-              <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 11, color: PINK, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600, margin: 0, marginBottom: 12 }}>
+              <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 13, color: PINK, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600, margin: 0, marginBottom: 12 }}>
                 What girls in low-resourced settings face
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -790,7 +790,7 @@ const VAGINPage = () => {
                   key={s.label}
                   variants={cardV}
                   className="flex flex-col items-center text-center"
-                  style={{ background: `${PINK}15`, border: `1px solid ${PINK}40`, borderRadius: 14, padding: "32px 20px", gap: 12, backdropFilter: "blur(4px)" }}
+                  style={{ background: `${PINK}15`, border: `1px solid ${PINK}40`, borderRadius: 12, padding: "32px 20px", gap: 12, backdropFilter: "blur(4px)" }}
                 >
                   <span aria-hidden="true" className="flex items-center justify-center" style={{ width: 44, height: 44, borderRadius: 12, background: `${PINK}15`, border: `1px solid ${PINK}38`, backdropFilter: "blur(4px)" }}>
                     <s.Icon size={22} color={PINK} strokeWidth={1.75} />
@@ -816,8 +816,8 @@ const VAGINPage = () => {
               className="mt-8 p-6 rounded-xl"
               style={{ background: `linear-gradient(135deg, ${PURPLE} 0%, ${PINK} 100%)`, border: `1px solid ${PINK}40` }}
             >
-              <p className="m-0" style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 11, color: "rgba(255,255,255,0.85)", letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600, marginBottom: 14 }}>
-                Project 2029 — Our 5-Year Vision
+              <p className="m-0" style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 13, color: "rgba(255,255,255,0.85)", letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600, marginBottom: 14 }}>
+                Project 2029. Our 5-Year Vision
               </p>
               <div className="grid grid-cols-3 gap-4 text-center">
                 {[
@@ -850,7 +850,7 @@ const VAGINPage = () => {
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.7, ease: "easeOut" as const }}
               >
-                <p className="font-body uppercase m-0" style={{ fontSize: 11, color: PURPLE_LIGHT, letterSpacing: "0.4em", marginBottom: 14 }}>Our Method</p>
+                <p className="font-body uppercase m-0" style={{ fontSize: 13, color: PURPLE_LIGHT, letterSpacing: "0.4em", marginBottom: 14, fontWeight: 600 }}>Our Method</p>
                 <h2 className="font-display m-0" style={{ fontSize: "clamp(28px, 4.2vw, 48px)", fontWeight: 800, color: "#111111", lineHeight: 1.08, marginBottom: 20, letterSpacing: "-0.02em" }}>
                   Why art is the right tool for this work.
                 </h2>
@@ -865,8 +865,8 @@ const VAGINPage = () => {
                     { cite: "Hartley et al., 2023", finding: "Art-based SRHR teaching increases participation and recall in young women." },
                     { cite: "Widarini et al., 2019", finding: "Art improved adolescents' knowledge and attitudes towards premarital sex and health choices." },
                   ].map((r) => (
-                    <div key={r.cite} style={{ background: `${PURPLE}1A`, border: `1px solid ${PURPLE_LIGHT}50`, borderRadius: 10, padding: "14px 18px", backdropFilter: "blur(4px)" }}>
-                      <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 11, color: PURPLE, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 600, margin: 0, marginBottom: 4 }}>{r.cite}</p>
+                    <div key={r.cite} style={{ background: `${PURPLE}1A`, border: `1px solid ${PURPLE_LIGHT}50`, borderRadius: 8, padding: "14px 18px", backdropFilter: "blur(4px)" }}>
+                      <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 12, color: PURPLE, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 600, margin: 0, marginBottom: 4 }}>{r.cite}</p>
                       <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 13.5, color: "rgba(17,17,17,0.75)", lineHeight: 1.6, margin: 0 }}>{r.finding}</p>
                     </div>
                   ))}
@@ -980,7 +980,7 @@ const VAGINPage = () => {
                   variants={cardV}
                   whileHover={reduced ? {} : { y: -4 }}
                   transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
-                  style={{ background: `${c.color}14`, border: `1px solid ${c.color}35`, borderRadius: 14, padding: "26px 22px" }}
+                  style={{ background: `${c.color}14`, border: `1px solid ${c.color}35`, borderRadius: 12, padding: "26px 22px" }}
                 >
                   <span aria-hidden="true" className="flex items-center justify-center" style={{ width: 46, height: 46, borderRadius: 12, background: `${c.color}15`, border: `1px solid ${c.color}33`, marginBottom: 16 }}>
                     <c.Icon size={22} color={c.color} strokeWidth={1.75} />
@@ -1018,7 +1018,7 @@ const VAGINPage = () => {
             >
               <div className="inline-flex items-center justify-center mb-5" style={{ gap: 8, background: "rgba(98,1,127,0.18)", border: "1px solid rgba(199,125,255,0.35)", borderRadius: 999, padding: "7px 18px" }}>
                 <Palette size={13} color={PURPLE_LIGHT} strokeWidth={2.2} />
-                <span style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 11, color: PURPLE_LIGHT, letterSpacing: "0.35em", textTransform: "uppercase", fontWeight: 600 }}>VaginART Program</span>
+                <span style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 13, color: PURPLE_LIGHT, letterSpacing: "0.35em", textTransform: "uppercase", fontWeight: 600 }}>VaginART Program</span>
               </div>
               <h2 className="font-display m-0" style={{ fontSize: "clamp(30px, 4.7vw, 54px)", fontWeight: 800, color: "#FAFAFA", lineHeight: 1.06, maxWidth: 700, margin: "0 auto 18px", letterSpacing: "-0.02em" }}>
                 One session changes how a girl sees herself.
@@ -1127,7 +1127,7 @@ const VAGINPage = () => {
                 animate={vaginartDeepInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -28 }}
                 transition={{ duration: 0.7, ease: "easeOut" as const, delay: 0.1 }}
               >
-                <p className="font-body m-0 uppercase" style={{ fontSize: 11, color: PURPLE_LIGHT, letterSpacing: "0.4em", marginBottom: 14 }}>Inside a Session</p>
+                <p className="font-body m-0 uppercase" style={{ fontSize: 13, color: PURPLE_LIGHT, letterSpacing: "0.4em", marginBottom: 14, fontWeight: 600 }}>Inside a Session</p>
                 <h3 className="font-display m-0" style={{ fontSize: "clamp(22px, 3vw, 34px)", fontWeight: 700, color: "#FAFAFA", lineHeight: 1.15, marginBottom: 28 }}>
                   Every session follows a simple, proven structure.
                 </h3>
@@ -1184,7 +1184,7 @@ const VAGINPage = () => {
                   <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontStyle: "italic", fontSize: 15, color: "rgba(250,250,250,0.92)", lineHeight: 1.6, margin: 0, marginBottom: 10 }}>
                     "I didn't know I could ask questions about my body. This session gave me permission."
                   </p>
-                  <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 11, color: PURPLE_LIGHT, letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 600, margin: 0 }}>— VaginART participant, Malawi</p>
+                  <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 13, color: PURPLE_LIGHT, letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 600, margin: 0 }}>VaginART participant, Malawi</p>
                 </div>
               </motion.div>
             </div>
@@ -1198,13 +1198,13 @@ const VAGINPage = () => {
             >
               {[
                 { src: vimg("vagin_page_05_img_2"), alt: "Girls' gathering, VAGIN initiative, Nigeria", label: "Lagos, Nigeria" },
-                { src: vimg("vagin_team_02"), alt: "Community outreach — VAGIN team", label: "Community Session" },
+                { src: vimg("vagin_team_02"), alt: "Community outreach: VAGIN team", label: "Community Session" },
                 { src: vimg("vagin_page_08_img_3"), alt: "Girls in community workshop", label: "Workshop Session" },
               ].map((photo) => (
                 <motion.div
                   key={photo.src}
                   variants={cardV}
-                  style={{ position: "relative", borderRadius: 14, overflow: "hidden", aspectRatio: "4/3", border: "1px solid rgba(255,255,255,0.1)" }}
+                  style={{ position: "relative", borderRadius: 12, overflow: "hidden", aspectRatio: "4/3", border: "1px solid rgba(255,255,255,0.1)" }}
                 >
                   <img
                     src={photo.src}
@@ -1214,7 +1214,7 @@ const VAGINPage = () => {
                   />
                   <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(10,0,28,0.65) 0%, transparent 55%)" }} />
                   <div style={{ position: "absolute", bottom: 10, left: 12 }}>
-                    <span style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 11, color: PURPLE_LIGHT, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>{photo.label}</span>
+                    <span style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 12, color: PURPLE_LIGHT, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>{photo.label}</span>
                   </div>
                 </motion.div>
               ))}
@@ -1325,7 +1325,7 @@ const VAGINPage = () => {
             >
               <div className="inline-flex items-center justify-center mb-5" style={{ gap: 8, background: "rgba(237,21,93,0.12)", border: "1px solid rgba(237,21,93,0.35)", borderRadius: 999, padding: "7px 18px" }}>
                 <Droplets size={13} color={PINK} strokeWidth={2.2} />
-                <span style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 11, color: PINK, letterSpacing: "0.35em", textTransform: "uppercase", fontWeight: 600 }}>PAD KOLO Project</span>
+                <span style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 13, color: PINK, letterSpacing: "0.35em", textTransform: "uppercase", fontWeight: 600 }}>PAD KOLO Project</span>
               </div>
               <h2 className="font-display m-0" style={{ fontSize: "clamp(30px, 4.7vw, 58px)", fontWeight: 800, color: "#FAFAFA", lineHeight: 1.04, maxWidth: 740, margin: "0 auto 20px", letterSpacing: "-0.025em" }}>
                 No girl should miss school<br />because of her period.
@@ -1402,7 +1402,7 @@ const VAGINPage = () => {
             >
               <div className="flex items-center mb-6" style={{ gap: 10 }}>
                 <TrendingUp size={15} color={PINK} strokeWidth={2} />
-                <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 11, color: PINK, letterSpacing: "0.28em", textTransform: "uppercase", fontWeight: 600, margin: 0 }}>PAD KOLO Impact So Far</p>
+                <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 13, color: PINK, letterSpacing: "0.28em", textTransform: "uppercase", fontWeight: 600, margin: 0 }}>PAD KOLO Impact So Far</p>
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
                 {[
@@ -1417,7 +1417,7 @@ const VAGINPage = () => {
                     ) : (
                       <CountUp end={end} prefix={prefix} suffix={suffix} className="font-display" style={{ fontSize: "clamp(26px, 3.5vw, 40px)", fontWeight: 700, color: PINK, lineHeight: 1, display: "block" }} />
                     )}
-                    <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 11, color: "rgba(250,250,250,0.5)", textTransform: "uppercase", letterSpacing: "0.14em", margin: 0 }}>{label}</p>
+                    <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 12, color: "rgba(250,250,250,0.5)", textTransform: "uppercase", letterSpacing: "0.14em", margin: 0, fontWeight: 500 }}>{label}</p>
                   </div>
                 ))}
               </div>
@@ -1487,7 +1487,7 @@ const VAGINPage = () => {
               viewport={{ once: true, amount: 0.3 }}
               className="text-center mb-12"
             >
-              <p className="font-body uppercase m-0" style={{ fontSize: 11, color: PINK, letterSpacing: "0.4em", marginBottom: 12 }}>What We Stand For</p>
+              <p className="font-body uppercase m-0" style={{ fontSize: 13, color: PINK, letterSpacing: "0.4em", marginBottom: 12, fontWeight: 600 }}>What We Stand For</p>
               <h2 className="font-display m-0" style={{ fontSize: "clamp(26px, 4vw, 48px)", fontWeight: 700, color: "#FAFAFA", lineHeight: 1.12 }}>
                 Our core values.
               </h2>
