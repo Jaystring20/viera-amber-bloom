@@ -151,13 +151,14 @@ const VASHPage = () => {
               <ShoppingBag size={14} color={TEAL_LIGHT} strokeWidth={1.5} />
               <p style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: 11,
+                fontSize: 13,
                 color: TEAL_LIGHT,
                 letterSpacing: "5px",
                 textTransform: "uppercase",
                 margin: 0,
+                fontWeight: 600,
               }}>
-                VASH — Viera Amber Shop
+                VASH. Viera Amber Shop
               </p>
             </motion.div>
 
@@ -235,8 +236,8 @@ const VASHPage = () => {
           <div className="flex flex-col items-center text-center mb-14" style={{ gap: 10 }}>
             <p style={{
               fontFamily: "DM Sans, system-ui, sans-serif",
-              fontSize: 11, color: TEAL,
-              letterSpacing: "4px", textTransform: "uppercase", margin: 0,
+              fontSize: 13, color: TEAL,
+              letterSpacing: "4px", textTransform: "uppercase", margin: 0, fontWeight: 600,
             }}>
               What We Offer
             </p>
@@ -362,8 +363,8 @@ const VASHPage = () => {
           <div className="flex flex-col items-center text-center mb-12" style={{ gap: 10 }}>
             <p style={{
               fontFamily: "DM Sans, system-ui, sans-serif",
-              fontSize: 11, color: TEAL,
-              letterSpacing: "4px", textTransform: "uppercase", margin: 0,
+              fontSize: 13, color: TEAL,
+              letterSpacing: "4px", textTransform: "uppercase", margin: 0, fontWeight: 600,
             }}>
               Featured Works
             </p>
@@ -484,9 +485,9 @@ const VASHPage = () => {
               variants={fadeVariants}
               style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: 11, color: TEAL_LIGHT,
+                fontSize: 13, color: TEAL_LIGHT,
                 letterSpacing: "4px", textTransform: "uppercase",
-                margin: "0 0 12px 0",
+                margin: "0 0 12px 0", fontWeight: 600,
               }}
             >
               Launch List
