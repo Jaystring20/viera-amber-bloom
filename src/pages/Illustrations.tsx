@@ -63,11 +63,11 @@ const Illustrations = () => {
             <p
               style={{
                 fontFamily: "Montserrat, system-ui, sans-serif",
-                fontSize: 10,
+                fontSize: 13,
                 color: "#111111",
                 letterSpacing: "4px",
                 textTransform: "uppercase",
-                fontWeight: 400,
+                fontWeight: 600,
                 margin: 0,
               }}
             >
@@ -111,11 +111,11 @@ const Illustrations = () => {
                 animate={appsInView ? "visible" : "hidden"}
                 style={{
                   fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: 11,
+                  fontSize: 13,
                   color: "#111111",
                   letterSpacing: "4px",
                   textTransform: "uppercase",
-                  fontWeight: 400,
+                  fontWeight: 600,
                   margin: 0,
                 }}
               >
@@ -149,7 +149,7 @@ const Illustrations = () => {
               {[
                 {
                   title: "Brand Campaigns",
-                  desc: "From #BreakTheBias to Mother's Day — illustration that gives a campaign a face and a voice.",
+                  desc: "From #BreakTheBias to Mother's Day. Illustration that gives a campaign a face and a voice.",
                 },
                 {
                   title: "Editorial & Print",
@@ -157,7 +157,7 @@ const Illustrations = () => {
                 },
                 {
                   title: "Fashion & Product",
-                  desc: "The Atelier line and the Lagos Icons accessories — art that walks off the page and onto the body.",
+                  desc: "The Atelier line and the Lagos Icons accessories. Art that walks off the page and onto the body.",
                 },
               ].map((app) => (
                 <motion.div
@@ -212,11 +212,11 @@ const Illustrations = () => {
                 animate={processInView ? "visible" : "hidden"}
                 style={{
                   fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: 11,
+                  fontSize: 13,
                   color: "#111111",
                   letterSpacing: "4px",
                   textTransform: "uppercase",
-                  fontWeight: 400,
+                  fontWeight: 600,
                   margin: 0,
                 }}
               >
@@ -267,7 +267,7 @@ const Illustrations = () => {
                     style={{
                       fontFamily: "DM Sans, system-ui, sans-serif",
                       fontWeight: 700,
-                      fontSize: 10,
+                      fontSize: 11,
                       color: "#111111",
                       letterSpacing: "3px",
                       display: "block",
