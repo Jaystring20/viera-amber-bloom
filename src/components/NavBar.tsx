@@ -110,9 +110,9 @@ const NavBar = () => {
           href="/"
           onClick={handleLogoClick}
           aria-label={
-            isVaginRoute ? "VAGIN — back to Viera Amber"
-            : isVivaRoute ? "VIVA — back to Viera Amber"
-            : "Viera Amber — home"
+            isVaginRoute ? "VAGIN. Back to Viera Amber"
+            : isVivaRoute ? "VIVA. Back to Viera Amber"
+            : "Viera Amber home"
           }
           className="flex items-center"
           style={{ cursor: "pointer", gap: 10 }}

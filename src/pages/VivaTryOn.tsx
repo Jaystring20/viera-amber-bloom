@@ -67,7 +67,7 @@ const VivaTryOn = () => {
       return;
     }
     if (file.size > 8 * 1024 * 1024) {
-      setError("Image is too large — please use one under 8MB.");
+      setError("Image is too large. Please use one under 8MB.");
       return;
     }
     setError(null);
@@ -150,7 +150,7 @@ const VivaTryOn = () => {
             </h1>
             <p style={{ fontFamily: SANS, fontWeight: 300, fontSize: 15, color: "rgba(255,255,255,0.85)", lineHeight: 1.7, margin: 0 }}>
               Upload a photo, pick a VIVA look, and preview how the piece would look on you.
-              When you love it, we finish the order on WhatsApp — made to your measurements.
+              When you love it, we finish the order on WhatsApp, made to your measurements.
             </p>
           </div>
         </section>

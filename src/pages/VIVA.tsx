@@ -57,7 +57,7 @@ const COMING = [
 const PILLARS = [
   { heading: "Structured Fluidity", line: "Where precision meets the body in motion.", numeral: "I" },
   { heading: "Artistic Agency",     line: "Every garment is a declaration.",             numeral: "II" },
-  { heading: "Sacred Identity",     line: "Dressed in who you are — and whose you are.", numeral: "III" },
+  { heading: "Sacred Identity",     line: "Dressed in who you are, and whose you are.", numeral: "III" },
 ];
 
 const PILLAR_ICONS = [

@@ -38,7 +38,7 @@ const CATEGORIES = [
   {
     icon: Download,
     title: "Digital Downloads",
-    desc: "Instant-access digital files — illustrations, wallpapers, and design assets for creatives who move fast.",
+    desc: "Instant-access digital files: illustrations, wallpapers, and design assets for creatives who move fast.",
     badge: "Instant Access",
     cta: "Shop Digital",
     items: ["Fashion Figure Pack (Procreate)", "Colour Palette Collection", "Brand Mood Board Templates"],
@@ -195,7 +195,7 @@ const VASHPage = () => {
                 margin: 0,
               }}
             >
-              Prints, originals, digital assets, and custom commissions — the full universe of Viera Amber's creative work, available for you to own.
+              Prints, originals, digital assets, and custom commissions. The full universe of Viera Amber's creative work, available for you to own.
             </motion.p>
 
             <motion.div
@@ -222,7 +222,7 @@ const VASHPage = () => {
                 fontFamily: "DM Sans, system-ui, sans-serif",
                 fontSize: 12, color: TEAL_LIGHT, letterSpacing: "1px",
               }}>
-                Shop opening soon — join the launch list
+                Shop opening soon. Join the launch list
               </span>
             </motion.div>
           </div>

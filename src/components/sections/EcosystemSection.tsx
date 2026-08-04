@@ -198,7 +198,7 @@ const EcosystemSection = () => {
             variants={fadeUp}
             className="font-body uppercase m-0"
             style={{
-              fontSize: 11,
+              fontSize: 13,
               color: "#0A0A0A",
               letterSpacing: "0.5em",
               fontWeight: 600,
@@ -233,7 +233,7 @@ const EcosystemSection = () => {
             variants={fadeUp}
             className="font-body m-0"
             style={{
-              fontSize: "clamp(15px, 1.8vw, 19px)",
+              fontSize: "clamp(16px, 1.9vw, 21px)",
               color: "#333333",
               fontWeight: 400,
               maxWidth: 700,
@@ -376,7 +376,7 @@ const EcosystemSection = () => {
           <p
             className="font-body uppercase m-0"
             style={{
-              fontSize: 11,
+              fontSize: 13,
               color: "#0A0A0A",
               letterSpacing: "0.2em",
               fontWeight: 600,

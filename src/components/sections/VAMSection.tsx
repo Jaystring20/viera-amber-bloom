@@ -80,11 +80,11 @@ const VAMSection = () => {
             animate={headerInView ? "visible" : "hidden"}
             style={{
               fontFamily: "DM Sans, system-ui, sans-serif",
-              fontSize: 11,
+              fontSize: 13,
               color: "#D97706",
               letterSpacing: "4px",
               textTransform: "uppercase",
-              fontWeight: 400,
+              fontWeight: 600,
               margin: 0,
             }}
           >
@@ -118,7 +118,7 @@ const VAMSection = () => {
             className="font-display"
             style={{
               fontStyle: "italic",
-              fontSize: "clamp(15px, 1.8vw, 20px)",
+              fontSize: "clamp(16px, 1.9vw, 21px)",
               color: "#444444",
               maxWidth: 420,
               lineHeight: 1.5,

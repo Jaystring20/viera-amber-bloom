@@ -313,10 +313,10 @@ const HeroSection = () => {
               variants={labelVariants}
               className="m-0"
               style={{
-                fontSize: 11,
+                fontSize: 13,
                 color: INK,
                 letterSpacing: "0.45em",
-                fontWeight: 500,
+                fontWeight: 600,
                 fontFamily: "var(--font-body, sans-serif)",
                 textTransform: "uppercase",
               }}
@@ -351,7 +351,7 @@ const HeroSection = () => {
               variants={textVariants}
               className="m-0"
               style={{
-                fontSize: "clamp(14px, 1.7vw, 19px)",
+                fontSize: "clamp(15px, 1.8vw, 20px)",
                 color: MUTED,
                 maxWidth: 520,
                 lineHeight: 1.8,
@@ -367,9 +367,9 @@ const HeroSection = () => {
               variants={taglineVariants}
               className="m-0"
               style={{
-                fontSize: "clamp(18px, 2.5vw, 32px)",
+                fontSize: "clamp(22px, 3vw, 40px)",
                 color: INK,
-                fontWeight: 500,
+                fontWeight: 600,
                 fontFamily: "var(--font-display, serif)",
                 fontStyle: "italic",
                 letterSpacing: "-0.015em",
@@ -381,8 +381,8 @@ const HeroSection = () => {
             <motion.div variants={ctaVariants}>
               <button
                 type="button"
-                className="rounded-full px-8 py-3 font-body uppercase tracking-widest text-xs min-h-[44px] transition-opacity hover:opacity-85"
-                style={{ backgroundColor: INK, color: PAPER }}
+                className="rounded-full px-8 py-3 font-body uppercase tracking-widest min-h-[44px] transition-opacity hover:opacity-85"
+                style={{ backgroundColor: INK, color: PAPER, fontSize: 13, fontWeight: 600 }}
                 onClick={handleScroll}
                 aria-label="Scroll down to explore the Viera Amber ecosystem"
               >

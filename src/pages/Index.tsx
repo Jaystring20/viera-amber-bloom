@@ -59,11 +59,11 @@ const Index = () => {
             <p
               style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: 11,
+                fontSize: 13,
                 color: "#D97706",
                 letterSpacing: "4px",
                 textTransform: "uppercase",
-                fontWeight: 400,
+                fontWeight: 600,
                 margin: 0,
               }}
             >
@@ -72,7 +72,7 @@ const Index = () => {
             <h2
               className="font-display"
               style={{
-                fontSize: "clamp(24px, 3.5vw, 40px)",
+                fontSize: "clamp(28px, 3.8vw, 44px)",
                 fontWeight: 700,
                 color: "#0A0A0A",
                 margin: 0,
@@ -85,7 +85,7 @@ const Index = () => {
               style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
                 fontWeight: 300,
-                fontSize: 14,
+                fontSize: 15,
                 color: "#555555",
                 lineHeight: 1.7,
                 margin: 0,

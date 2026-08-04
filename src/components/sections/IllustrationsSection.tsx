@@ -151,11 +151,11 @@ const CarouselCard = ({ card, isActive }: { card: PreviewCard; isActive: boolean
           color: "#D97706",
           borderRadius: 999,
           padding: "4px 12px",
-          fontSize: 9,
+          fontSize: 11,
           letterSpacing: "2px",
           textTransform: "uppercase",
           fontFamily: "DM Sans, system-ui, sans-serif",
-          fontWeight: 500,
+          fontWeight: 600,
           backdropFilter: "blur(8px)",
           backgroundColor: "rgba(255, 255, 255, 0.9)",
         }}
@@ -512,11 +512,11 @@ const IllustrationsSection = () => {
             animate={headerInView ? "visible" : "hidden"}
             style={{
               fontFamily: "DM Sans, system-ui, sans-serif",
-              fontSize: 11,
+              fontSize: 13,
               color: "#D97706",
               letterSpacing: "4px",
               textTransform: "uppercase",
-              fontWeight: 400,
+              fontWeight: 600,
               margin: 0,
             }}
           >
@@ -548,7 +548,7 @@ const IllustrationsSection = () => {
             style={{
               fontFamily: "DM Sans, system-ui, sans-serif",
               fontWeight: 300,
-              fontSize: 15,
+              fontSize: 16,
               color: "#555555",
               maxWidth: 520,
               lineHeight: 1.7,
