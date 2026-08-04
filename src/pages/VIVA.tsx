@@ -409,21 +409,21 @@ const VIVAPage = () => {
       <NavBar />
 
       {/* ═══════════════════════════════════════════════════════
-          HERO — Full-Bleed Editorial with Overlay Text
-          Luxury Fashion: Image Dominates, Text Positioned with Elegance
+          HERO — Animated Video Loop with Overlay Text
+          Luxury Fashion: Cinematic Animation, Text Positioned with Elegance
           ═══════════════════════════════════════════════════════ */}
       <section className="relative overflow-hidden" style={{ minHeight: "clamp(720px, 100vh, 1000px)", background: "#000" }}>
-        {/* Full-bleed hero image */}
+        {/* Full-bleed animated GIF background */}
         <motion.div
-          initial={{ opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
           className="absolute inset-0"
           style={{ overflow: "hidden" }}
         >
           <img
-            src={vivaHeroRight}
-            alt="VIVA by Viera Amber — Batya Collection"
+            src="/viva/hero-loop.gif"
+            alt="VIVA by Viera Amber — Batya Collection — Animated"
             loading="eager"
             style={{
               width: "100%",
@@ -439,7 +439,7 @@ const VIVAPage = () => {
             style={{
               position: "absolute",
               inset: 0,
-              background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.25) 100%)",
+              background: "linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.3) 100%)",
               pointerEvents: "none",
             }}
           />
