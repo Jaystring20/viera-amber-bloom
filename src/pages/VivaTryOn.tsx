@@ -143,7 +143,7 @@ const VivaTryOn = () => {
             </button>
             <div className="inline-flex items-center" style={{ gap: 8, background: "rgba(212,175,55,0.16)", border: `1px solid ${GOLD}55`, borderRadius: 999, padding: "6px 16px", marginBottom: 18 }}>
               <Sparkles size={13} color={GOLD} />
-              <span style={{ fontFamily: SANS, fontSize: 10, letterSpacing: "0.28em", textTransform: "uppercase", color: GOLD, fontWeight: 600 }}>Virtual Try-On · Preview</span>
+              <span style={{ fontFamily: SANS, fontSize: 13, letterSpacing: "0.28em", textTransform: "uppercase", color: GOLD, fontWeight: 600 }}>Virtual Try-On · Preview</span>
             </div>
             <h1 style={{ fontFamily: CORMORANT, fontSize: "clamp(34px, 5vw, 60px)", fontWeight: 700, color: "#FFFFFF", lineHeight: 1.05, margin: "0 0 14px" }}>
               See it on you, before it's made.
@@ -161,7 +161,7 @@ const VivaTryOn = () => {
             {/* LEFT: inputs */}
             <div>
               {/* Step 1 — upload */}
-              <p style={{ fontFamily: SANS, fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: BURGUNDY, fontWeight: 700, margin: "0 0 10px" }}>Step 1 · Your photo</p>
+              <p style={{ fontFamily: SANS, fontSize: 13, letterSpacing: "0.2em", textTransform: "uppercase", color: BURGUNDY, fontWeight: 700, margin: "0 0 10px" }}>Step 1 · Your photo</p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -183,7 +183,7 @@ const VivaTryOn = () => {
                   <img src={personPreview} alt="Your uploaded photo" style={{ width: "100%", height: "100%", maxHeight: 420, objectFit: "contain" }} />
                 ) : (
                   <>
-                    <span style={{ width: 52, height: 52, borderRadius: 14, background: `${BURGUNDY}0F`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <span style={{ width: 52, height: 52, borderRadius: 12, background: `${BURGUNDY}0F`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <Upload size={22} color={BURGUNDY} />
                     </span>
                     <span style={{ fontFamily: SANS, fontSize: 14, color: BURGUNDY, fontWeight: 600 }}>Upload a clear full-body photo</span>
@@ -237,14 +237,14 @@ const VivaTryOn = () => {
               >
                 {status === "loading" ? (<><RefreshCw size={16} className="animate-spin" /> Styling your look…</>) : (<><Sparkles size={16} /> Try it on</>)}
               </button>
-              <p style={{ fontFamily: SANS, fontSize: 11, color: "rgba(17,17,17,0.45)", lineHeight: 1.6, margin: "12px 0 0", textAlign: "center" }}>
+              <p style={{ fontFamily: SANS, fontSize: 12, color: "rgba(17,17,17,0.45)", lineHeight: 1.6, margin: "12px 0 0", textAlign: "center" }}>
                 AI-generated preview for styling only. Final colour, fit & fabric are confirmed on your made-to-measure order.
               </p>
             </div>
 
             {/* RIGHT: result */}
             <div>
-              <p style={{ fontFamily: SANS, fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: BURGUNDY, fontWeight: 700, margin: "0 0 10px" }}>Your preview</p>
+              <p style={{ fontFamily: SANS, fontSize: 13, letterSpacing: "0.2em", textTransform: "uppercase", color: BURGUNDY, fontWeight: 700, margin: "0 0 10px" }}>Your preview</p>
               <div style={{ width: "100%", minHeight: 380, borderRadius: 16, background: "#FFFFFF", border: `1px solid ${BURGUNDY}1A`, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
                 <AnimatePresence mode="wait">
                   {status === "loading" && (
