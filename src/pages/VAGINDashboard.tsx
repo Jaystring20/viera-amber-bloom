@@ -69,7 +69,7 @@ const inputSx: React.CSSProperties = {
   colorScheme: "dark", // renders native dropdown popups & date pickers in dark mode (readable options)
 };
 const labelSx: React.CSSProperties = {
-  fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10,
+  fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13,
   color: "rgba(250,250,250,0.45)", letterSpacing: "0.18em",
   textTransform: "uppercase", display: "block", marginBottom: 5,
 };
@@ -114,7 +114,7 @@ const StatCard = ({ icon: Icon, label, value, sub, color }: { icon: typeof Users
       <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 38, height: 38, borderRadius: 10, background: `${color}22`, border: `1px solid ${color}44` }}>
         <Icon size={18} color={color} strokeWidth={1.75} />
       </span>
-      <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: "rgba(250,250,250,0.45)", letterSpacing: "0.18em", textTransform: "uppercase", margin: 0 }}>{label}</p>
+      <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "rgba(250,250,250,0.45)", letterSpacing: "0.18em", textTransform: "uppercase", margin: 0 }}>{label}</p>
     </div>
     <p className="font-display" style={{ fontSize: "clamp(26px,3vw,36px)", fontWeight: 700, color: "#FAFAFA", margin: 0, lineHeight: 1 }}>{value}</p>
     {sub && <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, color: "rgba(250,250,250,0.4)", margin: "6px 0 0" }}>{sub}</p>}
@@ -128,7 +128,7 @@ const Table = ({ headers, rows }: { headers: string[]; rows: React.ReactNode[][]
       <thead>
         <tr>
           {headers.map(h => (
-            <th key={h} style={{ textAlign: "left", padding: "10px 14px", fontSize: 10, color: "rgba(250,250,250,0.4)", letterSpacing: "0.18em", textTransform: "uppercase", borderBottom: "1px solid rgba(255,255,255,0.08)", whiteSpace: "nowrap" }}>{h}</th>
+            <th key={h} style={{ textAlign: "left", padding: "10px 14px", fontSize: 11, color: "rgba(250,250,250,0.4)", letterSpacing: "0.18em", textTransform: "uppercase", borderBottom: "1px solid rgba(255,255,255,0.08)", whiteSpace: "nowrap" }}>{h}</th>
           ))}
         </tr>
       </thead>
@@ -152,7 +152,7 @@ const Table = ({ headers, rows }: { headers: string[]; rows: React.ReactNode[][]
 const Card = ({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) => (
   <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: "24px 24px 20px", marginBottom: 20 }}>
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
-      <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: "rgba(250,250,250,0.4)", letterSpacing: "0.25em", textTransform: "uppercase", margin: 0 }}>{title}</p>
+      <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "rgba(250,250,250,0.4)", letterSpacing: "0.25em", textTransform: "uppercase", margin: 0 }}>{title}</p>
       {action}
     </div>
     {children}
@@ -235,7 +235,7 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
       if (authErr) throw authErr;
       if (!data.user) throw new Error("Login failed");
       const { data: adminRow } = await supabase.from("va_admins").select("email").eq("email", data.user.email).maybeSingle();
-      if (!adminRow) { await supabase.auth.signOut(); throw new Error("Access denied — admins only."); }
+      if (!adminRow) { await supabase.auth.signOut(); throw new Error("Access denied. Admins only."); }
       onLogin();
     } catch (err) { setError(err instanceof Error ? err.message : "Login failed"); }
     finally { setLoading(false); }
@@ -247,7 +247,7 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
         <div className="text-center" style={{ marginBottom: 36 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: `${PURPLE}22`, border: `1px solid ${PL}44`, borderRadius: 999, padding: "7px 18px", marginBottom: 20 }}>
             <LayoutDashboard size={13} color={PL} strokeWidth={2} />
-            <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: PL, letterSpacing: "0.3em", textTransform: "uppercase", fontWeight: 600 }}>VAGIN Admin</span>
+            <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: PL, letterSpacing: "0.3em", textTransform: "uppercase", fontWeight: 600 }}>VAGIN Admin</span>
           </div>
           <h1 className="font-display" style={{ fontSize: "clamp(28px,5vw,38px)", fontWeight: 700, color: "#FAFAFA", margin: "0 0 8px", lineHeight: 1.1 }}>Dashboard Login</h1>
           <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 14, color: "rgba(250,250,250,0.5)", margin: 0 }}>Admin access only</p>
@@ -563,7 +563,7 @@ const VAGINDashboard = () => {
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "32px 24px 0" }}>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 16, marginBottom: 28 }}>
             <div>
-              <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: PL, letterSpacing: "0.3em", textTransform: "uppercase", fontWeight: 600, margin: "0 0 8px" }}>VAGIN Admin</p>
+              <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: PL, letterSpacing: "0.3em", textTransform: "uppercase", fontWeight: 600, margin: "0 0 8px" }}>VAGIN Admin</p>
               <h1 className="font-display" style={{ fontSize: "clamp(22px,4vw,34px)", fontWeight: 700, color: "#FAFAFA", margin: 0, lineHeight: 1.1 }}>Impact Dashboard</h1>
               <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "rgba(250,250,250,0.45)", margin: "6px 0 0" }}>Schools · Students · Matrons · Distributions · Sessions</p>
             </div>
@@ -595,7 +595,7 @@ const VAGINDashboard = () => {
       {/* ── Content ── */}
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "32px 24px 64px" }}>
         {dataError && (
-          <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 10, padding: "14px 18px", marginBottom: 24 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 8, padding: "14px 18px", marginBottom: 24 }}>
             <AlertCircle size={16} color="#EF4444" />
             <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "#EF4444" }}>{dataError}</span>
           </div>
@@ -772,7 +772,7 @@ const VAGINDashboard = () => {
             {activeTab === "gallery" && (
               <motion.div key="gallery" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
                 <div style={{ marginBottom: 20 }}>
-                  <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: PL, letterSpacing: "0.25em", textTransform: "uppercase", fontWeight: 600, margin: "0 0 4px" }}>Gallery CMS</p>
+                  <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: PL, letterSpacing: "0.25em", textTransform: "uppercase", fontWeight: 600, margin: "0 0 4px" }}>Gallery CMS</p>
                   <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "rgba(250,250,250,0.45)", margin: 0 }}>Manage Illustrations artworks and chapter descriptions. Changes appear live on the public gallery page.</p>
                 </div>
                 <GalleryAdminTab />
@@ -783,8 +783,8 @@ const VAGINDashboard = () => {
             {activeTab === "vagin_images" && (
               <motion.div key="vagin_images" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
                 <div style={{ marginBottom: 20 }}>
-                  <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: PL, letterSpacing: "0.25em", textTransform: "uppercase", fontWeight: 600, margin: "0 0 4px" }}>VAGIN Images</p>
-                  <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "rgba(250,250,250,0.45)", margin: 0 }}>Swap, upload, or remove the photos shown on the VAGIN page — hero cluster, Malawi field work, session snapshots, and the Meet the Team row.</p>
+                  <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: PL, letterSpacing: "0.25em", textTransform: "uppercase", fontWeight: 600, margin: "0 0 4px" }}>VAGIN Images</p>
+                  <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "rgba(250,250,250,0.45)", margin: 0 }}>Swap, upload, or remove the photos shown on the VAGIN page. Hero cluster, Malawi field work, session snapshots, and the Meet the Team row.</p>
                 </div>
                 <VAGINImagesAdminTab />
               </motion.div>
@@ -846,7 +846,7 @@ const VAGINDashboard = () => {
           <Modal key="school-modal" title={modal === "add-school" ? "Add School" : "Edit School"} onClose={closeModal}>
             <form onSubmit={saveSchool} style={{ display: "flex", flexDirection: "column" }}>
               <F label="School Name *"><input required style={inputSx} value={schoolForm.name} onChange={e => setSchoolForm(p => ({ ...p, name: e.target.value }))} /></F>
-              <F label="School Code * (2–4 letters — used in every student ID, must be unique)">
+              <F label="School Code * (2-4 letters. Used in every student ID, must be unique)">
                 <input required maxLength={4} style={{ ...inputSx, textTransform: "uppercase", fontFamily: "monospace", letterSpacing: "0.15em", color: PL }}
                   value={schoolForm.code} onChange={e => setSchoolForm(p => ({ ...p, code: e.target.value.toUpperCase().replace(/[^A-Z]/g, "") }))} placeholder="e.g. LGS" />
                 <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: "rgba(250,250,250,0.3)", margin: "5px 0 0" }}>
@@ -885,7 +885,7 @@ const VAGINDashboard = () => {
                 </select>
               </F>
               <F label="Full Name *"><input required style={inputSx} value={studentForm.name} onChange={e => studentField({ name: e.target.value })} placeholder="e.g. Faith Adeyemi" /></F>
-              <F label="Student ID (auto-generated — globally unique)">
+              <F label="Student ID (auto-generated, globally unique)">
                 <input required style={{ ...inputSx, fontFamily: "monospace", color: PL, letterSpacing: "0.1em", fontWeight: 600 }} value={studentForm.student_id}
                   onChange={e => setStudentForm(p => ({ ...p, student_id: e.target.value.toUpperCase(), idManual: true }))} placeholder="LGS-FA-001" />
                 <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: "rgba(250,250,250,0.3)", margin: "5px 0 0" }}>

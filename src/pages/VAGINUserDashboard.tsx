@@ -46,7 +46,7 @@ const DashboardHeader = ({ user }: { user: UserProfile }) => {
           <p
             style={{
               fontFamily: "DM Sans, system-ui, sans-serif",
-              fontSize: 11,
+              fontSize: 13,
               color: "#D97706",
               letterSpacing: "4px",
               textTransform: "uppercase",
@@ -229,7 +229,7 @@ const LearningResources = () => {
           <p
             style={{
               fontFamily: "DM Sans, system-ui, sans-serif",
-              fontSize: 11,
+              fontSize: 13,
               color: "#D97706",
               letterSpacing: "4px",
               textTransform: "uppercase",
@@ -330,7 +330,7 @@ const LearningResources = () => {
                 <span
                   style={{
                     fontFamily: "DM Sans, system-ui, sans-serif",
-                    fontSize: 11,
+                    fontSize: 13,
                     color: "rgba(250,250,250,0.5)",
                   }}
                 >
@@ -388,7 +388,7 @@ const ImpactStories = () => {
           <p
             style={{
               fontFamily: "DM Sans, system-ui, sans-serif",
-              fontSize: 11,
+              fontSize: 13,
               color: "#D97706",
               letterSpacing: "4px",
               textTransform: "uppercase",
