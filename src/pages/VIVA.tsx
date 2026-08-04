@@ -181,7 +181,7 @@ const VIVAPage = () => {
       return;
     }
     if (file.size > 8 * 1024 * 1024) {
-      setTryOnError("Image is too large — please use one under 8MB.");
+      setTryOnError("Image is too large. Please use one under 8MB.");
       return;
     }
     setTryOnError(null);
@@ -258,7 +258,7 @@ const VIVAPage = () => {
   const handlePaystack = () => {
     if (!checkoutEmail || cart.length === 0) return;
     if (typeof window.PaystackPop === "undefined") {
-      alert("Payment system is loading — please try again in a moment.");
+      alert("Payment system is loading. Please try again in a moment.");
       return;
     }
     setPayStatus("loading");
@@ -366,9 +366,9 @@ const VIVAPage = () => {
               style={{
                 background: "none", border: "none",
                 color: `rgba(212,175,55,0.45)`, cursor: "pointer",
-                fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11,
+                fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13,
                 letterSpacing: "1.5px", textTransform: "uppercase", padding: 0,
-                display: "flex", alignItems: "center", gap: 6,
+                display: "flex", alignItems: "center", gap: 6, fontWeight: 600,
                 alignSelf: "flex-start",
               }}
               whileHover={reduced ? {} : { color: GOLD }}
@@ -431,7 +431,7 @@ const VIVAPage = () => {
               <div style={{ aspectRatio: "3/4", overflow: "hidden" }}>
                 <img
                   src="/viva/look-4.jpeg"
-                  alt="Daughters of Adonai — VIVA 'Batya' collection"
+                  alt="Daughters of Adonai. VIVA 'Batya' collection"
                   loading="eager"
                   style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }}
                 />
@@ -444,9 +444,10 @@ const VIVAPage = () => {
               transition={{ delay: d(1.02) }}
               style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: 11,
+                fontSize: 13,
                 letterSpacing: "0.4em",
                 textTransform: "uppercase",
+                fontWeight: 600,
                 color: "rgba(255,255,255,0.7)",
                 fontWeight: 500,
                 margin: "0 0 4px 0",
@@ -756,7 +757,7 @@ const VIVAPage = () => {
               style={{ textAlign: "center", padding: "44px 20px", borderTop: `1px solid ${BURG_ALPHA}`, borderBottom: `1px solid ${BURG_ALPHA}`, margin: "0 0 32px 0" }}
             >
               <p style={{ fontFamily: CORMORANT, fontStyle: "italic", fontSize: "clamp(18px, 3vw, 30px)", color: BURGUNDY, fontWeight: 400, margin: 0, maxWidth: 600, display: "inline-block", opacity: 0.82 }}>
-                "She knows exactly who she is — the clothes are just the evidence."
+                "She knows exactly who she is. The clothes are just the evidence."
               </p>
             </motion.div>
 
@@ -1256,7 +1257,7 @@ const VIVAPage = () => {
                 <div style={{ padding: "28px" }}>
                   {/* Photo upload */}
                   <div style={{ marginBottom: 24 }}>
-                    <p style={{ fontFamily: "DM Sans", fontSize: 11, letterSpacing: "1.5px", textTransform: "uppercase", color: BURGUNDY, fontWeight: 600, margin: "0 0 12px 0" }}>
+                    <p style={{ fontFamily: "DM Sans", fontSize: 13, letterSpacing: "1.5px", textTransform: "uppercase", color: BURGUNDY, fontWeight: 600, margin: "0 0 12px 0" }}>
                       Your Photo
                     </p>
                     <input
