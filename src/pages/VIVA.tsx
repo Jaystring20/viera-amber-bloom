@@ -359,7 +359,6 @@ const VIVAPage = () => {
       `I'd like to order it / ask about a made-to-measure fit.`;
     window.open(`https://wa.me/2348074022917/?text=${encodeURIComponent(message)}`, "_blank");
   };
-    }));
 
   const handlePaystack = () => {
     if (!checkoutEmail || cart.length === 0) return;
