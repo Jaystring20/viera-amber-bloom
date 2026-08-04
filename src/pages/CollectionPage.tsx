@@ -300,7 +300,7 @@ const CollectionPage = () => {
                   whileTap={reduced ? {} : { scale: 0.98 }}
                   style={{
                     fontFamily: "Montserrat, system-ui, sans-serif",
-                    fontSize: 11,
+                    fontSize: 12,
                     fontWeight: 700,
                     letterSpacing: "1.5px",
                     textTransform: "uppercase",
