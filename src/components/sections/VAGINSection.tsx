@@ -264,7 +264,7 @@ const VAGINSection = () => {
           >
             <img
               src="/vagin-logo.webp"
-              alt="VAGIN — Girls' Initiative"
+              alt="VAGIN, Viera Amber's Girls' Initiative"
               style={{ height: 100, width: "auto", objectFit: "contain" }}
             />
           </motion.div>

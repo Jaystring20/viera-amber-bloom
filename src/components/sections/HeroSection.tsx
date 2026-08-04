@@ -1,549 +1,422 @@
-import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { GraduationCap, ShoppingBag } from "lucide-react";
+import { useRef } from "react";
 import logoSrc from "@/assets/viera-amber-logo.png";
 
 /* ════════════════════════════════════════════════════════════════════════
-   HERO — "The Current"
+   HERO — Jacqueline, masthead band
 
-   THESIS: one creative practice, five expressions. The Hero does not
-   describe that, it draws it: a single ink line descends through a warm
-   amber field, forks at the ∧ taken from the VIERA∧AMBER wordmark, and
-   lands on five plates — real windows into Illustrations, VAGIN, VIVA,
-   VAM and VASH, in the same five accent colours the Ecosystem map uses
-   directly below. The line a visitor half-notices here is the line doing
-   the work in the next section.
+   Restores the client-approved photo hero and fixes the one thing that was
+   actually wrong with it.
 
-   What this replaced, and why:
-   - A full-bleed portrait crushed to grayscale/brightness(0.6) under three
-     black overlays, purely so white type stayed legible. It fought its own
-     colour story and read as a mood, not an idea.
-   - Then an image-free amber field, which was better craft but still pure
-     atmosphere: nothing in it could only be Viera Amber.
+   The old treatment scrimmed the type with a soft radial blob:
+     radial-gradient(ellipse 600px 400px at 50% 50%, rgba(255,255,255,.92) …)
+   An edgeless wash has no shape, so it never reads as a decision — it reads
+   as the middle of the picture being faded out. That is the "too bright"
+   note: not the amount of white, the absence of an edge. Swapping it for a
+   black wash kept the same flaw with the opposite value, which is why that
+   attempt landed the same way.
 
-   GUARDRAILS: no forced desaturation of brand art, no dark overlay stack,
-   no purple gradient, no auto-rotating carousel, no perpetual ambient
-   motion beyond the slow field drift, no eyebrow above the headline.
-   Champagne #C8A96E measures 2.15:1 on paper, so it is confined to the
-   background wash — every mark that touches type uses #D97706 (3.05:1).
+   This replaces it with a masthead band, per the client's reference frame:
+   hard top and bottom edges so it reads as a deliberate plate, feathered
+   left and right so it dissolves into the portrait instead of ending in two
+   blunt vertical seams. Same job, but shaped — so the white is now an
+   authored element rather than haze.
+
+   The portrait also carries more contrast than before. Half of "too bright"
+   was the artwork itself sitting washed out; the reference frame has real
+   blacks in the hat and hair, and that density is what lets a white band sit
+   on top without the whole frame going pale.
+
+   GUARDRAILS: no perpetual motion — the scroll cue is static, since the
+   looping bob was explicitly called out as making the page hard to read.
    ════════════════════════════════════════════════════════════════════════ */
 
 const INK = "#0A0A0A";
-const PAPER = "#FAFAFA";
-const GOLD = "#C8A96E";     // Champagne — field wash only, never type.
-const GOLD_INK = "#D97706"; // Warm gold — clears AA for large text.
+const PAPER = "#FFFFFF";
+const MUTED = "rgba(10,10,10,0.62)";
 
-/* Where one current becomes five. Shared by the SVG and the plate layer so
-   both stay locked in a single 0–100 coordinate space. */
-const FORK = { x: 68, y: 82 };
+/* Pulled back from 0.96. At near-opaque the frame was mostly white and the
+   portrait had nowhere to breathe; letting more of the photograph read
+   through the plate is what balances the two instead of the white winning. */
+const BAND = "rgba(255,255,255,0.90)";
 
-/* `drape` hangs each plate lower the further its thread runs from the fork,
-   the way real thread sags — it is what stops the fan reading as a flat,
-   evenly spaced diagram. */
-const ARMS = [
-  { color: "#D97706", x: 10, drape: 9, label: "Illustrations", tag: "Art",       target: "illustrations", image: "/artworks/artwork_0022.webp",      rotate: -6 },
-  { color: "#62017F", x: 30, drape: 5, label: "VAGIN",         tag: "Impact",    target: "vagin",         image: "/vagin-images/vagin_team_01.webp", rotate: 4 },
-  { color: "#6E0025", x: 50, drape: 2, label: "VIVA",          tag: "Fashion",   target: "viva",          image: "/viva/hero-left.webp",            rotate: -3 },
-  { color: "#888888", x: 70, drape: 0, label: "VAM",           tag: "Education", target: "vam",           Icon: GraduationCap,                      rotate: 5 },
-  { color: "#0B7B8C", x: 90, drape: 3, label: "VASH",          tag: "Commerce",  target: "shop",          Icon: ShoppingBag,                        rotate: -4 },
-];
+/* ARCH RADIUS — the plate is a portal, not a card.
+   Large radius on the top corners, small on the bottom, so the shape reads as
+   an arch rather than a rounded rectangle. Arches are a standing device in
+   fashion and beauty editorial, and this one sits directly under the curve of
+   the hat brim, so the geometry rhymes with the photograph instead of fighting
+   it. Both values scale with the viewport so the arch keeps its proportion on
+   a phone rather than flattening into a generic radius. */
+const ARCH_TOP = "clamp(52px, 7vw, 104px)";
+const ARCH_BOTTOM = "clamp(14px, 2vw, 26px)";
 
-const TRUNK = `M 18,0 C 44,0 26,34 52,40 C 70,44 58,72 ${FORK.x},${FORK.y}`;
+/* NO MASK. Every previous pass feathered the left and right terminations —
+   7%, then 4% — and every one of them read as bleed, because a gradient edge
+   IS bleed no matter how narrow you make it. The plate is a hard-edged
+   rectangle on all four sides. The edge is the design; softening it was the
+   defect. */
 
 const HeroSection = () => {
   const reduced = useReducedMotion();
   const d = (s: number) => (reduced ? 0 : s);
-  const [activeArm, setActiveArm] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  /* The Hero owns the top of the page, so it animates on mount rather than
-     waiting to scroll into view. */
-  const TRUNK_DURATION = d(1.3);
-
-  const scrollTo = (id: string) => (e: React.MouseEvent) => {
+  const handleScroll = (e: React.MouseEvent) => {
     e.preventDefault();
-    const el = document.getElementById(id);
+    const el = document.getElementById("ecosystem");
     if (!el) return;
     const top = el.getBoundingClientRect().top + window.scrollY - 80;
     window.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { duration: d(1.4), staggerChildren: d(0.1), delayChildren: d(0.3) },
+    },
+  };
+
+  const labelVariants = {
+    hidden: { opacity: 0, y: 8 },
+    visible: { opacity: 1, y: 0, transition: { duration: d(0.5), ease: "easeOut" as const } },
+  };
+
+  const logoVariants = {
+    hidden: { opacity: 0, scale: 0.93 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { type: "spring" as const, stiffness: 110, damping: 18, delay: d(0.1) },
+    },
+  };
+
+  const dividerVariants = {
+    hidden: { scaleX: 0, opacity: 0 },
+    visible: { scaleX: 1, opacity: 1, transition: { duration: d(0.7), ease: "easeOut" as const, delay: d(0.15) } },
+  };
+
+  const textVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0, transition: { duration: d(0.6), ease: "easeOut" as const, delay: d(0.2) } },
+  };
+
+  const taglineVariants = {
+    hidden: { opacity: 0, y: 6 },
+    visible: { opacity: 1, y: 0, transition: { duration: d(0.6), ease: "easeOut" as const, delay: d(0.4) } },
+  };
+
+  const ctaVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { type: "spring" as const, stiffness: 200, damping: 22, delay: d(0.5) },
+    },
+  };
+
+  /* The one authored moment: the plate settles onto the photograph.
+     A clip wipe is wrong now that the shape is an arch — clip-path insets
+     are square, so mid-animation you would watch the corners un-round. A
+     scale settle keeps the silhouette intact the whole way through. */
+  const bandVariants = {
+    hidden: { opacity: reduced ? 1 : 0, scale: reduced ? 1 : 0.965 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: d(1.1), ease: [0.16, 1, 0.3, 1] as const },
+    },
+  };
+
   return (
-    <div
-      className="relative w-full min-h-dvh overflow-hidden flex items-center px-6 lg:px-16"
-      style={{ backgroundColor: PAPER, paddingTop: 104, paddingBottom: 64 }}
-    >
-      {/* ── Layered amber field: two washes drifting at their own rates, a
-           vignette for body, and fine grain for tactility ── */}
-      <motion.div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none"
-        initial={{ scale: 1 }}
-        animate={reduced ? {} : { scale: [1, 1.05, 1] }}
-        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" as const }}
-        style={{ background: `radial-gradient(ellipse 62% 70% at 22% 42%, ${GOLD}42 0%, ${GOLD}1c 45%, transparent 74%)` }}
-      />
-      <motion.div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none"
-        initial={{ x: 0, y: 0 }}
-        animate={reduced ? {} : { x: [0, 18, 0], y: [0, -14, 0] }}
-        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" as const }}
-        style={{ background: "radial-gradient(ellipse 46% 50% at 78% 30%, #E8D2A855 0%, transparent 68%)" }}
-      />
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse 120% 100% at 50% 50%, transparent 55%, rgba(10,10,10,0.05) 100%)" }}
-      />
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          opacity: 0.55,
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E\")",
-        }}
-      />
+    <>
+      <style>{`
+        /* The crop is tuned per breakpoint so the plate always bisects the
+           portrait the way the reference does: brow and hat above the top
+           edge, jaw and earring below the bottom one. Without this the plate
+           slides over the face on narrow screens and the composition dies. */
+        .hero-artwork { object-position: center 20%; }
 
-      {/* ══════════════════════════════════════════════════════════════════
-          THE CURRENT — desktop. Two layers: a decorative SVG (aria-hidden)
-          and a real, focusable link layer. The plates look clickable, so
-          they are clickable.
-          ══════════════════════════════════════════════════════════════════ */}
+        /* Tablet — portrait fills more of a squarer frame, so ease the crop up */
+        @media (max-width: 1023px) {
+          .hero-artwork { object-position: center 15%; }
+        }
+
+        /* ── Phone ──────────────────────────────────────────────────────
+           Requirement: nothing of the portrait below the plate. The crop is
+           pushed up so the frame holds the hat and brow, and the bottom fade
+           is grown to just over half the viewport and reaches solid white
+           EARLY (60% of its own height) rather than at the very bottom — so
+           the jaw, earring and shoulder are gone, not merely dimmed. The
+           result is portrait above, plate, clean paper below. */
+        @media (max-width: 767px) {
+          .hero-artwork {
+            object-position: 58% 8%;
+            transform: scale(1.34);
+            transform-origin: 58% 20%;
+          }
+          /* This curve DECELERATES into white. The previous one climbed to
+             0.92 by 44%, hit solid at 62%, then sat flat — and that abrupt
+             change in rate is what drew a visible line across the seam on
+             phones. Desktop never showed it because its curve keeps easing all
+             the way to 100%. Same idea here: no stop where the slope jumps,
+             so the photograph dissolves with no edge to catch, while still
+             arriving at effectively solid white before the section ends. */
+          .hero-bottom-fade {
+            height: 56% !important;
+            background: linear-gradient(
+              to bottom,
+              rgba(255,255,255,0) 0%,
+              rgba(255,255,255,0.10) 22%,
+              rgba(255,255,255,0.34) 42%,
+              rgba(255,255,255,0.62) 60%,
+              rgba(255,255,255,0.83) 74%,
+              rgba(255,255,255,0.95) 86%,
+              rgba(255,255,255,0.99) 94%,
+              rgba(255,255,255,1) 100%
+            ) !important;
+          }
+          .hero-scroll-indicator { display: none; }
+        }
+
+        @media (max-width: 479px) {
+          .hero-artwork {
+            object-position: 60% 7%;
+            transform: scale(1.38);
+            transform-origin: 60% 18%;
+          }
+          .hero-bottom-fade { height: 60% !important; }
+        }
+      `}</style>
+
       <div
-        className="absolute select-none hidden lg:block"
-        style={{ right: "0%", top: "1%", width: "clamp(540px, 52vw, 760px)", height: "70%" }}
+        ref={containerRef}
+        className="hero-container relative w-full min-h-dvh overflow-hidden flex items-center justify-center px-4 sm:px-6"
+        style={{ backgroundColor: PAPER }}
       >
-        <svg
+        {/* ── Jacqueline portrait — high-contrast B&W, multiplied onto paper.
+             Contrast is up and brightness slightly down against the previous
+             pass: the reference frame holds true blacks, and that density is
+             what stops the band from washing the whole composition out. ── */}
+        <div
           aria-hidden="true"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          className="w-full h-full pointer-events-none"
-          style={{ overflow: "visible" }}
+          className="absolute inset-0 pointer-events-none select-none overflow-hidden"
+          style={{ zIndex: 0 }}
         >
-          <defs>
-            <filter id="hero-current-depth" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="1.1" stdDeviation="1.1" floodColor="#0A0A0A" floodOpacity="0.16" />
-            </filter>
-          </defs>
+          <img
+            src="/artworks/artwork_0064.webp"
+            alt=""
+            draggable={false}
+            className="hero-artwork w-full h-full select-none"
+            style={{
+              objectFit: "cover",
+              /* No multiply blend. Against a white ground it did nothing but
+                 lift the midtones, which is half of why the hat rendered grey
+                 instead of black. Straight contrast gets the reference's
+                 density: true blacks in the hat and hair, clean separation. */
+              /* 1.85 was overcooked — it crushed the hair and hat into a
+                 single black mass and blew the background to paper. 1.5 keeps
+                 true blacks in the brim while holding midtone detail in the
+                 hair and jaw, which is where the drawing actually lives. */
+              filter: "grayscale(100%) contrast(1.5) brightness(0.96) saturate(0)",
+            }}
+          />
+        </div>
 
-          {/* Ghost trunk — the path exists before it is drawn */}
-          <path d={TRUNK} fill="none" stroke={INK} strokeWidth={2} strokeLinecap="round" vectorEffect="non-scaling-stroke" opacity={0.07} />
+        {/* ── Bottom fade — the seam into the white Ecosystem section.
+             Cut from 32% to 20% on desktop: at 32% it was climbing into the
+             jaw and earring and bleaching them. On phones it deliberately
+             goes the other way and grows tall enough to erase the lower
+             portrait completely — see .hero-bottom-fade in the style block. ── */}
+        <div
+          aria-hidden="true"
+          className="hero-bottom-fade absolute bottom-0 left-0 right-0 pointer-events-none"
+          style={{
+            height: "24%",
+            /* Eased, not linear. A straight alpha ramp has a detectable start
+               line — the eye finds the exact row where the wash begins. These
+               stops approximate an S-curve so the photograph dissolves with no
+               edge to catch on. */
+            background:
+              "linear-gradient(to bottom," +
+              " rgba(255,255,255,0) 0%," +
+              " rgba(255,255,255,0.06) 24%," +
+              " rgba(255,255,255,0.26) 45%," +
+              " rgba(255,255,255,0.56) 64%," +
+              " rgba(255,255,255,0.84) 82%," +
+              " rgba(255,255,255,1) 100%)",
+            zIndex: 2,
+          }}
+        />
 
-          {/* The trunk — one founder, one creative practice */}
-          <motion.path
-            d={TRUNK}
-            fill="none"
-            stroke={INK}
-            strokeWidth={3}
-            strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
-            filter="url(#hero-current-depth)"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 0.88 }}
-            transition={{ duration: TRUNK_DURATION, ease: [0.16, 1, 0.3, 1] }}
+        {/* No top fade. The nav is its own dark floating pill and needs no
+            scrim behind it, and a 14% white wash across the top was bleaching
+            the hat — the single densest black in the frame and the thing the
+            reference leads with. */}
+
+        {/* ── Content on the masthead plate ───────────────────────────────
+             The plate is a sized box, not a bleed. Its width and padding are
+             the only things that set its dimensions, and the band layer is
+             `inset: 0` against it — so the rectangle always wraps the copy
+             with the same proportional margin at every breakpoint, and both
+             feathered ends stay on screen.
+
+             The band stays a separate layer behind the type: masking the
+             content box itself would feather the words along with the plate. */}
+        <div
+          className="hero-plate relative mx-auto"
+          style={{
+            zIndex: 10,
+            width: "100%",
+            /* The hero container's own px-4/sm:px-6 supplies the outer margin,
+               so the plate simply fills the column up to its ceiling. This is
+               what keeps desktop, tablet and phone reading as the same object
+               at different sizes rather than three different crops. */
+            maxWidth: "min(100%, 880px)",
+            paddingLeft: "clamp(26px, 5.5vw, 92px)",
+            paddingRight: "clamp(26px, 5.5vw, 92px)",
+            /* Vertical padding cut from 38-68px. The plate was running ~500px
+               tall, which made it a panel rather than a masthead and pushed
+               the white past the portrait's share of the frame. The arch needs
+               a wide, low proportion to read as an arch at all. */
+            paddingTop: "clamp(30px, 3.4vw, 48px)",
+            paddingBottom: "clamp(30px, 3.4vw, 48px)",
+          }}
+        >
+          <motion.div
+            aria-hidden="true"
+            className="absolute pointer-events-none"
+            variants={bandVariants}
+            initial="hidden"
+            animate="visible"
+            style={{
+              inset: 0,
+              background: BAND,
+              /* No mask, no border, no backdrop-filter. Three separate
+                 attempts at "softening" this edge each produced the bleed:
+                 a mask gradient fades it, a hairline draws a stroke the
+                 reference does not have, and backdrop-filter ignores masks
+                 entirely and leaves a hard blur rectangle of its own. Every
+                 side stays crisp — the arch does the shaping, not a fade. */
+              borderRadius: `${ARCH_TOP} ${ARCH_TOP} ${ARCH_BOTTOM} ${ARCH_BOTTOM}`,
+            }}
           />
 
-          {/* Five threads, ending on each plate's draped position */}
-          {ARMS.map((t, i) => {
-            const endY = 96 + t.drape;
-            const dim = activeArm !== null && activeArm !== t.label;
-            return (
-              <motion.path
-                key={t.color}
-                d={`M ${FORK.x},${FORK.y} Q ${(FORK.x + t.x) / 2},${(FORK.y + endY) / 2 + 6} ${t.x},${endY}`}
-                fill="none"
-                stroke={t.color}
-                strokeLinecap="round"
-                vectorEffect="non-scaling-stroke"
-                filter="url(#hero-current-depth)"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: dim ? 0.28 : 0.95, strokeWidth: activeArm === t.label ? 4 : 2.5 }}
-                transition={{
-                  pathLength: { duration: d(0.62), delay: TRUNK_DURATION + d(i * 0.09), ease: "easeOut" as const },
-                  opacity: { duration: 0.3 },
-                  strokeWidth: { duration: 0.3 },
-                }}
-              />
-            );
-          })}
-
-          {/* The ∧ from the wordmark, marking where the brand divides */}
-          <motion.path
-            d={`M ${FORK.x - 3.4},${FORK.y + 2.4} L ${FORK.x},${FORK.y - 2.2} L ${FORK.x + 3.4},${FORK.y + 2.4}`}
-            fill="none"
-            stroke={GOLD_INK}
-            strokeWidth={3}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            vectorEffect="non-scaling-stroke"
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: TRUNK_DURATION - d(0.1), type: "spring" as const, stiffness: 300, damping: 16 }}
-            style={{ transformOrigin: `${FORK.x}px ${FORK.y}px` }}
-          />
-        </svg>
-
-        {/* Plate layer — real links, real states */}
-        {ARMS.map((t, i) => {
-          const isActive = activeArm === t.label;
-          const dim = activeArm !== null && !isActive;
-          return (
-            <motion.a
-              key={`plate-${t.label}`}
-              href={`#${t.target}`}
-              onClick={scrollTo(t.target)}
-              aria-label={`${t.label} — ${t.tag}. Jump to section.`}
-              className="absolute flex flex-col items-center"
+          <motion.div
+            className="relative flex flex-col items-center text-center w-full"
+            style={{ gap: "clamp(11px, 1.4vw, 17px)", zIndex: 1 }}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.p
+              variants={labelVariants}
+              className="m-0"
               style={{
-                left: `${t.x}%`,
-                top: `${96 + t.drape}%`,
-                gap: 9,
-                translate: "-50% 0",
-                textDecoration: "none",
-                zIndex: isActive ? 3 : 2,
-              }}
-              onMouseEnter={() => setActiveArm(t.label)}
-              onMouseLeave={() => setActiveArm(null)}
-              onFocus={() => setActiveArm(t.label)}
-              onBlur={() => setActiveArm(null)}
-              initial={{ opacity: 0, y: 16, scale: 0.86, rotate: t.rotate }}
-              animate={{
-                opacity: dim ? 0.45 : 1,
-                y: isActive ? -8 : 0,
-                scale: isActive ? 1.09 : 1,
-                rotate: isActive ? 0 : t.rotate,
-              }}
-              transition={{
-                default: { type: "spring" as const, stiffness: 300, damping: 22, delay: TRUNK_DURATION + d(i * 0.09) + d(0.3) },
-                y: { type: "spring" as const, stiffness: 400, damping: 26 },
-                scale: { type: "spring" as const, stiffness: 400, damping: 26 },
-                rotate: { type: "spring" as const, stiffness: 400, damping: 26 },
-                opacity: { duration: 0.3 },
+                fontSize: 11,
+                color: INK,
+                letterSpacing: "0.45em",
+                fontWeight: 500,
+                fontFamily: "var(--font-body, sans-serif)",
+                textTransform: "uppercase",
               }}
             >
-              <div
-                className="overflow-hidden flex items-center justify-center"
-                style={{
-                  width: "clamp(60px, 6.2vw, 88px)",
-                  height: "clamp(60px, 6.2vw, 88px)",
-                  borderRadius: 11,
-                  border: `2px solid ${PAPER}`,
-                  /* Contact shadow grounds the plate, ambient shadow gives it air */
-                  boxShadow: isActive
-                    ? `0 3px 6px rgba(10,10,10,0.12), 0 20px 44px rgba(10,10,10,0.22), 0 0 0 1px ${t.color}`
-                    : `0 2px 4px rgba(10,10,10,0.10), 0 12px 30px rgba(10,10,10,0.14), 0 0 0 1px ${t.color}55`,
-                  background: t.image ? "#fff" : `${t.color}12`,
-                  transition: "box-shadow 0.3s ease",
-                }}
-              >
-                {t.image ? (
-                  <img
-                    src={t.image}
-                    alt=""
-                    className="w-full h-full object-cover"
-                    draggable={false}
-                    loading="eager"
-                    style={{
-                      filter: isActive ? "saturate(1.05)" : "saturate(0.88)",
-                      transition: "filter 0.3s ease, transform 0.4s ease",
-                      transform: isActive ? "scale(1.06)" : "scale(1)",
-                    }}
-                  />
-                ) : t.Icon ? (
-                  <t.Icon size={27} color={t.color} strokeWidth={1.75} />
-                ) : null}
-              </div>
+              EST. 2013
+            </motion.p>
 
-              <div className="flex flex-col items-center" style={{ gap: 2 }}>
-                <span
-                  style={{
-                    fontFamily: "DM Sans, system-ui, sans-serif",
-                    fontSize: 9.5,
-                    letterSpacing: "0.13em",
-                    textTransform: "uppercase",
-                    fontWeight: 700,
-                    color: t.color,
-                    background: PAPER,
-                    padding: "2px 8px",
-                    borderRadius: 999,
-                    whiteSpace: "nowrap",
-                    boxShadow: "0 1px 3px rgba(10,10,10,0.07)",
-                  }}
-                >
-                  {t.label}
-                </span>
-                {/* The discipline, revealed on approach */}
-                <motion.span
-                  aria-hidden="true"
-                  initial={false}
-                  animate={{ opacity: isActive ? 1 : 0, y: isActive ? 0 : -3 }}
-                  transition={{ duration: 0.25 }}
-                  style={{
-                    fontFamily: "DM Sans, system-ui, sans-serif",
-                    fontSize: 8.5,
-                    letterSpacing: "0.2em",
-                    textTransform: "uppercase",
-                    fontWeight: 500,
-                    color: "rgba(10,10,10,0.5)",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {t.tag}
-                </motion.span>
-              </div>
-            </motion.a>
-          );
-        })}
-      </div>
-
-      {/* ── Content column ── */}
-      <div className="relative w-full mx-auto" style={{ maxWidth: 1180, zIndex: 1 }}>
-        <div className="flex flex-col items-center lg:items-start text-center lg:text-left" style={{ maxWidth: 640, gap: "clamp(18px, 2.2vw, 26px)" }}>
-          {/* Masthead. The wordmark is a hairline-outline asset, so scale alone
-              leaves it faint — three stacked zero-offset shadows in its own ink
-              dilate the strokes so it holds against the headline below. */}
-          <motion.div
-            className="flex flex-col items-center lg:items-start"
-            style={{ gap: 12 }}
-            initial={{ opacity: 0, y: d(6) }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: d(0.7), ease: "easeOut" as const }}
-          >
-            <h1 className="m-0" style={{ lineHeight: 1 }}>
+            <motion.h1 variants={logoVariants} className="m-0" style={{ lineHeight: 1 }}>
               <span className="sr-only">Viera Amber</span>
               <img
                 src={logoSrc}
                 alt=""
                 aria-hidden="true"
                 draggable={false}
+                className="select-none"
                 style={{
-                  width: "clamp(178px, 17vw, 268px)",
+                  width: "clamp(172px, 30vw, 420px)",
                   height: "auto",
                   display: "block",
-                  filter:
-                    "brightness(0) drop-shadow(0 0 0.55px #0A0A0A) drop-shadow(0 0 0.55px #0A0A0A) drop-shadow(0 0 0.55px #0A0A0A)",
+                  filter: "brightness(0) saturate(0)",
                 }}
               />
-            </h1>
-            <div className="flex items-center" style={{ gap: 12 }}>
-              <div style={{ width: 26, height: 1, background: `${INK}40` }} aria-hidden="true" />
-              {/* At 11px this needs 4.5:1, which no gold in the palette reaches
-                  on paper — ink at 62% clears it and reads quieter. */}
-              <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(10,10,10,0.62)", fontWeight: 600 }}>
-                Est. 2013
-              </span>
-            </div>
-          </motion.div>
+            </motion.h1>
 
-          {/* Display ceiling 96px; tracking -0.035em sits just inside the
-              -0.04em floor, where Playfair's italic closes up without
-              colliding. The full stop carries the brand's gold. */}
-          <motion.p
-            className="font-display m-0"
-            initial={reduced ? false : { clipPath: "inset(0 100% 0 0)" }}
-            animate={{ clipPath: "inset(0 0% 0 0)" }}
-            transition={{ duration: d(1), delay: d(0.15), ease: [0.16, 1, 0.3, 1] }}
-            style={{
-              fontSize: "clamp(42px, 6.4vw, 96px)",
-              fontWeight: 700,
-              fontStyle: "italic",
-              color: INK,
-              lineHeight: 0.98,
-              letterSpacing: "-0.035em",
-              textWrap: "balance",
-            }}
-          >
-            For her, by her<span style={{ color: GOLD_INK }}>.</span>
-          </motion.p>
+            <motion.div
+              variants={dividerVariants}
+              aria-hidden="true"
+              style={{ width: 44, height: 1, backgroundColor: INK, transformOrigin: "center" }}
+            />
 
-          <motion.p
-            className="m-0"
-            initial={{ opacity: 0, y: d(8) }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: d(0.7), delay: d(0.55) }}
-            style={{
-              fontFamily: "DM Sans, system-ui, sans-serif",
-              fontWeight: 300,
-              fontSize: 16,
-              color: "rgba(10,10,10,0.64)",
-              maxWidth: 440,
-              lineHeight: 1.85,
-            }}
-          >
-            A creative ecosystem built for feminine empowerment.
-          </motion.p>
-
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: d(0.6), delay: d(0.7), ease: "easeOut" as const }}
-            style={{ width: 44, height: 1.5, backgroundColor: GOLD_INK, transformOrigin: "left center" }}
-            aria-hidden="true"
-          />
-
-          <motion.div
-            className="flex flex-wrap items-center justify-center lg:justify-start"
-            style={{ gap: 22, marginTop: 4 }}
-            initial={{ opacity: 0, y: d(8) }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: d(0.6), delay: d(0.82) }}
-          >
-            <a
-              href="#ecosystem"
-              onClick={scrollTo("ecosystem")}
-              className="inline-flex items-center"
+            <motion.p
+              variants={textVariants}
+              className="m-0"
               style={{
-                gap: 8,
-                minHeight: 48,
-                fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: 12,
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                fontWeight: 600,
-                color: PAPER,
-                background: INK,
-                borderRadius: 999,
-                padding: "14px 32px",
-                textDecoration: "none",
-                boxShadow: `0 14px 34px ${GOLD}45`,
+                fontSize: "clamp(14px, 1.7vw, 19px)",
+                color: MUTED,
+                maxWidth: 520,
+                lineHeight: 1.8,
+                fontWeight: 400,
+                fontFamily: "var(--font-body, sans-serif)",
+                letterSpacing: "0.2px",
               }}
             >
-              Explore the ecosystem ↓
-            </a>
-            {/* The underline lives on an inner span so the link can carry a
-                44px touch target without an oversized visible rule. */}
-            <a
-              href="#founder"
-              onClick={scrollTo("founder")}
-              className="inline-flex items-center"
+              A creative ecosystem built for feminine empowerment.
+            </motion.p>
+
+            <motion.p
+              variants={taglineVariants}
+              className="m-0"
               style={{
-                minHeight: 44,
-                fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: 12,
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                fontWeight: 500,
+                fontSize: "clamp(18px, 2.5vw, 32px)",
                 color: INK,
-                textDecoration: "none",
+                fontWeight: 500,
+                fontFamily: "var(--font-display, serif)",
+                fontStyle: "italic",
+                letterSpacing: "-0.015em",
               }}
             >
-              <span style={{ borderBottom: `1px solid ${INK}40`, paddingBottom: 2 }}>
-                Meet the founder →
-              </span>
-            </a>
+              For her, by her.
+            </motion.p>
+
+            <motion.div variants={ctaVariants}>
+              <button
+                type="button"
+                className="rounded-full px-8 py-3 font-body uppercase tracking-widest text-xs min-h-[44px] transition-opacity hover:opacity-85"
+                style={{ backgroundColor: INK, color: PAPER }}
+                onClick={handleScroll}
+                aria-label="Scroll down to explore the Viera Amber ecosystem"
+              >
+                Explore the Ecosystem ↓
+              </button>
+            </motion.div>
           </motion.div>
 
-          {/* ══════════════════════════════════════════════════════════════
-              THE CURRENT — mobile. Not the desktop graphic shrunk: re-cut
-              for a portrait screen, so phone visitors get the same idea
-              rather than a bare gradient. Five equal flex columns centre on
-              10/30/50/70/90%, exactly where the threads terminate.
-              ══════════════════════════════════════════════════════════════ */}
-          <motion.div
-            className="lg:hidden w-full"
-            style={{ marginTop: 30, maxWidth: 340 }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: d(0.5), delay: d(0.9) }}
+          {/* Scroll cue — static. The looping bob this used to carry was
+              called out as making the page hard to read; it does not come
+              back. */}
+          <div
+            className="hero-scroll-indicator absolute"
+            style={{ bottom: "-3.25rem", left: "50%", transform: "translateX(-50%)" }}
+            aria-hidden="true"
           >
-            <svg aria-hidden="true" viewBox="0 0 100 34" preserveAspectRatio="none" className="w-full" style={{ height: 62, display: "block" }}>
-              <motion.path
-                d="M 50,0 L 50,11"
-                fill="none"
-                stroke={INK}
-                strokeWidth={2.5}
-                strokeLinecap="round"
-                vectorEffect="non-scaling-stroke"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 0.85 }}
-                transition={{ duration: d(0.5), delay: d(1.0) }}
-              />
-              <motion.path
-                d="M 46.5,15 L 50,10.5 L 53.5,15"
-                fill="none"
-                stroke={GOLD_INK}
-                strokeWidth={2.5}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                vectorEffect="non-scaling-stroke"
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: d(1.3), type: "spring" as const, stiffness: 300, damping: 16 }}
-                style={{ transformOrigin: "50px 13px" }}
-              />
-              {ARMS.map((t, i) => (
-                <motion.path
-                  key={`m-${t.color}`}
-                  d={`M 50,14 Q ${(50 + t.x) / 2},26 ${t.x},34`}
-                  fill="none"
-                  stroke={t.color}
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  vectorEffect="non-scaling-stroke"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: 0.9 }}
-                  transition={{ duration: d(0.5), delay: d(1.35 + i * 0.07), ease: "easeOut" as const }}
-                />
-              ))}
-            </svg>
-
-            <div className="flex items-start justify-between w-full">
-              {ARMS.map((t, i) => (
-                <motion.a
-                  key={`m-plate-${t.label}`}
-                  href={`#${t.target}`}
-                  onClick={scrollTo(t.target)}
-                  aria-label={`${t.label} — ${t.tag}. Jump to section.`}
-                  className="flex flex-col items-center"
-                  style={{
-                    flex: "1 1 0",
-                    gap: 5,
-                    textDecoration: "none",
-                    minHeight: 44,
-                    WebkitTapHighlightColor: "transparent",
-                  }}
-                  initial={{ opacity: 0, y: 10, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ delay: d(1.5 + i * 0.07), type: "spring" as const, stiffness: 320, damping: 22 }}
-                >
-                  <div
-                    className="overflow-hidden flex items-center justify-center"
-                    style={{
-                      width: 50,
-                      height: 50,
-                      borderRadius: 9,
-                      border: `2px solid ${PAPER}`,
-                      boxShadow: `0 2px 4px rgba(10,10,10,0.10), 0 8px 20px rgba(10,10,10,0.13), 0 0 0 1px ${t.color}55`,
-                      background: t.image ? "#fff" : `${t.color}12`,
-                    }}
-                  >
-                    {t.image ? (
-                      <img src={t.image} alt="" className="w-full h-full object-cover" draggable={false} />
-                    ) : t.Icon ? (
-                      <t.Icon size={21} color={t.color} strokeWidth={1.9} />
-                    ) : null}
-                  </div>
-                  <span
-                    style={{
-                      fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontSize: 8.5,
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase",
-                      fontWeight: 700,
-                      color: t.color,
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {t.label}
-                  </span>
-                </motion.a>
-              ))}
+            <div
+              style={{
+                width: 22,
+                height: 38,
+                border: `1.5px solid ${INK}`,
+                borderRadius: 11,
+                display: "flex",
+                justifyContent: "center",
+                paddingTop: 7,
+                opacity: 0.55,
+              }}
+            >
+              <div style={{ width: 2, height: 6, background: INK, borderRadius: 1 }} />
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

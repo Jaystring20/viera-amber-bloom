@@ -239,7 +239,7 @@ const VIVASection = () => {
         }}
       >
         {[
-          { title: "Structured Fluidity", body: "Tailored lines paired with flowing fabrics. Precision and grace in one silhouette — the garments hold shape and invite movement at once." },
+          { title: "Structured Fluidity", body: "Tailored lines paired with flowing fabrics. Precision and grace in one silhouette. The garments hold shape and invite movement at once." },
           { title: "Artistic Agency", body: "VIVA translates internal confidence into a vivid exterior statement. Every touchpoint is deliberate, curated, gallery-grade." },
         ].map((p) => (
           <motion.div key={p.title}

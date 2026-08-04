@@ -719,7 +719,12 @@ const VAGINPage = () => {
                   key={s.body}
                   variants={cardItem}
                   className="flex flex-col"
-                  style={{ background: `${s.accent}14`, border: `1px solid ${s.accent}38`, borderLeft: `4px solid ${s.accent}`, borderRadius: 14, padding: "32px 28px", gap: 14, backdropFilter: "blur(4px)" }}
+                  /* No 4px accent border-left. A thick coloured side-tab is
+                     one of the most recognisable AI-UI tells, and it was
+                     redundant here: the statistic itself is already set in
+                     the accent at 68px, so the card was stating its colour
+                     twice. The 1px border carries it. */
+                  style={{ background: `${s.accent}14`, border: `1px solid ${s.accent}38`, borderRadius: 14, padding: "32px 28px", gap: 14, backdropFilter: "blur(4px)" }}
                 >
                   <CountUp end={s.end} suffix={s.suffix} className="font-display" style={{ fontSize: "clamp(44px, 6vw, 68px)", fontWeight: 800, color: s.accent, lineHeight: 1, letterSpacing: "-0.03em" }} />
                   <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 16, color: "rgba(17,17,17,0.8)", lineHeight: 1.7, margin: 0 }}>{s.body}</p>

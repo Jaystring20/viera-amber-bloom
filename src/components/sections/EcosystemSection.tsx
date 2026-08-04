@@ -153,13 +153,17 @@ const EcosystemSection = () => {
       style={{ backgroundColor: "#FFFFFF", paddingBottom: "clamp(100px, 12vw, 160px)" }}
       aria-label="The Viera Amber Ecosystem"
     >
-      {/* Ambient brand wash */}
+      {/* Ambient brand wash.
+          Origin moved off the top edge (was `at 50% 0%`). Sitting at 0% it put
+          a 3% dark wash exactly where the Hero's white fade lands, so the seam
+          picked up a faint grey smudge right at the join. Starting it lower
+          lets the two sections meet on clean white. */}
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(60% 50% at 50% 0%, rgba(0,0,0,0.03) 0%, transparent 70%)",
+            "radial-gradient(60% 50% at 50% 22%, rgba(0,0,0,0.03) 0%, transparent 70%)",
         }}
       />
 
@@ -174,7 +178,12 @@ const EcosystemSection = () => {
 
       <div
         className="relative mx-auto"
-        style={{ maxWidth: 1400, padding: "clamp(100px, 12vw, 160px) clamp(24px, 5vw, 64px) 0" }}
+        /* Top padding cut from 100-160px. The Hero already ends in a tall
+           white fade, so this was stacking a second empty white zone on top of
+           it — roughly 340px of nothing between the portrait and the first
+           headline. Tightening it is most of what makes the seam read as one
+           continuous page rather than two sections with a gap. */
+        style={{ maxWidth: 1400, padding: "clamp(56px, 6.5vw, 96px) clamp(24px, 5vw, 64px) 0" }}
       >
         {/* ── HEADER ──────────────────────────────────────────────────────── */}
         <motion.div
@@ -558,6 +567,13 @@ const EcosystemCard = ({
       }}
       transition={{ duration: 0.3, ease: "easeOut" }}
       style={{
+        /* REQUIRED. The icon badge below is position:absolute, so without a
+           positioned ancestor here it escapes the card entirely and anchors to
+           the section wrapper instead — landing at top:48/right:24 of the whole
+           Ecosystem section, on top of the heading. All five badges escaped to
+           the same coordinate and stacked, so only the last one rendered (VASH,
+           the shop bag) was ever visible as a stray. */
+        position: "relative",
         padding: "0 32px 32px 32px",
         borderRadius: 12,
         border: `2px solid ${isHovered ? arm.accent : `${arm.accent}15`}`,

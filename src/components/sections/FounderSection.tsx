@@ -9,10 +9,13 @@ import {
   useReducedVariants,
 } from "@/lib/animations";
 
+/* Commas, not em-dashes. The client called the em-dash out by name as the
+   thing that made the copy read as machine-written, and it is a standing
+   rule here — including in alt text, which screen readers speak aloud. */
 const AWARDS = [
-  "Heineken Design Week — Recognized Excellence",
-  "GTCO — Award-Winning Brand",
-  "DesignFashionAfrica — Fashion & Art Illustration",
+  "Heineken Design Week, Recognized Excellence",
+  "GTCO, Award-Winning Brand",
+  "DesignFashionAfrica, Fashion & Art Illustration",
 ];
 
 const FounderSection = () => {
@@ -76,7 +79,7 @@ const FounderSection = () => {
             >
               <img
                 src="/faith-adigwe-founder.webp"
-                alt="Faith Adigwe — Founder, Viera Amber"
+                alt="Faith Adigwe, Founder of Viera Amber"
                 style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }}
               />
               {/* name chip */}
@@ -186,7 +189,21 @@ const FounderSection = () => {
                     margin: 0,
                   }}
                 >
-                  <span style={{ color: "#555555" }}>— </span>
+                  {/* A drawn hairline, not an em-dash bullet. The dash was
+                      doing decorative work, which is exactly the use the
+                      house rules forbid; a rule reads as an editorial credit
+                      list and costs nothing to a screen reader. */}
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      display: "inline-block",
+                      width: 14,
+                      height: 1,
+                      backgroundColor: "#999999",
+                      verticalAlign: "middle",
+                      marginRight: 10,
+                    }}
+                  />
                   {award}
                 </motion.p>
               ))}
