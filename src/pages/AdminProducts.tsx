@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Edit, Trash2, X, Save, ChevronDown, ChevronUp, Sparkles, Search, Eye, EyeOff, Star, Filter, MoreVertical, Copy, Check } from "lucide-react";
+import { Plus, Edit, Trash2, X, Save, ChevronDown, ChevronUp, Search, Eye, EyeOff, Star, Filter, MoreVertical, Copy, Check } from "lucide-react";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
@@ -47,7 +47,6 @@ const AdminProducts = () => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [enhancing, setEnhancing] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<"all" | "garment" | "print">("all");
   const [filterActive, setFilterActive] = useState<"all" | "active" | "inactive">("all");
@@ -158,37 +157,6 @@ const AdminProducts = () => {
     }
   };
 
-  const handleAIEnhance = async (product: Product) => {
-    if (!product.id || enhancing === product.id) return;
-
-    setEnhancing(product.id);
-    try {
-      const response = await fetch("/api/enhance-product", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(product),
-      });
-
-      if (!response.ok) throw new Error("AI enhancement failed");
-      const enhanced = await response.json();
-
-      const { error } = await supabase
-        .from("products")
-        .update({
-          ...enhanced,
-          ai_enhanced: true,
-        })
-        .eq("id", product.id);
-
-      if (error) throw error;
-      await fetchProducts();
-    } catch (e) {
-      alert("AI enhancement failed: " + (e instanceof Error ? e.message : "Unknown error"));
-    } finally {
-      setEnhancing(null);
-    }
-  };
-
   const handleEdit = (product: Product) => {
     setFormData(product);
     setEditingId(product.id || null);
@@ -224,8 +192,8 @@ const AdminProducts = () => {
     total: products.length,
     garments: products.filter(p => p.type === "garment").length,
     prints: products.filter(p => p.type === "print").length,
-    aiEnhanced: products.filter(p => p.ai_enhanced).length,
     featured: products.filter(p => p.featured).length,
+    active: products.filter(p => p.active).length,
   };
 
   return (
@@ -249,8 +217,8 @@ const AdminProducts = () => {
             { label: "Total Products", value: stats.total, color: COLORS.BURGUNDY },
             { label: "Garments", value: stats.garments, color: COLORS.GOLD },
             { label: "Prints", value: stats.prints, color: COLORS.SUCCESS },
-            { label: "AI Enhanced", value: stats.aiEnhanced, color: COLORS.WARNING },
-            { label: "Featured", value: stats.featured, color: COLORS.BURGUNDY },
+            { label: "Active", value: stats.active, color: COLORS.SUCCESS },
+            { label: "Featured", value: stats.featured, color: COLORS.WARNING },
           ].map((stat) => (
             <motion.div
               key={stat.label}
@@ -385,13 +353,11 @@ const AdminProducts = () => {
                 product={product}
                 isEditing={editingId === product.id}
                 isExpanded={expandedId === product.id}
-                isEnhancing={enhancing === product.id}
                 isCopied={copiedId === product.id}
                 formData={editingId === product.id ? formData : null}
                 setFormData={editingId === product.id ? setFormData : null}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
-                onAIEnhance={handleAIEnhance}
                 onSave={handleSave}
                 onCancel={handleCancel}
                 onToggleExpand={() => setExpandedId(expandedId === product.id ? null : product.id)}
@@ -476,13 +442,11 @@ interface ProductCardProps {
   product: Product;
   isEditing: boolean;
   isExpanded: boolean;
-  isEnhancing: boolean;
   isCopied: boolean;
   formData: Product | null;
   setFormData: ((data: Product) => void) | null;
   onEdit: (product: Product) => void;
   onDelete: (id: string) => void;
-  onAIEnhance: (product: Product) => void;
   onSave: () => void;
   onCancel: () => void;
   onToggleExpand: () => void;
@@ -493,13 +457,11 @@ const ProductCard = ({
   product,
   isEditing,
   isExpanded,
-  isEnhancing,
   isCopied,
   formData,
   setFormData,
   onEdit,
   onDelete,
-  onAIEnhance,
   onSave,
   onCancel,
   onToggleExpand,
@@ -587,27 +549,6 @@ const ProductCard = ({
             </div>
 
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
-              <motion.button
-                onClick={() => onAIEnhance(product)}
-                disabled={isEnhancing}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                title="AI Enhance"
-                style={{
-                  background: isEnhancing ? "rgba(212,175,55,0.5)" : "rgba(212,175,55,0.2)",
-                  color: COLORS.GOLD,
-                  border: "none",
-                  borderRadius: 6,
-                  padding: 8,
-                  cursor: isEnhancing ? "wait" : "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Sparkles size={16} />
-              </motion.button>
-
               <motion.button
                 onClick={() => onEdit(product)}
                 whileHover={{ scale: 1.05 }}

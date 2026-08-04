@@ -56,23 +56,11 @@ CREATE POLICY "Admin manage" ON products
 
 5. Click **Run** ✓
 
-### Step 2: Set AI Key (1 minute)
+### Step 2: Done! (2 minute setup complete)
 
-1. Go to **Settings** → **Edge Functions**
-2. Click **Secrets**
-3. Add new secret:
-   - **Name:** `ANTHROPIC_API_KEY`
-   - **Value:** `sk-ant-xxx...` (from [Anthropic Console](https://console.anthropic.com/account/keys))
-4. Click **Save** ✓
+That's it! You're ready to start managing products.
 
-### Step 3: Deploy Edge Function (2 minutes)
-
-```bash
-cd /c/Users/DELL/projects/viera-amber
-supabase functions deploy enhance-product
-```
-
-✓ Function is live!
+> **Note:** AI-powered description enhancement is currently pending. You can manually write rich descriptions, or we can integrate Claude API enhancements later.
 
 ---
 
@@ -102,17 +90,12 @@ supabase functions deploy enhance-product
 - **Delete:** Click trash icon → Confirm
 - **Expand:** Click chevron for full details
 
-#### 4. **AI Enhancement**
-- Click **Sparkles icon** on any product
-- AI generates:
-  - Rich descriptions
-  - Materials composition
-  - Care instructions
-  - Fit details
-  - Style notes
-  - Color palette
-  - Occasions
-- Mark product as "AI Enhanced" ✓
+#### 4. **Product Details**
+- Write rich descriptions manually
+- Add materials and care information
+- Describe fit details and styling notes
+- Include color palette and occasions
+- All editable in the product form
 
 #### 5. **Export**
 - Click **Copy icon** to export product JSON
@@ -143,10 +126,13 @@ supabase functions deploy enhance-product
 5. Write description:
    > Olive woven kimono · wide-leg pleated denim · gold cuffs. Bespoke fit, made to your measurements.
 
-6. Click **Save Product** ✓
+6. (Optional) Add more details:
+   - Full description (2-3 paragraphs)
+   - Materials composition
+   - Care instructions
+   - Fit details and sizing
 
-7. **Click Sparkles icon** to AI-enhance
-   - AI generates full description, materials, care, sizing, styling tips
+7. Click **Save Product** ✓
 
 8. Done! Product appears on VIVA page instantly
 
@@ -174,11 +160,11 @@ Admin Creates Product
 
 ---
 
-## 🤖 AI Enhancement Details
+## 🤖 AI Enhancement (Pending Feature)
 
-### What Gets Generated
+### Coming Soon
 
-When you click the Sparkles icon, Claude AI analyzes your product and creates:
+AI-powered product description enhancement is planned for a future release. When implemented, it will use Claude API to generate:
 
 1. **Full Description** (2-3 paragraphs)
    - Tells the product story

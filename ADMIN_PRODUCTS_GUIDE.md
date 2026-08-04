@@ -74,18 +74,11 @@ CREATE POLICY "Admin manage products" ON products
   FOR ALL USING (auth.role() = 'authenticated');
 ```
 
-### 3. Deploy Edge Function
+### 3. Ready to Use
 
-Deploy the AI enhancement edge function:
+Your product management system is now ready!
 
-```bash
-supabase functions deploy enhance-product
-```
-
-Set environment variables in Supabase:
-```
-ANTHROPIC_API_KEY=sk-ant-...
-```
+> **AI Enhancement (Pending):** Claude API-based description enhancement is planned for a future release. You can manually write rich product descriptions now, or we can enable AI-powered generation later.
 
 ### 4. Update Frontend
 
@@ -209,22 +202,23 @@ Products update automatically in real-time when:
 - You delete a product (removed from all displays)
 - You enhance with AI (enriched details appear immediately)
 
-## AI Enhancement Details
+## AI Enhancement (Pending Feature)
 
-The AI enhancement uses Claude 3 Sonnet to:
+AI-powered product description enhancement is planned for a future release.
 
-1. **Analyze** the current product description and metadata
-2. **Generate** a compelling 2-3 paragraph full description
-3. **Create** specific materials composition details
-4. **Write** detailed care instructions (3-5 steps)
-5. **Suggest** fit details and sizing information
-6. **Provide** styling notes and pairing recommendations
-7. **Identify** occasions perfect for the piece
-8. **Extract** dominant colors from descriptions
+When implemented, it will use Claude 3 Sonnet to:
+1. Analyze the current product description and metadata
+2. Generate compelling 2-3 paragraph full descriptions
+3. Create specific materials composition details
+4. Write detailed care instructions (3-5 steps)
+5. Suggest fit details and sizing information
+6. Provide styling notes and pairing recommendations
+7. Identify occasions perfect for the piece
+8. Extract dominant colors from descriptions
 
-### Prompt Guidelines
+### Planned AI Capabilities
 
-The AI is instructed to:
+The AI will be instructed to:
 - Use sophisticated, aspirational language
 - Emphasize craftsmanship and quality
 - Focus on the wearer's empowerment
@@ -239,13 +233,13 @@ The AI is instructed to:
 2. **Write compelling short description** - Make users want to learn more
 3. **Use consistent badging** - "Made to Order", "Limited", "Edition / 30"
 4. **Price accurately** - Double-check NGN/USD conversion
-5. **Enable AI enhancement** - Click Sparkles for rich descriptions
+5. **Add rich details** - Write full descriptions, materials, care instructions
 
 ### Product Editing
 1. **Update all fields** - Incomplete data affects frontend display
 2. **Fix typos promptly** - Changes sync in real-time
-3. **Re-enhance after changes** - AI adapts to new information
-4. **Test on mobile** - Ensure descriptions display well
+3. **Improve descriptions** - Enhance with more details over time
+4. **Test on mobile** - Ensure content displays well
 
 ### Image Management
 1. **Use optimized images** - WebP format, ~300KB each
@@ -261,12 +255,6 @@ The AI is instructed to:
 - Ensure `active = true` on products
 - Hard refresh browser (Ctrl+Shift+R)
 
-### AI Enhancement Fails
-- Verify `ANTHROPIC_API_KEY` is set in Supabase env
-- Check Claude API quota hasn't been exceeded
-- Try enhancement again (it's resilient)
-- Check browser console for error details
-
 ### Images Not Loading
 - Verify image URLs are correct
 - Check URLs are accessible from frontend
@@ -280,14 +268,14 @@ The AI is instructed to:
 
 ## Future Enhancements
 
-1. **Admin Authentication** - Require login for `/admin/products`
-2. **Batch Operations** - Edit multiple products at once
-3. **Image Upload** - Upload images directly to Supabase Storage
-4. **Audit Logs** - Track who changed what and when
-5. **Product Variants** - Support size/color options
-6. **Inventory Tracking** - Stock levels per product
-7. **SEO Optimization** - Meta descriptions, keywords
-8. **Bulk AI Enhancement** - Enhance multiple products at once
+1. **AI-Powered Descriptions** - Claude API integration for rich descriptions and metadata generation
+2. **Admin Authentication** - Require login for `/admin/products`
+3. **Batch Operations** - Edit multiple products at once
+4. **Image Upload** - Upload images directly to Supabase Storage
+5. **Audit Logs** - Track who changed what and when
+6. **Product Variants** - Support size/color options
+7. **Inventory Tracking** - Stock levels per product
+8. **SEO Optimization** - Meta descriptions, keywords
 
 ## Support
 
@@ -296,4 +284,4 @@ For issues or questions:
 2. Verify Supabase credentials
 3. Test with fallback data (disable Supabase query)
 4. Review Supabase logs for database errors
-5. Check edge function logs for AI enhancement issues
+5. Consult this guide's troubleshooting section
