@@ -158,7 +158,30 @@ const AdminProducts = () => {
   };
 
   const handleEdit = (product: Product) => {
-    setFormData(product);
+    // Ensure all fields are populated before editing
+    setFormData({
+      id: product.id,
+      title: product.title || "",
+      subtitle: product.subtitle || "",
+      type: product.type || "garment",
+      badge: product.badge || "",
+      images: product.images || [],
+      price_ngn: product.price_ngn || 0,
+      price_usd: product.price_usd || 0,
+      description: product.description || "",
+      full_description: product.full_description || "",
+      materials: product.materials || "",
+      care_instructions: product.care_instructions || "",
+      size_guide: product.size_guide || "",
+      style_notes: product.style_notes || "",
+      occasions: product.occasions || [],
+      colors: product.colors || [],
+      fit_details: product.fit_details || "",
+      ai_enhanced: product.ai_enhanced || false,
+      featured: product.featured || false,
+      active: product.active !== false,
+      sort_order: product.sort_order || 0,
+    });
     setEditingId(product.id || null);
   };
 
