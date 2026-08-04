@@ -677,8 +677,11 @@ const VIVAPage = () => {
 
           {/* Header row */}
           <div className="flex items-start justify-between flex-wrap gap-4" style={{ marginBottom: 48 }}>
-            <div>
-              <p style={{ fontFamily: "DM Sans", fontSize: 10, color: BURGUNDY, letterSpacing: "5px", textTransform: "uppercase", margin: "0 0 8px 0" }}>The Shop</p>
+            <div style={{ width: "100%" }}>
+              <p style={{ fontFamily: "DM Sans", fontSize: 13, color: BURGUNDY, letterSpacing: "5px", textTransform: "uppercase", margin: "0 0 8px 0" }}>Maiden Collection</p>
+              <h1 style={{ fontFamily: CORMORANT, fontSize: "clamp(36px, 5vw, 64px)", fontWeight: 700, color: BURGUNDY, margin: "0 0 24px 0", lineHeight: 1.1 }}>
+                Batya: Daughters of Adonai
+              </h1>
               <h2 style={{ fontFamily: CORMORANT, fontSize: "clamp(28px, 4.5vw, 52px)", fontWeight: 700, color: BURGUNDY, margin: 0, lineHeight: 1.1 }}>
                 Shop the Collection
               </h2>
