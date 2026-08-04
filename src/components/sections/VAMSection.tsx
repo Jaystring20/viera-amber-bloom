@@ -143,7 +143,7 @@ const VAMSection = () => {
                 style={{
                   fontFamily: "DM Sans, system-ui, sans-serif",
                   fontWeight: 700,
-                  fontSize: 10,
+                  fontSize: 11,
                   color: "#D97706",
                   letterSpacing: "3px",
                   display: "block",
@@ -191,11 +191,12 @@ const VAMSection = () => {
           <p
             style={{
               fontFamily: "DM Sans, system-ui, sans-serif",
-              fontSize: 11,
+              fontSize: 13,
               color: "#888888",
               letterSpacing: "3px",
               textTransform: "uppercase",
               margin: 0,
+              fontWeight: 600,
             }}
           >
             Who it's for
