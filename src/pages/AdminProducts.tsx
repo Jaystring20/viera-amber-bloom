@@ -200,7 +200,7 @@ const AdminProducts = () => {
     <div style={{ background: COLORS.ALABASTER, minHeight: "100vh" }}>
       <NavBar />
 
-      <main style={{ maxWidth: 1400, margin: "0 auto", padding: "40px 20px" }}>
+      <main style={{ maxWidth: 1400, margin: "0 auto", padding: "100px 20px 40px 20px" }}>
         {/* Header */}
         <div style={{ marginBottom: 40 }}>
           <h1 style={{ fontFamily: CORMORANT, fontSize: 48, fontWeight: 700, color: COLORS.BURGUNDY, margin: "0 0 8px 0" }}>
@@ -687,6 +687,8 @@ interface ProductFormProps {
 }
 
 const ProductForm = ({ formData, setFormData, onSave, onCancel, isInline }: ProductFormProps) => {
+  const [uploadingImage, setUploadingImage] = useState(false);
+
   const inputStyle: React.CSSProperties = {
     fontFamily: "DM Sans",
     fontSize: 13,
@@ -704,6 +706,36 @@ const ProductForm = ({ formData, setFormData, onSave, onCancel, isInline }: Prod
     color: COLORS.BURGUNDY,
     marginBottom: 4,
     display: "block",
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    setUploadingImage(true);
+    try {
+      const newUrls: string[] = [...(formData.images || [])];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const timestamp = Date.now();
+        const filename = `${timestamp}-${i}-${file.name}`;
+        const path = `viva-products/${filename}`;
+
+        const { error } = await supabase.storage.from("viva-assets").upload(path, file);
+        if (error) throw error;
+
+        const { data } = supabase.storage.from("viva-assets").getPublicUrl(path);
+        if (data) newUrls.push(data.publicUrl);
+      }
+
+      setFormData({ ...formData, images: newUrls });
+    } catch (err) {
+      console.error("Upload failed:", err);
+      alert("Failed to upload images. Check console.");
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   return (
@@ -766,7 +798,29 @@ const ProductForm = ({ formData, setFormData, onSave, onCancel, isInline }: Prod
       </div>
 
       <div>
-        <label style={labelStyle}>Images (comma-separated URLs)</label>
+        <label style={labelStyle}>Images</label>
+        <div style={{ marginBottom: 12 }}>
+          <label style={{ display: "inline-block", padding: "10px 16px", background: COLORS.BURGUNDY, color: "white", borderRadius: 6, cursor: uploadingImage ? "not-allowed" : "pointer", fontFamily: "DM Sans", fontSize: 12, fontWeight: 600, opacity: uploadingImage ? 0.6 : 1 }}>
+            {uploadingImage ? "Uploading..." : "📸 Upload Images"}
+            <input type="file" multiple accept="image/*" onChange={handleImageUpload} disabled={uploadingImage} style={{ display: "none" }} />
+          </label>
+        </div>
+
+        {formData.images && formData.images.length > 0 && (
+          <div style={{ marginBottom: 12 }}>
+            <p style={{ fontSize: 11, color: "rgba(0,0,0,0.5)", margin: "0 0 8px 0", fontWeight: 600 }}>Uploaded Images ({formData.images.length}):</p>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {formData.images.map((url, idx) => (
+                <div key={idx} style={{ position: "relative", display: "inline-block" }}>
+                  <img src={url} alt={`img-${idx}`} style={{ width: 60, height: 60, borderRadius: 6, objectFit: "cover", border: `1px solid ${COLORS.BURG_ALPHA}` }} />
+                  <button onClick={() => setFormData({ ...formData, images: formData.images.filter((_, i) => i !== idx) })} style={{ position: "absolute", top: -8, right: -8, background: "#EF4444", border: "none", borderRadius: 999, width: 20, height: 20, color: "white", fontSize: 12, cursor: "pointer", fontWeight: 700 }}>×</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <label style={{ ...labelStyle, marginTop: 12 }}>Or paste URLs (comma-separated)</label>
         <input
           type="text"
           value={formData.images?.join(", ") || ""}
