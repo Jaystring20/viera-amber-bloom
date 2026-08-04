@@ -56,19 +56,6 @@ const Index = () => {
             className="flex flex-col items-center text-center mx-auto px-6"
             style={{ maxWidth: 560, gap: 20 }}
           >
-            <p
-              style={{
-                fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: 13,
-                color: "#D97706",
-                letterSpacing: "4px",
-                textTransform: "uppercase",
-                fontWeight: 600,
-                margin: 0,
-              }}
-            >
-              VASH — Viera Amber Shop
-            </p>
             <h2
               className="font-display"
               style={{
@@ -92,7 +79,7 @@ const Index = () => {
               }}
             >
               Wearable art, premium Procreate brushes, fashion illustration pose
-              references, and customized design products — all curated by Faith
+              references, and customized design products. All curated by Faith
               Adigwe.
             </p>
             <a

@@ -63,7 +63,7 @@ const StatTile = ({ Icon, value, suffix = "", label, inView }: StatTileProps) =>
       style={{
         background: "#FFFFFF",
         border: `1.5px solid ${PINK}22`,
-        borderRadius: 14,
+        borderRadius: 12,
         padding: "24px 20px",
         gap: 12,
         boxShadow: "0 2px 8px rgba(237,21,93,0.08)",
@@ -344,7 +344,7 @@ const VAGINSection = () => {
                 style={{
                   width: 48,
                   height: 48,
-                  borderRadius: 14,
+                  borderRadius: 12,
                   background: "rgba(237,21,93,0.28)",
                   border: "1px solid rgba(244,114,182,0.6)",
                   marginBottom: 14,

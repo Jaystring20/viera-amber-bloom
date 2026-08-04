@@ -381,8 +381,8 @@ const HeroSection = () => {
             <motion.div variants={ctaVariants}>
               <button
                 type="button"
-                className="rounded-full px-8 py-3 font-body uppercase tracking-widest min-h-[44px] transition-opacity hover:opacity-85"
-                style={{ backgroundColor: INK, color: PAPER, fontSize: 13, fontWeight: 600 }}
+                className="px-8 py-3 font-body uppercase tracking-widest min-h-[44px] transition-opacity hover:opacity-85"
+                style={{ backgroundColor: INK, color: PAPER, fontSize: 13, fontWeight: 600, borderRadius: 999 }}
                 onClick={handleScroll}
                 aria-label="Scroll down to explore the Viera Amber ecosystem"
               >

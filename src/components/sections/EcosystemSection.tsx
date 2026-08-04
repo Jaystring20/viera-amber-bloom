@@ -508,7 +508,7 @@ const FlowNode = ({
           color: "#1A1A1A",
           backgroundColor: "rgba(255,255,255,0.88)",
           padding: "3px 9px",
-          borderRadius: 6,
+          borderRadius: 8,
           boxShadow: `0 1px 6px rgba(0,0,0,0.06)`,
         }}
         animate={{ color: isHovered ? arm.accent : "#1A1A1A" }}
