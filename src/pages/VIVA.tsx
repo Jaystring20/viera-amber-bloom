@@ -445,25 +445,37 @@ const VIVAPage = () => {
           />
         </motion.div>
 
-        {/* Text content — asymmetric, editorial layout */}
+        {/* Text content — perfectly positioned editorial layout */}
         <div
           className="relative"
-          style={{ minHeight: "inherit", zIndex: 10, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "clamp(48px, 8vw, 80px) clamp(24px, 6vw, 80px)" }}
+          style={{
+            minHeight: "inherit",
+            zIndex: 10,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-start",
+            justifyContent: "center",
+            padding: "clamp(48px, 8vw, 80px) clamp(24px, 6vw, 80px)",
+            paddingTop: "clamp(60px, 10vh, 120px)",
+          }}
         >
-          {/* Top: Navigation — subtle, elegant */}
+          {/* Back button — positioned at top */}
           <motion.button
             type="button"
             onClick={() => navigate("/")}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.15 }}
+            transition={{ duration: 0.8, delay: 0.12 }}
             style={{
+              position: "absolute",
+              top: "clamp(32px, 6vw, 60px)",
+              left: "clamp(24px, 6vw, 80px)",
               background: "none",
               border: "none",
-              color: "rgba(255, 255, 255, 0.6)",
+              color: "rgba(255, 255, 255, 0.5)",
               cursor: "pointer",
               fontFamily: "DM Sans, system-ui, sans-serif",
-              fontSize: "clamp(9px, 0.9vw, 11px)",
+              fontSize: "clamp(9px, 0.85vw, 11px)",
               letterSpacing: "0.3em",
               textTransform: "uppercase",
               padding: 0,
@@ -479,144 +491,144 @@ const VIVAPage = () => {
             <span>Back</span>
           </motion.button>
 
-          {/* Center: Main editorial content — left-aligned, dramatic */}
-          <div style={{ maxWidth: "65%", minWidth: "280px" }}>
+          {/* Main editorial hero content — centered vertically, left-aligned */}
+          <div style={{ maxWidth: "70%", minWidth: "300px", width: "100%" }}>
             {/* Eyebrow — understated serif intro */}
             <motion.p
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -24 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.25, ease: "easeOut" }}
+              transition={{ duration: 0.75, delay: 0.22, ease: "easeOut" }}
               style={{
                 fontFamily: CORMORANT,
-                fontSize: "clamp(11px, 1.4vw, 16px)",
+                fontSize: "clamp(12px, 1.6vw, 18px)",
                 fontWeight: 400,
                 fontStyle: "italic",
-                letterSpacing: "0.15em",
+                letterSpacing: "0.18em",
                 textTransform: "uppercase",
                 color: GOLD,
                 margin: 0,
-                marginBottom: "clamp(20px, 3vw, 32px)",
-                opacity: 0.9,
+                marginBottom: "clamp(16px, 2.2vw, 28px)",
+                opacity: 0.95,
               }}
             >
               The Maiden Collection
             </motion.p>
 
-            {/* Hero heading — MASSIVE, commands attention */}
+            {/* Hero heading — MASSIVE, serif dominant */}
             <motion.h1
-              initial={{ opacity: 0, y: 40 }}
+              initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.35, ease: [0.12, 0.72, 0.48, 1] }}
+              transition={{ duration: 1, delay: 0.32, ease: [0.12, 0.72, 0.48, 1] }}
               style={{
                 fontFamily: CORMORANT,
-                fontSize: "clamp(56px, 14vw, 140px)",
+                fontSize: "clamp(64px, 16vw, 160px)",
                 fontWeight: 300,
-                lineHeight: 0.95,
+                lineHeight: 0.92,
                 color: "#FFFFFF",
                 margin: 0,
-                marginBottom: "clamp(8px, 1.5vw, 24px)",
-                letterSpacing: "-0.02em",
+                marginBottom: "clamp(12px, 1.8vw, 28px)",
+                letterSpacing: "-0.03em",
               }}
             >
               Batya
             </motion.h1>
 
-            {/* Descriptor — secondary serif with presence */}
+            {/* Descriptor — secondary serif, strong presence */}
             <motion.p
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 36 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.45, ease: "easeOut" }}
+              transition={{ duration: 0.9, delay: 0.42, ease: "easeOut" }}
               style={{
                 fontFamily: CORMORANT,
-                fontSize: "clamp(24px, 4vw, 48px)",
+                fontSize: "clamp(28px, 5vw, 56px)",
                 fontWeight: 300,
-                lineHeight: 1.15,
-                color: "rgba(255, 255, 255, 0.85)",
+                lineHeight: 1.12,
+                color: "rgba(255, 255, 255, 0.88)",
                 margin: 0,
-                marginBottom: "clamp(24px, 4vw, 48px)",
+                marginBottom: "clamp(32px, 5vw, 56px)",
                 fontStyle: "normal",
               }}
             >
               Daughters of Adonai
             </motion.p>
 
-            {/* Subtext — contextual, not mantra */}
+            {/* Description text — editorial, compelling */}
             <motion.p
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.85, delay: 0.52, ease: "easeOut" }}
+              transition={{ duration: 0.85, delay: 0.50, ease: "easeOut" }}
               style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: "clamp(13px, 1.3vw, 17px)",
+                fontSize: "clamp(14px, 1.5vw, 18px)",
                 fontWeight: 400,
-                lineHeight: 1.7,
-                color: "rgba(255, 255, 255, 0.75)",
+                lineHeight: 1.75,
+                color: "rgba(255, 255, 255, 0.80)",
                 margin: 0,
-                marginBottom: "clamp(32px, 5vw, 56px)",
-                maxWidth: "520px",
-                letterSpacing: "0.01em",
+                marginBottom: "clamp(40px, 6vw, 64px)",
+                maxWidth: "560px",
+                letterSpacing: "0.005em",
               }}
             >
               Structured tailoring meets fluid artistic silhouettes. High-end wearable art for the modern woman who wears her confidence out loud.
             </motion.p>
-          </div>
 
-          {/* Bottom: CTA — bold, commands action */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-col sm:flex-row gap-4 sm:gap-5"
-            style={{ maxWidth: "520px" }}
-          >
-            <a href="#viva-collection" style={{ textDecoration: "none", flex: "0 0 auto" }}>
+            {/* CTA buttons — bold, command attention */}
+            <motion.div
+              initial={{ opacity: 0, y: 28 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.58 }}
+              className="flex flex-col sm:flex-row gap-4 sm:gap-5 items-start"
+              style={{}}
+            >
+              <a href="#viva-collection" style={{ textDecoration: "none" }}>
+                <motion.button
+                  type="button"
+                  whileHover={reduced ? {} : { scale: 1.07, backgroundColor: "#E5D85A", boxShadow: "0 16px 48px rgba(212, 175, 55, 0.3)" }}
+                  whileTap={reduced ? {} : { scale: 0.96 }}
+                  style={{
+                    background: GOLD,
+                    color: "#1A1A1A",
+                    border: "none",
+                    padding: "clamp(16px, 2.8vw, 19px) clamp(36px, 6vw, 52px)",
+                    fontFamily: "DM Sans, system-ui, sans-serif",
+                    fontSize: "clamp(11px, 1.05vw, 13px)",
+                    fontWeight: 700,
+                    letterSpacing: "0.18em",
+                    textTransform: "uppercase",
+                    cursor: "pointer",
+                    borderRadius: 1,
+                    transition: "all 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+                    boxShadow: "0 14px 42px rgba(212, 175, 55, 0.25)",
+                  }}
+                >
+                  Shop the Collection
+                </motion.button>
+              </a>
               <motion.button
                 type="button"
-                whileHover={reduced ? {} : { scale: 1.06, backgroundColor: "#E5D85A" }}
-                whileTap={reduced ? {} : { scale: 0.98 }}
+                onClick={scrollToEnquiry}
+                whileHover={reduced ? {} : { scale: 1.07, borderColor: "#FFFFFF", backgroundColor: "rgba(255, 255, 255, 0.12)" }}
+                whileTap={reduced ? {} : { scale: 0.96 }}
                 style={{
-                  background: GOLD,
-                  color: "#1A1A1A",
-                  border: "none",
-                  padding: "clamp(15px, 2.5vw, 18px) clamp(32px, 5vw, 48px)",
+                  background: "rgba(255, 255, 255, 0.03)",
+                  color: "#FFFFFF",
+                  border: `2.5px solid ${GOLD}`,
+                  padding: "clamp(16px, 2.8vw, 19px) clamp(36px, 6vw, 52px)",
                   fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: "clamp(12px, 1.1vw, 14px)",
+                  fontSize: "clamp(11px, 1.05vw, 13px)",
                   fontWeight: 700,
-                  letterSpacing: "0.15em",
+                  letterSpacing: "0.18em",
                   textTransform: "uppercase",
                   cursor: "pointer",
                   borderRadius: 1,
-                  transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-                  boxShadow: "0 12px 40px rgba(212, 175, 55, 0.2)",
+                  transition: "all 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+                  backdropFilter: "blur(6px)",
                 }}
               >
-                Shop the Collection
+                Enquire
               </motion.button>
-            </a>
-            <motion.button
-              type="button"
-              onClick={scrollToEnquiry}
-              whileHover={reduced ? {} : { scale: 1.06, borderColor: "#FFFFFF", backgroundColor: "rgba(255, 255, 255, 0.08)" }}
-              whileTap={reduced ? {} : { scale: 0.98 }}
-              style={{
-                background: "rgba(255, 255, 255, 0.02)",
-                color: "#FFFFFF",
-                border: `2px solid ${GOLD}`,
-                padding: "clamp(15px, 2.5vw, 18px) clamp(32px, 5vw, 48px)",
-                fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: "clamp(12px, 1.1vw, 14px)",
-                fontWeight: 700,
-                letterSpacing: "0.15em",
-                textTransform: "uppercase",
-                cursor: "pointer",
-                borderRadius: 1,
-                transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-                backdropFilter: "blur(4px)",
-              }}
-            >
-              Enquire
-            </motion.button>
-          </motion.div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
