@@ -422,17 +422,18 @@ const VIVAPage = () => {
           background: "black",
         }
       }}>
-        {/* Desktop: Full-bleed animated GIF background */}
+        {/* Desktop: Full-bleed animated GIF background with fallback */}
         <motion.div
           initial={{ opacity: 0, scale: 1.02 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.4, ease: [0.12, 0.72, 0.48, 1] }}
           className="hidden md:block absolute inset-0"
-          style={{ overflow: "hidden" }}
+          style={{ overflow: "hidden", background: `url('/viva/hero-right.webp') center/cover no-repeat` }}
         >
+          {/* Primary: Animated GIF */}
           <img
-            src="/viva/hero-loop.gif"
-            alt="VIVA by Viera Amber — Batya Collection — Animated"
+            src="/viva/hero-product.gif"
+            alt="VIVA by Viera Amber — Batya Collection — Animated Product"
             loading="eager"
             style={{
               width: "100%",
@@ -440,6 +441,11 @@ const VIVAPage = () => {
               objectFit: "cover",
               objectPosition: "center right",
               display: "block",
+            }}
+            onError={(e) => {
+              // Fallback: If GIF fails, show the static image
+              e.currentTarget.src = '/viva/hero-right.webp';
+              e.currentTarget.style.display = 'block';
             }}
           />
           {/* Strategic overlay — darker on left for text */}
