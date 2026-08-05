@@ -409,16 +409,25 @@ const VIVAPage = () => {
       <NavBar />
 
       {/* ═══════════════════════════════════════════════════════
-          HERO — Luxury Editorial with Cinematic Animation
-          Full-bleed video, asymmetric text layout, bold typography hierarchy
+          HERO — Responsive Luxury Editorial
+          Desktop: Asymmetric left-aligned on video | Mobile: Centered editorial
           ═══════════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden" style={{ minHeight: "clamp(760px, 100vh, 1080px)", background: "#000" }}>
-        {/* Full-bleed animated GIF background — image dominates */}
+      <section className="relative overflow-hidden md:bg-black" style={{
+        minHeight: "clamp(720px, 100vh, 1080px)",
+        background: BURGUNDY,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        "@media (min-width: 768px)": {
+          background: "black",
+        }
+      }}>
+        {/* Desktop: Full-bleed animated GIF background */}
         <motion.div
           initial={{ opacity: 0, scale: 1.02 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.4, ease: [0.12, 0.72, 0.48, 1] }}
-          className="absolute inset-0"
+          className="hidden md:block absolute inset-0"
           style={{ overflow: "hidden" }}
         >
           <img
@@ -433,7 +442,7 @@ const VIVAPage = () => {
               display: "block",
             }}
           />
-          {/* Strategic overlay — darker on left for text, subtle on right */}
+          {/* Strategic overlay — darker on left for text */}
           <div
             aria-hidden="true"
             style={{
@@ -445,21 +454,17 @@ const VIVAPage = () => {
           />
         </motion.div>
 
-        {/* Text content — perfectly positioned editorial layout */}
+        {/* Content wrapper — responsive layout */}
         <div
-          className="relative"
+          className="relative w-full"
           style={{
-            minHeight: "inherit",
             zIndex: 10,
             display: "flex",
             flexDirection: "column",
-            alignItems: "flex-start",
-            justifyContent: "center",
-            padding: "clamp(48px, 8vw, 80px) clamp(24px, 6vw, 80px)",
-            paddingTop: "clamp(60px, 10vh, 120px)",
+            padding: "clamp(48px, 8vw, 80px) clamp(20px, 5vw, 80px)",
           }}
         >
-          {/* Back button — positioned at top */}
+          {/* Back button — desktop top-left, mobile top-center */}
           <motion.button
             type="button"
             onClick={() => navigate("/")}
@@ -468,32 +473,223 @@ const VIVAPage = () => {
             transition={{ duration: 0.8, delay: 0.12 }}
             style={{
               position: "absolute",
-              top: "clamp(32px, 6vw, 60px)",
-              left: "clamp(24px, 6vw, 80px)",
+              top: "clamp(24px, 5vw, 60px)",
+              left: "clamp(20px, 5vw, 80px)",
               background: "none",
               border: "none",
               color: "rgba(255, 255, 255, 0.5)",
               cursor: "pointer",
               fontFamily: "DM Sans, system-ui, sans-serif",
-              fontSize: "clamp(9px, 0.85vw, 11px)",
+              fontSize: "clamp(8px, 2vw, 11px)",
               letterSpacing: "0.3em",
               textTransform: "uppercase",
               padding: 0,
               display: "inline-flex",
               alignItems: "center",
-              gap: 10,
+              gap: 8,
               fontWeight: 500,
-              width: "fit-content",
             }}
             whileHover={reduced ? {} : { color: "#FFFFFF", x: -3 }}
           >
-            <ArrowLeft size={13} strokeWidth={1.5} />
+            <ArrowLeft size={12} strokeWidth={1.5} />
             <span>Back</span>
           </motion.button>
 
-          {/* Main editorial hero content — centered vertically, left-aligned */}
-          <div style={{ maxWidth: "70%", minWidth: "300px", width: "100%" }}>
-            {/* Eyebrow — understated serif intro */}
+          {/* MOBILE LAYOUT: Centered editorial (visible only on small screens) */}
+          <div className="md:hidden flex flex-col items-center text-center w-full" style={{ paddingTop: "clamp(60px, 12vh, 80px)" }}>
+            {/* Mobile decorative line */}
+            <motion.div
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: "80px" }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              style={{
+                height: "1px",
+                background: GOLD,
+                marginBottom: "clamp(16px, 4vw, 24px)",
+              }}
+            />
+
+            {/* VIVA Logo — Mobile centered */}
+            <motion.h1
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.9, delay: 0.28 }}
+              style={{
+                fontFamily: CORMORANT,
+                fontSize: "clamp(48px, 12vw, 80px)",
+                fontWeight: 300,
+                letterSpacing: "0.15em",
+                color: GOLD,
+                margin: 0,
+                marginBottom: "clamp(8px, 2vw, 16px)",
+              }}
+            >
+              VIVA
+            </motion.h1>
+
+            {/* Subheading */}
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.36 }}
+              style={{
+                fontFamily: "DM Sans, system-ui, sans-serif",
+                fontSize: "clamp(10px, 2.2vw, 13px)",
+                letterSpacing: "0.15em",
+                textTransform: "uppercase",
+                color: "rgba(255, 255, 255, 0.75)",
+                margin: 0,
+                marginBottom: "clamp(12px, 3vw, 20px)",
+                fontWeight: 400,
+              }}
+            >
+              By Viera Amber
+            </motion.p>
+
+            {/* Mobile decorative line */}
+            <motion.div
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: "80px" }}
+              transition={{ duration: 0.8, delay: 0.42 }}
+              style={{
+                height: "1px",
+                background: GOLD,
+                marginBottom: "clamp(16px, 4vw, 24px)",
+              }}
+            />
+
+            {/* Mantra */}
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.48 }}
+              style={{
+                fontFamily: CORMORANT,
+                fontSize: "clamp(14px, 3.5vw, 20px)",
+                fontStyle: "italic",
+                color: GOLD,
+                margin: 0,
+                marginBottom: "clamp(20px, 5vw, 32px)",
+              }}
+            >
+              For her, by her.
+            </motion.p>
+
+            {/* Mobile descriptor section */}
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.54 }}
+              style={{
+                fontFamily: "DM Sans, system-ui, sans-serif",
+                fontSize: "clamp(9px, 2vw, 11px)",
+                letterSpacing: "0.15em",
+                textTransform: "uppercase",
+                color: GOLD,
+                margin: 0,
+                marginBottom: "clamp(12px, 3vw, 18px)",
+                fontWeight: 500,
+              }}
+            >
+              THE MAIDEN COLLECTION
+            </motion.p>
+
+            {/* Mobile collection heading */}
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.60 }}
+              style={{
+                fontFamily: CORMORANT,
+                fontSize: "clamp(24px, 7vw, 40px)",
+                fontWeight: 300,
+                lineHeight: 1.2,
+                color: "#FFFFFF",
+                margin: 0,
+                marginBottom: "clamp(16px, 3vw, 24px)",
+              }}
+            >
+              Batya: Daughters of Adonai
+            </motion.h2>
+
+            {/* Mobile description */}
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.66 }}
+              style={{
+                fontFamily: "DM Sans, system-ui, sans-serif",
+                fontSize: "clamp(12px, 2.8vw, 15px)",
+                lineHeight: 1.6,
+                color: "rgba(255, 255, 255, 0.85)",
+                margin: 0,
+                marginBottom: "clamp(24px, 5vw, 36px)",
+                maxWidth: "280px",
+              }}
+            >
+              Structured tailoring meets fluid artistic silhouettes. High-end wearable art for the modern woman who wears her confidence out loud.
+            </motion.p>
+
+            {/* Mobile CTA Buttons — Full width stacked */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.72 }}
+              className="flex flex-col gap-3 w-full max-w-xs"
+            >
+              <a href="#viva-collection" style={{ textDecoration: "none", width: "100%" }}>
+                <motion.button
+                  type="button"
+                  whileHover={reduced ? {} : { scale: 1.04 }}
+                  whileTap={reduced ? {} : { scale: 0.97 }}
+                  style={{
+                    width: "100%",
+                    background: GOLD,
+                    color: "#1A1A1A",
+                    border: "none",
+                    padding: "clamp(13px, 3vw, 16px)",
+                    fontFamily: "DM Sans, system-ui, sans-serif",
+                    fontSize: "clamp(10px, 2vw, 12px)",
+                    fontWeight: 700,
+                    letterSpacing: "0.15em",
+                    textTransform: "uppercase",
+                    cursor: "pointer",
+                    borderRadius: 1,
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  Enquire About a Commission
+                </motion.button>
+              </a>
+              <motion.button
+                type="button"
+                onClick={scrollToEnquiry}
+                whileHover={reduced ? {} : { scale: 1.04 }}
+                whileTap={reduced ? {} : { scale: 0.97 }}
+                style={{
+                  width: "100%",
+                  background: "none",
+                  color: GOLD,
+                  border: `1.5px solid ${GOLD}`,
+                  padding: "clamp(13px, 3vw, 16px)",
+                  fontFamily: "DM Sans, system-ui, sans-serif",
+                  fontSize: "clamp(10px, 2vw, 12px)",
+                  fontWeight: 700,
+                  letterSpacing: "0.15em",
+                  textTransform: "uppercase",
+                  cursor: "pointer",
+                  borderRadius: 1,
+                  transition: "all 0.3s ease",
+                }}
+              >
+                Try It On Virtually
+              </motion.button>
+            </motion.div>
+          </div>
+
+          {/* DESKTOP LAYOUT: Left-aligned asymmetric (hidden on mobile) */}
+          <div className="hidden md:block" style={{ maxWidth: "70%", minWidth: "300px" }}>
+            {/* Eyebrow */}
             <motion.p
               initial={{ opacity: 0, x: -24 }}
               animate={{ opacity: 1, x: 0 }}
@@ -508,13 +704,12 @@ const VIVAPage = () => {
                 color: GOLD,
                 margin: 0,
                 marginBottom: "clamp(16px, 2.2vw, 28px)",
-                opacity: 0.95,
               }}
             >
               The Maiden Collection
             </motion.p>
 
-            {/* Hero heading — MASSIVE, serif dominant */}
+            {/* Hero heading */}
             <motion.h1
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -533,7 +728,7 @@ const VIVAPage = () => {
               Batya
             </motion.h1>
 
-            {/* Descriptor — secondary serif, strong presence */}
+            {/* Descriptor */}
             <motion.p
               initial={{ opacity: 0, y: 36 }}
               animate={{ opacity: 1, y: 0 }}
@@ -546,13 +741,12 @@ const VIVAPage = () => {
                 color: "rgba(255, 255, 255, 0.88)",
                 margin: 0,
                 marginBottom: "clamp(32px, 5vw, 56px)",
-                fontStyle: "normal",
               }}
             >
               Daughters of Adonai
             </motion.p>
 
-            {/* Description text — editorial, compelling */}
+            {/* Description */}
             <motion.p
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
@@ -566,24 +760,22 @@ const VIVAPage = () => {
                 margin: 0,
                 marginBottom: "clamp(40px, 6vw, 64px)",
                 maxWidth: "560px",
-                letterSpacing: "0.005em",
               }}
             >
               Structured tailoring meets fluid artistic silhouettes. High-end wearable art for the modern woman who wears her confidence out loud.
             </motion.p>
 
-            {/* CTA buttons — bold, command attention */}
+            {/* Desktop CTA Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.58 }}
-              className="flex flex-col sm:flex-row gap-4 sm:gap-5 items-start"
-              style={{}}
+              className="flex flex-col sm:flex-row gap-4 sm:gap-5"
             >
               <a href="#viva-collection" style={{ textDecoration: "none" }}>
                 <motion.button
                   type="button"
-                  whileHover={reduced ? {} : { scale: 1.07, backgroundColor: "#E5D85A", boxShadow: "0 16px 48px rgba(212, 175, 55, 0.3)" }}
+                  whileHover={reduced ? {} : { scale: 1.07, backgroundColor: "#E5D85A" }}
                   whileTap={reduced ? {} : { scale: 0.96 }}
                   style={{
                     background: GOLD,
@@ -597,7 +789,6 @@ const VIVAPage = () => {
                     textTransform: "uppercase",
                     cursor: "pointer",
                     borderRadius: 1,
-                    transition: "all 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
                     boxShadow: "0 14px 42px rgba(212, 175, 55, 0.25)",
                   }}
                 >
@@ -607,7 +798,7 @@ const VIVAPage = () => {
               <motion.button
                 type="button"
                 onClick={scrollToEnquiry}
-                whileHover={reduced ? {} : { scale: 1.07, borderColor: "#FFFFFF", backgroundColor: "rgba(255, 255, 255, 0.12)" }}
+                whileHover={reduced ? {} : { scale: 1.07, backgroundColor: "rgba(255, 255, 255, 0.12)" }}
                 whileTap={reduced ? {} : { scale: 0.96 }}
                 style={{
                   background: "rgba(255, 255, 255, 0.03)",
@@ -621,7 +812,6 @@ const VIVAPage = () => {
                   textTransform: "uppercase",
                   cursor: "pointer",
                   borderRadius: 1,
-                  transition: "all 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
                   backdropFilter: "blur(6px)",
                 }}
               >
