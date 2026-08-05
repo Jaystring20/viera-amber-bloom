@@ -745,7 +745,7 @@ const VIVAPage = () => {
               marginBottom: 24,
             }}>Garments</p>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 32 }}>
+            <a href="#viva-enquiry" style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
                 fontSize: 10,
                 letterSpacing: "2.5px",
@@ -761,7 +761,7 @@ const VIVAPage = () => {
                 display: "inline-block",
                 marginTop: 4,
               }}
-            >Enquire About a Commission</motion.a>
+            >Enquire About a Commission</a>
 
             {/* Secondary CTA — Virtual Try-On */}
             <motion.button
