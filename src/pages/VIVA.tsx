@@ -207,7 +207,8 @@ const VIVAPage = () => {
     },
   ] as const;
 
-  const HERO_HOLD_MS = 10000; // two complete 5s loops per clip
+  const HERO_HOLD_MS = 10000;  // two complete 5s loops per clip
+  const FILM_FADE_MS = 900;    // handover length; drives both the CSS fade and the park timer
   const [heroFilmIndex, setHeroFilmIndex] = useState(0);
 
   // Breakpoint match drives which cut we mount, so only the active viewport's
@@ -289,15 +290,23 @@ const VIVAPage = () => {
     }));
   };
 
-  // Only the on-screen film decodes; the other is parked to keep the
-  // main thread free (two 1080p loops decoding at once costs real frames).
+  // Film handover. The incoming clip is rewound and started *before* the fade,
+  // so it is already in motion as it surfaces rather than dissolving in on a
+  // stale frame. The outgoing clip keeps playing through the crossfade and is
+  // only parked once it is invisible — two live decodes for 0.9s, one at rest.
   const filmRefs = useRef<(HTMLVideoElement | null)[]>([]);
   useEffect(() => {
+    const timers: number[] = [];
     filmRefs.current.forEach((v, i) => {
       if (!v) return;
-      if (i === heroFilmIndex) void v.play().catch(() => {});
-      else v.pause();
+      if (i === heroFilmIndex) {
+        try { v.currentTime = 0; } catch { /* not seekable yet — harmless */ }
+        void v.play().catch(() => {});
+      } else {
+        timers.push(window.setTimeout(() => v.pause(), FILM_FADE_MS));
+      }
     });
+    return () => timers.forEach(clearTimeout);
   }, [heroFilmIndex, isDesktop]);
 
   // Hero film carousel — advance after two complete loop cycles.
@@ -511,7 +520,8 @@ const VIVAPage = () => {
                 objectPosition: "center top",
                 display: "block",
                 opacity: i === heroFilmIndex ? 1 : 0,
-                transition: reduced ? "none" : "opacity 1.1s cubic-bezier(0.4,0,0.2,1)",
+                // Symmetric ease so neither clip dominates the dissolve
+                transition: reduced ? "none" : `opacity ${FILM_FADE_MS}ms cubic-bezier(0.45,0,0.55,1)`,
               }}
             />
           ))}
@@ -528,14 +538,31 @@ const VIVAPage = () => {
             }}
           />
 
-          {/* Desktop feathered left edge — dissolves the panel seam into the field */}
+          {/* Desktop seam — a cut, not a fade. The old 42% burgundy wash laid a
+              translucent film over the model; an editorial panel wants a clean
+              architectural edge. Only a 5% feather to stop the join aliasing. */}
           <div
             className="hidden md:block"
             style={{
               position: "absolute",
               inset: 0,
               background:
-                `linear-gradient(to right, ${BURGUNDY} 0%, rgba(110,0,37,0.72) 8%, rgba(110,0,37,0.18) 22%, rgba(110,0,37,0) 42%)`,
+                `linear-gradient(to right, rgba(110,0,37,0.55) 0%, rgba(110,0,37,0.12) 3%, rgba(110,0,37,0) 6%)`,
+              pointerEvents: "none",
+            }}
+          />
+
+          {/* Gold hairline — states the edge deliberately */}
+          <div
+            className="hidden md:block"
+            style={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              width: 1,
+              background: `linear-gradient(to bottom, rgba(212,175,55,0) 0%, ${GOLD} 18%, ${GOLD} 82%, rgba(212,175,55,0) 100%)`,
+              opacity: 0.55,
               pointerEvents: "none",
             }}
           />
@@ -754,7 +781,7 @@ const VIVAPage = () => {
               transition={{ duration: 0.8, delay: 0.72 }}
               className="flex flex-col gap-3 w-full max-w-xs"
             >
-              <a href="#viva-collection" style={{ textDecoration: "none", width: "100%" }}>
+              <a href="#viva-shop" style={{ textDecoration: "none", width: "100%" }}>
                 <motion.button
                   type="button"
                   whileHover={reduced ? {} : { scale: 1.04 }}
@@ -889,7 +916,7 @@ const VIVAPage = () => {
               transition={{ duration: 0.8, delay: 0.58 }}
               className="flex flex-col sm:flex-row gap-4 sm:gap-5"
             >
-              <a href="#viva-collection" style={{ textDecoration: "none" }}>
+              <a href="#viva-shop" style={{ textDecoration: "none" }}>
                 <motion.button
                   type="button"
                   whileHover={reduced ? {} : { scale: 1.07, backgroundColor: "#E5D85A" }}
@@ -934,189 +961,6 @@ const VIVAPage = () => {
               >
                 Enquire
               </motion.button>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════
-          Continue with rest of page
-          ═══════════════════════════════════════════════════════ */}
-      <section id="viva-collection" style={{ position: "relative", overflow: "visible", background: BURGUNDY, minHeight: "400px", paddingTop: 80, paddingBottom: 80 }}>
-        {/* Philosophy section continues here */}
-        <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
-          <div aria-hidden="true" style={{
-            position: "absolute", inset: 0, pointerEvents: "none",
-            backgroundImage: "repeating-linear-gradient(45deg, rgba(0,0,0,0.005) 0px, rgba(0,0,0,0.005) 1px, transparent 1px, transparent 12px)",
-          }} />
-          <div aria-hidden="true" style={{
-            position: "absolute", inset: 0, pointerEvents: "none",
-            background: "radial-gradient(ellipse 90% 45% at 50% -2%, rgba(212,175,55,0.08) 0%, transparent 65%)",
-          }} />
-        </div>
-
-        <div className="relative mx-auto px-6" style={{ maxWidth: 960, zIndex: 2 }}>
-          <div
-            className="grid md:grid-cols-3 gap-8"
-            style={{ marginBottom: 80 }}
-          >
-            <motion.div initial={{ opacity: 0, y: 32 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} viewport={{ once: true }}>
-              <h2 style={{
-                fontFamily: CORMORANT,
-                fontSize: "clamp(20px, 3vw, 32px)",
-                fontWeight: 400,
-                color: "#FFFFFF",
-                margin: "0 0 12px 0",
-              }}>Structured Fluidity</h2>
-              <p style={{
-                fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: 14,
-                color: "rgba(255,255,255,0.75)",
-                margin: 0,
-                lineHeight: 1.7,
-              }}>Where precision meets the body in motion.</p>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0, y: 32 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.1 }} viewport={{ once: true }}>
-              <h2 style={{
-                fontFamily: CORMORANT,
-                fontSize: "clamp(20px, 3vw, 32px)",
-                fontWeight: 400,
-                color: "#FFFFFF",
-                margin: "0 0 12px 0",
-              }}>Artistic Agency</h2>
-              <p style={{
-                fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: 14,
-                color: "rgba(255,255,255,0.75)",
-                margin: 0,
-                lineHeight: 1.7,
-              }}>Every garment is a declaration.</p>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0, y: 32 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }} viewport={{ once: true }}>
-              <h2 style={{
-                fontFamily: CORMORANT,
-                fontSize: "clamp(20px, 3vw, 32px)",
-                fontWeight: 400,
-                color: "#FFFFFF",
-                margin: "0 0 12px 0",
-              }}>Sacred Identity</h2>
-              <p style={{
-                fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: 14,
-                color: "rgba(255,255,255,0.75)",
-                margin: 0,
-                lineHeight: 1.7,
-              }}>Dressed in who you are, and whose you are.</p>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Continue with products section */}
-      <section style={{ position: "relative", overflow: "visible", background: "#FAFAFA", minHeight: "clamp(800px, 100vh, 1200px)" }}>
-        <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
-          <div aria-hidden="true" style={{
-            position: "absolute", inset: 0, pointerEvents: "none",
-            backgroundImage: "repeating-linear-gradient(45deg, rgba(0,0,0,0.005) 0px, rgba(0,0,0,0.005) 1px, transparent 1px, transparent 12px)",
-          }} />
-        </div>
-
-        <div className="relative mx-auto px-6" style={{ maxWidth: 1280, zIndex: 2, paddingTop: 80, paddingBottom: 80 }}>
-          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} viewport={{ once: true }} style={{ marginBottom: 60 }}>
-            <p style={{
-              fontFamily: "DM Sans, system-ui, sans-serif",
-              fontSize: 13,
-              letterSpacing: "0.4em",
-              textTransform: "uppercase",
-              fontWeight: 600,
-              color: GOLD,
-              margin: 0,
-              marginBottom: 12,
-            }}>Shop the Collection</p>
-            <h2 style={{
-              fontFamily: CORMORANT,
-              fontSize: "clamp(32px, 4vw, 48px)",
-              fontWeight: 400,
-              color: BURGUNDY,
-              margin: 0,
-            }}>Curated for Her</h2>
-          </motion.div>
-
-          {/* Garments */}
-          <div style={{ marginBottom: 80 }}>
-            <p style={{
-              fontFamily: "DM Sans, system-ui, sans-serif",
-              fontSize: 12,
-              letterSpacing: "0.35em",
-              textTransform: "uppercase",
-              fontWeight: 600,
-              color: GOLD,
-              margin: 0,
-              marginBottom: 24,
-            }}>Garments</p>
-
-            <a href="#viva-enquiry" style={{
-                fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: 10,
-                letterSpacing: "2.5px",
-                textTransform: "uppercase",
-                fontWeight: 500,
-                background: GOLD,
-                color: DARK_TEXT,
-                border: "none",
-                borderRadius: 3,
-                padding: "13px 30px",
-                cursor: "pointer",
-                textDecoration: "none",
-                display: "inline-block",
-                marginTop: 4,
-              }}
-            >Enquire About a Commission</a>
-
-            {/* Secondary CTA — Virtual Try-On */}
-            <motion.button
-              type="button"
-              onClick={() => navigate("/viva/try-on")}
-              variants={fadeVariants} initial="hidden" animate="visible"
-              transition={{ delay: d(1.42) }}
-              whileHover={reduced ? {} : { scale: 1.02 }}
-              whileTap={reduced ? {} : { scale: 0.97 }}
-              style={{
-                fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: 10,
-                letterSpacing: "2.5px",
-                textTransform: "uppercase",
-                fontWeight: 500,
-                background: "transparent",
-                color: GOLD,
-                border: `1px solid ${GOLD}`,
-                borderRadius: 3,
-                padding: "12px 28px",
-                cursor: "pointer",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                marginTop: 4,
-                marginLeft: 12,
-              }}
-            >
-              <Sparkles size={13} /> Try It On Virtually
-            </motion.button>
-
-            {/* Stats strip */}
-            <motion.div
-              variants={fadeVariants} initial="hidden" animate="visible"
-              transition={{ delay: d(1.5) }}
-              style={{ display: "flex", gap: 36, marginTop: 8 }}
-            >
-              {[["48–72hrs", "Delivery"], ["Made to Order", "Garments"], ["SDG", "Aligned"]].map(([val, lbl]) => (
-                <div key={lbl} style={{ textAlign: "center" }}>
-                  <p style={{ fontFamily: CORMORANT, fontSize: 22, fontWeight: 700, color: GOLD, margin: 0, lineHeight: 1 }}>{val}</p>
-                  <p style={{ fontFamily: "DM Sans", fontSize: 9, color: `rgba(212,175,55,0.38)`, margin: "5px 0 0 0", letterSpacing: "1.8px", textTransform: "uppercase" }}>{lbl}</p>
-                </div>
-              ))}
             </motion.div>
           </div>
         </div>
@@ -1280,6 +1124,30 @@ const VIVAPage = () => {
               </button>
             </div>
           </div>
+
+          {/* Trust bar — rescued from the removed stub section. Delivery, make
+              and ethics belong beside the buying decision, not in isolation. */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-wrap"
+            style={{
+              gap: "clamp(28px, 5vw, 56px)",
+              padding: "20px 0 24px",
+              borderTop: `1px solid ${BURG_ALPHA}`,
+              borderBottom: `1px solid ${BURG_ALPHA}`,
+              marginBottom: 48,
+            }}
+          >
+            {[["48–72hrs", "Delivery"], ["Made to Order", "Garments"], ["SDG", "Aligned"]].map(([val, lbl]) => (
+              <div key={lbl}>
+                <p style={{ fontFamily: CORMORANT, fontSize: "clamp(19px, 2.2vw, 24px)", fontWeight: 700, color: BURGUNDY, margin: 0, lineHeight: 1 }}>{val}</p>
+                <p style={{ fontFamily: "DM Sans", fontSize: 9, color: "rgba(110,0,37,0.5)", margin: "6px 0 0 0", letterSpacing: "1.8px", textTransform: "uppercase" }}>{lbl}</p>
+              </div>
+            ))}
+          </motion.div>
 
           {/* GARMENTS */}
           <p style={{ fontFamily: "DM Sans", fontSize: 9, color: BURGUNDY, letterSpacing: "4px", textTransform: "uppercase", margin: "0 0 20px 0", borderBottom: `1px solid ${BURG_ALPHA}`, paddingBottom: 10 }}>Garments</p>
