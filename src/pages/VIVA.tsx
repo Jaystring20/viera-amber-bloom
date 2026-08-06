@@ -196,6 +196,9 @@ const VIVAPage = () => {
       desktop: "/viva/hero-loop-desktop.mp4",
       mobile:  "/viva/hero-loop-mobile.mp4",
       poster:  "/viva/hero-loop-poster.jpg",
+      // Two figures side by side in a wide frame — anchoring to the top would
+      // crop the pair off at the knee, so this one holds the middle.
+      focus:   "center 42%",
       alt: "Two models in the Batya Collection — pink and olive woven kimonos with wide-leg denim",
     },
     {
@@ -203,6 +206,8 @@ const VIVAPage = () => {
       desktop: "/viva/hero-product-desktop.mp4",
       mobile:  "/viva/hero-product-mobile.mp4",
       poster:  "/viva/hero-product-poster.jpg",
+      // A close portrait: keep the face and the printed tee in frame.
+      focus:   "center 22%",
       alt: "Model wearing the Daughters of Adonai graphic tee from the Batya Collection",
     },
   ] as const;
@@ -520,7 +525,9 @@ const VIVAPage = () => {
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
-                objectPosition: "center top",
+                // Per-film anchor: a wide two-up and a close portrait cannot
+                // share one crop origin without one of them losing its subject.
+                objectPosition: film.focus,
                 display: "block",
                 // On mobile the film sits directly behind the copy, so it is
                 // pulled back a stop: it should carry the collection's mood,
@@ -683,13 +690,15 @@ const VIVAPage = () => {
               transition={{ duration: 0.9, delay: 0.28 }}
               style={{
                 fontFamily: CORMORANT,
-                fontSize: "clamp(40px, 10vw, 60px)",
-                fontWeight: 300,
-                letterSpacing: "0.16em",
+                // Was 60px — larger than the headline it introduces. At masthead
+                // scale the wordmark leads, then hands over to the collection.
+                fontSize: "clamp(30px, 7.4vw, 40px)",
+                fontWeight: 400,
+                letterSpacing: "0.34em",
                 lineHeight: 1,
                 color: GOLD,
                 // Optical centring: the trailing letterspace pushes the word left
-                textIndent: "0.16em",
+                textIndent: "0.34em",
                 textShadow: "0 2px 22px rgba(60,0,20,0.65)",
               }}
             >
@@ -703,11 +712,12 @@ const VIVAPage = () => {
               transition={{ duration: 0.75, delay: 0.34 }}
               style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: "clamp(10px, 2.5vw, 12px)",
-                letterSpacing: "0.28em",
+                fontSize: "clamp(9px, 2.4vw, 10px)",
+                // Matches the wordmark's tracking so the pair reads as a lockup
+                letterSpacing: "0.34em",
                 textTransform: "uppercase",
-                color: "rgba(255,255,255,0.72)",
-                margin: "clamp(10px, 2.5vw, 14px) 0 0 0",
+                color: "rgba(255,255,255,0.6)",
+                margin: "10px 0 0 0",
                 fontWeight: 500,
                 textShadow: "0 1px 12px rgba(60,0,20,0.55)",
               }}
@@ -715,19 +725,32 @@ const VIVAPage = () => {
               By Viera Amber
             </motion.p>
 
-            {/* Mantra */}
+            {/* Hairline — internal to the lockup, not a section divider */}
+            <motion.div
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: 38 }}
+              transition={{ duration: 0.7, delay: 0.38 }}
+              style={{
+                height: 1,
+                background: GOLD,
+                opacity: 0.42,
+                margin: "15px 0",
+              }}
+            />
+
+            {/* Mantra — closes the lockup */}
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.42 }}
+              transition={{ duration: 0.8, delay: 0.44 }}
               style={{
                 fontFamily: CORMORANT,
-                fontSize: "clamp(16px, 3.8vw, 20px)",
+                fontSize: "clamp(15px, 3.5vw, 18px)",
                 fontStyle: "italic",
-                color: "rgba(212,175,55,0.92)",
-                margin: "clamp(8px, 2vw, 12px) 0 0 0",
+                color: "rgba(212,175,55,0.8)",
+                margin: 0,
                 // Descender clearance for the 'y' in "by"
-                lineHeight: 1.25,
+                lineHeight: 1.3,
                 paddingBottom: 2,
                 textShadow: "0 1px 14px rgba(60,0,20,0.6)",
               }}
@@ -735,32 +758,19 @@ const VIVAPage = () => {
               For her, by her.
             </motion.p>
 
-            {/* Single rule — divides brand from collection */}
-            <motion.div
-              initial={{ opacity: 0, width: 0 }}
-              animate={{ opacity: 1, width: "56px" }}
-              transition={{ duration: 0.8, delay: 0.44 }}
-              style={{
-                height: "1px",
-                background: GOLD,
-                opacity: 0.5,
-                margin: "clamp(20px, 5vw, 28px) 0",
-              }}
-            />
-
-            {/* Eyebrow — was 9px at 375px, below the legibility floor */}
+            {/* Breath — the one large gap in the column, separating masthead
+                from collection so the groups read as related but distinct. */}
             <motion.p
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.52 }}
+              transition={{ duration: 0.8, delay: 0.54 }}
               style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
                 fontSize: "clamp(11px, 2.6vw, 12px)",
-                letterSpacing: "0.22em",
+                letterSpacing: "0.26em",
                 textTransform: "uppercase",
                 color: GOLD,
-                margin: 0,
-                marginBottom: "clamp(10px, 2.5vw, 14px)",
+                margin: "clamp(34px, 8vw, 48px) 0 clamp(12px, 3vw, 16px) 0",
                 fontWeight: 500,
                 textShadow: "0 1px 12px rgba(60,0,20,0.6)",
               }}
@@ -908,18 +918,22 @@ const VIVAPage = () => {
           </div>
 
           {/* DESKTOP LAYOUT: Left-aligned asymmetric — sits clear of the 46% film panel */}
-          <div className="hidden md:block" style={{ width: "50%", maxWidth: 680, minWidth: 300 }}>
-            {/* Brand mark — was absent on desktop entirely; the stack now
-                matches mobile: wordmark, attribution, mantra, then collection. */}
+          <div className="hidden md:block" style={{ width: "50%", maxWidth: 680, minWidth: 300, paddingTop: "clamp(8px, 2vw, 30px)" }}>
+            {/* ── MASTHEAD LOCKUP ──────────────────────────────────────────
+                Wordmark, attribution and mantra read as one unit, bound by a
+                shared 0.34em tracking and tight leading. The wordmark was
+                previously set at 56px, which fought the 66px headline for the
+                eye; at masthead scale it introduces the brand and then hands
+                over cleanly to the collection below. */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.20, ease: "easeOut" }}
               style={{
                 fontFamily: CORMORANT,
-                fontSize: "clamp(36px, 3.6vw, 56px)",
-                fontWeight: 300,
-                letterSpacing: "0.17em",
+                fontSize: "clamp(24px, 2.2vw, 32px)",
+                fontWeight: 400,
+                letterSpacing: "0.34em",
                 lineHeight: 1,
                 color: GOLD,
               }}
@@ -927,57 +941,59 @@ const VIVAPage = () => {
               VIVA
             </motion.div>
 
-            {/* Attribution */}
+            {/* Attribution — same tracking as the wordmark locks the pair together */}
             <motion.p
               initial={{ opacity: 0, x: -18 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.75, delay: 0.28, ease: "easeOut" }}
+              transition={{ duration: 0.75, delay: 0.27, ease: "easeOut" }}
               style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: "clamp(10px, 0.82vw, 12px)",
-                letterSpacing: "0.30em",
+                fontSize: "clamp(9px, 0.72vw, 10px)",
+                letterSpacing: "0.34em",
                 textTransform: "uppercase",
-                color: "rgba(255,255,255,0.68)",
-                margin: "clamp(10px, 1.1vw, 14px) 0 0 0",
+                color: "rgba(255,255,255,0.55)",
+                margin: "10px 0 0 0",
                 fontWeight: 500,
               }}
             >
               By Viera Amber
             </motion.p>
 
-            {/* Rule — divides brand from collection, mirroring mobile */}
+            {/* Hairline — internal to the lockup, not a section divider */}
             <motion.div
               initial={{ opacity: 0, width: 0 }}
-              animate={{ opacity: 1, width: "clamp(48px, 5vw, 72px)" }}
-              transition={{ duration: 0.8, delay: 0.34, ease: "easeOut" }}
+              animate={{ opacity: 1, width: 38 }}
+              transition={{ duration: 0.7, delay: 0.33, ease: "easeOut" }}
               style={{
                 height: 1,
                 background: GOLD,
-                opacity: 0.5,
-                margin: "clamp(18px, 2vw, 26px) 0",
+                opacity: 0.42,
+                margin: "16px 0",
               }}
             />
 
-            {/* Mantra */}
+            {/* Mantra — closes the lockup */}
             <motion.p
               initial={{ opacity: 0, x: -18 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.40, ease: "easeOut" }}
+              transition={{ duration: 0.8, delay: 0.39, ease: "easeOut" }}
               style={{
                 fontFamily: CORMORANT,
-                fontSize: "clamp(17px, 1.55vw, 23px)",
+                fontSize: "clamp(15px, 1.25vw, 18px)",
                 fontStyle: "italic",
-                color: "rgba(212,175,55,0.9)",
+                color: "rgba(212,175,55,0.78)",
                 margin: 0,
                 // Descender clearance for the 'y' in "by"
-                lineHeight: 1.25,
+                lineHeight: 1.3,
                 paddingBottom: 2,
               }}
             >
               For her, by her.
             </motion.p>
 
-            {/* Eyebrow */}
+            {/* Breath — the one large gap in the column. It separates masthead
+                from collection, so the two groups read as related but distinct
+                rather than as one undifferentiated list of lines. */}
             <motion.p
               initial={{ opacity: 0, x: -18 }}
               animate={{ opacity: 1, x: 0 }}
@@ -989,7 +1005,7 @@ const VIVAPage = () => {
                 letterSpacing: "0.26em",
                 textTransform: "uppercase",
                 color: GOLD,
-                margin: "clamp(20px, 2.4vw, 30px) 0 clamp(12px, 1.4vw, 18px) 0",
+                margin: "clamp(38px, 4.4vw, 60px) 0 clamp(14px, 1.6vw, 20px) 0",
               }}
             >
               The Maiden Collection
