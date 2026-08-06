@@ -188,6 +188,10 @@ const VIVAPage = () => {
   const [form, setForm] = useState({ name: "", email: "", interest: "", message: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
 
+  // Hero GIF carousel state — alternates between two GIFs
+  const [heroGifIndex, setHeroGifIndex] = useState(0);
+  const heroGifs = ["/viva/hero-loop.gif", "/viva/hero-product.gif"];
+
   // Shop state
   const [currency, setCurrency]           = useState<"NGN" | "USD">("NGN");
   const [cart, setCart]                   = useState<CartItem[]>([]);
@@ -247,6 +251,14 @@ const VIVAPage = () => {
       [productId]: (getCarouselIndex(productId) - 1 + imageCount) % imageCount
     }));
   };
+
+  // Hero GIF carousel: switch between two GIFs every 3 seconds
+  useEffect(() => {
+    const heroInterval = setInterval(() => {
+      setHeroGifIndex(prev => (prev + 1) % heroGifs.length);
+    }, 3000);
+    return () => clearInterval(heroInterval);
+  }, [heroGifs.length]);
 
   // Auto-play carousel effect
   useEffect(() => {
@@ -422,32 +434,86 @@ const VIVAPage = () => {
           background: "black",
         }
       }}>
-        {/* Desktop: Full-bleed animated GIF background with fallback */}
+        {/* Mobile: Full-screen animated GIF carousel with fallback */}
+        <motion.div
+          initial={{ opacity: 0, scale: 1.02 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.4, ease: [0.12, 0.72, 0.48, 1] }}
+          className="md:hidden absolute inset-0"
+          style={{ overflow: "hidden", background: `url('/viva/hero-right.webp') center/contain no-repeat` }}
+        >
+          {/* Mobile GIF Carousel */}
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={`mobile-${heroGifs[heroGifIndex]}`}
+              src={heroGifs[heroGifIndex]}
+              alt="VIVA by Viera Amber — Batya Collection — Mobile Carousel"
+              loading="eager"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8, ease: "easeInOut" }}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                objectPosition: "center",
+                display: "block",
+              }}
+              onError={(e) => {
+                e.currentTarget.src = '/viva/hero-right.webp';
+                e.currentTarget.style.objectFit = 'cover';
+              }}
+            />
+          </AnimatePresence>
+
+          {/* Mobile overlay — stronger on mobile for text contrast */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: "linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(110,0,37,0.5) 50%, rgba(110,0,37,0.7) 100%)",
+              pointerEvents: "none",
+            }}
+          />
+        </motion.div>
+
+        {/* Desktop: Full-bleed animated GIF carousel with fallback */}
         <motion.div
           initial={{ opacity: 0, scale: 1.02 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.4, ease: [0.12, 0.72, 0.48, 1] }}
           className="hidden md:block absolute inset-0"
-          style={{ overflow: "hidden", background: `url('/viva/hero-right.webp') center/cover no-repeat` }}
+          style={{ overflow: "hidden", background: `url('/viva/hero-right.webp') center/contain no-repeat` }}
         >
-          {/* Primary: Animated GIF */}
-          <img
-            src="/viva/hero-product.gif"
-            alt="VIVA by Viera Amber — Batya Collection — Animated Product"
-            loading="eager"
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              objectPosition: "center right",
-              display: "block",
-            }}
-            onError={(e) => {
-              // Fallback: If GIF fails, show the static image
-              e.currentTarget.src = '/viva/hero-right.webp';
-              e.currentTarget.style.display = 'block';
-            }}
-          />
+          {/* GIF Carousel — alternates every 3 seconds with smooth crossfade */}
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={heroGifs[heroGifIndex]}
+              src={heroGifs[heroGifIndex]}
+              alt="VIVA by Viera Amber — Batya Collection — Animated Product Carousel"
+              loading="eager"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8, ease: "easeInOut" }}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                objectPosition: "center",
+                display: "block",
+              }}
+              onError={(e) => {
+                // Fallback: If GIF fails, show the static image
+                e.currentTarget.src = '/viva/hero-right.webp';
+                e.currentTarget.style.objectFit = 'cover';
+                e.currentTarget.style.objectPosition = 'center right';
+              }}
+            />
+          </AnimatePresence>
+
           {/* Strategic overlay — darker on left for text */}
           <div
             aria-hidden="true"
