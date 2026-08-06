@@ -12,11 +12,6 @@ dist
 dist-ssr
 *.local
 
-# Large media files (GIFs) — kept locally, not version controlled
-*.gif
-# Source GIFs superseded by art-directed MP4 cuts (hero-*-desktop/mobile.mp4)
-public/viva/*.gif
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
