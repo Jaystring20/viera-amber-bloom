@@ -526,14 +526,17 @@ const VIVAPage = () => {
             />
           ))}
 
-          {/* Mobile scrim — burgundy wash so copy stays legible over the film */}
+          {/* Mobile scrim — graded, not a blanket. The previous wash sat at
+              72-94% across the whole frame, which hid the very film it was
+              protecting. Density now lives only in the lower half, under the
+              copy; the upper frame stays clear so the garment reads. */}
           <div
             className="md:hidden"
             style={{
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(to bottom, rgba(110,0,37,0.72) 0%, rgba(110,0,37,0.55) 34%, rgba(110,0,37,0.78) 68%, rgba(110,0,37,0.94) 100%)",
+                "linear-gradient(to bottom, rgba(110,0,37,0.34) 0%, rgba(110,0,37,0.12) 26%, rgba(110,0,37,0.30) 46%, rgba(110,0,37,0.80) 68%, rgba(110,0,37,0.95) 86%, rgba(110,0,37,0.98) 100%)",
               pointerEvents: "none",
             }}
           />
@@ -605,6 +608,10 @@ const VIVAPage = () => {
             zIndex: 10,
             display: "flex",
             flexDirection: "column",
+            // Stretch so the mobile block can bottom-anchor via mt-auto while
+            // the desktop block still centres on the justifyContent below.
+            alignSelf: "stretch",
+            justifyContent: "center",
             padding: "clamp(48px, 8vw, 80px) clamp(20px, 5vw, 80px)",
           }}
         >
@@ -617,17 +624,21 @@ const VIVAPage = () => {
             transition={{ duration: 0.8, delay: 0.12 }}
             style={{
               position: "absolute",
-              top: "clamp(24px, 5vw, 60px)",
-              left: "clamp(20px, 5vw, 80px)",
+              // Offset by the padding below so the label stays optically aligned
+              // to the content edge while the hit area extends past it.
+              top: "calc(clamp(24px, 5vw, 60px) - 12px)",
+              left: "calc(clamp(20px, 5vw, 80px) - 10px)",
               background: "none",
               border: "none",
-              color: "rgba(255, 255, 255, 0.5)",
+              color: "rgba(255, 255, 255, 0.62)",
               cursor: "pointer",
               fontFamily: "DM Sans, system-ui, sans-serif",
-              fontSize: "clamp(8px, 2vw, 11px)",
+              fontSize: "clamp(10px, 2vw, 11px)",
               letterSpacing: "0.3em",
               textTransform: "uppercase",
-              padding: 0,
+              // 44x44 minimum target — was a bare 12px glyph with no padding
+              padding: "12px 10px",
+              minHeight: 44,
               display: "inline-flex",
               alignItems: "center",
               gap: 8,
@@ -639,139 +650,128 @@ const VIVAPage = () => {
             <span>Back</span>
           </motion.button>
 
-          {/* MOBILE LAYOUT: Centered editorial (visible only on small screens) */}
-          <div className="md:hidden flex flex-col items-center text-center w-full" style={{ paddingTop: "clamp(60px, 12vh, 80px)" }}>
-            {/* Mobile decorative line */}
+          {/* MOBILE LAYOUT — bottom-anchored editorial.
+              Three groups (brand / collection / action) separated by a single
+              rule, rather than the previous ten-item stack where three gold
+              text items and two rules competed for the same eye. */}
+          <div className="md:hidden mt-auto flex flex-col items-center text-center w-full" style={{ paddingTop: "clamp(56px, 18vh, 130px)" }}>
+            {/* Brand mark — kept as a wordmark, not a heading. "Batya" below is
+                the page's h1; VIVA is already the navbar logotype. */}
             <motion.div
-              initial={{ opacity: 0, width: 0 }}
-              animate={{ opacity: 1, width: "80px" }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              style={{
-                height: "1px",
-                background: GOLD,
-                marginBottom: "clamp(16px, 4vw, 24px)",
-              }}
-            />
-
-            {/* VIVA Logo — Mobile centered */}
-            <motion.h1
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.94 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.9, delay: 0.28 }}
               style={{
                 fontFamily: CORMORANT,
-                fontSize: "clamp(48px, 12vw, 80px)",
+                fontSize: "clamp(40px, 10vw, 60px)",
                 fontWeight: 300,
-                letterSpacing: "0.15em",
+                letterSpacing: "0.16em",
+                lineHeight: 1,
                 color: GOLD,
-                margin: 0,
-                marginBottom: "clamp(8px, 2vw, 16px)",
+                // Optical centring: the trailing letterspace pushes the word left
+                textIndent: "0.16em",
               }}
             >
               VIVA
-            </motion.h1>
+            </motion.div>
 
-            {/* Subheading */}
+            {/* Mantra — replaces the old "By Viera Amber", which restated the navbar */}
             <motion.p
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.36 }}
               style={{
-                fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: "clamp(10px, 2.2vw, 13px)",
-                letterSpacing: "0.15em",
-                textTransform: "uppercase",
-                color: "rgba(255, 255, 255, 0.75)",
-                margin: 0,
-                marginBottom: "clamp(12px, 3vw, 20px)",
-                fontWeight: 400,
-              }}
-            >
-              By Viera Amber
-            </motion.p>
-
-            {/* Mobile decorative line */}
-            <motion.div
-              initial={{ opacity: 0, width: 0 }}
-              animate={{ opacity: 1, width: "80px" }}
-              transition={{ duration: 0.8, delay: 0.42 }}
-              style={{
-                height: "1px",
-                background: GOLD,
-                marginBottom: "clamp(16px, 4vw, 24px)",
-              }}
-            />
-
-            {/* Mantra */}
-            <motion.p
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.48 }}
-              style={{
                 fontFamily: CORMORANT,
-                fontSize: "clamp(14px, 3.5vw, 20px)",
+                fontSize: "clamp(15px, 3.6vw, 19px)",
                 fontStyle: "italic",
-                color: GOLD,
-                margin: 0,
-                marginBottom: "clamp(20px, 5vw, 32px)",
+                color: "rgba(212,175,55,0.85)",
+                margin: "clamp(6px, 1.5vw, 10px) 0 0 0",
+                // Descender clearance for the 'y' in "by"
+                lineHeight: 1.25,
+                paddingBottom: 2,
               }}
             >
               For her, by her.
             </motion.p>
 
-            {/* Mobile descriptor section */}
+            {/* Single rule — divides brand from collection */}
+            <motion.div
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: "56px" }}
+              transition={{ duration: 0.8, delay: 0.44 }}
+              style={{
+                height: "1px",
+                background: GOLD,
+                opacity: 0.5,
+                margin: "clamp(20px, 5vw, 28px) 0",
+              }}
+            />
+
+            {/* Eyebrow — was 9px at 375px, below the legibility floor */}
             <motion.p
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.54 }}
+              transition={{ duration: 0.8, delay: 0.52 }}
               style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: "clamp(9px, 2vw, 11px)",
-                letterSpacing: "0.15em",
+                fontSize: "clamp(11px, 2.6vw, 12px)",
+                letterSpacing: "0.22em",
                 textTransform: "uppercase",
                 color: GOLD,
                 margin: 0,
-                marginBottom: "clamp(12px, 3vw, 18px)",
+                marginBottom: "clamp(10px, 2.5vw, 14px)",
                 fontWeight: 500,
               }}
             >
-              THE MAIDEN COLLECTION
+              The Maiden Collection
             </motion.p>
 
-            {/* Mobile collection heading */}
-            <motion.h2
+            {/* Collection heading — the mobile h1. Broken to two lines so the
+                colon never orphans "Adonai" on a narrow screen. */}
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.60 }}
               style={{
                 fontFamily: CORMORANT,
-                fontSize: "clamp(24px, 7vw, 40px)",
+                fontSize: "clamp(34px, 9vw, 50px)",
                 fontWeight: 300,
-                lineHeight: 1.2,
+                lineHeight: 1.06,
+                letterSpacing: "-0.01em",
                 color: "#FFFFFF",
                 margin: 0,
-                marginBottom: "clamp(16px, 3vw, 24px)",
+                marginBottom: "clamp(14px, 3.5vw, 20px)",
               }}
             >
-              Batya: Daughters of Adonai
-            </motion.h2>
+              Batya
+              <span style={{
+                display: "block",
+                fontSize: "0.46em",
+                letterSpacing: "0.02em",
+                color: "rgba(255,255,255,0.88)",
+                marginTop: "0.35em",
+              }}>
+                Daughters of Adonai
+              </span>
+            </motion.h1>
 
-            {/* Mobile description */}
+            {/* Description — was 12px; now clears the 15px floor, and measured
+                in ch rather than a fixed 280px that cramped larger handsets. */}
             <motion.p
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.66 }}
               style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: "clamp(12px, 2.8vw, 15px)",
-                lineHeight: 1.6,
-                color: "rgba(255, 255, 255, 0.85)",
+                fontSize: "clamp(15px, 3.7vw, 16px)",
+                lineHeight: 1.65,
+                color: "rgba(255, 255, 255, 0.88)",
                 margin: 0,
-                marginBottom: "clamp(24px, 5vw, 36px)",
-                maxWidth: "280px",
+                marginBottom: "clamp(26px, 6vw, 36px)",
+                maxWidth: "34ch",
               }}
             >
-              Structured tailoring meets fluid artistic silhouettes. High-end wearable art for the modern woman who wears her confidence out loud.
+              Structured tailoring meets fluid artistic silhouettes — wearable art for the woman who wears her confidence out loud.
             </motion.p>
 
             {/* Mobile CTA Buttons — Full width stacked */}
@@ -779,55 +779,94 @@ const VIVAPage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.72 }}
-              className="flex flex-col gap-3 w-full max-w-xs"
+              className="flex flex-col gap-3 w-full"
+              style={{ maxWidth: 340 }}
             >
+              {/* Primary — mirrors the desktop CTA. Previously this read
+                  "Enquire About a Commission" while linking to #viva-shop. */}
               <a href="#viva-shop" style={{ textDecoration: "none", width: "100%" }}>
                 <motion.button
                   type="button"
-                  whileHover={reduced ? {} : { scale: 1.04 }}
                   whileTap={reduced ? {} : { scale: 0.97 }}
                   style={{
                     width: "100%",
                     background: GOLD,
                     color: "#1A1A1A",
                     border: "none",
-                    padding: "clamp(13px, 3vw, 16px)",
+                    padding: "16px 18px",
+                    minHeight: 48,
                     fontFamily: "DM Sans, system-ui, sans-serif",
-                    fontSize: "clamp(10px, 2vw, 12px)",
+                    fontSize: "clamp(12px, 2.9vw, 13px)",
                     fontWeight: 700,
-                    letterSpacing: "0.15em",
+                    letterSpacing: "0.14em",
                     textTransform: "uppercase",
                     cursor: "pointer",
                     borderRadius: 1,
-                    transition: "all 0.3s ease",
                   }}
                 >
-                  Enquire About a Commission
+                  Shop the Collection
                 </motion.button>
               </a>
+              {/* Secondary — was labelled "Try It On Virtually" but called
+                  scrollToEnquiry. Now goes to the enquiry form it names. */}
               <motion.button
                 type="button"
                 onClick={scrollToEnquiry}
-                whileHover={reduced ? {} : { scale: 1.04 }}
                 whileTap={reduced ? {} : { scale: 0.97 }}
                 style={{
                   width: "100%",
-                  background: "none",
+                  background: "rgba(255,255,255,0.04)",
                   color: GOLD,
-                  border: `1.5px solid ${GOLD}`,
-                  padding: "clamp(13px, 3vw, 16px)",
+                  border: `1px solid ${GOLD}`,
+                  padding: "16px 18px",
+                  minHeight: 48,
                   fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: "clamp(10px, 2vw, 12px)",
+                  fontSize: "clamp(12px, 2.9vw, 13px)",
                   fontWeight: 700,
-                  letterSpacing: "0.15em",
+                  letterSpacing: "0.14em",
                   textTransform: "uppercase",
                   cursor: "pointer",
                   borderRadius: 1,
-                  transition: "all 0.3s ease",
                 }}
               >
-                Try It On Virtually
+                Enquire
               </motion.button>
+            </motion.div>
+
+            {/* Film rail — mobile had no affordance at all, so two art-directed
+                cuts swapped with nothing to indicate or control them. */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.84 }}
+              className="flex"
+              style={{ gap: 10, marginTop: "clamp(24px, 6vw, 34px)" }}
+            >
+              {HERO_FILMS.map((film, i) => (
+                <button
+                  key={film.id}
+                  type="button"
+                  onClick={() => setHeroFilmIndex(i)}
+                  aria-label={`Show film ${i + 1} of ${HERO_FILMS.length}`}
+                  aria-current={i === heroFilmIndex}
+                  style={{
+                    // Hairline visual, 44px target: padding carries the hit area
+                    padding: "20px 0",
+                    width: i === heroFilmIndex ? 40 : 20,
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "width 0.5s cubic-bezier(0.4,0,0.2,1)",
+                  }}
+                >
+                  <span style={{
+                    display: "block",
+                    height: 2,
+                    background: i === heroFilmIndex ? GOLD : "rgba(255,255,255,0.34)",
+                    transition: "background 0.5s ease",
+                  }} />
+                </button>
+              ))}
             </motion.div>
           </div>
 
