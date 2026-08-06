@@ -188,9 +188,46 @@ const VIVAPage = () => {
   const [form, setForm] = useState({ name: "", email: "", interest: "", message: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
 
-  // Hero GIF carousel state — alternates between two GIFs
-  const [heroGifIndex, setHeroGifIndex] = useState(0);
-  const heroGifs = ["/viva/hero-loop.gif", "/viva/hero-product.gif"];
+  // Hero film carousel — art-directed sources, one per viewport class.
+  // Each clip is a 5s loop; we hold for two full cycles so motion never cuts mid-gesture.
+  const HERO_FILMS = [
+    {
+      id: "loop",
+      desktop: "/viva/hero-loop-desktop.mp4",
+      mobile:  "/viva/hero-loop-mobile.mp4",
+      poster:  "/viva/hero-loop-poster.jpg",
+      alt: "Two models in the Batya Collection — pink and olive woven kimonos with wide-leg denim",
+    },
+    {
+      id: "product",
+      desktop: "/viva/hero-product-desktop.mp4",
+      mobile:  "/viva/hero-product-mobile.mp4",
+      poster:  "/viva/hero-product-poster.jpg",
+      alt: "Model wearing the Daughters of Adonai graphic tee from the Batya Collection",
+    },
+  ] as const;
+
+  const HERO_HOLD_MS = 10000; // two complete 5s loops per clip
+  const [heroFilmIndex, setHeroFilmIndex] = useState(0);
+
+  // Breakpoint match drives which cut we mount, so only the active viewport's
+  // file is ever fetched — the hidden one must not cost the visitor bandwidth.
+  const [isDesktop, setIsDesktop] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches
+  );
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const sync = () => setIsDesktop(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    // resize is a belt-and-braces fallback: if the media-query event is ever
+    // missed the src must still track the breakpoint, never strand a stale cut.
+    window.addEventListener("resize", sync);
+    return () => {
+      mq.removeEventListener("change", sync);
+      window.removeEventListener("resize", sync);
+    };
+  }, []);
 
   // Shop state
   const [currency, setCurrency]           = useState<"NGN" | "USD">("NGN");
@@ -252,13 +289,26 @@ const VIVAPage = () => {
     }));
   };
 
-  // Hero GIF carousel: switch between two GIFs every 3 seconds
+  // Only the on-screen film decodes; the other is parked to keep the
+  // main thread free (two 1080p loops decoding at once costs real frames).
+  const filmRefs = useRef<(HTMLVideoElement | null)[]>([]);
   useEffect(() => {
+    filmRefs.current.forEach((v, i) => {
+      if (!v) return;
+      if (i === heroFilmIndex) void v.play().catch(() => {});
+      else v.pause();
+    });
+  }, [heroFilmIndex, isDesktop]);
+
+  // Hero film carousel — advance after two complete loop cycles.
+  // Honours prefers-reduced-motion by holding on the first clip.
+  useEffect(() => {
+    if (reduced) return;
     const heroInterval = setInterval(() => {
-      setHeroGifIndex(prev => (prev + 1) % heroGifs.length);
-    }, 3000);
+      setHeroFilmIndex(prev => (prev + 1) % HERO_FILMS.length);
+    }, HERO_HOLD_MS);
     return () => clearInterval(heroInterval);
-  }, [heroGifs.length]);
+  }, [reduced]);
 
   // Auto-play carousel effect
   useEffect(() => {
@@ -424,107 +474,102 @@ const VIVAPage = () => {
           HERO — Responsive Luxury Editorial
           Desktop: Asymmetric left-aligned on video | Mobile: Centered editorial
           ═══════════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden md:bg-black" style={{
-        minHeight: "clamp(720px, 100vh, 1080px)",
+      <section className="relative overflow-hidden" style={{
+        minHeight: "clamp(680px, 100svh, 1000px)",
         background: BURGUNDY,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        "@media (min-width: 768px)": {
-          background: "black",
-        }
       }}>
-        {/* Mobile: Full-screen animated GIF carousel with fallback */}
-        <motion.div
-          initial={{ opacity: 0, scale: 1.02 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.4, ease: [0.12, 0.72, 0.48, 1] }}
-          className="md:hidden absolute inset-0"
-          style={{ overflow: "hidden", background: `url('/viva/hero-right.webp') center/contain no-repeat` }}
+        {/* ── FILM STAGE ──────────────────────────────────────────────
+            One stage, geometry switched by CSS alone: full-bleed under
+            768px, right-hand panel above it. Both films stay mounted and
+            crossfade on opacity — no presence choreography that can stall
+            while a container is display:none, and never an empty stage. */}
+        <div
+          className="absolute inset-0 md:inset-y-0 md:left-auto md:right-0 md:w-[46%]"
+          style={{ overflow: "hidden", background: BURGUNDY }}
+          aria-hidden="true"
         >
-          {/* Mobile GIF Carousel */}
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={`mobile-${heroGifs[heroGifIndex]}`}
-              src={heroGifs[heroGifIndex]}
-              alt="VIVA by Viera Amber — Batya Collection — Mobile Carousel"
-              loading="eager"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.8, ease: "easeInOut" }}
+          {HERO_FILMS.map((film, i) => (
+            <video
+              key={film.id}
+              ref={el => { filmRefs.current[i] = el; }}
+              src={isDesktop ? film.desktop : film.mobile}
+              poster={film.poster}
+              autoPlay={i === 0}
+              muted
+              loop
+              playsInline
+              preload={i === 0 ? "auto" : "metadata"}
               style={{
+                position: "absolute",
+                inset: 0,
                 width: "100%",
                 height: "100%",
-                objectFit: "contain",
-                objectPosition: "center",
+                objectFit: "cover",
+                objectPosition: "center top",
                 display: "block",
-              }}
-              onError={(e) => {
-                e.currentTarget.src = '/viva/hero-right.webp';
-                e.currentTarget.style.objectFit = 'cover';
+                opacity: i === heroFilmIndex ? 1 : 0,
+                transition: reduced ? "none" : "opacity 1.1s cubic-bezier(0.4,0,0.2,1)",
               }}
             />
-          </AnimatePresence>
+          ))}
 
-          {/* Mobile overlay — stronger on mobile for text contrast */}
+          {/* Mobile scrim — burgundy wash so copy stays legible over the film */}
           <div
-            aria-hidden="true"
+            className="md:hidden"
             style={{
               position: "absolute",
               inset: 0,
-              background: "linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(110,0,37,0.5) 50%, rgba(110,0,37,0.7) 100%)",
+              background:
+                "linear-gradient(to bottom, rgba(110,0,37,0.72) 0%, rgba(110,0,37,0.55) 34%, rgba(110,0,37,0.78) 68%, rgba(110,0,37,0.94) 100%)",
               pointerEvents: "none",
             }}
           />
-        </motion.div>
 
-        {/* Desktop: Full-bleed animated GIF carousel with fallback */}
-        <motion.div
-          initial={{ opacity: 0, scale: 1.02 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.4, ease: [0.12, 0.72, 0.48, 1] }}
-          className="hidden md:block absolute inset-0"
-          style={{ overflow: "hidden", background: `url('/viva/hero-right.webp') center/contain no-repeat` }}
-        >
-          {/* GIF Carousel — alternates every 3 seconds with smooth crossfade */}
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={heroGifs[heroGifIndex]}
-              src={heroGifs[heroGifIndex]}
-              alt="VIVA by Viera Amber — Batya Collection — Animated Product Carousel"
-              loading="eager"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.8, ease: "easeInOut" }}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-                objectPosition: "center",
-                display: "block",
-              }}
-              onError={(e) => {
-                // Fallback: If GIF fails, show the static image
-                e.currentTarget.src = '/viva/hero-right.webp';
-                e.currentTarget.style.objectFit = 'cover';
-                e.currentTarget.style.objectPosition = 'center right';
-              }}
-            />
-          </AnimatePresence>
-
-          {/* Strategic overlay — darker on left for text */}
+          {/* Desktop feathered left edge — dissolves the panel seam into the field */}
           <div
-            aria-hidden="true"
+            className="hidden md:block"
             style={{
               position: "absolute",
               inset: 0,
-              background: "linear-gradient(to right, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.1) 100%)",
+              background:
+                `linear-gradient(to right, ${BURGUNDY} 0%, rgba(110,0,37,0.72) 8%, rgba(110,0,37,0.18) 22%, rgba(110,0,37,0) 42%)`,
               pointerEvents: "none",
             }}
           />
-        </motion.div>
+        </div>
+
+        {/* Progress rail — which film is showing */}
+        <div
+          className="hidden md:flex absolute"
+          style={{
+            bottom: "clamp(32px, 4vw, 56px)",
+            left: "clamp(20px, 5vw, 80px)",
+            gap: 10,
+            zIndex: 12,
+          }}
+        >
+          {HERO_FILMS.map((film, i) => (
+            <button
+              key={film.id}
+              type="button"
+              onClick={() => setHeroFilmIndex(i)}
+              aria-label={`Show film ${i + 1} of ${HERO_FILMS.length}`}
+              aria-current={i === heroFilmIndex}
+              style={{
+                width: i === heroFilmIndex ? 44 : 22,
+                height: 2,
+                border: "none",
+                padding: 0,
+                cursor: "pointer",
+                background: i === heroFilmIndex ? GOLD : "rgba(255,255,255,0.3)",
+                transition: "width 0.5s cubic-bezier(0.4,0,0.2,1), background 0.5s ease",
+              }}
+            />
+          ))}
+        </div>
 
         {/* Content wrapper — responsive layout */}
         <div
@@ -759,8 +804,8 @@ const VIVAPage = () => {
             </motion.div>
           </div>
 
-          {/* DESKTOP LAYOUT: Left-aligned asymmetric (hidden on mobile) */}
-          <div className="hidden md:block" style={{ maxWidth: "70%", minWidth: "300px" }}>
+          {/* DESKTOP LAYOUT: Left-aligned asymmetric — sits clear of the 46% film panel */}
+          <div className="hidden md:block" style={{ width: "50%", maxWidth: 680, minWidth: 300 }}>
             {/* Eyebrow */}
             <motion.p
               initial={{ opacity: 0, x: -24 }}
@@ -788,13 +833,13 @@ const VIVAPage = () => {
               transition={{ duration: 1, delay: 0.32, ease: [0.12, 0.72, 0.48, 1] }}
               style={{
                 fontFamily: CORMORANT,
-                fontSize: "clamp(64px, 16vw, 160px)",
+                fontSize: "clamp(72px, 9vw, 148px)",
                 fontWeight: 300,
-                lineHeight: 0.92,
+                lineHeight: 0.9,
                 color: "#FFFFFF",
                 margin: 0,
-                marginBottom: "clamp(12px, 1.8vw, 28px)",
-                letterSpacing: "-0.03em",
+                marginBottom: "clamp(10px, 1.4vw, 22px)",
+                letterSpacing: "-0.035em",
               }}
             >
               Batya
@@ -807,12 +852,12 @@ const VIVAPage = () => {
               transition={{ duration: 0.9, delay: 0.42, ease: "easeOut" }}
               style={{
                 fontFamily: CORMORANT,
-                fontSize: "clamp(28px, 5vw, 56px)",
+                fontSize: "clamp(26px, 3.1vw, 48px)",
                 fontWeight: 300,
-                lineHeight: 1.12,
+                lineHeight: 1.14,
                 color: "rgba(255, 255, 255, 0.88)",
                 margin: 0,
-                marginBottom: "clamp(32px, 5vw, 56px)",
+                marginBottom: "clamp(28px, 3.4vw, 44px)",
               }}
             >
               Daughters of Adonai
@@ -825,13 +870,13 @@ const VIVAPage = () => {
               transition={{ duration: 0.85, delay: 0.50, ease: "easeOut" }}
               style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: "clamp(14px, 1.5vw, 18px)",
+                fontSize: "clamp(14px, 1.1vw, 17px)",
                 fontWeight: 400,
                 lineHeight: 1.75,
                 color: "rgba(255, 255, 255, 0.80)",
                 margin: 0,
-                marginBottom: "clamp(40px, 6vw, 64px)",
-                maxWidth: "560px",
+                marginBottom: "clamp(32px, 3.6vw, 52px)",
+                maxWidth: "46ch",
               }}
             >
               Structured tailoring meets fluid artistic silhouettes. High-end wearable art for the modern woman who wears her confidence out loud.
