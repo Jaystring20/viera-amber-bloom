@@ -1,22 +1,14 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, useInView, useReducedMotion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Send, ShoppingBag, X, Plus, Minus, CreditCard, Sparkles, Upload, AlertCircle, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, Send, ShoppingBag, X, Plus, Minus, MessageCircle, Sparkles, Upload, AlertCircle, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "@/components/NavBar";
 import { fadeIn, fadeSlideUp, staggerContainer, cardItem, scaleXRule, inViewProps, useReducedVariants } from "@/lib/animations";
 import { supabase } from "@/lib/supabase";
 
-declare global {
-  interface Window {
-    PaystackPop: {
-      setup(opts: {
-        key: string; email: string; amount: number; currency: string; ref?: string;
-        callback(r: { reference: string }): void;
-        onClose(): void;
-      }): { openIframe(): void };
-    };
-  }
-}
+// Orders are finalised over WhatsApp — the same number the try-on and
+// gallery enquiries already use.
+const WHATSAPP_NUMBER = "2348074022917";
 
 const vivaHeroLeft  = "/viva/hero-left.webp";  // Look 1 — olive kimono — left flank
 const vivaHeroRight = "/viva/hero-right.webp"; // Look 2 — hot-pink crop — right flank
@@ -240,9 +232,9 @@ const VIVAPage = () => {
   const [currency, setCurrency]           = useState<"NGN" | "USD">("NGN");
   const [cart, setCart]                   = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen]           = useState(false);
-  const [payStatus, setPayStatus]         = useState<"idle" | "loading" | "verifying" | "success" | "error">("idle");
-  const [payError, setPayError]           = useState<string | null>(null);
-  const [paidReference, setPaidReference] = useState<string | null>(null);
+  const [orderStatus, setOrderStatus] = useState<"idle" | "sending" | "sent">("idle");
+  const [orderError, setOrderError]   = useState<string | null>(null);
+  const [orderRef, setOrderRef]       = useState<string | null>(null);
 
   // Delivery details. The shop sells physical, made-to-measure garments —
   // an email address alone is not a fulfillable order.
@@ -455,103 +447,81 @@ const VIVAPage = () => {
     const message =
       `Hi VIVA! I tried on "${selectedGarmentForTryOn.title}" using the virtual try-on and I love it. ` +
       `I'd like to order it / ask about a made-to-measure fit.`;
-    window.open(`https://wa.me/2348074022917/?text=${encodeURIComponent(message)}`, "_blank");
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}/?text=${encodeURIComponent(message)}`, "_blank");
   };
 
-  // Checkout runs server-first, in three steps:
-  //   1. create-order    — the server prices the basket and issues a reference.
-  //                        The browser never sends an amount; it used to send
-  //                        `cartTotal * 100`, which anyone could edit.
-  //   2. Paystack        — opened with the server's reference and total.
-  //   3. verify-payment  — asks Paystack directly, with the secret key, whether
-  //                        that reference really settled. Only then is the cart
-  //                        cleared. Paystack's browser callback is not proof:
-  //                        it is JavaScript on the customer's machine, and it
-  //                        also fires for payments that later fail.
-  const handlePaystack = async () => {
-    if (!checkoutComplete || cart.length === 0 || payStatus === "loading" || payStatus === "verifying") return;
+  const money = (v: number) =>
+    currency === "NGN" ? `₦${v.toLocaleString()}` : `$${v.toLocaleString()}`;
 
-    const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
-    if (!publicKey) {
-      setPayStatus("error");
-      setPayError("Payments are not configured yet. Please contact us to complete your order.");
-      return;
-    }
-    if (typeof window.PaystackPop === "undefined") {
-      setPayStatus("error");
-      setPayError("The payment window is still loading. Please try again in a moment.");
-      return;
-    }
-
-    setPayStatus("loading");
-    setPayError(null);
-
-    // ── 1. Server prices the basket ───────────────────────────────────
-    let reference: string;
-    let amountSubunit: number;
-    try {
-      const { data, error } = await supabase.functions.invoke("create-order", {
-        body: {
-          items: cart.map(i => ({ id: i.product.id, qty: i.qty })),
-          currency,
-          customer: checkout,
-        },
-      });
-      if (error) throw new Error(error.message);
-      if (data?.error) throw new Error(data.error);
-      if (!data?.reference || !data?.amountSubunit) throw new Error("Could not start your order.");
-      reference = data.reference;
-      amountSubunit = data.amountSubunit;
-    } catch (e) {
-      setPayStatus("error");
-      setPayError(e instanceof Error ? e.message : "Could not start your order. Please try again.");
-      return;
-    }
-
-    // ── 2. Paystack ───────────────────────────────────────────────────
-    const handler = window.PaystackPop.setup({
-      key: publicKey,
-      email: checkout.email.trim(),
-      amount: amountSubunit,
-      currency,
-      ref: reference,
-      callback: () => {
-        // Paystack calls this synchronously, so hand off rather than await.
-        void confirmPayment(reference);
-      },
-      onClose: () => {
-        // Only reset if we are not already confirming — closing the iframe
-        // after a successful charge must not wipe the verifying state.
-        setPayStatus(s => (s === "loading" ? "idle" : s));
-      },
+  // The order summary the customer sends. It is written to be read by a
+  // human on a phone: one line per piece, the total, then the delivery
+  // block. Everything Viera needs to confirm and quote shipping is in the
+  // first message, so the conversation starts at "yes" rather than at
+  // twenty questions.
+  const buildOrderMessage = (ref: string) => {
+    const lines = cart.map(i => {
+      const unit = currency === "NGN" ? i.product.priceNGN : i.product.priceUSD;
+      return `• ${i.product.title} ×${i.qty} — ${money(unit * i.qty)}`;
     });
-    handler.openIframe();
+
+    return [
+      `Hi VIVA! I'd like to place an order.`,
+      ``,
+      `ORDER ${ref}`,
+      ...lines,
+      ``,
+      `Total: ${money(cartTotal)}`,
+      ``,
+      `DELIVER TO`,
+      `${checkout.name}`,
+      `${checkout.phone}`,
+      `${checkout.email}`,
+      `${checkout.address}`,
+      `${checkout.city}, ${checkout.state}`,
+      `${checkout.country}`,
+      ...(checkout.notes.trim() ? [``, `NOTES`, checkout.notes.trim()] : []),
+      ``,
+      `Please confirm availability, shipping and payment. Thank you!`,
+    ].join("\n");
   };
 
-  // ── 3. Settle it against Paystack, server-side ──────────────────────
-  const confirmPayment = async (reference: string) => {
-    setPayStatus("verifying");
-    setPayError(null);
-    try {
-      const { data, error } = await supabase.functions.invoke("verify-payment", {
-        body: { reference },
-      });
-      if (error) throw new Error(error.message);
-      if (data?.status !== "paid") throw new Error(data?.error ?? "We could not confirm that payment.");
+  // Checkout hands off to WhatsApp, where the order is confirmed and paid.
+  // Before opening the chat we log the basket to contact_submissions — the
+  // same table the enquiry form already writes to — so an order survives
+  // even if the customer never sends the message or the chat is lost.
+  // That log is best effort: a logging failure must never block the sale.
+  const handleWhatsAppCheckout = async () => {
+    if (!checkoutComplete || cart.length === 0 || orderStatus !== "idle") return;
 
-      setPaidReference(reference);
-      setPayStatus("success");
-      setCart([]); // cleared only now, once the server has confirmed
+    setOrderStatus("sending");
+    setOrderError(null);
+
+    const ref = `VIVA-${Date.now().toString(36).toUpperCase()}`;
+    const message = buildOrderMessage(ref);
+
+    try {
+      await supabase.from("contact_submissions").insert({
+        name: checkout.name,
+        email: checkout.email,
+        subject: `VIVA Order ${ref} — ${money(cartTotal)}`,
+        message,
+      });
     } catch (e) {
-      // The charge may well have gone through — say so plainly rather than
-      // inviting a second payment for the same basket.
-      setPayStatus("error");
-      setPayError(
-        e instanceof Error
-          ? `${e.message} If you were charged, quote reference ${reference} and we will confirm it — please do not pay again.`
-          : `We could not confirm your payment. Quote reference ${reference} before trying again.`,
-      );
+      // Deliberately swallowed. The customer's route to buying is WhatsApp;
+      // losing our copy of the record is our problem, not theirs.
+      console.error("Order log failed (non-fatal):", e);
     }
+
+    // Opened directly in the click's task so mobile Safari does not treat
+    // it as an unsolicited popup. wa.me handles both app and web.
+    window.open(
+      `https://wa.me/${WHATSAPP_NUMBER}/?text=${encodeURIComponent(message)}`,
+      "_blank",
+      "noopener,noreferrer",
+    );
+
+    setOrderRef(ref);
+    setOrderStatus("sent");
   };
 
   const handleEnquiry = async (e: React.FormEvent) => {
@@ -1362,7 +1332,7 @@ const VIVAPage = () => {
       </section>
 
       {/* ═══════════════════════════════════════════════════════
-          SHOP — garments + illustration prints, Paystack checkout
+          SHOP — garments + illustration prints, WhatsApp checkout
           ═══════════════════════════════════════════════════════ */}
       <section id="viva-shop" className="w-full" style={{ background: ALABASTER, paddingTop: 80, paddingBottom: 80 }}>
         <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
@@ -1758,7 +1728,7 @@ const VIVAPage = () => {
       </footer>
 
       {/* ═══════════════════════════════════════════════════════
-          CART DRAWER — slide-in from right, Paystack checkout
+          CART DRAWER — slide-in from right, WhatsApp checkout
           ═══════════════════════════════════════════════════════ */}
       <AnimatePresence>
         {cartOpen && (
@@ -1841,7 +1811,7 @@ const VIVAPage = () => {
                 )}
               </div>
 
-              {/* Cart footer — total + Paystack */}
+              {/* Cart footer — total + WhatsApp handoff */}
               {cart.length > 0 && (
                 <div style={{ padding: "20px 24px", borderTop: `1px solid ${GOLD_ALPHA}` }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 20 }}>
@@ -1852,24 +1822,44 @@ const VIVAPage = () => {
                   </div>
 
                   <AnimatePresence mode="wait">
-                    {payStatus === "success" ? (
-                      <motion.div key="pay-success"
+                    {orderStatus === "sent" ? (
+                      <motion.div key="order-sent"
                         initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                         style={{ textAlign: "center", padding: "16px 0" }}
                       >
-                        <div style={{ width: 44, height: 44, borderRadius: "50%", border: `1px solid ${GOLD}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: GOLD, margin: "0 auto 12px" }}>✓</div>
-                        <p style={{ fontFamily: CORMORANT, fontSize: 20, color: ALABASTER, margin: "0 0 6px 0", fontWeight: 700 }}>Payment confirmed</p>
-                        <p style={{ fontFamily: "DM Sans", fontSize: 12, color: `rgba(250,249,246,0.42)`, margin: 0 }}>
-                          We have your order and your delivery details. A confirmation is on its way to {checkout.email}.
+                        <div style={{ width: 44, height: 44, borderRadius: "50%", border: `1px solid ${GOLD}`, display: "flex", alignItems: "center", justifyContent: "center", color: GOLD, margin: "0 auto 12px" }}>
+                          <MessageCircle size={18} />
+                        </div>
+                        <p style={{ fontFamily: CORMORANT, fontSize: 20, color: ALABASTER, margin: "0 0 6px 0", fontWeight: 700 }}>Your order is ready to send</p>
+                        <p style={{ fontFamily: "DM Sans", fontSize: 12, color: `rgba(250,249,246,0.5)`, margin: 0, lineHeight: 1.6 }}>
+                          We've opened WhatsApp with your order details. Press send there and Viera will confirm availability, shipping and payment.
                         </p>
-                        {paidReference && (
+                        {orderRef && (
                           <p style={{ fontFamily: "DM Sans", fontSize: 10, color: `rgba(212,175,55,0.6)`, margin: "10px 0 0 0", letterSpacing: "1px" }}>
-                            Ref {paidReference}
+                            {orderRef}
                           </p>
                         )}
+                        {/* WhatsApp can be blocked by a popup blocker, and on
+                            desktop the app may not be installed. Never strand
+                            the customer on a screen with no way forward. */}
+                        <button
+                          type="button"
+                          onClick={() => orderRef && window.open(
+                            `https://wa.me/${WHATSAPP_NUMBER}/?text=${encodeURIComponent(buildOrderMessage(orderRef))}`,
+                            "_blank", "noopener,noreferrer",
+                          )}
+                          style={{
+                            marginTop: 14, background: "none", border: `1px solid ${GOLD_ALPHA}`,
+                            color: GOLD, borderRadius: 6, padding: "10px 16px", minHeight: 44,
+                            fontFamily: "DM Sans", fontSize: 10, letterSpacing: "2px",
+                            textTransform: "uppercase", cursor: "pointer",
+                          }}
+                        >
+                          WhatsApp didn't open — try again
+                        </button>
                       </motion.div>
                     ) : (
-                      <motion.div key="pay-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                      <motion.div key="order-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                         {/* Delivery details — required, because these are
                             physical made-to-measure pieces. Checkout used to
                             collect an email and nothing else, which left no
@@ -1928,33 +1918,33 @@ const VIVAPage = () => {
                           </div>
                         </div>
 
-                        <motion.button onClick={handlePaystack}
-                          disabled={!checkoutComplete || payStatus === "loading" || payStatus === "verifying"}
-                          whileHover={!checkoutComplete || payStatus !== "idle" ? {} : { opacity: 0.88 }}
-                          whileTap={!checkoutComplete || payStatus !== "idle" ? {} : { scale: 0.98 }}
+                        <motion.button onClick={handleWhatsAppCheckout}
+                          disabled={!checkoutComplete || orderStatus === "sending"}
+                          whileHover={!checkoutComplete || orderStatus !== "idle" ? {} : { opacity: 0.88 }}
+                          whileTap={!checkoutComplete || orderStatus !== "idle" ? {} : { scale: 0.98 }}
                           style={{
                             width: "100%", padding: "14px", minHeight: 48,
                             fontFamily: "DM Sans", fontSize: 10, letterSpacing: "2.5px", textTransform: "uppercase", fontWeight: 600,
-                            background: !checkoutComplete || payStatus === "loading" || payStatus === "verifying" ? "rgba(212,175,55,0.38)" : GOLD,
+                            background: !checkoutComplete || orderStatus === "sending" ? "rgba(212,175,55,0.38)" : GOLD,
                             color: DARK_TEXT, border: "none", borderRadius: 6,
                             cursor: !checkoutComplete ? "not-allowed" : "pointer",
                             display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                           }}
                         >
-                          <CreditCard size={13} />
-                          {payStatus === "loading"   ? "Preparing your order…"
-                           : payStatus === "verifying" ? "Confirming payment…"
-                           : `Pay ${currency === "NGN" ? `₦${cartTotal.toLocaleString()}` : `$${cartTotal}`} via Paystack`}
+                          <MessageCircle size={13} />
+                          {orderStatus === "sending" ? "Preparing your order…" : `Complete order on WhatsApp`}
                         </motion.button>
 
-                        {payStatus === "verifying" && (
-                          <p style={{ fontFamily: "DM Sans", fontSize: 11, color: `rgba(250,249,246,0.55)`, margin: "10px 0 0 0", textAlign: "center", lineHeight: 1.5 }}>
-                            Please keep this window open while we confirm with Paystack.
-                          </p>
-                        )}
-                        {payStatus === "error" && payError && (
+                        {/* Say what the button does before it is pressed —
+                            handing off to another app is a surprise otherwise. */}
+                        <p style={{ fontFamily: "DM Sans", fontSize: 10, color: `rgba(250,249,246,0.42)`, margin: "10px 0 0 0", textAlign: "center", lineHeight: 1.6 }}>
+                          {checkoutComplete
+                            ? `Opens WhatsApp with your ${money(cartTotal)} order. Viera confirms shipping and payment there.`
+                            : "Complete the fields above to continue."}
+                        </p>
+                        {orderError && (
                           <p role="alert" style={{ fontFamily: "DM Sans", fontSize: 11, color: "#FFAAAA", margin: "10px 0 0 0", textAlign: "center", lineHeight: 1.5 }}>
-                            {payError}
+                            {orderError}
                           </p>
                         )}
                       </motion.div>
