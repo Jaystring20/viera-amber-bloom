@@ -101,7 +101,42 @@ const SHOP_PRODUCTS = [
 ] as const;
 
 type ShopProduct = typeof SHOP_PRODUCTS[number];
-type CartItem = { product: ShopProduct; qty: number };
+// Garments are cut to order, so a line without a size is not an order —
+// it is the first question of a conversation. Prints have no size at all.
+const GARMENT_SIZES = ["UK 6", "UK 8", "UK 10", "UK 12", "UK 14", "UK 16", "UK 18", "Made to my measurements"] as const;
+type GarmentSize = typeof GARMENT_SIZES[number];
+const BESPOKE_SIZE: GarmentSize = "Made to my measurements";
+
+type CartItem = { product: ShopProduct; qty: number; size?: GarmentSize };
+
+// Persisted shape. Only ids and choices are stored — never the product
+// objects themselves, so a price or title change in the catalogue is picked
+// up on the next load instead of being frozen into someone's basket.
+const CART_STORAGE_KEY = "viva.cart.v1";
+type StoredLine = { id: string; qty: number; size?: string };
+
+function loadCart(): CartItem[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(CART_STORAGE_KEY);
+    if (!raw) return [];
+    const lines: StoredLine[] = JSON.parse(raw);
+    if (!Array.isArray(lines)) return [];
+    return lines.flatMap(line => {
+      const product = SHOP_PRODUCTS.find(p => p.id === line.id);
+      // A discontinued id is dropped rather than resurrected as a broken row.
+      if (!product) return [];
+      const qty = Number(line.qty);
+      if (!Number.isInteger(qty) || qty < 1) return [];
+      const size = GARMENT_SIZES.find(s => s === line.size);
+      return [{ product, qty: Math.min(qty, 99), ...(size ? { size } : {}) }];
+    });
+  } catch {
+    // Corrupt or unavailable storage (private mode, quota) must never stop
+    // the shop rendering — an empty basket is a fine failure mode.
+    return [];
+  }
+}
 
 // Carousel state for each product
 interface CarouselState {
@@ -228,11 +263,27 @@ const VIVAPage = () => {
 
   // Shop state
   const [currency, setCurrency]           = useState<"NGN" | "USD">("NGN");
-  const [cart, setCart]                   = useState<CartItem[]>([]);
+  // Restored from storage. This matters more here than on an ordinary shop:
+  // checkout deliberately hands off to another app, so the tab is routinely
+  // backgrounded and unloaded mid-purchase. A basket that did not survive
+  // that was being lost at exactly the moment it was worth most.
+  const [cart, setCart]                   = useState<CartItem[]>(loadCart);
   const [cartOpen, setCartOpen]           = useState(false);
   const [orderStatus, setOrderStatus] = useState<"idle" | "sending" | "sent">("idle");
   const [orderError, setOrderError]   = useState<string | null>(null);
   const [orderRef, setOrderRef]       = useState<string | null>(null);
+
+  // Mirror the basket into storage on every change. Only ids, quantities
+  // and sizes go in — see StoredLine.
+  useEffect(() => {
+    try {
+      const lines: StoredLine[] = cart.map(i => ({ id: i.product.id, qty: i.qty, ...(i.size ? { size: i.size } : {}) }));
+      window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(lines));
+    } catch {
+      // Private mode or a full quota. Persistence is a convenience; losing
+      // it must not break the basket the customer is currently using.
+    }
+  }, [cart]);
 
   // Delivery details. The shop sells physical, made-to-measure garments —
   // an email address alone is not a fulfillable order.
@@ -243,8 +294,23 @@ const VIVAPage = () => {
   const setCheckoutField = (k: keyof typeof checkout) => (v: string) =>
     setCheckout(prev => ({ ...prev, [k]: v }));
 
+  // Optional, and only asked for once — not per garment. Requested when any
+  // line is bespoke, otherwise offered as a refinement to a standard size.
+  const [measurements, setMeasurements] = useState({ bust: "", waist: "", hips: "", height: "" });
+  const setMeasurement = (k: keyof typeof measurements) => (v: string) =>
+    setMeasurements(prev => ({ ...prev, [k]: v }));
+
+  const garmentLines = cart.filter(i => i.product.type === "garment");
+  const linesNeedingSize = garmentLines.filter(i => !i.size);
+  const wantsBespoke = garmentLines.some(i => i.size === BESPOKE_SIZE);
+  const measurementsProvided = Object.values(measurements).some(v => v.trim().length > 0);
+
   const REQUIRED_CHECKOUT_FIELDS = ["name", "email", "phone", "address", "city", "state"] as const;
-  const checkoutComplete = REQUIRED_CHECKOUT_FIELDS.every(k => checkout[k].trim().length > 0);
+  const detailsComplete = REQUIRED_CHECKOUT_FIELDS.every(k => checkout[k].trim().length > 0);
+  // Every garment must carry a size, and a bespoke line must carry at least
+  // one measurement — otherwise "made to my measurements" tells Viera nothing.
+  const checkoutComplete =
+    detailsComplete && linesNeedingSize.length === 0 && (!wantsBespoke || measurementsProvided);
 
   // Try-On Modal state
   const [tryOnModalOpen, setTryOnModalOpen]                 = useState(false);
@@ -270,8 +336,15 @@ const VIVAPage = () => {
       const hit = prev.find(i => i.product.id === product.id);
       return hit ? prev.map(i => i.product.id === product.id ? { ...i, qty: i.qty + 1 } : i) : [...prev, { product, qty: 1 }];
     });
+    // Adding to a basket that has already been sent starts a new order —
+    // otherwise the drawer would keep showing the previous confirmation.
+    setOrderStatus("idle");
+    setOrderRef(null);
     setCartOpen(true);
   };
+
+  const setLineSize = (id: string, size: GarmentSize) =>
+    setCart(prev => prev.map(i => (i.product.id === id ? { ...i, size } : i)));
 
   const removeFromCart = (id: string) => setCart(prev => prev.filter(i => i.product.id !== id));
 
@@ -459,8 +532,22 @@ const VIVAPage = () => {
   const buildOrderMessage = (ref: string) => {
     const lines = cart.map(i => {
       const unit = currency === "NGN" ? i.product.priceNGN : i.product.priceUSD;
-      return `• ${i.product.title} ×${i.qty} — ${money(unit * i.qty)}`;
+      // Size rides on the same line as the piece, so nothing has to be
+      // cross-referenced further down the message.
+      const size = i.size ? ` · ${i.size}` : "";
+      return `• ${i.product.title}${size} ×${i.qty} — ${money(unit * i.qty)}`;
     });
+
+    const measurementBlock = measurementsProvided
+      ? [
+          ``,
+          `MEASUREMENTS`,
+          ...(measurements.bust.trim()   ? [`Bust: ${measurements.bust.trim()}`]     : []),
+          ...(measurements.waist.trim()  ? [`Waist: ${measurements.waist.trim()}`]   : []),
+          ...(measurements.hips.trim()   ? [`Hips: ${measurements.hips.trim()}`]     : []),
+          ...(measurements.height.trim() ? [`Height: ${measurements.height.trim()}`] : []),
+        ]
+      : [];
 
     return [
       `Hi VIVA! I'd like to place an order.`,
@@ -469,6 +556,7 @@ const VIVAPage = () => {
       ...lines,
       ``,
       `Total: ${money(cartTotal)}`,
+      ...measurementBlock,
       ``,
       `DELIVER TO`,
       `${checkout.name}`,
@@ -1773,7 +1861,7 @@ const VIVAPage = () => {
                   </div>
                 ) : (
                   <div style={{ display: "flex", flexDirection: "column", gap: 0, paddingTop: 8 }}>
-                    {cart.map(({ product, qty }) => (
+                    {cart.map(({ product, qty, size }) => (
                       <div key={product.id} style={{ display: "flex", gap: 14, alignItems: "flex-start", paddingBottom: 18, marginBottom: 18, borderBottom: `1px solid ${GOLD_ALPHA}` }}>
                         <div style={{ width: 66, height: 82, flexShrink: 0, borderRadius: 3, overflow: "hidden" }}>
                           <img src={product.images[0]} alt={product.title}
@@ -1781,7 +1869,37 @@ const VIVAPage = () => {
                         </div>
                         <div style={{ flex: 1 }}>
                           <p style={{ fontFamily: CORMORANT, fontSize: 16, color: ALABASTER, margin: "0 0 2px 0", fontWeight: 600 }}>{product.title}</p>
-                          <p style={{ fontFamily: "DM Sans", fontSize: 10, color: `rgba(212,175,55,0.5)`, margin: "0 0 12px 0" }}>{product.subtitle}</p>
+                          <p style={{ fontFamily: "DM Sans", fontSize: 10, color: `rgba(212,175,55,0.5)`, margin: "0 0 10px 0" }}>{product.subtitle}</p>
+
+                          {/* Size — garments only. Prints have no size, and
+                              asking for one would just be a question with no
+                              right answer. */}
+                          {product.type === "garment" && (
+                            <div style={{ marginBottom: 10 }}>
+                              <label htmlFor={`size-${product.id}`} style={{ fontFamily: "DM Sans", fontSize: 9, color: `rgba(250,249,246,0.5)`, letterSpacing: "1.5px", textTransform: "uppercase", display: "block", marginBottom: 4 }}>
+                                Size *
+                              </label>
+                              <select
+                                id={`size-${product.id}`}
+                                value={size ?? ""}
+                                onChange={e => setLineSize(product.id, e.target.value as GarmentSize)}
+                                style={{
+                                  width: "100%", minHeight: 40,
+                                  background: "rgba(255,255,255,0.13)",
+                                  border: `1px solid ${size ? GOLD_ALPHA : "rgba(255,170,170,0.5)"}`,
+                                  borderRadius: 4, color: ALABASTER,
+                                  fontFamily: "DM Sans", fontSize: 12, padding: "8px 10px",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <option value="" disabled style={{ color: "#888" }}>Choose a size</option>
+                                {GARMENT_SIZES.map(s => (
+                                  <option key={s} value={s} style={{ background: BURGUNDY, color: ALABASTER }}>{s}</option>
+                                ))}
+                              </select>
+                            </div>
+                          )}
+
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 0, border: `1px solid ${GOLD_ALPHA}`, borderRadius: 4 }}>
                               <button onClick={() => updateQty(product.id, -1)}
@@ -1916,6 +2034,49 @@ const VIVAPage = () => {
                           </div>
                         </div>
 
+                        {/* Measurements — asked once, not per garment. Required
+                            only when a line is bespoke, where a size label
+                            alone communicates nothing. Otherwise offered, since
+                            a standard size plus real numbers still gives a
+                            better fit than a size alone. */}
+                        {garmentLines.length > 0 && (
+                          <div style={{ marginBottom: 12 }}>
+                            <p style={{ fontFamily: "DM Sans", fontSize: 9, color: `rgba(212,175,55,0.55)`, letterSpacing: "2px", textTransform: "uppercase", margin: "0 0 4px 0" }}>
+                              Measurements {wantsBespoke ? "*" : "(optional)"}
+                            </p>
+                            <p style={{ fontFamily: "DM Sans", fontSize: 10, color: `rgba(250,249,246,0.4)`, margin: "0 0 8px 0", lineHeight: 1.5 }}>
+                              {wantsBespoke
+                                ? "You've chosen a made-to-measure piece — please add at least one measurement."
+                                : "Helps Viera refine the fit. Inches or centimetres, whichever you know."}
+                            </p>
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                              {([
+                                { k: "bust",   label: "Bust",   ph: "34in" },
+                                { k: "waist",  label: "Waist",  ph: "28in" },
+                                { k: "hips",   label: "Hips",   ph: "38in" },
+                                { k: "height", label: "Height", ph: "5ft 6" },
+                              ] as const).map(f => (
+                                <div key={f.k}>
+                                  <label htmlFor={`m-${f.k}`} style={{ fontFamily: "DM Sans", fontSize: 9, color: `rgba(250,249,246,0.5)`, letterSpacing: "1.5px", textTransform: "uppercase", display: "block", marginBottom: 4 }}>
+                                    {f.label}
+                                  </label>
+                                  <input
+                                    id={`m-${f.k}`}
+                                    type="text"
+                                    inputMode="text"
+                                    value={measurements[f.k]}
+                                    onChange={e => setMeasurement(f.k)(e.target.value)}
+                                    placeholder={f.ph}
+                                    style={{ ...enquiryInputStyle, fontSize: 12 }}
+                                    onFocus={e => (e.target.style.borderColor = GOLD)}
+                                    onBlur={e => (e.target.style.borderColor = "rgba(250,249,246,0.22)")}
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
                         <motion.button onClick={handleWhatsAppCheckout}
                           disabled={!checkoutComplete || orderStatus === "sending"}
                           whileHover={!checkoutComplete || orderStatus !== "idle" ? {} : { opacity: 0.88 }}
@@ -1938,7 +2099,13 @@ const VIVAPage = () => {
                         <p style={{ fontFamily: "DM Sans", fontSize: 10, color: `rgba(250,249,246,0.42)`, margin: "10px 0 0 0", textAlign: "center", lineHeight: 1.6 }}>
                           {checkoutComplete
                             ? `Opens WhatsApp with your ${money(cartTotal)} order. Viera confirms shipping and payment there.`
-                            : "Complete the fields above to continue."}
+                            : linesNeedingSize.length > 0
+                              // Name the piece. "Complete the fields above" makes
+                              // the customer hunt for what is missing.
+                              ? `Choose a size for ${linesNeedingSize.map(i => i.product.title).join(" and ")}.`
+                            : wantsBespoke && !measurementsProvided
+                              ? "Add at least one measurement for your made-to-measure piece."
+                              : "Complete your delivery details to continue."}
                         </p>
                         {orderError && (
                           <p role="alert" style={{ fontFamily: "DM Sans", fontSize: 11, color: "#FFAAAA", margin: "10px 0 0 0", textAlign: "center", lineHeight: 1.5 }}>
