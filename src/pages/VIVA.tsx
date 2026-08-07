@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import NavBar from "@/components/NavBar";
 import { fadeIn, fadeSlideUp, staggerContainer, cardItem, scaleXRule, inViewProps, useReducedVariants } from "@/lib/animations";
 import { supabase } from "@/lib/supabase";
+import { useProducts, type Product } from "@/hooks/useProducts";
 
 import { whatsappLink } from "@/config/contact";
 
@@ -27,7 +28,10 @@ const LOOKBOOK = [
   { title: "The Artist",   mood: "Chromatic Freedom", photo: "/viva/look-3.webp", desc: "Chartreuse palazzo · Structured crop · Layered gold jewellery" },
 ];
 
-const SHOP_PRODUCTS = [
+// Fallback catalogue. The shop reads from the `products` table so the admin
+// UI can drive it, but keeps this as the offline/empty-table answer — a
+// storefront that renders nothing when a query fails reads as broken.
+const SHOP_PRODUCTS: ShopProduct[] = [
   {
     id: "heritage",
     title: "The Heritage",
@@ -98,9 +102,12 @@ const SHOP_PRODUCTS = [
     materials: "300gsm cotton rag paper · ink and gouache · hand-signed",
     care: "Frame under glass. Avoid moisture. Display away from heat sources."
   },
-] as const;
+];
 
-type ShopProduct = typeof SHOP_PRODUCTS[number];
+// Every product carries an id once it is in the shop — DB rows have a uuid,
+// the fallback entries have their slug. The cart, carousel and modals all
+// key on it, so it is required here even though it is optional on Product.
+type ShopProduct = Product & { id: string };
 // Garments are cut to order, so a line without a size is not an order —
 // it is the first question of a conversation. Prints have no size at all.
 const GARMENT_SIZES = ["UK 6", "UK 8", "UK 10", "UK 12", "UK 14", "UK 16", "UK 18", "Made to my measurements"] as const;
@@ -115,7 +122,11 @@ type CartItem = { product: ShopProduct; qty: number; size?: GarmentSize };
 const CART_STORAGE_KEY = "viva.cart.v1";
 type StoredLine = { id: string; qty: number; size?: string };
 
-function loadCart(): CartItem[] {
+// Rehydrated against whichever catalogue is actually live, not against the
+// fallback: a database row is keyed by uuid while a fallback entry is keyed
+// by slug, so restoring before the real catalogue has loaded would silently
+// drop every line as "discontinued".
+function loadCart(catalogue: ShopProduct[]): CartItem[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = window.localStorage.getItem(CART_STORAGE_KEY);
@@ -123,7 +134,7 @@ function loadCart(): CartItem[] {
     const lines: StoredLine[] = JSON.parse(raw);
     if (!Array.isArray(lines)) return [];
     return lines.flatMap(line => {
-      const product = SHOP_PRODUCTS.find(p => p.id === line.id);
+      const product = catalogue.find(p => p.id === line.id);
       // A discontinued id is dropped rather than resurrected as a broken row.
       if (!product) return [];
       const qty = Number(line.qty);
@@ -263,19 +274,40 @@ const VIVAPage = () => {
 
   // Shop state
   const [currency, setCurrency]           = useState<"NGN" | "USD">("NGN");
+  // The shop's catalogue: the `products` table when it has rows, the
+  // hardcoded list otherwise. Admin edits now reach the storefront, which
+  // was the whole point of the admin UI existing.
+  const { products, loading: productsLoading } = useProducts(SHOP_PRODUCTS);
+  const catalogue = products.filter((p): p is ShopProduct => Boolean(p.id));
+
   // Restored from storage. This matters more here than on an ordinary shop:
   // checkout deliberately hands off to another app, so the tab is routinely
   // backgrounded and unloaded mid-purchase. A basket that did not survive
   // that was being lost at exactly the moment it was worth most.
-  const [cart, setCart]                   = useState<CartItem[]>(loadCart);
+  //
+  // Starts empty and is filled once the live catalogue is known — see below.
+  const [cart, setCart]                   = useState<CartItem[]>([]);
+  const [cartHydrated, setCartHydrated]   = useState(false);
   const [cartOpen, setCartOpen]           = useState(false);
   const [orderStatus, setOrderStatus] = useState<"idle" | "sending" | "sent">("idle");
   const [orderError, setOrderError]   = useState<string | null>(null);
   const [orderRef, setOrderRef]       = useState<string | null>(null);
 
+  // Restore once, as soon as we know which catalogue is real.
+  useEffect(() => {
+    if (cartHydrated || productsLoading) return;
+    setCart(loadCart(catalogue));
+    setCartHydrated(true);
+    // catalogue is derived per-render; productsLoading is the meaningful gate.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productsLoading, cartHydrated]);
+
   // Mirror the basket into storage on every change. Only ids, quantities
   // and sizes go in — see StoredLine.
   useEffect(() => {
+    // Never write before restoring, or the initial empty state would
+    // overwrite the very basket we are about to read back.
+    if (!cartHydrated) return;
     try {
       const lines: StoredLine[] = cart.map(i => ({ id: i.product.id, qty: i.qty, ...(i.size ? { size: i.size } : {}) }));
       window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(lines));
@@ -283,7 +315,7 @@ const VIVAPage = () => {
       // Private mode or a full quota. Persistence is a convenience; losing
       // it must not break the basket the customer is currently using.
     }
-  }, [cart]);
+  }, [cart, cartHydrated]);
 
   // Delivery details. The shop sells physical, made-to-measure garments —
   // an email address alone is not a fulfillable order.
@@ -358,17 +390,21 @@ const VIVAPage = () => {
   // Carousel functions
   const getCarouselIndex = (productId: string) => carouselIndices[productId] ?? 0;
 
+  // Reads the index from `prev`, not from the enclosing render's state. The
+  // auto-play interval below is mounted once, so a closure read here always
+  // saw the initial {} — every tick computed 0 + 1, and the carousel stuck
+  // on the second image instead of cycling.
   const nextImage = (productId: string, imageCount: number) => {
     setCarouselIndices(prev => ({
       ...prev,
-      [productId]: (getCarouselIndex(productId) + 1) % imageCount
+      [productId]: ((prev[productId] ?? 0) + 1) % imageCount
     }));
   };
 
   const prevImage = (productId: string, imageCount: number) => {
     setCarouselIndices(prev => ({
       ...prev,
-      [productId]: (getCarouselIndex(productId) - 1 + imageCount) % imageCount
+      [productId]: ((prev[productId] ?? 0) - 1 + imageCount) % imageCount
     }));
   };
 
@@ -409,15 +445,21 @@ const VIVAPage = () => {
     return () => clearInterval(heroInterval);
   }, [reduced]);
 
-  // Auto-play carousel effect
+  // Auto-play carousel. Re-armed when the catalogue changes so products
+  // arriving from the table get intervals too, and a removed product's
+  // interval is cleared rather than left ticking against a stale id.
   useEffect(() => {
-    const intervals = SHOP_PRODUCTS.filter(p => p.images.length > 1).map(product =>
-      setInterval(() => {
-        nextImage(product.id, product.images.length);
-      }, 2000)
-    );
-    return () => intervals.forEach(interval => clearInterval(interval));
-  }, []);
+    if (reduced) return;
+    const intervals = catalogue
+      .filter(p => p.images.length > 1)
+      .map(product =>
+        setInterval(() => {
+          nextImage(product.id, product.images.length);
+        }, 2000),
+      );
+    return () => intervals.forEach(clearInterval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [catalogue.map(p => `${p.id}:${p.images.length}`).join(","), reduced]);
 
   // Try-On Modal handlers
   const openTryOnModal = (product: ShopProduct) => {
@@ -1493,7 +1535,7 @@ const VIVAPage = () => {
           {/* GARMENTS */}
           <p style={{ fontFamily: "DM Sans", fontSize: 9, color: BURGUNDY, letterSpacing: "4px", textTransform: "uppercase", margin: "0 0 20px 0", borderBottom: `1px solid ${BURG_ALPHA}`, paddingBottom: 10 }}>Garments</p>
           <div ref={shopRef} className="grid gap-6 mb-16" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(270px, 1fr))" }}>
-            {SHOP_PRODUCTS.filter(p => p.type === "garment").map((product, i) => {
+            {catalogue.filter(p => p.type === "garment").map((product, i) => {
               const currentImageIndex = getCarouselIndex(product.id);
               const currentImage = product.images[currentImageIndex];
               return (
@@ -1646,7 +1688,7 @@ const VIVAPage = () => {
           {/* PRINTS */}
           <p style={{ fontFamily: "DM Sans", fontSize: 9, color: BURGUNDY, letterSpacing: "4px", textTransform: "uppercase", margin: "0 0 20px 0", borderBottom: `1px solid ${BURG_ALPHA}`, paddingBottom: 10 }}>Illustration Prints</p>
           <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
-            {SHOP_PRODUCTS.filter(p => p.type === "print").map((product, i) => (
+            {catalogue.filter(p => p.type === "print").map((product, i) => (
               <motion.div key={product.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={shopInView ? { opacity: 1, y: 0 } : {}}
