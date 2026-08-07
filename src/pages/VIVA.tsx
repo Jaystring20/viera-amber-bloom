@@ -240,8 +240,21 @@ const VIVAPage = () => {
   const [currency, setCurrency]           = useState<"NGN" | "USD">("NGN");
   const [cart, setCart]                   = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen]           = useState(false);
-  const [checkoutEmail, setCheckoutEmail] = useState("");
-  const [payStatus, setPayStatus]         = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [payStatus, setPayStatus]         = useState<"idle" | "loading" | "verifying" | "success" | "error">("idle");
+  const [payError, setPayError]           = useState<string | null>(null);
+  const [paidReference, setPaidReference] = useState<string | null>(null);
+
+  // Delivery details. The shop sells physical, made-to-measure garments —
+  // an email address alone is not a fulfillable order.
+  const [checkout, setCheckout] = useState({
+    name: "", email: "", phone: "",
+    address: "", city: "", state: "", country: "Nigeria", notes: "",
+  });
+  const setCheckoutField = (k: keyof typeof checkout) => (v: string) =>
+    setCheckout(prev => ({ ...prev, [k]: v }));
+
+  const REQUIRED_CHECKOUT_FIELDS = ["name", "email", "phone", "address", "city", "state"] as const;
+  const checkoutComplete = REQUIRED_CHECKOUT_FIELDS.every(k => checkout[k].trim().length > 0);
 
   // Try-On Modal state
   const [tryOnModalOpen, setTryOnModalOpen]                 = useState(false);
@@ -445,23 +458,100 @@ const VIVAPage = () => {
     window.open(`https://wa.me/2348074022917/?text=${encodeURIComponent(message)}`, "_blank");
   };
 
-  const handlePaystack = () => {
-    if (!checkoutEmail || cart.length === 0) return;
-    if (typeof window.PaystackPop === "undefined") {
-      alert("Payment system is loading. Please try again in a moment.");
+  // Checkout runs server-first, in three steps:
+  //   1. create-order    — the server prices the basket and issues a reference.
+  //                        The browser never sends an amount; it used to send
+  //                        `cartTotal * 100`, which anyone could edit.
+  //   2. Paystack        — opened with the server's reference and total.
+  //   3. verify-payment  — asks Paystack directly, with the secret key, whether
+  //                        that reference really settled. Only then is the cart
+  //                        cleared. Paystack's browser callback is not proof:
+  //                        it is JavaScript on the customer's machine, and it
+  //                        also fires for payments that later fail.
+  const handlePaystack = async () => {
+    if (!checkoutComplete || cart.length === 0 || payStatus === "loading" || payStatus === "verifying") return;
+
+    const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
+    if (!publicKey) {
+      setPayStatus("error");
+      setPayError("Payments are not configured yet. Please contact us to complete your order.");
       return;
     }
+    if (typeof window.PaystackPop === "undefined") {
+      setPayStatus("error");
+      setPayError("The payment window is still loading. Please try again in a moment.");
+      return;
+    }
+
     setPayStatus("loading");
+    setPayError(null);
+
+    // ── 1. Server prices the basket ───────────────────────────────────
+    let reference: string;
+    let amountSubunit: number;
+    try {
+      const { data, error } = await supabase.functions.invoke("create-order", {
+        body: {
+          items: cart.map(i => ({ id: i.product.id, qty: i.qty })),
+          currency,
+          customer: checkout,
+        },
+      });
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
+      if (!data?.reference || !data?.amountSubunit) throw new Error("Could not start your order.");
+      reference = data.reference;
+      amountSubunit = data.amountSubunit;
+    } catch (e) {
+      setPayStatus("error");
+      setPayError(e instanceof Error ? e.message : "Could not start your order. Please try again.");
+      return;
+    }
+
+    // ── 2. Paystack ───────────────────────────────────────────────────
     const handler = window.PaystackPop.setup({
-      key: "pk_test_REPLACE_WITH_YOUR_PAYSTACK_PUBLIC_KEY",
-      email: checkoutEmail,
-      amount: cartTotal * 100,
+      key: publicKey,
+      email: checkout.email.trim(),
+      amount: amountSubunit,
       currency,
-      ref: `VIVA-${Date.now()}`,
-      callback: (_response) => { setPayStatus("success"); setCart([]); },
-      onClose: () => setPayStatus("idle"),
+      ref: reference,
+      callback: () => {
+        // Paystack calls this synchronously, so hand off rather than await.
+        void confirmPayment(reference);
+      },
+      onClose: () => {
+        // Only reset if we are not already confirming — closing the iframe
+        // after a successful charge must not wipe the verifying state.
+        setPayStatus(s => (s === "loading" ? "idle" : s));
+      },
     });
     handler.openIframe();
+  };
+
+  // ── 3. Settle it against Paystack, server-side ──────────────────────
+  const confirmPayment = async (reference: string) => {
+    setPayStatus("verifying");
+    setPayError(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("verify-payment", {
+        body: { reference },
+      });
+      if (error) throw new Error(error.message);
+      if (data?.status !== "paid") throw new Error(data?.error ?? "We could not confirm that payment.");
+
+      setPaidReference(reference);
+      setPayStatus("success");
+      setCart([]); // cleared only now, once the server has confirmed
+    } catch (e) {
+      // The charge may well have gone through — say so plainly rather than
+      // inviting a second payment for the same basket.
+      setPayStatus("error");
+      setPayError(
+        e instanceof Error
+          ? `${e.message} If you were charged, quote reference ${reference} and we will confirm it — please do not pay again.`
+          : `We could not confirm your payment. Quote reference ${reference} before trying again.`,
+      );
+    }
   };
 
   const handleEnquiry = async (e: React.FormEvent) => {
@@ -1768,42 +1858,103 @@ const VIVAPage = () => {
                         style={{ textAlign: "center", padding: "16px 0" }}
                       >
                         <div style={{ width: 44, height: 44, borderRadius: "50%", border: `1px solid ${GOLD}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: GOLD, margin: "0 auto 12px" }}>✓</div>
-                        <p style={{ fontFamily: CORMORANT, fontSize: 20, color: ALABASTER, margin: "0 0 6px 0", fontWeight: 700 }}>Payment confirmed!</p>
-                        <p style={{ fontFamily: "DM Sans", fontSize: 12, color: `rgba(250,249,246,0.42)`, margin: 0 }}>Check your email for order details.</p>
+                        <p style={{ fontFamily: CORMORANT, fontSize: 20, color: ALABASTER, margin: "0 0 6px 0", fontWeight: 700 }}>Payment confirmed</p>
+                        <p style={{ fontFamily: "DM Sans", fontSize: 12, color: `rgba(250,249,246,0.42)`, margin: 0 }}>
+                          We have your order and your delivery details. A confirmation is on its way to {checkout.email}.
+                        </p>
+                        {paidReference && (
+                          <p style={{ fontFamily: "DM Sans", fontSize: 10, color: `rgba(212,175,55,0.6)`, margin: "10px 0 0 0", letterSpacing: "1px" }}>
+                            Ref {paidReference}
+                          </p>
+                        )}
                       </motion.div>
                     ) : (
                       <motion.div key="pay-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                        <div style={{ marginBottom: 12 }}>
-                          <label style={{ fontFamily: "DM Sans", fontSize: 9, color: `rgba(212,175,55,0.55)`, letterSpacing: "2px", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
-                            Email for receipt *
-                          </label>
-                          <input type="email" value={checkoutEmail}
-                            onChange={(e) => setCheckoutEmail(e.target.value)}
-                            placeholder="you@example.com"
-                            style={{ ...enquiryInputStyle, fontSize: 12 }}
-                            onFocus={(e) => (e.target.style.borderColor = GOLD)}
-                            onBlur={(e) => (e.target.style.borderColor = "rgba(250,249,246,0.22)")}
-                          />
+                        {/* Delivery details — required, because these are
+                            physical made-to-measure pieces. Checkout used to
+                            collect an email and nothing else, which left no
+                            way to actually send the garment. */}
+                        <p style={{ fontFamily: "DM Sans", fontSize: 9, color: `rgba(212,175,55,0.55)`, letterSpacing: "2px", textTransform: "uppercase", margin: "0 0 10px 0" }}>
+                          Delivery details
+                        </p>
+
+                        <div style={{ display: "grid", gap: 8, marginBottom: 12 }}>
+                          {([
+                            { k: "name",    label: "Full name",       type: "text",  ph: "Ada Okafor",        auto: "name" },
+                            { k: "email",   label: "Email",           type: "email", ph: "you@example.com",   auto: "email" },
+                            { k: "phone",   label: "Phone",           type: "tel",   ph: "+234 800 000 0000", auto: "tel" },
+                            { k: "address", label: "Delivery address",type: "text",  ph: "Street and number", auto: "street-address" },
+                          ] as const).map(f => (
+                            <div key={f.k}>
+                              <label htmlFor={`checkout-${f.k}`} style={{ fontFamily: "DM Sans", fontSize: 9, color: `rgba(250,249,246,0.5)`, letterSpacing: "1.5px", textTransform: "uppercase", display: "block", marginBottom: 4 }}>
+                                {f.label} *
+                              </label>
+                              <input
+                                id={`checkout-${f.k}`}
+                                type={f.type}
+                                autoComplete={f.auto}
+                                value={checkout[f.k]}
+                                onChange={e => setCheckoutField(f.k)(e.target.value)}
+                                placeholder={f.ph}
+                                style={{ ...enquiryInputStyle, fontSize: 12 }}
+                                onFocus={e => (e.target.style.borderColor = GOLD)}
+                                onBlur={e => (e.target.style.borderColor = "rgba(250,249,246,0.22)")}
+                              />
+                            </div>
+                          ))}
+
+                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                            {([
+                              { k: "city",  label: "City",  ph: "Lagos",       auto: "address-level2" },
+                              { k: "state", label: "State", ph: "Lagos State", auto: "address-level1" },
+                            ] as const).map(f => (
+                              <div key={f.k}>
+                                <label htmlFor={`checkout-${f.k}`} style={{ fontFamily: "DM Sans", fontSize: 9, color: `rgba(250,249,246,0.5)`, letterSpacing: "1.5px", textTransform: "uppercase", display: "block", marginBottom: 4 }}>
+                                  {f.label} *
+                                </label>
+                                <input
+                                  id={`checkout-${f.k}`}
+                                  type="text"
+                                  autoComplete={f.auto}
+                                  value={checkout[f.k]}
+                                  onChange={e => setCheckoutField(f.k)(e.target.value)}
+                                  placeholder={f.ph}
+                                  style={{ ...enquiryInputStyle, fontSize: 12 }}
+                                  onFocus={e => (e.target.style.borderColor = GOLD)}
+                                  onBlur={e => (e.target.style.borderColor = "rgba(250,249,246,0.22)")}
+                                />
+                              </div>
+                            ))}
+                          </div>
                         </div>
+
                         <motion.button onClick={handlePaystack}
-                          disabled={!checkoutEmail || payStatus === "loading"}
-                          whileHover={!checkoutEmail || payStatus === "loading" ? {} : { opacity: 0.88 }}
-                          whileTap={!checkoutEmail || payStatus === "loading" ? {} : { scale: 0.98 }}
+                          disabled={!checkoutComplete || payStatus === "loading" || payStatus === "verifying"}
+                          whileHover={!checkoutComplete || payStatus !== "idle" ? {} : { opacity: 0.88 }}
+                          whileTap={!checkoutComplete || payStatus !== "idle" ? {} : { scale: 0.98 }}
                           style={{
-                            width: "100%", padding: "14px",
+                            width: "100%", padding: "14px", minHeight: 48,
                             fontFamily: "DM Sans", fontSize: 10, letterSpacing: "2.5px", textTransform: "uppercase", fontWeight: 600,
-                            background: !checkoutEmail || payStatus === "loading" ? "rgba(212,175,55,0.38)" : GOLD,
+                            background: !checkoutComplete || payStatus === "loading" || payStatus === "verifying" ? "rgba(212,175,55,0.38)" : GOLD,
                             color: DARK_TEXT, border: "none", borderRadius: 6,
-                            cursor: !checkoutEmail ? "not-allowed" : "pointer",
+                            cursor: !checkoutComplete ? "not-allowed" : "pointer",
                             display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                           }}
                         >
                           <CreditCard size={13} />
-                          {payStatus === "loading" ? "Opening Paystack..." : `Pay ${currency === "NGN" ? `₦${cartTotal.toLocaleString()}` : `$${cartTotal}`} via Paystack`}
+                          {payStatus === "loading"   ? "Preparing your order…"
+                           : payStatus === "verifying" ? "Confirming payment…"
+                           : `Pay ${currency === "NGN" ? `₦${cartTotal.toLocaleString()}` : `$${cartTotal}`} via Paystack`}
                         </motion.button>
-                        {payStatus === "error" && (
-                          <p style={{ fontFamily: "DM Sans", fontSize: 11, color: "#FFAAAA", margin: "10px 0 0 0", textAlign: "center" }}>
-                            Payment failed. Try again or email admin@vieraamber.com
+
+                        {payStatus === "verifying" && (
+                          <p style={{ fontFamily: "DM Sans", fontSize: 11, color: `rgba(250,249,246,0.55)`, margin: "10px 0 0 0", textAlign: "center", lineHeight: 1.5 }}>
+                            Please keep this window open while we confirm with Paystack.
+                          </p>
+                        )}
+                        {payStatus === "error" && payError && (
+                          <p role="alert" style={{ fontFamily: "DM Sans", fontSize: 11, color: "#FFAAAA", margin: "10px 0 0 0", textAlign: "center", lineHeight: 1.5 }}>
+                            {payError}
                           </p>
                         )}
                       </motion.div>
