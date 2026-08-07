@@ -294,14 +294,16 @@ const VIVAPage = () => {
     };
   }, []);
 
-  // Pulled back a stop on both stages now that a garment sits directly
-  // behind the copy on every viewport, not just mobile: the film should
-  // carry the collection's mood without competing with the words for
-  // attention. Desktop gets a slightly lighter pull-back than mobile — more
-  // screen real estate means the scrim is doing comparatively less of the
-  // legibility work on its own.
+  // Pulled back a stop on both stages so the film carries the collection's
+  // mood without fighting the copy sitting on top of it. Desktop pulls back
+  // slightly harder than mobile now, not lighter — the first pass assumed
+  // desktop copy only needed protecting near mid-frame and could afford a
+  // lighter touch, but centered text actually spans nearly the whole
+  // vertical stage, top to bottom, for the entire time it's on screen. It
+  // needs the film tamed everywhere the way mobile already tames it, not a
+  // lighter version of the same idea.
   const heroFilmFilter = isDesktop
-    ? "saturate(0.92) brightness(0.90) contrast(1.03)"
+    ? "saturate(0.86) brightness(0.82) contrast(1.05)"
     : "saturate(0.88) brightness(0.86) contrast(1.04)";
 
   // Shop state
@@ -841,25 +843,29 @@ const VIVAPage = () => {
           />
 
           {/* ── DESKTOP SCRIM ────────────────────────────────────────────
-              There is no seam left to protect — the film covers the whole
-              stage now, and the copy sits centered on top of it instead of
-              beside it in its own burgundy panel. That copy needs the same
-              guarantee mobile's scrim gives it: legible over whichever frame
-              of whichever film happens to be showing.
+              First pass darkened only a narrow band around the exact
+              vertical center — but the text stack (masthead, eyebrow,
+              heading, description, buttons) is much taller than that band.
+              Against a high-key frame (pale backdrop, light hair, a cream
+              sweater filling most of the shot) the masthead at the top of
+              the stack sat in the barely-tinted 10-16% zone and all but
+              vanished — gold-on-white with almost no scrim under it.
 
-              Mobile solves this with a gradient loaded toward the bottom,
-              because mobile copy is bottom-anchored. Desktop copy is
-              centered both ways, so the darkening is centered too: a
-              horizontal band across the vertical middle, symmetric top and
-              bottom, fading out toward both edges so the film still reads
-              as full-bleed rather than as a strip behind a dark bar. */}
+              The fix is a wide plateau, not a taller spike: strong,
+              near-flat density across the entire range the text actually
+              occupies (roughly 10-90% of the frame), tapering only in the
+              last ~10% at each true edge so the film still reads as
+              full-bleed at the very top and bottom rather than under a
+              dark bar. The floor never drops below ~0.30 anywhere text can
+              land — a "clear window" is what caused this in the first
+              place, so nothing here is allowed to go fully clear again. */}
           <div
             className="hidden md:block"
             style={{
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(to bottom, rgba(110,0,37,0.16) 0%, rgba(110,0,37,0.10) 16%, rgba(110,0,37,0.30) 32%, rgba(110,0,37,0.60) 44%, rgba(110,0,37,0.68) 50%, rgba(110,0,37,0.60) 56%, rgba(110,0,37,0.30) 68%, rgba(110,0,37,0.10) 84%, rgba(110,0,37,0.16) 100%)",
+                "linear-gradient(to bottom, rgba(110,0,37,0.34) 0%, rgba(110,0,37,0.44) 10%, rgba(110,0,37,0.52) 22%, rgba(110,0,37,0.62) 36%, rgba(110,0,37,0.68) 50%, rgba(110,0,37,0.62) 64%, rgba(110,0,37,0.52) 78%, rgba(110,0,37,0.44) 90%, rgba(110,0,37,0.34) 100%)",
               pointerEvents: "none",
             }}
           />
@@ -876,7 +882,7 @@ const VIVAPage = () => {
               position: "absolute",
               inset: 0,
               background:
-                "radial-gradient(62% 78% at 50% 50%, rgba(110,0,37,0.30) 0%, rgba(110,0,37,0.12) 55%, rgba(110,0,37,0) 82%)",
+                "radial-gradient(68% 86% at 50% 50%, rgba(110,0,37,0.26) 0%, rgba(110,0,37,0.14) 60%, rgba(110,0,37,0) 88%)",
               pointerEvents: "none",
             }}
           />
@@ -956,6 +962,12 @@ const VIVAPage = () => {
               alignItems: "center",
               gap: 8,
               fontWeight: 500,
+              // Shared by both viewports, sitting right at the top edge of
+              // whichever film is playing — needs the same independent
+              // protection as the rest of the hero copy now gets. A CSS
+              // filter (not textShadow) so it shadows the icon too, not
+              // just the "Back" label.
+              filter: "drop-shadow(0 1px 6px rgba(60,0,20,0.55))",
             }}
             whileHover={reduced ? {} : { color: "#FFFFFF", x: -3 }}
           >
@@ -1237,6 +1249,12 @@ const VIVAPage = () => {
                 // Optical centring: the trailing letterspace pushes the word
                 // left of true-center, same correction mobile's wordmark uses.
                 textIndent: "0.34em",
+                // Every desktop text element got a scrim to sit on but no
+                // shadow of its own — mobile has carried this from the start.
+                // A drop shadow protects independently of what the scrim
+                // achieves in a given frame; against a high-key shot (pale
+                // backdrop, light hair) gold-on-white needs both.
+                textShadow: "0 1px 12px rgba(60,0,20,0.6)",
               }}
             >
               VIVA
@@ -1255,6 +1273,7 @@ const VIVAPage = () => {
                 color: "rgba(255,255,255,0.55)",
                 margin: "10px 0 0 0",
                 fontWeight: 500,
+                textShadow: "0 1px 10px rgba(60,0,20,0.55)",
               }}
             >
               By Viera Amber
@@ -1287,6 +1306,7 @@ const VIVAPage = () => {
                 // Descender clearance for the 'y' in "by"
                 lineHeight: 1.3,
                 paddingBottom: 2,
+                textShadow: "0 1px 12px rgba(60,0,20,0.6)",
               }}
             >
               For her, by her.
@@ -1307,6 +1327,7 @@ const VIVAPage = () => {
                 textTransform: "uppercase",
                 color: GOLD,
                 margin: "clamp(38px, 4.4vw, 60px) 0 clamp(14px, 1.6vw, 20px) 0",
+                textShadow: "0 1px 12px rgba(60,0,20,0.6)",
               }}
             >
               The Maiden Collection
@@ -1328,6 +1349,7 @@ const VIVAPage = () => {
                 margin: 0,
                 marginBottom: "clamp(20px, 2.4vw, 32px)",
                 letterSpacing: "-0.012em",
+                textShadow: "0 2px 22px rgba(60,0,20,0.7)",
               }}
             >
               Batya: Daughters of Adonai
@@ -1347,6 +1369,7 @@ const VIVAPage = () => {
                 margin: "0 auto",
                 marginBottom: "clamp(28px, 3.2vw, 44px)",
                 maxWidth: "46ch",
+                textShadow: "0 1px 14px rgba(60,0,20,0.6)",
               }}
             >
               Structured tailoring meets fluid artistic silhouettes — wearable art for the woman who wears her confidence out loud.
@@ -1388,10 +1411,14 @@ const VIVAPage = () => {
               <motion.button
                 type="button"
                 onClick={() => navigate("/viva/try-on")}
-                whileHover={reduced ? {} : { scale: 1.04, backgroundColor: "rgba(255, 255, 255, 0.12)" }}
+                whileHover={reduced ? {} : { scale: 1.04, backgroundColor: "rgba(40,0,14,0.5)" }}
                 whileTap={reduced ? {} : { scale: 0.97 }}
                 style={{
-                  background: "rgba(255, 255, 255, 0.03)",
+                  // Was rgba(255,255,255,0.03) — essentially transparent, so
+                  // this button's legibility depended entirely on the scrim
+                  // behind it happening to be dark enough. It now carries its
+                  // own dark chip, independent of whatever frame is playing.
+                  background: "rgba(40,0,14,0.34)",
                   color: GOLD,
                   border: `1.5px solid ${GOLD}`,
                   padding: "clamp(15px, 1.5vw, 18px) clamp(30px, 3.2vw, 44px)",
@@ -1403,7 +1430,7 @@ const VIVAPage = () => {
                   cursor: "pointer",
                   borderRadius: 1,
                   whiteSpace: "nowrap",
-                  backdropFilter: "blur(6px)",
+                  backdropFilter: "blur(8px)",
                 }}
               >
                 Try It On Virtually
