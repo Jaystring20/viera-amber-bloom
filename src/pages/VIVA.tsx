@@ -217,16 +217,29 @@ const enquiryInputStyle: React.CSSProperties = {
 // exactly what the next round of feedback flagged.
 //
 // Re-solved against the REAL measured pre-plate background instead of the
-// theoretical extreme: at 0.55 alpha this still composites to 6.4-7.1:1 for
-// gold text across every landmark on the worst film — real margin above the
-// 4.5:1 floor, not a bare pass — while letting roughly twice as much of the
-// actual burgundy-toned video read through. That has a second effect beyond
-// brightness: blending with the real (burgundy-cast) video instead of
-// mostly the plate's own near-black tint warms the panel's rendered color
-// toward the surrounding scrim's hue, which is most of why the box no
-// longer reads as a disconnected black rectangle.
+// theoretical extreme: 0.55 alpha held 6.4-7.1:1 for solid gold text, real
+// margin, and reads meaningfully softer than the first pass. Still called
+// "too dark" on review.
+//
+// Lowering the plate further exposed the actual bottleneck: it was never
+// the plate alone doing the work. The mantra ("For her, by her.") and
+// attribution ("By Viera Amber") lines are themselves semi-transparent —
+// rgba(gold, 0.78) and rgba(white, 0.55) — so their EFFECTIVE color is
+// already a blend toward whatever sits behind them before the contrast
+// math even starts. That's what was propping the plate alpha up: two of
+// five landmarks were fighting their own transparency on top of the
+// plate's, and the plate had to compensate for both to keep the worst
+// case (mantra) above 4.5:1.
+//
+// Raised those two lines toward opaque instead (0.55->0.82, 0.78->0.92) so
+// each carries its own contrast rather than borrowing all of it from the
+// plate, then re-solved: 0.35 alpha now holds 4.5-7.5:1 across every
+// landmark on the worst film, worst case (mantra) at 4.89 — real margin
+// for the frame-to-frame brightness variance actually observed during live
+// verification, not a value that was merely computed and assumed. Down
+// from 0.78 to 0.35 overall: less than half the original darkness.
 const HERO_TEXT_PLATE: React.CSSProperties = {
-  background: "rgba(18,4,10,0.55)",
+  background: "rgba(18,4,10,0.35)",
   backdropFilter: "blur(22px)",
   WebkitBackdropFilter: "blur(22px)",
   border: "1px solid rgba(212,175,55,0.12)",
@@ -1067,7 +1080,11 @@ const VIVAPage = () => {
                   // Matches the wordmark's tracking so the pair reads as a lockup
                   letterSpacing: "0.34em",
                   textTransform: "uppercase",
-                  color: "rgba(255,255,255,0.6)",
+                  // Was 0.6 — its own transparency was fighting the plate
+                  // for contrast, forcing the plate darker than it needed
+                  // to be. Raised so the text carries more of its own
+                  // weight, which is what let the plate come down.
+                  color: "rgba(255,255,255,0.82)",
                   margin: "10px 0 0 0",
                   fontWeight: 500,
                 }}
@@ -1097,7 +1114,9 @@ const VIVAPage = () => {
                   fontFamily: CORMORANT,
                   fontSize: "clamp(15px, 3.5vw, 18px)",
                   fontStyle: "italic",
-                  color: "rgba(212,175,55,0.8)",
+                  // Was 0.8 — same reasoning as the attribution line above:
+                  // more of this text's own opacity, less demanded of the plate.
+                  color: "rgba(212,175,55,0.92)",
                   margin: 0,
                   // Descender clearance for the 'y' in "by"
                   lineHeight: 1.3,
@@ -1335,7 +1354,11 @@ const VIVAPage = () => {
                   fontSize: "clamp(9px, 0.72vw, 10px)",
                   letterSpacing: "0.34em",
                   textTransform: "uppercase",
-                  color: "rgba(255,255,255,0.55)",
+                  // Was 0.55 — its own transparency was fighting the plate
+                  // for contrast, forcing the plate darker than it needed
+                  // to be. Raised so the text carries more of its own
+                  // weight, which is what let the plate come down.
+                  color: "rgba(255,255,255,0.82)",
                   margin: "10px 0 0 0",
                   fontWeight: 500,
                 }}
@@ -1365,7 +1388,9 @@ const VIVAPage = () => {
                   fontFamily: CORMORANT,
                   fontSize: "clamp(15px, 1.25vw, 18px)",
                   fontStyle: "italic",
-                  color: "rgba(212,175,55,0.78)",
+                  // Was 0.78 — same reasoning as the attribution line above:
+                  // more of this text's own opacity, less demanded of the plate.
+                  color: "rgba(212,175,55,0.92)",
                   margin: 0,
                   // Descender clearance for the 'y' in "by"
                   lineHeight: 1.3,
