@@ -199,6 +199,38 @@ const enquiryInputStyle: React.CSSProperties = {
   transition: "border-color 0.2s",
 };
 
+// ── HERO TEXT PLATES ─────────────────────────────────────────────────────
+// The masthead lockup and eyebrow were floating directly on the hero scrim
+// with no backing of their own, on the assumption the page-wide gradient
+// would be dark enough wherever they happened to land. Measured against the
+// actual video (pixel-sampled + composited with the real scrim/vignette/
+// filter math, not eyeballed): against the close-portrait clip's brightest
+// frame the gold wordmark hit only ~3.1:1 contrast — WCAG AA needs 4.5:1 for
+// text this size, and the user's own screenshot showed exactly this failure.
+//
+// The fix is not a darker global gradient — solving for that mathematically
+// requires the scrim to reach ~88% opacity everywhere, which stops the video
+// being a video. Instead these two blocks get a dedicated, near-opaque
+// backing plate. Solved against the worst case actually measured (a raw
+// frame ~rgb(230,230,225)): rgba(18,4,10) at 0.78 alpha yields ~8.2:1 for
+// gold text — comfortable margin, not a bare pass, and true regardless of
+// which film or which frame is behind it. The H1 and description are
+// deliberately left off this plate: measured at 8.84:1 and 5.66:1 on the
+// same worst-case frame with no extra help, they don't need it, and leaving
+// them floating keeps the composition from reading as one solid card.
+const HERO_TEXT_PLATE: React.CSSProperties = {
+  background: "rgba(18,4,10,0.78)",
+  backdropFilter: "blur(20px)",
+  WebkitBackdropFilter: "blur(20px)",
+  border: "1px solid rgba(212,175,55,0.14)",
+  boxShadow: "0 20px 50px rgba(0,0,0,0.30)",
+};
+const HERO_EYEBROW_CHIP: React.CSSProperties = {
+  ...HERO_TEXT_PLATE,
+  borderRadius: 999,
+  display: "inline-block",
+};
+
 const VIVAPage = () => {
   const navigate   = useNavigate();
   const reduced    = useReducedMotion();
@@ -981,100 +1013,121 @@ const VIVAPage = () => {
               text items and two rules competed for the same eye. */}
           <div className="md:hidden mt-auto flex flex-col items-center text-center w-full" style={{ paddingTop: "clamp(56px, 18vh, 130px)" }}>
             {/* Brand mark — kept as a wordmark, not a heading. "Batya" below is
-                the page's h1; VIVA is already the navbar logotype. */}
+                the page's h1; VIVA is already the navbar logotype.
+
+                Wrapped in the same guaranteed-contrast plate as desktop (see
+                HERO_TEXT_PLATE). Mobile's bottom-loaded gradient usually
+                protects this block on its own, but only once it's deep
+                enough into the high-opacity zone — measured against a
+                worst-case bright frame, the top of this block (where the
+                gradient is still only ~0.84) held to ~4.15:1, just short of
+                the 4.5:1 small text needs. The plate closes that gap. */}
+            <div
+              style={{
+                ...HERO_TEXT_PLATE,
+                borderRadius: 12,
+                padding: "clamp(18px, 5vw, 24px) clamp(26px, 8vw, 36px)",
+              }}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.94 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.9, delay: 0.28 }}
+                style={{
+                  fontFamily: CORMORANT,
+                  // Was 60px — larger than the headline it introduces. At masthead
+                  // scale the wordmark leads, then hands over to the collection.
+                  fontSize: "clamp(30px, 7.4vw, 40px)",
+                  fontWeight: 400,
+                  letterSpacing: "0.34em",
+                  lineHeight: 1,
+                  color: GOLD,
+                  // Optical centring: the trailing letterspace pushes the word left
+                  textIndent: "0.34em",
+                }}
+              >
+                VIVA
+              </motion.div>
+
+              {/* Attribution */}
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.75, delay: 0.34 }}
+                style={{
+                  fontFamily: "DM Sans, system-ui, sans-serif",
+                  fontSize: "clamp(9px, 2.4vw, 10px)",
+                  // Matches the wordmark's tracking so the pair reads as a lockup
+                  letterSpacing: "0.34em",
+                  textTransform: "uppercase",
+                  color: "rgba(255,255,255,0.6)",
+                  margin: "10px 0 0 0",
+                  fontWeight: 500,
+                }}
+              >
+                By Viera Amber
+              </motion.p>
+
+              {/* Hairline — internal to the lockup, not a section divider */}
+              <motion.div
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: 38 }}
+                transition={{ duration: 0.7, delay: 0.38 }}
+                style={{
+                  height: 1,
+                  background: GOLD,
+                  opacity: 0.42,
+                  margin: "15px 0",
+                }}
+              />
+
+              {/* Mantra — closes the lockup */}
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.44 }}
+                style={{
+                  fontFamily: CORMORANT,
+                  fontSize: "clamp(15px, 3.5vw, 18px)",
+                  fontStyle: "italic",
+                  color: "rgba(212,175,55,0.8)",
+                  margin: 0,
+                  // Descender clearance for the 'y' in "by"
+                  lineHeight: 1.3,
+                  paddingBottom: 2,
+                }}
+              >
+                For her, by her.
+              </motion.p>
+            </div>
+
+            {/* Eyebrow — its own small pill chip, same guaranteed-contrast
+                treatment. The large gap that used to be this paragraph's own
+                top margin moved to this wrapper instead. */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.94 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.9, delay: 0.28 }}
-              style={{
-                fontFamily: CORMORANT,
-                // Was 60px — larger than the headline it introduces. At masthead
-                // scale the wordmark leads, then hands over to the collection.
-                fontSize: "clamp(30px, 7.4vw, 40px)",
-                fontWeight: 400,
-                letterSpacing: "0.34em",
-                lineHeight: 1,
-                color: GOLD,
-                // Optical centring: the trailing letterspace pushes the word left
-                textIndent: "0.34em",
-                textShadow: "0 2px 22px rgba(60,0,20,0.65)",
-              }}
-            >
-              VIVA
-            </motion.div>
-
-            {/* Attribution */}
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.75, delay: 0.34 }}
-              style={{
-                fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: "clamp(9px, 2.4vw, 10px)",
-                // Matches the wordmark's tracking so the pair reads as a lockup
-                letterSpacing: "0.34em",
-                textTransform: "uppercase",
-                color: "rgba(255,255,255,0.6)",
-                margin: "10px 0 0 0",
-                fontWeight: 500,
-                textShadow: "0 1px 12px rgba(60,0,20,0.55)",
-              }}
-            >
-              By Viera Amber
-            </motion.p>
-
-            {/* Hairline — internal to the lockup, not a section divider */}
-            <motion.div
-              initial={{ opacity: 0, width: 0 }}
-              animate={{ opacity: 1, width: 38 }}
-              transition={{ duration: 0.7, delay: 0.38 }}
-              style={{
-                height: 1,
-                background: GOLD,
-                opacity: 0.42,
-                margin: "15px 0",
-              }}
-            />
-
-            {/* Mantra — closes the lockup */}
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.44 }}
-              style={{
-                fontFamily: CORMORANT,
-                fontSize: "clamp(15px, 3.5vw, 18px)",
-                fontStyle: "italic",
-                color: "rgba(212,175,55,0.8)",
-                margin: 0,
-                // Descender clearance for the 'y' in "by"
-                lineHeight: 1.3,
-                paddingBottom: 2,
-                textShadow: "0 1px 14px rgba(60,0,20,0.6)",
-              }}
-            >
-              For her, by her.
-            </motion.p>
-
-            {/* Breath — the one large gap in the column, separating masthead
-                from collection so the groups read as related but distinct. */}
-            <motion.p
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.54 }}
               style={{
-                fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: "clamp(11px, 2.6vw, 12px)",
-                letterSpacing: "0.26em",
-                textTransform: "uppercase",
-                color: GOLD,
-                margin: "clamp(34px, 8vw, 48px) 0 clamp(12px, 3vw, 16px) 0",
-                fontWeight: 500,
-                textShadow: "0 1px 12px rgba(60,0,20,0.6)",
+                ...HERO_EYEBROW_CHIP,
+                margin: "clamp(34px, 8vw, 48px) 0 clamp(14px, 3.4vw, 18px) 0",
+                padding: "9px 22px",
               }}
             >
-              The Maiden Collection
-            </motion.p>
+              <p
+                style={{
+                  fontFamily: "DM Sans, system-ui, sans-serif",
+                  fontSize: "clamp(11px, 2.6vw, 12px)",
+                  letterSpacing: "0.26em",
+                  textTransform: "uppercase",
+                  color: GOLD,
+                  margin: 0,
+                  fontWeight: 500,
+                }}
+              >
+                The Maiden Collection
+              </p>
+            </motion.div>
 
             {/* Collection heading — one heading, matching desktop */}
             <motion.h1
@@ -1232,106 +1285,120 @@ const VIVAPage = () => {
             }}
           >
             {/* ── MASTHEAD LOCKUP ──────────────────────────────────────────
-                Wordmark, attribution and mantra read as one unit, bound by a
-                shared 0.34em tracking and tight leading, then hand over to
-                the collection below. */}
+                Wordmark, attribution and mantra read as one unit. Previously
+                these floated directly on the scrim gradient with only a
+                text-shadow for protection — measured against the actual
+                video (see HERO_TEXT_PLATE above), that held to roughly
+                3.1-4.0:1 contrast against a bright frame, short of the
+                4.5:1 small text needs. A backing plate now guarantees it
+                regardless of what the film is doing underneath. */}
+            <div
+              style={{
+                ...HERO_TEXT_PLATE,
+                borderRadius: 14,
+                padding: "clamp(22px, 2.6vw, 30px) clamp(36px, 4.2vw, 52px)",
+              }}
+            >
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.20, ease: "easeOut" }}
+                style={{
+                  fontFamily: CORMORANT,
+                  fontSize: "clamp(24px, 2.2vw, 32px)",
+                  fontWeight: 400,
+                  letterSpacing: "0.34em",
+                  lineHeight: 1,
+                  color: GOLD,
+                  // Optical centring: the trailing letterspace pushes the word
+                  // left of true-center, same correction mobile's wordmark uses.
+                  textIndent: "0.34em",
+                }}
+              >
+                VIVA
+              </motion.div>
+
+              {/* Attribution — same tracking as the wordmark locks the pair together */}
+              <motion.p
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.75, delay: 0.27, ease: "easeOut" }}
+                style={{
+                  fontFamily: "DM Sans, system-ui, sans-serif",
+                  fontSize: "clamp(9px, 0.72vw, 10px)",
+                  letterSpacing: "0.34em",
+                  textTransform: "uppercase",
+                  color: "rgba(255,255,255,0.55)",
+                  margin: "10px 0 0 0",
+                  fontWeight: 500,
+                }}
+              >
+                By Viera Amber
+              </motion.p>
+
+              {/* Hairline — internal to the lockup, not a section divider */}
+              <motion.div
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: 38 }}
+                transition={{ duration: 0.7, delay: 0.33, ease: "easeOut" }}
+                style={{
+                  height: 1,
+                  background: GOLD,
+                  opacity: 0.42,
+                  margin: "16px auto",
+                }}
+              />
+
+              {/* Mantra — closes the lockup */}
+              <motion.p
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.39, ease: "easeOut" }}
+                style={{
+                  fontFamily: CORMORANT,
+                  fontSize: "clamp(15px, 1.25vw, 18px)",
+                  fontStyle: "italic",
+                  color: "rgba(212,175,55,0.78)",
+                  margin: 0,
+                  // Descender clearance for the 'y' in "by"
+                  lineHeight: 1.3,
+                  paddingBottom: 2,
+                }}
+              >
+                For her, by her.
+              </motion.p>
+            </div>
+
+            {/* Eyebrow — its own small chip, same guaranteed-contrast
+                treatment, sized as a pill rather than the masthead's card so
+                the two don't read as one undifferentiated block. The large
+                gap above it is what actually separates masthead from
+                collection now — it moved from the old paragraph's own
+                margin onto this wrapper. */}
             <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.20, ease: "easeOut" }}
-              style={{
-                fontFamily: CORMORANT,
-                fontSize: "clamp(24px, 2.2vw, 32px)",
-                fontWeight: 400,
-                letterSpacing: "0.34em",
-                lineHeight: 1,
-                color: GOLD,
-                // Optical centring: the trailing letterspace pushes the word
-                // left of true-center, same correction mobile's wordmark uses.
-                textIndent: "0.34em",
-                // Every desktop text element got a scrim to sit on but no
-                // shadow of its own — mobile has carried this from the start.
-                // A drop shadow protects independently of what the scrim
-                // achieves in a given frame; against a high-key shot (pale
-                // backdrop, light hair) gold-on-white needs both.
-                textShadow: "0 1px 12px rgba(60,0,20,0.6)",
-              }}
-            >
-              VIVA
-            </motion.div>
-
-            {/* Attribution — same tracking as the wordmark locks the pair together */}
-            <motion.p
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.75, delay: 0.27, ease: "easeOut" }}
-              style={{
-                fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: "clamp(9px, 0.72vw, 10px)",
-                letterSpacing: "0.34em",
-                textTransform: "uppercase",
-                color: "rgba(255,255,255,0.55)",
-                margin: "10px 0 0 0",
-                fontWeight: 500,
-                textShadow: "0 1px 10px rgba(60,0,20,0.55)",
-              }}
-            >
-              By Viera Amber
-            </motion.p>
-
-            {/* Hairline — internal to the lockup, not a section divider */}
-            <motion.div
-              initial={{ opacity: 0, width: 0 }}
-              animate={{ opacity: 1, width: 38 }}
-              transition={{ duration: 0.7, delay: 0.33, ease: "easeOut" }}
-              style={{
-                height: 1,
-                background: GOLD,
-                opacity: 0.42,
-                margin: "16px auto",
-              }}
-            />
-
-            {/* Mantra — closes the lockup */}
-            <motion.p
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.39, ease: "easeOut" }}
-              style={{
-                fontFamily: CORMORANT,
-                fontSize: "clamp(15px, 1.25vw, 18px)",
-                fontStyle: "italic",
-                color: "rgba(212,175,55,0.78)",
-                margin: 0,
-                // Descender clearance for the 'y' in "by"
-                lineHeight: 1.3,
-                paddingBottom: 2,
-                textShadow: "0 1px 12px rgba(60,0,20,0.6)",
-              }}
-            >
-              For her, by her.
-            </motion.p>
-
-            {/* Breath — the one large gap in the column. It separates masthead
-                from collection, so the two groups read as related but distinct
-                rather than as one undifferentiated list of lines. */}
-            <motion.p
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.75, delay: 0.48, ease: "easeOut" }}
               style={{
-                fontFamily: "DM Sans, system-ui, sans-serif",
-                fontSize: "clamp(11px, 0.92vw, 13px)",
-                fontWeight: 500,
-                letterSpacing: "0.26em",
-                textTransform: "uppercase",
-                color: GOLD,
-                margin: "clamp(38px, 4.4vw, 60px) 0 clamp(14px, 1.6vw, 20px) 0",
-                textShadow: "0 1px 12px rgba(60,0,20,0.6)",
+                ...HERO_EYEBROW_CHIP,
+                margin: "clamp(38px, 4.4vw, 60px) 0 clamp(18px, 2vw, 26px) 0",
+                padding: "10px 26px",
               }}
             >
-              The Maiden Collection
-            </motion.p>
+              <p
+                style={{
+                  fontFamily: "DM Sans, system-ui, sans-serif",
+                  fontSize: "clamp(11px, 0.92vw, 13px)",
+                  fontWeight: 500,
+                  letterSpacing: "0.26em",
+                  textTransform: "uppercase",
+                  color: GOLD,
+                  margin: 0,
+                }}
+              >
+                The Maiden Collection
+              </p>
+            </motion.div>
 
             {/* Hero heading — one heading, as on mobile. Was previously split
                 into a 148px "Batya" with "Daughters of Adonai" set beneath it
