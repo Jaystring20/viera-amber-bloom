@@ -208,22 +208,29 @@ const enquiryInputStyle: React.CSSProperties = {
 // frame the gold wordmark hit only ~3.1:1 contrast — WCAG AA needs 4.5:1 for
 // text this size, and the user's own screenshot showed exactly this failure.
 //
-// The fix is not a darker global gradient — solving for that mathematically
-// requires the scrim to reach ~88% opacity everywhere, which stops the video
-// being a video. Instead these two blocks get a dedicated, near-opaque
-// backing plate. Solved against the worst case actually measured (a raw
-// frame ~rgb(230,230,225)): rgba(18,4,10) at 0.78 alpha yields ~8.2:1 for
-// gold text — comfortable margin, not a bare pass, and true regardless of
-// which film or which frame is behind it. The H1 and description are
-// deliberately left off this plate: measured at 8.84:1 and 5.66:1 on the
-// same worst-case frame with no extra help, they don't need it, and leaving
-// them floating keeps the composition from reading as one solid card.
+// First pass solved the plate against a theoretical pure-white worst case
+// (255,255,255), which never actually occurs in the footage — the real
+// video, even at its brightest measured point, is already darkened by the
+// scrim beneath the plate to roughly rgb(130-140). That over-conservative
+// target (0.78 alpha) produced a near-opaque near-black card that read as
+// a UI element pasted onto the photo rather than part of the composition —
+// exactly what the next round of feedback flagged.
+//
+// Re-solved against the REAL measured pre-plate background instead of the
+// theoretical extreme: at 0.55 alpha this still composites to 6.4-7.1:1 for
+// gold text across every landmark on the worst film — real margin above the
+// 4.5:1 floor, not a bare pass — while letting roughly twice as much of the
+// actual burgundy-toned video read through. That has a second effect beyond
+// brightness: blending with the real (burgundy-cast) video instead of
+// mostly the plate's own near-black tint warms the panel's rendered color
+// toward the surrounding scrim's hue, which is most of why the box no
+// longer reads as a disconnected black rectangle.
 const HERO_TEXT_PLATE: React.CSSProperties = {
-  background: "rgba(18,4,10,0.78)",
-  backdropFilter: "blur(20px)",
-  WebkitBackdropFilter: "blur(20px)",
-  border: "1px solid rgba(212,175,55,0.14)",
-  boxShadow: "0 20px 50px rgba(0,0,0,0.30)",
+  background: "rgba(18,4,10,0.55)",
+  backdropFilter: "blur(22px)",
+  WebkitBackdropFilter: "blur(22px)",
+  border: "1px solid rgba(212,175,55,0.12)",
+  boxShadow: "0 14px 34px rgba(0,0,0,0.20)",
 };
 const HERO_EYEBROW_CHIP: React.CSSProperties = {
   ...HERO_TEXT_PLATE,
