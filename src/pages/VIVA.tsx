@@ -238,16 +238,20 @@ const enquiryInputStyle: React.CSSProperties = {
 // for the frame-to-frame brightness variance actually observed during live
 // verification, not a value that was merely computed and assumed. Down
 // from 0.78 to 0.35 overall: less than half the original darkness.
+// Corners are flat by client direction, not a stylistic default — 0 here,
+// not a small radius. Both the masthead plate and the eyebrow chip carry
+// it explicitly so neither drifts back toward rounded in a future edit.
 const HERO_TEXT_PLATE: React.CSSProperties = {
   background: "rgba(18,4,10,0.35)",
   backdropFilter: "blur(22px)",
   WebkitBackdropFilter: "blur(22px)",
   border: "1px solid rgba(212,175,55,0.12)",
   boxShadow: "0 14px 34px rgba(0,0,0,0.20)",
+  borderRadius: 0,
 };
 const HERO_EYEBROW_CHIP: React.CSSProperties = {
   ...HERO_TEXT_PLATE,
-  borderRadius: 999,
+  borderRadius: 0,
   display: "inline-block",
 };
 
@@ -1045,7 +1049,8 @@ const VIVAPage = () => {
             <div
               style={{
                 ...HERO_TEXT_PLATE,
-                borderRadius: 12,
+                // Flat corners by client direction, not rounded — see
+                // HERO_TEXT_PLATE.
                 padding: "clamp(18px, 5vw, 24px) clamp(26px, 8vw, 36px)",
               }}
             >
@@ -1321,7 +1326,8 @@ const VIVAPage = () => {
             <div
               style={{
                 ...HERO_TEXT_PLATE,
-                borderRadius: 14,
+                // Flat corners by client direction, not rounded — see
+                // HERO_TEXT_PLATE.
                 padding: "clamp(22px, 2.6vw, 30px) clamp(36px, 4.2vw, 52px)",
               }}
             >
