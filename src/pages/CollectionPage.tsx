@@ -6,6 +6,7 @@ import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { getArtworksByCollection, getCollectionMetadata } from "@/lib/gallery-data";
 import { Artwork } from "@/lib/gallery-data";
+import { WHATSAPP_NUMBER } from "@/config/contact";
 
 const CollectionPage = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
@@ -290,7 +291,7 @@ const CollectionPage = () => {
 
                 <motion.button
                   onClick={() => {
-                    const whatsappNumber = "2348074022917";
+                    const whatsappNumber = WHATSAPP_NUMBER;
                     const message = `Hi, I'd like to commission: ${selectedItem.title}\n\n${selectedItem.story}`;
                     const encodedMessage = encodeURIComponent(message);
                     const whatsappLink = `https://wa.me/${whatsappNumber}/?text=${encodedMessage}`;

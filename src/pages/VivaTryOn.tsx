@@ -5,13 +5,14 @@ import { ArrowLeft, Upload, Sparkles, Send, RefreshCw, AlertCircle } from "lucid
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
+import { WHATSAPP_NUMBER } from "@/config/contact";
 
 const BURGUNDY = "#6E0025";
 const GOLD = "#D4AF37";
 const ALABASTER = "#FAF9F6";
 const CORMORANT = "Cormorant Garamond, Georgia, serif";
 const SANS = "DM Sans, system-ui, sans-serif";
-const WHATSAPP_NUMBER = "2348074022917";
+
 
 // Wearable VIVA garments (look-4 is a print, excluded).
 const GARMENTS = [

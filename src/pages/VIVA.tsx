@@ -2533,6 +2533,57 @@ const VIVAPage = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ═══════════════════════════════════════════════════════
+          FLOATING WHATSAPP — persistent route to a human
+          ═══════════════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {/* Withdrawn whenever a layer owns the screen. A button floating over
+            an open cart or modal is clutter competing with the task the
+            customer is already doing. */}
+        {!cartOpen && !detailModalOpen && !tryOnModalOpen && (
+          <motion.a
+            key="whatsapp-fab"
+            href={whatsappLink("Hi VIVA! I have a question about the Batya collection.")}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Chat with VIVA on WhatsApp"
+            initial={{ opacity: 0, scale: 0.8, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 12 }}
+            transition={reduced ? { duration: 0 } : { duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+            whileHover={reduced ? {} : { scale: 1.06 }}
+            whileTap={reduced ? {} : { scale: 0.94 }}
+            style={{
+              position: "fixed",
+              right: "clamp(16px, 4vw, 28px)",
+              // Sits clear of the mobile tab bar (56px + the device's own safe
+              // area, per the clearance rule in index.css). The lg breakpoint
+              // is exactly where that bar stops being rendered.
+              bottom: isDesktop
+                ? "clamp(20px, 3vw, 32px)"
+                : "calc(56px + env(safe-area-inset-bottom, 0px) + 16px)",
+              // Above page content, below the cart drawer and modals (1000).
+              zIndex: 80,
+              width: 56,
+              height: 56,
+              borderRadius: "50%",
+              // WhatsApp's own green — this is a recognised affordance, and
+              // dressing it in brand gold would cost more in recognition than
+              // it gained in consistency.
+              background: "#25D366",
+              color: "#FFFFFF",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textDecoration: "none",
+              boxShadow: "0 6px 22px rgba(37,211,102,0.36), 0 2px 8px rgba(0,0,0,0.18)",
+            }}
+          >
+            <MessageCircle size={26} strokeWidth={1.9} />
+          </motion.a>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Artwork } from "@/lib/gallery-data";
+import { WHATSAPP_NUMBER } from "@/config/contact";
 
 export interface CollectionItem {
   id: string;
@@ -213,7 +214,7 @@ export const CollectionGallery = ({ collection, onClose }: CollectionGalleryProp
                   {/* CTA */}
                   <button
                     onClick={() => {
-                      const whatsappNumber = "2348074022917";
+                      const whatsappNumber = WHATSAPP_NUMBER;
                       const message = `Hi, I'd like to commission: ${selectedItem.title}\n\n${selectedItem.story}`;
                       const encodedMessage = encodeURIComponent(message);
                       const whatsappLink = `https://wa.me/${whatsappNumber}/?text=${encodedMessage}`;
