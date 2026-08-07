@@ -6,9 +6,7 @@ import NavBar from "@/components/NavBar";
 import { fadeIn, fadeSlideUp, staggerContainer, cardItem, scaleXRule, inViewProps, useReducedVariants } from "@/lib/animations";
 import { supabase } from "@/lib/supabase";
 
-// Orders are finalised over WhatsApp — the same number the try-on and
-// gallery enquiries already use.
-const WHATSAPP_NUMBER = "2348074022917";
+import { whatsappLink } from "@/config/contact";
 
 const vivaHeroLeft  = "/viva/hero-left.webp";  // Look 1 — olive kimono — left flank
 const vivaHeroRight = "/viva/hero-right.webp"; // Look 2 — hot-pink crop — right flank
@@ -447,7 +445,7 @@ const VIVAPage = () => {
     const message =
       `Hi VIVA! I tried on "${selectedGarmentForTryOn.title}" using the virtual try-on and I love it. ` +
       `I'd like to order it / ask about a made-to-measure fit.`;
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}/?text=${encodeURIComponent(message)}`, "_blank");
+    window.open(whatsappLink(message), "_blank", "noopener,noreferrer");
   };
 
   const money = (v: number) =>
@@ -515,7 +513,7 @@ const VIVAPage = () => {
     // Opened directly in the click's task so mobile Safari does not treat
     // it as an unsolicited popup. wa.me handles both app and web.
     window.open(
-      `https://wa.me/${WHATSAPP_NUMBER}/?text=${encodeURIComponent(message)}`,
+      whatsappLink(message),
       "_blank",
       "noopener,noreferrer",
     );
@@ -1845,7 +1843,7 @@ const VIVAPage = () => {
                         <button
                           type="button"
                           onClick={() => orderRef && window.open(
-                            `https://wa.me/${WHATSAPP_NUMBER}/?text=${encodeURIComponent(buildOrderMessage(orderRef))}`,
+                            whatsappLink(buildOrderMessage(orderRef)),
                             "_blank", "noopener,noreferrer",
                           )}
                           style={{
