@@ -195,7 +195,6 @@ const VIVAPage = () => {
       id: "loop",
       desktop: "/viva/hero-loop-desktop.mp4",
       mobile:  "/viva/hero-loop-mobile.mp4",
-      poster:  "/viva/hero-loop-poster.jpg",
       // Two figures side by side in a wide frame — anchoring to the top would
       // crop the pair off at the knee, so this one holds the middle.
       focus:   "center 42%",
@@ -205,7 +204,6 @@ const VIVAPage = () => {
       id: "product",
       desktop: "/viva/hero-product-desktop.mp4",
       mobile:  "/viva/hero-product-mobile.mp4",
-      poster:  "/viva/hero-product-poster.jpg",
       // A close portrait: keep the face and the printed tee in frame.
       focus:   "center 22%",
       alt: "Model wearing the Daughters of Adonai graphic tee from the Batya Collection",
@@ -215,6 +213,9 @@ const VIVAPage = () => {
   const HERO_HOLD_MS = 10000;  // two complete 5s loops per clip
   const FILM_FADE_MS = 900;    // handover length; drives both the CSS fade and the park timer
   const [heroFilmIndex, setHeroFilmIndex] = useState(0);
+  // A film only reveals once it reports it can play. Until then the base plate
+  // shows through, which is the whole point on an unreliable connection.
+  const [filmsReady, setFilmsReady] = useState<boolean[]>(() => HERO_FILMS.map(() => false));
 
   // Breakpoint match drives which cut we mount, so only the active viewport's
   // file is ever fetched — the hidden one must not cost the visitor bandwidth.
@@ -304,6 +305,11 @@ const VIVAPage = () => {
     const timers: number[] = [];
     filmRefs.current.forEach((v, i) => {
       if (!v) return;
+      // A cached clip can reach HAVE_FUTURE_DATA before React attaches
+      // onCanPlay, which would strand it at opacity 0. Reconcile here.
+      if (v.readyState >= 3) {
+        setFilmsReady(r => (r[i] ? r : r.map((val, n) => (n === i ? true : val))));
+      }
       if (i === heroFilmIndex) {
         try { v.currentTime = 0; } catch { /* not seekable yet — harmless */ }
         // Slightly slower on mobile, where the film sits under the copy —
@@ -506,18 +512,57 @@ const VIVAPage = () => {
         <div
           className="absolute inset-0 md:inset-y-0 md:left-auto md:right-0 md:w-[46%]"
           style={{ overflow: "hidden", background: BURGUNDY }}
-          aria-hidden="true"
         >
+          {/* ── BASE PLATE ───────────────────────────────────────────────
+              A real element, not a poster attribute. The films sit on top of
+              it and fade in only once they can play, so on a slow or failing
+              connection this is simply what the hero is — never a blank panel.
+              At 50KB / 19KB it paints long before any film could.
+
+              This is also the layer that carries the accessible description:
+              the films above are decorative duplicates and are hidden from
+              assistive tech. */}
+          <img
+            src="/viva/hero-fallback-1664.webp"
+            srcSet="/viva/hero-fallback-900.webp 900w, /viva/hero-fallback-1664.webp 1664w"
+            sizes="(min-width: 768px) 46vw, 100vw"
+            alt="Two models in the Batya Collection — a pink woven kimono top and an olive striped kimono top, both with wide-leg pleated denim and gold jewellery."
+            fetchPriority="high"
+            decoding="async"
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              // Anchored a little above centre so both figures stay in frame
+              // when the wide plate is cropped into a tall panel.
+              objectPosition: "center 38%",
+              display: "block",
+              filter: isDesktop ? "none" : "saturate(0.88) brightness(0.86) contrast(1.04)",
+            }}
+            onError={e => {
+              // Last resort: if even the plate fails, fall back to the JPEG
+              // rather than exposing burgundy with a broken-image glyph.
+              const img = e.currentTarget;
+              if (!img.dataset.fallbackTried) {
+                img.dataset.fallbackTried = "1";
+                img.srcset = "";
+                img.src = "/viva/hero-fallback.jpg";
+              }
+            }}
+          />
+
           {HERO_FILMS.map((film, i) => (
             <video
               key={film.id}
               ref={el => { filmRefs.current[i] = el; }}
               src={isDesktop ? film.desktop : film.mobile}
-              poster={film.poster}
               autoPlay={i === 0}
               muted
               loop
               playsInline
+              aria-hidden="true"
               preload={i === 0 ? "auto" : "metadata"}
               style={{
                 position: "absolute",
@@ -533,10 +578,14 @@ const VIVAPage = () => {
                 // pulled back a stop: it should carry the collection's mood,
                 // not compete with the words for attention.
                 filter: isDesktop ? "none" : "saturate(0.88) brightness(0.86) contrast(1.04)",
-                opacity: i === heroFilmIndex ? 1 : 0,
+                // Held back until the clip can actually play, so a stalled
+                // download shows the plate rather than a black rectangle.
+                opacity: i === heroFilmIndex && filmsReady[i] ? 1 : 0,
                 // Symmetric ease so neither clip dominates the dissolve
                 transition: reduced ? "none" : `opacity ${FILM_FADE_MS}ms cubic-bezier(0.45,0,0.55,1)`,
               }}
+              onCanPlay={() => setFilmsReady(r => (r[i] ? r : r.map((v, n) => (n === i ? true : v))))}
+              onError={() => setFilmsReady(r => (!r[i] ? r : r.map((v, n) => (n === i ? false : v))))}
             />
           ))}
 
