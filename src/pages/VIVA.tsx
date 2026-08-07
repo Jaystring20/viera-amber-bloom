@@ -226,6 +226,14 @@ const VIVAPage = () => {
 
   // Hero film carousel — art-directed sources, one per viewport class.
   // Each clip is a 5s loop; we hold for two full cycles so motion never cuts mid-gesture.
+  //
+  // focusDesktop and focusMobile are deliberately separate values, not one
+  // shared crop, because the two stages crop on opposite axes. Mobile is a
+  // narrow-tall container: a landscape source overflows sideways and crops
+  // left/right, so Y barely matters. Desktop is now full-bleed and typically
+  // wider than tall: the same source overflows vertically instead, and how
+  // severely depends on how wide the monitor is. A single Y value tuned for
+  // one axis is close to meaningless on the other — hence two numbers.
   const HERO_FILMS = [
     {
       id: "loop",
@@ -233,7 +241,13 @@ const VIVAPage = () => {
       mobile:  "/viva/hero-loop-mobile.mp4",
       // Two figures side by side in a wide frame — anchoring to the top would
       // crop the pair off at the knee, so this one holds the middle.
-      focus:   "center 42%",
+      focusMobile:  "center 42%",
+      // Full-bleed desktop crops top/bottom, more severely the wider the
+      // monitor. Biased toward the top (a *smaller* Y keeps more headroom
+      // visible) so both heads stay in frame from a 1280px laptop up to an
+      // ultrawide, at the cost of a little more leg cropped at the bottom —
+      // the cheaper thing to lose.
+      focusDesktop: "center 28%",
       alt: "Two models in the Batya Collection — pink and olive woven kimonos with wide-leg denim",
     },
     {
@@ -241,7 +255,15 @@ const VIVAPage = () => {
       desktop: "/viva/hero-product-desktop.mp4",
       mobile:  "/viva/hero-product-mobile.mp4",
       // A close portrait: keep the face and the printed tee in frame.
-      focus:   "center 22%",
+      focusMobile:  "center 22%",
+      // This is the close portrait that was previously reported cropping the
+      // model's head — a real risk here, since a portrait source in a wide
+      // full-bleed frame is cropped far more severely than it was in the old
+      // 46%-wide side panel. Anchored close to the top edge on purpose: the
+      // face is protected at essentially any desktop width, and what is
+      // sacrificed as the screen widens is the torso and the printed text
+      // lower on the sweater, which is the correct thing to give up first.
+      focusDesktop: "center 9%",
       alt: "Model wearing the Daughters of Adonai graphic tee from the Batya Collection",
     },
   ] as const;
@@ -271,6 +293,16 @@ const VIVAPage = () => {
       window.removeEventListener("resize", sync);
     };
   }, []);
+
+  // Pulled back a stop on both stages now that a garment sits directly
+  // behind the copy on every viewport, not just mobile: the film should
+  // carry the collection's mood without competing with the words for
+  // attention. Desktop gets a slightly lighter pull-back than mobile — more
+  // screen real estate means the scrim is doing comparatively less of the
+  // legibility work on its own.
+  const heroFilmFilter = isDesktop
+    ? "saturate(0.92) brightness(0.90) contrast(1.03)"
+    : "saturate(0.88) brightness(0.86) contrast(1.04)";
 
   // Shop state
   const [currency, setCurrency]           = useState<"NGN" | "USD">("NGN");
@@ -683,7 +715,13 @@ const VIVAPage = () => {
 
       {/* ═══════════════════════════════════════════════════════
           HERO — Responsive Luxury Editorial
-          Desktop: Asymmetric left-aligned on video | Mobile: Centered editorial
+          One composition on every viewport: full-bleed film behind
+          centered copy, held legible by a graded burgundy scrim. Desktop
+          previously split the frame — burgundy panel with left-aligned
+          text on one side, video confined to a 46% right column on the
+          other. That seam is gone; the film now covers the whole stage
+          and the copy sits centered on top of it, the same technique
+          mobile already used.
           ═══════════════════════════════════════════════════════ */}
       <section className="relative overflow-hidden" style={{
         minHeight: "clamp(680px, 100svh, 1000px)",
@@ -693,12 +731,11 @@ const VIVAPage = () => {
         justifyContent: "center",
       }}>
         {/* ── FILM STAGE ──────────────────────────────────────────────
-            One stage, geometry switched by CSS alone: full-bleed under
-            768px, right-hand panel above it. Both films stay mounted and
+            Full-bleed on every breakpoint. Both films stay mounted and
             crossfade on opacity — no presence choreography that can stall
             while a container is display:none, and never an empty stage. */}
         <div
-          className="absolute inset-0 md:inset-y-0 md:left-auto md:right-0 md:w-[46%]"
+          className="absolute inset-0"
           style={{ overflow: "hidden", background: BURGUNDY }}
         >
           {/* ── BASE PLATE ───────────────────────────────────────────────
@@ -713,7 +750,7 @@ const VIVAPage = () => {
           <img
             src="/viva/hero-fallback-1664.webp"
             srcSet="/viva/hero-fallback-900.webp 900w, /viva/hero-fallback-1664.webp 1664w"
-            sizes="(min-width: 768px) 46vw, 100vw"
+            sizes="100vw"
             alt="Two models in the Batya Collection — a pink woven kimono top and an olive striped kimono top, both with wide-leg pleated denim and gold jewellery."
             fetchPriority="high"
             decoding="async"
@@ -723,11 +760,12 @@ const VIVAPage = () => {
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              // Anchored a little above centre so both figures stay in frame
-              // when the wide plate is cropped into a tall panel.
-              objectPosition: "center 38%",
+              // Mirrors the loop film's desktop anchor (see HERO_FILMS) so the
+              // plate and the film it precedes crop the same way — no visible
+              // jump in framing the instant the video takes over.
+              objectPosition: isDesktop ? "center 28%" : "center 38%",
               display: "block",
-              filter: isDesktop ? "none" : "saturate(0.88) brightness(0.86) contrast(1.04)",
+              filter: heroFilmFilter,
             }}
             onError={e => {
               // Last resort: if even the plate fails, fall back to the JPEG
@@ -758,14 +796,11 @@ const VIVAPage = () => {
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
-                // Per-film anchor: a wide two-up and a close portrait cannot
-                // share one crop origin without one of them losing its subject.
-                objectPosition: film.focus,
+                // Per-film, per-viewport anchor — see the HERO_FILMS comment
+                // for why desktop and mobile cannot share one crop origin.
+                objectPosition: isDesktop ? film.focusDesktop : film.focusMobile,
                 display: "block",
-                // On mobile the film sits directly behind the copy, so it is
-                // pulled back a stop: it should carry the collection's mood,
-                // not compete with the words for attention.
-                filter: isDesktop ? "none" : "saturate(0.88) brightness(0.86) contrast(1.04)",
+                filter: heroFilmFilter,
                 // Held back until the clip can actually play, so a stalled
                 // download shows the plate rather than a black rectangle.
                 opacity: i === heroFilmIndex && filmsReady[i] ? 1 : 0,
@@ -805,42 +840,56 @@ const VIVAPage = () => {
             }}
           />
 
-          {/* Desktop seam — a cut, not a fade. The old 42% burgundy wash laid a
-              translucent film over the model; an editorial panel wants a clean
-              architectural edge. Only a 5% feather to stop the join aliasing. */}
+          {/* ── DESKTOP SCRIM ────────────────────────────────────────────
+              There is no seam left to protect — the film covers the whole
+              stage now, and the copy sits centered on top of it instead of
+              beside it in its own burgundy panel. That copy needs the same
+              guarantee mobile's scrim gives it: legible over whichever frame
+              of whichever film happens to be showing.
+
+              Mobile solves this with a gradient loaded toward the bottom,
+              because mobile copy is bottom-anchored. Desktop copy is
+              centered both ways, so the darkening is centered too: a
+              horizontal band across the vertical middle, symmetric top and
+              bottom, fading out toward both edges so the film still reads
+              as full-bleed rather than as a strip behind a dark bar. */}
           <div
             className="hidden md:block"
             style={{
               position: "absolute",
               inset: 0,
               background:
-                `linear-gradient(to right, rgba(110,0,37,0.55) 0%, rgba(110,0,37,0.12) 3%, rgba(110,0,37,0) 6%)`,
+                "linear-gradient(to bottom, rgba(110,0,37,0.16) 0%, rgba(110,0,37,0.10) 16%, rgba(110,0,37,0.30) 32%, rgba(110,0,37,0.60) 44%, rgba(110,0,37,0.68) 50%, rgba(110,0,37,0.60) 56%, rgba(110,0,37,0.30) 68%, rgba(110,0,37,0.10) 84%, rgba(110,0,37,0.16) 100%)",
               pointerEvents: "none",
             }}
           />
 
-          {/* Gold hairline — states the edge deliberately */}
+          {/* Desktop vignette — a soft ellipse centered on the text column,
+              closing the frame at the left/right edges too. Ultra-wide
+              monitors expose a lot of clear film either side of the copy;
+              this keeps that film present without letting its brightest
+              patch (the beige studio backdrop) fight the words in front
+              of it. */}
           <div
             className="hidden md:block"
             style={{
               position: "absolute",
-              top: 0,
-              bottom: 0,
-              left: 0,
-              width: 1,
-              background: `linear-gradient(to bottom, rgba(212,175,55,0) 0%, ${GOLD} 18%, ${GOLD} 82%, rgba(212,175,55,0) 100%)`,
-              opacity: 0.55,
+              inset: 0,
+              background:
+                "radial-gradient(62% 78% at 50% 50%, rgba(110,0,37,0.30) 0%, rgba(110,0,37,0.12) 55%, rgba(110,0,37,0) 82%)",
               pointerEvents: "none",
             }}
           />
         </div>
 
-        {/* Progress rail — which film is showing */}
+        {/* Progress rail — which film is showing, centered beneath the copy
+            now that the copy itself is centered rather than left-aligned. */}
         <div
           className="hidden md:flex absolute"
           style={{
             bottom: "clamp(32px, 4vw, 56px)",
-            left: "clamp(20px, 5vw, 80px)",
+            left: "50%",
+            transform: "translateX(-50%)",
             gap: 10,
             zIndex: 12,
           }}
@@ -1154,17 +1203,29 @@ const VIVAPage = () => {
             </motion.div>
           </div>
 
-          {/* DESKTOP LAYOUT: Left-aligned asymmetric — sits clear of the 46% film panel */}
-          <div className="hidden md:block" style={{ width: "50%", maxWidth: 680, minWidth: 300, paddingTop: "clamp(8px, 2vw, 30px)" }}>
+          {/* DESKTOP LAYOUT — centered editorial, the same technique as
+              mobile: full-bleed film behind, graded scrim for legibility,
+              copy centered on top. Previously this column sat left-aligned
+              at 50% width, positioned to clear the video panel that no
+              longer exists. Motion now runs on y like mobile's, not x —
+              text sliding in sideways reads oddly once it is centered
+              rather than pinned to an edge. */}
+          <div
+            className="hidden md:flex flex-col items-center text-center"
+            style={{
+              width: "100%",
+              maxWidth: "clamp(560px, 60vw, 800px)",
+              margin: "0 auto",
+              paddingTop: "clamp(8px, 2vw, 30px)",
+            }}
+          >
             {/* ── MASTHEAD LOCKUP ──────────────────────────────────────────
                 Wordmark, attribution and mantra read as one unit, bound by a
-                shared 0.34em tracking and tight leading. The wordmark was
-                previously set at 56px, which fought the 66px headline for the
-                eye; at masthead scale it introduces the brand and then hands
-                over cleanly to the collection below. */}
+                shared 0.34em tracking and tight leading, then hand over to
+                the collection below. */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.20, ease: "easeOut" }}
               style={{
                 fontFamily: CORMORANT,
@@ -1173,6 +1234,9 @@ const VIVAPage = () => {
                 letterSpacing: "0.34em",
                 lineHeight: 1,
                 color: GOLD,
+                // Optical centring: the trailing letterspace pushes the word
+                // left of true-center, same correction mobile's wordmark uses.
+                textIndent: "0.34em",
               }}
             >
               VIVA
@@ -1180,8 +1244,8 @@ const VIVAPage = () => {
 
             {/* Attribution — same tracking as the wordmark locks the pair together */}
             <motion.p
-              initial={{ opacity: 0, x: -18 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.75, delay: 0.27, ease: "easeOut" }}
               style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
@@ -1205,14 +1269,14 @@ const VIVAPage = () => {
                 height: 1,
                 background: GOLD,
                 opacity: 0.42,
-                margin: "16px 0",
+                margin: "16px auto",
               }}
             />
 
             {/* Mantra — closes the lockup */}
             <motion.p
-              initial={{ opacity: 0, x: -18 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.39, ease: "easeOut" }}
               style={{
                 fontFamily: CORMORANT,
@@ -1232,8 +1296,8 @@ const VIVAPage = () => {
                 from collection, so the two groups read as related but distinct
                 rather than as one undifferentiated list of lines. */}
             <motion.p
-              initial={{ opacity: 0, x: -18 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.75, delay: 0.48, ease: "easeOut" }}
               style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
@@ -1252,12 +1316,12 @@ const VIVAPage = () => {
                 into a 148px "Batya" with "Daughters of Adonai" set beneath it
                 as a separate line, which read as two unrelated titles. */}
             <motion.h1
-              initial={{ opacity: 0, y: 40 }}
+              initial={{ opacity: 0, y: 32 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.56, ease: [0.12, 0.72, 0.48, 1] }}
               style={{
                 fontFamily: CORMORANT,
-                fontSize: "clamp(38px, 4.3vw, 66px)",
+                fontSize: "clamp(40px, 5vw, 74px)",
                 fontWeight: 300,
                 lineHeight: 1.06,
                 color: "#FFFFFF",
@@ -1271,7 +1335,7 @@ const VIVAPage = () => {
 
             {/* Description */}
             <motion.p
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.85, delay: 0.66, ease: "easeOut" }}
               style={{
@@ -1279,8 +1343,8 @@ const VIVAPage = () => {
                 fontSize: "clamp(14px, 1.1vw, 17px)",
                 fontWeight: 400,
                 lineHeight: 1.75,
-                color: "rgba(255, 255, 255, 0.82)",
-                margin: 0,
+                color: "rgba(255, 255, 255, 0.85)",
+                margin: "0 auto",
                 marginBottom: "clamp(28px, 3.2vw, 44px)",
                 maxWidth: "46ch",
               }}
@@ -1290,10 +1354,10 @@ const VIVAPage = () => {
 
             {/* Desktop CTA Buttons */}
             <motion.div
-              initial={{ opacity: 0, y: 28 }}
+              initial={{ opacity: 0, y: 22 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.74 }}
-              className="flex flex-col sm:flex-row gap-4 sm:gap-5"
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5"
             >
               <a href="#viva-shop" style={{ textDecoration: "none" }}>
                 <motion.button
