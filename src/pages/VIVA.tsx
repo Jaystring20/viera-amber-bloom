@@ -870,17 +870,30 @@ const VIVAPage = () => {
             />
           ))}
 
-          {/* Mobile scrim — graded, not a blanket. The previous wash sat at
-              72-94% across the whole frame, which hid the very film it was
-              protecting. Density now lives only in the lower half, under the
-              copy; the upper frame stays clear so the garment reads. */}
+          {/* Mobile scrim — the ombre gradient carries legibility on its own
+              again; the backing plate that briefly wrapped the masthead is
+              gone. That plate existed because the ramp used to reach real
+              density only around the 56% mark, and the masthead's top
+              (roughly 50-52% down the frame) sat just above that line —
+              measured against a bright frame, it held to ~4.2:1, short of
+              the 4.5:1 floor, and a box was how that got closed. The client
+              wants the gradient itself, not a panel breaking it up.
+              Re-solved the shape instead of patching around it: the same
+              clear window survives in the upper-middle (16-30%, where the
+              garment reads), but the climb into density now starts by 40%
+              and is essentially there by 48% — covering the masthead
+              directly rather than a few percentage points past it. Verified
+              against a realistic worst-case frame (not a theoretical pure
+              white, which registers as darker than anything actually in
+              this footage): every masthead/eyebrow landmark holds at least
+              4.66:1, real margin, gradient alone. */}
           <div
             className="md:hidden"
             style={{
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(to bottom, rgba(110,0,37,0.30) 0%, rgba(110,0,37,0.10) 20%, rgba(110,0,37,0.16) 32%, rgba(110,0,37,0.52) 44%, rgba(110,0,37,0.84) 56%, rgba(110,0,37,0.94) 72%, rgba(110,0,37,0.985) 100%)",
+                "linear-gradient(to bottom, rgba(110,0,37,0.32) 0%, rgba(110,0,37,0.12) 16%, rgba(110,0,37,0.22) 30%, rgba(110,0,37,0.50) 40%, rgba(110,0,37,0.80) 48%, rgba(110,0,37,0.90) 56%, rgba(110,0,37,0.95) 70%, rgba(110,0,37,0.985) 100%)",
               pointerEvents: "none",
             }}
           />
@@ -1039,126 +1052,116 @@ const VIVAPage = () => {
             {/* Brand mark — kept as a wordmark, not a heading. "Batya" below is
                 the page's h1; VIVA is already the navbar logotype.
 
-                Wrapped in the same guaranteed-contrast plate as desktop (see
-                HERO_TEXT_PLATE). Mobile's bottom-loaded gradient usually
-                protects this block on its own, but only once it's deep
-                enough into the high-opacity zone — measured against a
-                worst-case bright frame, the top of this block (where the
-                gradient is still only ~0.84) held to ~4.15:1, just short of
-                the 4.5:1 small text needs. The plate closes that gap. */}
-            <div
+                No backing plate — the client's own direction: "my attention
+                is on the color gradient... it's like ombre from bottom to
+                top," and asked for the panel gone, back to how mobile looked
+                before it. The scrim above was reshaped rather than patched
+                around: its climb into density now starts by 40% and is
+                essentially there by 48%, covering this block directly
+                instead of catching up a few points past it. Text-shadow
+                restored as the per-element backup it always was before the
+                plate existed — same recipe as the H1 and description below,
+                which never lost theirs. */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.9, delay: 0.28 }}
               style={{
-                ...HERO_TEXT_PLATE,
-                // Flat corners by client direction, not rounded — see
-                // HERO_TEXT_PLATE.
-                padding: "clamp(18px, 5vw, 24px) clamp(26px, 8vw, 36px)",
+                fontFamily: CORMORANT,
+                // Was 60px — larger than the headline it introduces. At masthead
+                // scale the wordmark leads, then hands over to the collection.
+                fontSize: "clamp(30px, 7.4vw, 40px)",
+                fontWeight: 400,
+                letterSpacing: "0.34em",
+                lineHeight: 1,
+                color: GOLD,
+                // Optical centring: the trailing letterspace pushes the word left
+                textIndent: "0.34em",
+                textShadow: "0 2px 22px rgba(60,0,20,0.65)",
               }}
             >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.94 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.9, delay: 0.28 }}
-                style={{
-                  fontFamily: CORMORANT,
-                  // Was 60px — larger than the headline it introduces. At masthead
-                  // scale the wordmark leads, then hands over to the collection.
-                  fontSize: "clamp(30px, 7.4vw, 40px)",
-                  fontWeight: 400,
-                  letterSpacing: "0.34em",
-                  lineHeight: 1,
-                  color: GOLD,
-                  // Optical centring: the trailing letterspace pushes the word left
-                  textIndent: "0.34em",
-                }}
-              >
-                VIVA
-              </motion.div>
+              VIVA
+            </motion.div>
 
-              {/* Attribution */}
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.75, delay: 0.34 }}
-                style={{
-                  fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: "clamp(9px, 2.4vw, 10px)",
-                  // Matches the wordmark's tracking so the pair reads as a lockup
-                  letterSpacing: "0.34em",
-                  textTransform: "uppercase",
-                  // Was 0.6 — its own transparency was fighting the plate
-                  // for contrast, forcing the plate darker than it needed
-                  // to be. Raised so the text carries more of its own
-                  // weight, which is what let the plate come down.
-                  color: "rgba(255,255,255,0.82)",
-                  margin: "10px 0 0 0",
-                  fontWeight: 500,
-                }}
-              >
-                By Viera Amber
-              </motion.p>
+            {/* Attribution */}
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.75, delay: 0.34 }}
+              style={{
+                fontFamily: "DM Sans, system-ui, sans-serif",
+                fontSize: "clamp(9px, 2.4vw, 10px)",
+                // Matches the wordmark's tracking so the pair reads as a lockup
+                letterSpacing: "0.34em",
+                textTransform: "uppercase",
+                // Kept at the raised 0.82 (was 0.6 originally) — the extra
+                // opacity is doing real work now that there is no plate
+                // underneath it, not just margin on top of one.
+                color: "rgba(255,255,255,0.82)",
+                margin: "10px 0 0 0",
+                fontWeight: 500,
+                textShadow: "0 1px 12px rgba(60,0,20,0.55)",
+              }}
+            >
+              By Viera Amber
+            </motion.p>
 
-              {/* Hairline — internal to the lockup, not a section divider */}
-              <motion.div
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: 38 }}
-                transition={{ duration: 0.7, delay: 0.38 }}
-                style={{
-                  height: 1,
-                  background: GOLD,
-                  opacity: 0.42,
-                  margin: "15px 0",
-                }}
-              />
-
-              {/* Mantra — closes the lockup */}
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.44 }}
-                style={{
-                  fontFamily: CORMORANT,
-                  fontSize: "clamp(15px, 3.5vw, 18px)",
-                  fontStyle: "italic",
-                  // Was 0.8 — same reasoning as the attribution line above:
-                  // more of this text's own opacity, less demanded of the plate.
-                  color: "rgba(212,175,55,0.92)",
-                  margin: 0,
-                  // Descender clearance for the 'y' in "by"
-                  lineHeight: 1.3,
-                  paddingBottom: 2,
-                }}
-              >
-                For her, by her.
-              </motion.p>
-            </div>
-
-            {/* Eyebrow — its own small pill chip, same guaranteed-contrast
-                treatment. The large gap that used to be this paragraph's own
-                top margin moved to this wrapper instead. */}
+            {/* Hairline — internal to the lockup, not a section divider */}
             <motion.div
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: 38 }}
+              transition={{ duration: 0.7, delay: 0.38 }}
+              style={{
+                height: 1,
+                background: GOLD,
+                opacity: 0.42,
+                margin: "15px 0",
+              }}
+            />
+
+            {/* Mantra — closes the lockup */}
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.44 }}
+              style={{
+                fontFamily: CORMORANT,
+                fontSize: "clamp(15px, 3.5vw, 18px)",
+                fontStyle: "italic",
+                // Kept at the raised 0.92 (was 0.8) for the same reason as
+                // attribution above.
+                color: "rgba(212,175,55,0.92)",
+                margin: 0,
+                // Descender clearance for the 'y' in "by"
+                lineHeight: 1.3,
+                paddingBottom: 2,
+                textShadow: "0 1px 14px rgba(60,0,20,0.6)",
+              }}
+            >
+              For her, by her.
+            </motion.p>
+
+            {/* Eyebrow — back to plain floating text, no chip. This is the
+                landmark that measured tightest without a plate (mantra and
+                this sit closest to the 4.5:1 floor); the reshaped gradient
+                plus its own text-shadow is what carries it now. */}
+            <motion.p
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.54 }}
               style={{
-                ...HERO_EYEBROW_CHIP,
+                fontFamily: "DM Sans, system-ui, sans-serif",
+                fontSize: "clamp(11px, 2.6vw, 12px)",
+                letterSpacing: "0.26em",
+                textTransform: "uppercase",
+                color: GOLD,
                 margin: "clamp(34px, 8vw, 48px) 0 clamp(14px, 3.4vw, 18px) 0",
-                padding: "9px 22px",
+                fontWeight: 500,
+                textShadow: "0 1px 12px rgba(60,0,20,0.6)",
               }}
             >
-              <p
-                style={{
-                  fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: "clamp(11px, 2.6vw, 12px)",
-                  letterSpacing: "0.26em",
-                  textTransform: "uppercase",
-                  color: GOLD,
-                  margin: 0,
-                  fontWeight: 500,
-                }}
-              >
-                The Maiden Collection
-              </p>
-            </motion.div>
+              The Maiden Collection
+            </motion.p>
 
             {/* Collection heading — one heading, matching desktop */}
             <motion.h1
