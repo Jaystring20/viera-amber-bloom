@@ -47,8 +47,13 @@ const BAND = "rgba(255,255,255,0.90)";
    the hat brim, so the geometry rhymes with the photograph instead of fighting
    it. Both values scale with the viewport so the arch keeps its proportion on
    a phone rather than flattening into a generic radius. */
-const ARCH_TOP = "clamp(52px, 7vw, 104px)";
-const ARCH_BOTTOM = "clamp(14px, 2vw, 26px)";
+// Flat by client direction — the arch shape (52-104px top, 14-26px bottom
+// radius) described above was superseded by a site-wide flat-corner rule
+// applied first to the VIVA hero's masthead plate; this card carries the
+// same rule now. Left as named constants rather than deleted so the
+// original arch rationale stays on record if it's ever revisited.
+const ARCH_TOP = "0px";
+const ARCH_BOTTOM = "0px";
 
 /* NO MASK. Every previous pass feathered the left and right terminations —
    7%, then 4% — and every one of them read as bleed, because a gradient edge

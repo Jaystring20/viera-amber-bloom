@@ -257,7 +257,9 @@ const VAGINSection = () => {
               alignItems: "center",
               justifyContent: "center",
               padding: "24px 42px",
-              borderRadius: 28,
+              // Flat by client direction — same rule applied to the VIVA
+              // masthead plate and the homepage hero's arch card.
+              borderRadius: 0,
               background: "linear-gradient(135deg, #62017F 0%, #6B2C91 50%, #ED155D 100%)",
               boxShadow: "0 24px 64px rgba(98,1,127,0.24), 0 0 0 1px rgba(237,21,93,0.2)",
             }}
