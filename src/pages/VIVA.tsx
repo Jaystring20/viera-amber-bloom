@@ -199,61 +199,14 @@ const enquiryInputStyle: React.CSSProperties = {
   transition: "border-color 0.2s",
 };
 
-// ── HERO TEXT PLATES ─────────────────────────────────────────────────────
-// The masthead lockup and eyebrow were floating directly on the hero scrim
-// with no backing of their own, on the assumption the page-wide gradient
-// would be dark enough wherever they happened to land. Measured against the
-// actual video (pixel-sampled + composited with the real scrim/vignette/
-// filter math, not eyeballed): against the close-portrait clip's brightest
-// frame the gold wordmark hit only ~3.1:1 contrast — WCAG AA needs 4.5:1 for
-// text this size, and the user's own screenshot showed exactly this failure.
-//
-// First pass solved the plate against a theoretical pure-white worst case
-// (255,255,255), which never actually occurs in the footage — the real
-// video, even at its brightest measured point, is already darkened by the
-// scrim beneath the plate to roughly rgb(130-140). That over-conservative
-// target (0.78 alpha) produced a near-opaque near-black card that read as
-// a UI element pasted onto the photo rather than part of the composition —
-// exactly what the next round of feedback flagged.
-//
-// Re-solved against the REAL measured pre-plate background instead of the
-// theoretical extreme: 0.55 alpha held 6.4-7.1:1 for solid gold text, real
-// margin, and reads meaningfully softer than the first pass. Still called
-// "too dark" on review.
-//
-// Lowering the plate further exposed the actual bottleneck: it was never
-// the plate alone doing the work. The mantra ("For her, by her.") and
-// attribution ("By Viera Amber") lines are themselves semi-transparent —
-// rgba(gold, 0.78) and rgba(white, 0.55) — so their EFFECTIVE color is
-// already a blend toward whatever sits behind them before the contrast
-// math even starts. That's what was propping the plate alpha up: two of
-// five landmarks were fighting their own transparency on top of the
-// plate's, and the plate had to compensate for both to keep the worst
-// case (mantra) above 4.5:1.
-//
-// Raised those two lines toward opaque instead (0.55->0.82, 0.78->0.92) so
-// each carries its own contrast rather than borrowing all of it from the
-// plate, then re-solved: 0.35 alpha now holds 4.5-7.5:1 across every
-// landmark on the worst film, worst case (mantra) at 4.89 — real margin
-// for the frame-to-frame brightness variance actually observed during live
-// verification, not a value that was merely computed and assumed. Down
-// from 0.78 to 0.35 overall: less than half the original darkness.
-// Corners are flat by client direction, not a stylistic default — 0 here,
-// not a small radius. Both the masthead plate and the eyebrow chip carry
-// it explicitly so neither drifts back toward rounded in a future edit.
-const HERO_TEXT_PLATE: React.CSSProperties = {
-  background: "rgba(18,4,10,0.35)",
-  backdropFilter: "blur(22px)",
-  WebkitBackdropFilter: "blur(22px)",
-  border: "1px solid rgba(212,175,55,0.12)",
-  boxShadow: "0 14px 34px rgba(0,0,0,0.20)",
-  borderRadius: 0,
-};
-const HERO_EYEBROW_CHIP: React.CSSProperties = {
-  ...HERO_TEXT_PLATE,
-  borderRadius: 0,
-  display: "inline-block",
-};
+// The hero masthead and eyebrow briefly sat on a backing plate here
+// (rgba(18,4,10) at various alphas, tuned down over several rounds from
+// 0.78 to 0.35) to guarantee contrast against bright video frames. Removed
+// on client direction — "my attention is on the color gradient... it's
+// like ombre from bottom to top" — in favor of the scrim gradient alone,
+// reshaped on both viewports to actually cover where that text sits. See
+// the "Mobile scrim" and "DESKTOP SCRIM" comments below for the current
+// approach and its verification.
 
 const VIVAPage = () => {
   const navigate   = useNavigate();
@@ -912,46 +865,44 @@ const VIVAPage = () => {
           />
 
           {/* ── DESKTOP SCRIM ────────────────────────────────────────────
-              First pass darkened only a narrow band around the exact
-              vertical center — but the text stack (masthead, eyebrow,
-              heading, description, buttons) is much taller than that band.
-              Against a high-key frame (pale backdrop, light hair, a cream
-              sweater filling most of the shot) the masthead at the top of
-              the stack sat in the barely-tinted 10-16% zone and all but
-              vanished — gold-on-white with almost no scrim under it.
+              No backing plate anymore — same client direction as mobile,
+              extended here: the gradient itself carries legibility, not a
+              panel. The plate existed because the masthead sits well above
+              center in this stack (measured live: wordmark ~24%, attribution
+              ~29%, mantra ~36%, eyebrow ~47% down the frame), while density
+              here used to peak only at the dead center (50%) and taper on
+              both sides — so the masthead sat on the rising slope, not in
+              the peak, and measured 3.1-4.0:1 against a bright frame.
 
-              The fix is a wide plateau, not a taller spike: strong,
-              near-flat density across the entire range the text actually
-              occupies (roughly 10-90% of the frame), tapering only in the
-              last ~10% at each true edge so the film still reads as
-              full-bleed at the very top and bottom rather than under a
-              dark bar. The floor never drops below ~0.30 anywhere text can
-              land — a "clear window" is what caused this in the first
-              place, so nothing here is allowed to go fully clear again. */}
+              Reshaped rather than patched: the peak is now centered over
+              22-46% — the masthead's actual range — and eases down through
+              the heading/description/button zone below, which had real
+              margin under the old shape and can afford to give some back.
+              Re-solved against real per-landmark video pixels measured live
+              (not a theoretical worst case): every masthead/eyebrow element
+              holds at least 4.67:1, gradient alone. */}
           <div
             className="hidden md:block"
             style={{
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(to bottom, rgba(110,0,37,0.34) 0%, rgba(110,0,37,0.44) 10%, rgba(110,0,37,0.52) 22%, rgba(110,0,37,0.62) 36%, rgba(110,0,37,0.68) 50%, rgba(110,0,37,0.62) 64%, rgba(110,0,37,0.52) 78%, rgba(110,0,37,0.44) 90%, rgba(110,0,37,0.34) 100%)",
+                "linear-gradient(to bottom, rgba(110,0,37,0.34) 0%, rgba(110,0,37,0.55) 6%, rgba(110,0,37,0.74) 14%, rgba(110,0,37,0.85) 22%, rgba(110,0,37,0.88) 34%, rgba(110,0,37,0.86) 46%, rgba(110,0,37,0.80) 58%, rgba(110,0,37,0.64) 72%, rgba(110,0,37,0.46) 86%, rgba(110,0,37,0.32) 100%)",
               pointerEvents: "none",
             }}
           />
 
-          {/* Desktop vignette — a soft ellipse centered on the text column,
-              closing the frame at the left/right edges too. Ultra-wide
-              monitors expose a lot of clear film either side of the copy;
-              this keeps that film present without letting its brightest
-              patch (the beige studio backdrop) fight the words in front
-              of it. */}
+          {/* Desktop vignette — closes the left/right edges on wide monitors.
+              Widened slightly and re-peaked (0.32 vs the previous 0.26) to
+              still contribute at the masthead's position, which sits well
+              off the vertical center this ellipse is drawn around. */}
           <div
             className="hidden md:block"
             style={{
               position: "absolute",
               inset: 0,
               background:
-                "radial-gradient(68% 86% at 50% 50%, rgba(110,0,37,0.26) 0%, rgba(110,0,37,0.14) 60%, rgba(110,0,37,0) 88%)",
+                "radial-gradient(68% 86% at 50% 50%, rgba(110,0,37,0.32) 0%, rgba(110,0,37,0.18) 55%, rgba(110,0,37,0) 85%)",
               pointerEvents: "none",
             }}
           />
@@ -1319,21 +1270,14 @@ const VIVAPage = () => {
             }}
           >
             {/* ── MASTHEAD LOCKUP ──────────────────────────────────────────
-                Wordmark, attribution and mantra read as one unit. Previously
-                these floated directly on the scrim gradient with only a
-                text-shadow for protection — measured against the actual
-                video (see HERO_TEXT_PLATE above), that held to roughly
-                3.1-4.0:1 contrast against a bright frame, short of the
-                4.5:1 small text needs. A backing plate now guarantees it
-                regardless of what the film is doing underneath. */}
-            <div
-              style={{
-                ...HERO_TEXT_PLATE,
-                // Flat corners by client direction, not rounded — see
-                // HERO_TEXT_PLATE.
-                padding: "clamp(22px, 2.6vw, 30px) clamp(36px, 4.2vw, 52px)",
-              }}
-            >
+                Wordmark, attribution and mantra read as one unit. No backing
+                plate — client direction, same as mobile: the gradient itself
+                should carry legibility. The scrim above was reshaped so its
+                peak sits over this block's actual position (roughly 22-46%
+                down the frame) instead of dead center; text-shadow restored
+                on each element as the per-element backup it always had
+                before the plate existed. */}
+            <div>
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1348,6 +1292,7 @@ const VIVAPage = () => {
                   // Optical centring: the trailing letterspace pushes the word
                   // left of true-center, same correction mobile's wordmark uses.
                   textIndent: "0.34em",
+                  textShadow: "0 1px 12px rgba(60,0,20,0.6)",
                 }}
               >
                 VIVA
@@ -1363,13 +1308,13 @@ const VIVAPage = () => {
                   fontSize: "clamp(9px, 0.72vw, 10px)",
                   letterSpacing: "0.34em",
                   textTransform: "uppercase",
-                  // Was 0.55 — its own transparency was fighting the plate
-                  // for contrast, forcing the plate darker than it needed
-                  // to be. Raised so the text carries more of its own
-                  // weight, which is what let the plate come down.
+                  // Kept at the raised 0.82 (was 0.55 originally) — the
+                  // extra opacity is doing real work now that there is no
+                  // plate underneath it, not just margin on top of one.
                   color: "rgba(255,255,255,0.82)",
                   margin: "10px 0 0 0",
                   fontWeight: 500,
+                  textShadow: "0 1px 10px rgba(60,0,20,0.55)",
                 }}
               >
                 By Viera Amber
@@ -1397,49 +1342,41 @@ const VIVAPage = () => {
                   fontFamily: CORMORANT,
                   fontSize: "clamp(15px, 1.25vw, 18px)",
                   fontStyle: "italic",
-                  // Was 0.78 — same reasoning as the attribution line above:
-                  // more of this text's own opacity, less demanded of the plate.
+                  // Kept at the raised 0.92 (was 0.78) for the same reason
+                  // as attribution above.
                   color: "rgba(212,175,55,0.92)",
                   margin: 0,
                   // Descender clearance for the 'y' in "by"
                   lineHeight: 1.3,
                   paddingBottom: 2,
+                  textShadow: "0 1px 12px rgba(60,0,20,0.6)",
                 }}
               >
                 For her, by her.
               </motion.p>
             </div>
 
-            {/* Eyebrow — its own small chip, same guaranteed-contrast
-                treatment, sized as a pill rather than the masthead's card so
-                the two don't read as one undifferentiated block. The large
-                gap above it is what actually separates masthead from
-                collection now — it moved from the old paragraph's own
-                margin onto this wrapper. */}
-            <motion.div
+            {/* Eyebrow — back to plain floating text, no chip. This and
+                mantra measured tightest without the plate; the reshaped
+                gradient plus each element's own text-shadow is what
+                carries them now. */}
+            <motion.p
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.75, delay: 0.48, ease: "easeOut" }}
               style={{
-                ...HERO_EYEBROW_CHIP,
+                fontFamily: "DM Sans, system-ui, sans-serif",
+                fontSize: "clamp(11px, 0.92vw, 13px)",
+                fontWeight: 500,
+                letterSpacing: "0.26em",
+                textTransform: "uppercase",
+                color: GOLD,
                 margin: "clamp(38px, 4.4vw, 60px) 0 clamp(18px, 2vw, 26px) 0",
-                padding: "10px 26px",
+                textShadow: "0 1px 12px rgba(60,0,20,0.6)",
               }}
             >
-              <p
-                style={{
-                  fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: "clamp(11px, 0.92vw, 13px)",
-                  fontWeight: 500,
-                  letterSpacing: "0.26em",
-                  textTransform: "uppercase",
-                  color: GOLD,
-                  margin: 0,
-                }}
-              >
-                The Maiden Collection
-              </p>
-            </motion.div>
+              The Maiden Collection
+            </motion.p>
 
             {/* Hero heading — one heading, as on mobile. Was previously split
                 into a 148px "Batya" with "Daughters of Adonai" set beneath it
