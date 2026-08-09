@@ -538,8 +538,6 @@ const EcosystemCard = ({
   onHoverChange?: (isHovered: boolean) => void;
   index?: number;
 }) => {
-  const { Icon } = arm;
-
   return (
     <motion.div
       onClick={() => onActivate(arm.target)}
@@ -614,28 +612,8 @@ const EcosystemCard = ({
         </p>
       </div>
 
-      {/* Icon badge (echoes the node) — positioned top-right */}
-      <motion.div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          top: 48,
-          right: 24,
-          width: 56,
-          height: 56,
-          borderRadius: "50%",
-          backgroundColor: arm.accent,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          boxShadow: `0 4px 16px ${arm.accent}33`,
-          opacity: 0.8,
-        }}
-        animate={{ opacity: isHovered ? 1 : 0.6, scale: isHovered ? 1.1 : 1 }}
-        transition={{ duration: 0.3 }}
-      >
-        <Icon size={28} color="#FFFFFF" strokeWidth={2} />
-      </motion.div>
+      {/* Icon badge removed — it duplicated the icon already shown on this
+          card's node in the ecosystem map above, per client direction. */}
 
       {/* Title */}
       <h3

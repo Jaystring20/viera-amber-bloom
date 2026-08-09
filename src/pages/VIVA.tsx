@@ -1308,28 +1308,28 @@ const VIVAPage = () => {
                 transition={{ duration: 0.8, delay: 0.20, ease: "easeOut" }}
                 style={{
                   fontFamily: CORMORANT,
-                  fontSize: "clamp(24px, 2.2vw, 32px)",
-                  fontWeight: 400,
+                  // Enlarged and set genuinely bold — Cormorant Garamond 700
+                  // is one of the weights actually loaded (index.html), not
+                  // a browser-faked bold, so this is real ink weight, not
+                  // just a bigger version of the thin 400 cut.
+                  fontSize: "clamp(34px, 3.2vw, 48px)",
+                  fontWeight: 700,
                   letterSpacing: "0.34em",
                   lineHeight: 1,
                   color: GOLD,
                   // Optical centring: the trailing letterspace pushes the word
                   // left of true-center, same correction mobile's wordmark uses.
                   textIndent: "0.34em",
-                  // First pass (14px blur, 0.6px stroke) went soft on a
-                  // dark frame — fixed by tightening both. That then
-                  // undercorrected against a bright frame: 0.35px is thin
-                  // enough to nearly disappear once there's no burgundy
-                  // left to contrast against, which is most of this frame
-                  // now that the scrim is intentionally light. Two-layer
-                  // shadow: a tight one for a crisp edge (does the work on
-                  // a dark frame, matches what already looked right there)
-                  // plus a wider, low-opacity one that only becomes visible
-                  // once the background is genuinely bright — it is nearly
-                  // invisible layered on a dark frame, so it should not
-                  // reintroduce the haze, only cover the case that broke.
-                  WebkitTextStroke: "0.55px rgba(30,0,8,0.8)",
-                  textShadow: "0 1px 2px rgba(30,0,8,0.75), 0 0 10px rgba(30,0,8,0.42)",
+                  // The two-layer shadow from the last round fixed bright-frame
+                  // legibility but overcorrected — reported as "dark shadows,
+                  // not bright and bold." Bold, larger letterforms carry far
+                  // more of their own visual weight than the thin 400 cut did,
+                  // so they need less shadow doing the work: both layers eased
+                  // back (tight 0.75->0.55, wide 0.42->0.28 alpha; wide blur
+                  // 10px->6px) rather than removed outright, so some bright-
+                  // frame insurance survives without the letters reading dim.
+                  WebkitTextStroke: "0.5px rgba(30,0,8,0.55)",
+                  textShadow: "0 1px 2px rgba(30,0,8,0.55), 0 0 6px rgba(30,0,8,0.28)",
                 }}
               >
                 VIVA
