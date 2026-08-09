@@ -3,6 +3,7 @@ import { motion, useInView, useReducedMotion, AnimatePresence } from "framer-mot
 import { ArrowLeft, Send, ShoppingBag, X, Plus, Minus, MessageCircle, Sparkles, Upload, AlertCircle, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "@/components/NavBar";
+import VivaLaunchModal from "@/components/VivaLaunchModal";
 import { fadeIn, fadeSlideUp, staggerContainer, cardItem, scaleXRule, inViewProps, useReducedVariants } from "@/lib/animations";
 import { supabase } from "@/lib/supabase";
 import { useProducts, type Product } from "@/hooks/useProducts";
@@ -723,6 +724,7 @@ const VIVAPage = () => {
   return (
     <div style={{ backgroundColor: "#FAFAFA", minHeight: "100vh" }}>
       <NavBar />
+      <VivaLaunchModal />
 
       {/* ═══════════════════════════════════════════════════════
           HERO — Responsive Luxury Editorial

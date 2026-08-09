@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
-import logoSrc from "@/assets/viera-amber-logo.png";
+import logoSrc from "@/assets/viera-amber-logo-dark.png";
 
 /* ════════════════════════════════════════════════════════════════════════
    HERO — Jacqueline, masthead band
@@ -341,7 +341,6 @@ const HeroSection = () => {
                   width: "clamp(172px, 30vw, 420px)",
                   height: "auto",
                   display: "block",
-                  filter: "brightness(0) saturate(0)",
                 }}
               />
             </motion.h1>
