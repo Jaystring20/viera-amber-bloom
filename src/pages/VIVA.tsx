@@ -1342,7 +1342,8 @@ const VIVAPage = () => {
                 transition={{ duration: 0.75, delay: 0.27, ease: "easeOut" }}
                 style={{
                   fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: "clamp(9px, 0.72vw, 10px)",
+                  // Same ~1.4x expansion as the wordmark.
+                  fontSize: "clamp(13px, 1.05vw, 15px)",
                   letterSpacing: "0.34em",
                   textTransform: "uppercase",
                   // Kept at the raised 0.82 (was 0.55 originally) — the
@@ -1350,8 +1351,12 @@ const VIVAPage = () => {
                   // plate underneath it, not just margin on top of one.
                   color: "rgba(255,255,255,0.82)",
                   margin: "10px 0 0 0",
+                  // Already the heaviest DM Sans cut this project loads
+                  // (300/400/500 only, per index.html) — no bolder weight
+                  // to move to without a synthetic-bold browser fallback,
+                  // so the size increase is carrying this one alone.
                   fontWeight: 500,
-                  // Thinner than the wordmark's stroke — at 9-10px a
+                  // Thinner than the wordmark's stroke — at this size a
                   // heavier outline reads as a blob — but same two-layer
                   // shadow fix: this line went the softest of all four
                   // against a bright frame, being both the smallest text
@@ -1383,8 +1388,14 @@ const VIVAPage = () => {
                 transition={{ duration: 0.8, delay: 0.39, ease: "easeOut" }}
                 style={{
                   fontFamily: CORMORANT,
-                  fontSize: "clamp(15px, 1.25vw, 18px)",
+                  // Same ~1.4x expansion as the wordmark.
+                  fontSize: "clamp(21px, 1.75vw, 25px)",
                   fontStyle: "italic",
+                  // Cormorant Garamond 600 italic is loaded (index.html) —
+                  // real bold italic, matching the wordmark's move to a
+                  // genuinely heavier cut rather than just scaling the
+                  // thin 400 up.
+                  fontWeight: 600,
                   // Kept at the raised 0.92 (was 0.78) for the same reason
                   // as attribution above.
                   color: "rgba(212,175,55,0.92)",
