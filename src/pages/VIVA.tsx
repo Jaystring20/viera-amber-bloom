@@ -887,17 +887,26 @@ const VIVAPage = () => {
               shape built to peak there — so the climb starts earlier and
               reaches real density by ~26% instead of coasting through a
               wide clear band the way mobile's does before the masthead
-              begins. Re-verified against every landmark, not just the
-              masthead: heading and description keep real margin too under
-              this shape, more than before, since nothing tapers back off
-              approaching the bottom now. Worst case (mantra) holds 4.70:1. */}
+              begins.
+
+              Asked afterward to bring the overall intensity down, "from
+              ground back up." The 0-46% span (through the eyebrow) is the
+              actual tight constraint — that's what "reduce intensity from
+              the ground back up" bottoms out at without breaking contrast
+              again, so it stayed. But the ground itself (60-100%, under the
+              heading/description/buttons) was carrying far more density
+              than it needed: those landmarks measured 10.4:1 and 8.1:1 with
+              real margin to spare. Eased that half down substantially —
+              bottom edge 0.98 -> 0.48 — with zero cost to the masthead's
+              margin, since nothing above 46% moved. Worst case (mantra,
+              which sits in the untouched upper half) is unchanged at 4.70:1. */}
           <div
             className="hidden md:block"
             style={{
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(to bottom, rgba(110,0,37,0.28) 0%, rgba(110,0,37,0.45) 10%, rgba(110,0,37,0.68) 18%, rgba(110,0,37,0.85) 26%, rgba(110,0,37,0.90) 36%, rgba(110,0,37,0.92) 46%, rgba(110,0,37,0.94) 60%, rgba(110,0,37,0.96) 75%, rgba(110,0,37,0.98) 100%)",
+                "linear-gradient(to bottom, rgba(110,0,37,0.28) 0%, rgba(110,0,37,0.45) 10%, rgba(110,0,37,0.68) 18%, rgba(110,0,37,0.85) 26%, rgba(110,0,37,0.90) 36%, rgba(110,0,37,0.92) 46%, rgba(110,0,37,0.78) 60%, rgba(110,0,37,0.62) 75%, rgba(110,0,37,0.48) 100%)",
               pointerEvents: "none",
             }}
           />
