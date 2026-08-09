@@ -121,6 +121,7 @@ export default function VivaLaunchModal() {
   const [open, setOpen] = useState(false);
   const [phone, setPhone] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [phoneFocused, setPhoneFocused] = useState(false);
   const countdown = useCountdown(LAUNCH_DATE);
 
   // Someone who has already joined never sees the ask again — not this
@@ -419,10 +420,18 @@ export default function VivaLaunchModal() {
                         aria-invalid={validationError ? true : undefined}
                         style={{
                           ...inputStyle,
-                          borderColor: validationError ? "#B00020" : BURG_ALPHA,
+                          // Driven entirely by state now, not by onFocus/
+                          // onBlur mutating the DOM directly. That imperative
+                          // version raced with this declarative style: a
+                          // blur handler bound during a stale render could
+                          // fire after setValidationError and stomp the red
+                          // border back to default, which is exactly what
+                          // happened testing this live — the error text and
+                          // aria-invalid were correct, the visual cue wasn't.
+                          borderColor: validationError ? "#B00020" : phoneFocused ? GOLD : BURG_ALPHA,
                         }}
-                        onFocus={(e) => (e.target.style.borderColor = validationError ? "#B00020" : GOLD)}
-                        onBlur={(e) => (e.target.style.borderColor = validationError ? "#B00020" : BURG_ALPHA)}
+                        onFocus={() => setPhoneFocused(true)}
+                        onBlur={() => setPhoneFocused(false)}
                       />
                       {validationError && (
                         <p role="alert" style={{ fontFamily: SANS, fontSize: 11, color: "#B00020", margin: "6px 0 0 0" }}>
