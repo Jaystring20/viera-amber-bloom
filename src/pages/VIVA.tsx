@@ -1316,15 +1316,20 @@ const VIVAPage = () => {
                   // Optical centring: the trailing letterspace pushes the word
                   // left of true-center, same correction mobile's wordmark uses.
                   textIndent: "0.34em",
-                  // Was a 14px shadow blur + 0.6px stroke — sized for a
-                  // heavier sans-serif, not this thin, widely-tracked
-                  // Cormorant serif. On strokes this delicate the blur
-                  // didn't read as a shadow, it read as the letters
-                  // themselves going soft. Tightened to an actual shadow
-                  // (small blur, offset visible) and a hairline stroke that
-                  // defines the edge without thickening it.
-                  WebkitTextStroke: "0.35px rgba(30,0,8,0.75)",
-                  textShadow: "0 1px 3px rgba(30,0,8,0.7)",
+                  // First pass (14px blur, 0.6px stroke) went soft on a
+                  // dark frame — fixed by tightening both. That then
+                  // undercorrected against a bright frame: 0.35px is thin
+                  // enough to nearly disappear once there's no burgundy
+                  // left to contrast against, which is most of this frame
+                  // now that the scrim is intentionally light. Two-layer
+                  // shadow: a tight one for a crisp edge (does the work on
+                  // a dark frame, matches what already looked right there)
+                  // plus a wider, low-opacity one that only becomes visible
+                  // once the background is genuinely bright — it is nearly
+                  // invisible layered on a dark frame, so it should not
+                  // reintroduce the haze, only cover the case that broke.
+                  WebkitTextStroke: "0.55px rgba(30,0,8,0.8)",
+                  textShadow: "0 1px 2px rgba(30,0,8,0.75), 0 0 10px rgba(30,0,8,0.42)",
                 }}
               >
                 VIVA
@@ -1346,11 +1351,13 @@ const VIVAPage = () => {
                   color: "rgba(255,255,255,0.82)",
                   margin: "10px 0 0 0",
                   fontWeight: 500,
-                  // Thinner stroke than the wordmark — at 9-10px a heavier
-                  // outline reads as a blob, not an edge. Shadow blur
-                  // tightened for the same reason as the wordmark.
-                  WebkitTextStroke: "0.3px rgba(30,0,8,0.75)",
-                  textShadow: "0 1px 2px rgba(30,0,8,0.65)",
+                  // Thinner than the wordmark's stroke — at 9-10px a
+                  // heavier outline reads as a blob — but same two-layer
+                  // shadow fix: this line went the softest of all four
+                  // against a bright frame, being both the smallest text
+                  // and the lowest-contrast color (white, not gold).
+                  WebkitTextStroke: "0.4px rgba(30,0,8,0.78)",
+                  textShadow: "0 1px 1.5px rgba(30,0,8,0.7), 0 0 8px rgba(30,0,8,0.4)",
                 }}
               >
                 By Viera Amber
@@ -1385,11 +1392,11 @@ const VIVAPage = () => {
                   // Descender clearance for the 'y' in "by"
                   lineHeight: 1.3,
                   paddingBottom: 2,
-                  // Same fix as the wordmark: this is also thin Cormorant
-                  // italic, and the old 14px shadow blur made it go soft
-                  // rather than read as protected.
-                  WebkitTextStroke: "0.35px rgba(30,0,8,0.75)",
-                  textShadow: "0 1px 3px rgba(30,0,8,0.7)",
+                  // Same two-layer fix as the wordmark — also thin
+                  // Cormorant italic, needed the same insurance for a
+                  // bright frame.
+                  WebkitTextStroke: "0.5px rgba(30,0,8,0.78)",
+                  textShadow: "0 1px 2px rgba(30,0,8,0.75), 0 0 9px rgba(30,0,8,0.4)",
                 }}
               >
                 For her, by her.
@@ -1412,11 +1419,9 @@ const VIVAPage = () => {
                 textTransform: "uppercase",
                 color: GOLD,
                 margin: "clamp(38px, 4.4vw, 60px) 0 clamp(18px, 2vw, 26px) 0",
-                // Same tightening as the rest of the masthead — DM Sans
-                // is bolder than Cormorant so it could carry more, but the
-                // 14px blur was still reading as haze at this size.
-                WebkitTextStroke: "0.35px rgba(30,0,8,0.75)",
-                textShadow: "0 1px 3px rgba(30,0,8,0.7)",
+                // Same two-layer fix as the rest of the masthead.
+                WebkitTextStroke: "0.5px rgba(30,0,8,0.78)",
+                textShadow: "0 1px 2px rgba(30,0,8,0.72), 0 0 8px rgba(30,0,8,0.4)",
               }}
             >
               The Maiden Collection
