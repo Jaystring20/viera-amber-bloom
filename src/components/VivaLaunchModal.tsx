@@ -22,6 +22,37 @@ const LAUNCH_DATE = new Date(2026, 8, 13, 0, 0, 0); // month is 0-indexed: 8 = S
 // re-interrupts every single page load reads as spam, not launch energy.
 const SESSION_KEY = "viva.launchModal.shownThisSession";
 
+// Persists across sessions (unlike SESSION_KEY above) — once someone has
+// actually joined, the auto-popup should never interrupt them with the same
+// ask again, on this or any future visit.
+const JOINED_KEY = "viva.launchModal.joinedPhone";
+
+// A dedicated subject on the shared contact_submissions table, not a
+// separate column — this is how the duplicate check below finds prior
+// launch-list rows without touching order/enquiry rows that share the table.
+const LAUNCH_SUBJECT = "VIVA Launch Signup — Batya";
+
+// Strips everything but digits and a leading "+" — the shape stored and
+// matched against for the duplicate check, so "0814 342 5141" and
+// "+234 814 342 5141" typed on two different visits are recognised as the
+// same number rather than becoming two rows.
+function normalizePhone(raw: string): string {
+  const trimmed = raw.trim();
+  const plus = trimmed.startsWith("+") ? "+" : "";
+  return plus + trimmed.replace(/\D/g, "");
+}
+
+// Deliberately loose — not validating a specific country's format, since
+// VIVA ships internationally and a strict pattern would reject real numbers
+// from anyone outside Nigeria. This exists to catch "hi", "123", or a
+// stray keystroke, not to police formatting: 7-15 digits covers the real
+// E.164 range without rejecting valid numbers written with or without a
+// country code.
+function isPlausiblePhone(raw: string): boolean {
+  const digits = raw.replace(/\D/g, "");
+  return digits.length >= 7 && digits.length <= 15;
+}
+
 function useCountdown(target: Date) {
   const [remaining, setRemaining] = useState(() => target.getTime() - Date.now());
   useEffect(() => {
@@ -89,11 +120,31 @@ export default function VivaLaunchModal() {
   const reduced = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [phone, setPhone] = useState("");
-  const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
+  const [validationError, setValidationError] = useState<string | null>(null);
   const countdown = useCountdown(LAUNCH_DATE);
 
+  // Someone who has already joined never sees the ask again — not this
+  // session, not next month. Checked once, synchronously, before the first
+  // paint would otherwise decide whether to schedule the auto-popup at all.
+  const [alreadyJoined] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return !!localStorage.getItem(JOINED_KEY);
+    } catch {
+      return false;
+    }
+  });
+
+  // Defensive: there's currently no OTHER way to open this modal besides
+  // the auto-popup, which already skips itself for a joined visitor — but
+  // if that ever changes, this stops a returning member from landing on a
+  // blank form as if they'd never signed up.
+  const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">(
+    alreadyJoined ? "done" : "idle",
+  );
+
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || alreadyJoined) return;
     try {
       if (sessionStorage.getItem(SESSION_KEY)) return;
     } catch {
@@ -114,9 +165,40 @@ export default function VivaLaunchModal() {
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!phone.trim()) return;
+    setValidationError(null);
+
+    // Catches "hi", "123", a stray keystroke — the class of submission that
+    // used to insert successfully and show "you're on the list" for a
+    // number nobody could ever actually reach.
+    if (!isPlausiblePhone(phone)) {
+      setValidationError("That doesn't look like a complete phone number — please check it.");
+      return;
+    }
+
+    const normalized = normalizePhone(phone);
     setStatus("sending");
+
     try {
+      // Look for this exact number already on the launch list before
+      // writing a new row. Scoped to LAUNCH_SUBJECT specifically so this
+      // never matches an unrelated order or enquiry that happens to share
+      // the same free-text message field.
+      const { data: existing, error: lookupError } = await supabase
+        .from("contact_submissions")
+        .select("id")
+        .eq("subject", LAUNCH_SUBJECT)
+        .eq("message", normalized)
+        .limit(1);
+
+      // A failed lookup should not block a genuine new signup — fall
+      // through to inserting rather than stranding the user on an error
+      // for a read that was only ever a nice-to-have.
+      if (!lookupError && existing && existing.length > 0) {
+        try { localStorage.setItem(JOINED_KEY, normalized); } catch { /* non-fatal */ }
+        setStatus("done");
+        return;
+      }
+
       const { error } = await supabase.from("contact_submissions").insert({
         name: "VIVA Launch List",
         // Every other caller of this table always has a real email; this
@@ -124,10 +206,22 @@ export default function VivaLaunchModal() {
         // than "" in case the column has an email-format check this
         // session has no way to inspect (no live DB access available).
         email: "no-email@viva-launch-list.local",
-        subject: "VIVA Launch Signup — Batya",
-        message: phone.trim(),
+        subject: LAUNCH_SUBJECT,
+        message: normalized,
       });
       if (error) throw error;
+
+      // Best effort, and explicitly not trusted: notify-admin is not
+      // present anywhere in this repo, so whether it is actually deployed
+      // on Supabase cannot be confirmed from here. If it exists this
+      // reaches the same inbox the enquiry form already notifies; if it
+      // doesn't, this fails exactly as harmlessly as that form's call
+      // already does, and the signup itself has still succeeded either way.
+      supabase.functions.invoke("notify-admin", {
+        body: { type: "viva_launch_signup", data: { phone: normalized } },
+      }).catch(() => {});
+
+      try { localStorage.setItem(JOINED_KEY, normalized); } catch { /* non-fatal */ }
       setStatus("done");
     } catch (err) {
       console.error("Launch list signup failed:", err);
@@ -285,58 +379,82 @@ export default function VivaLaunchModal() {
                 Join our VIVA community to stay connected and updated.
               </p>
 
-              <AnimatePresence mode="wait">
-                {status === "done" ? (
-                  <motion.p
-                    key="signup-done"
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                    style={{ fontFamily: SANS, fontSize: 13, color: BURGUNDY, fontWeight: 600, margin: 0 }}
-                  >
-                    You're on the list — see you at launch.
-                  </motion.p>
-                ) : (
-                  <motion.form
-                    key="signup-form"
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                    onSubmit={handleJoin}
-                  >
-                    <input
-                      type="tel"
-                      inputMode="tel"
-                      autoComplete="tel"
-                      required
-                      placeholder="Phone number"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      style={inputStyle}
-                      onFocus={(e) => (e.target.style.borderColor = GOLD)}
-                      onBlur={(e) => (e.target.style.borderColor = BURG_ALPHA)}
-                    />
-                    <button
-                      type="submit"
-                      disabled={status === "sending" || !phone.trim()}
-                      style={{
-                        width: "100%", marginTop: 10, minHeight: 46,
-                        background: !phone.trim() || status === "sending" ? "rgba(110,0,37,0.35)" : BURGUNDY,
-                        color: ALABASTER, border: "none", borderRadius: 2,
-                        fontFamily: SANS, fontSize: 12, fontWeight: 700, letterSpacing: "0.14em",
-                        textTransform: "uppercase",
-                        cursor: !phone.trim() ? "not-allowed" : "pointer",
-                      }}
+              {/* aria-live so a screen reader hears the outcome — the visual
+                  swap between form and confirmation previously had no
+                  announcement at all. */}
+              <div aria-live="polite">
+                <AnimatePresence mode="wait">
+                  {status === "done" ? (
+                    <motion.div
+                      key="signup-done"
+                      initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                     >
-                      {status === "sending" ? "Joining…" : "Join"}
-                    </button>
-                    {status === "error" && (
-                      <p role="alert" style={{ fontFamily: SANS, fontSize: 11, color: "#B00020", margin: "8px 0 0 0" }}>
-                        Something went wrong — please try again.
+                      <p style={{ fontFamily: SANS, fontSize: 13, color: BURGUNDY, fontWeight: 600, margin: 0 }}>
+                        You're on the list — see you at launch.
                       </p>
-                    )}
-                    <p style={{ fontFamily: SANS, fontSize: 10, color: "rgba(34,26,26,0.5)", margin: "10px 0 0 0", lineHeight: 1.5 }}>
-                      By signing up, I agree to receive email marketing. (No spam.)
-                    </p>
-                  </motion.form>
-                )}
-              </AnimatePresence>
+                      {/* Points back at the pre-order CTA above rather than
+                          leaving someone who just signalled real interest
+                          with nothing further to do but close the window. */}
+                      <p style={{ fontFamily: SANS, fontSize: 12, color: "rgba(34,26,26,0.65)", margin: "8px 0 0 0", lineHeight: 1.6 }}>
+                        Want to lock in your size before launch? Pre-order above to enjoy 20% off now.
+                      </p>
+                    </motion.div>
+                  ) : (
+                    <motion.form
+                      key="signup-form"
+                      initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                      onSubmit={handleJoin}
+                    >
+                      <input
+                        type="tel"
+                        inputMode="tel"
+                        autoComplete="tel"
+                        required
+                        placeholder="Phone number"
+                        value={phone}
+                        onChange={(e) => {
+                          setPhone(e.target.value);
+                          if (validationError) setValidationError(null);
+                        }}
+                        aria-invalid={validationError ? true : undefined}
+                        style={{
+                          ...inputStyle,
+                          borderColor: validationError ? "#B00020" : BURG_ALPHA,
+                        }}
+                        onFocus={(e) => (e.target.style.borderColor = validationError ? "#B00020" : GOLD)}
+                        onBlur={(e) => (e.target.style.borderColor = validationError ? "#B00020" : BURG_ALPHA)}
+                      />
+                      {validationError && (
+                        <p role="alert" style={{ fontFamily: SANS, fontSize: 11, color: "#B00020", margin: "6px 0 0 0" }}>
+                          {validationError}
+                        </p>
+                      )}
+                      <button
+                        type="submit"
+                        disabled={status === "sending" || !phone.trim()}
+                        style={{
+                          width: "100%", marginTop: 10, minHeight: 46,
+                          background: !phone.trim() || status === "sending" ? "rgba(110,0,37,0.35)" : BURGUNDY,
+                          color: ALABASTER, border: "none", borderRadius: 2,
+                          fontFamily: SANS, fontSize: 12, fontWeight: 700, letterSpacing: "0.14em",
+                          textTransform: "uppercase",
+                          cursor: !phone.trim() ? "not-allowed" : "pointer",
+                        }}
+                      >
+                        {status === "sending" ? "Joining…" : "Join"}
+                      </button>
+                      {status === "error" && (
+                        <p role="alert" style={{ fontFamily: SANS, fontSize: 11, color: "#B00020", margin: "8px 0 0 0" }}>
+                          Something went wrong — please try again.
+                        </p>
+                      )}
+                      <p style={{ fontFamily: SANS, fontSize: 10, color: "rgba(34,26,26,0.5)", margin: "10px 0 0 0", lineHeight: 1.5 }}>
+                        By signing up, I agree to receive email marketing. (No spam.)
+                      </p>
+                    </motion.form>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </motion.div>
         </motion.div>
