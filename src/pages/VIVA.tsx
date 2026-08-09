@@ -865,64 +865,64 @@ const VIVAPage = () => {
           />
 
           {/* ── DESKTOP SCRIM ────────────────────────────────────────────
-              No backing plate — client direction, same as mobile: the
-              gradient carries legibility, not a panel.
+              Two real problems found in the previous version, both from a
+              live screenshot rather than the contrast math alone (the
+              numbers were passing; the frame still looked wrong).
 
-              First reshape peaked density over 22-46% (the masthead's
-              range) and eased off on both sides of that peak — which
-              solved contrast but was the wrong shape: it climbed toward
-              the middle and tapered back down toward the bottom, the
-              opposite of what was asked. The brief was explicit: "strong
-              from the bottom... concentration reduces gradually from the
-              bottom upwards," using mobile's actual gradient as the
-              reference to stop the back-and-forth, not a shape that merely
-              solves for contrast wherever the text happens to sit.
+              1. It had silently stopped being monotonic. The prior "ease
+                 the ground" edit only checked contrast, not shape — it left
+                 a peak at 46% with the true bottom (100%) LIGHTER (0.48)
+                 than the upper-middle (0.92). That is a hump, the same
+                 defect corrected two commits earlier, just relocated.
 
-              This is a genuine single-direction ramp: strongest at 100%
-              (the bottom edge), lightest at 0% (the top), monotonically
-              increasing all the way down — no hump, no reversal. It still
-              has to satisfy the same measured contrast requirement, since
-              the masthead sits high in this composition (~24-47% down) and
-              a bottom-loaded ramp naturally protects that zone less than a
-              shape built to peak there — so the climb starts earlier and
-              reaches real density by ~26% instead of coasting through a
-              wide clear band the way mobile's does before the masthead
-              begins.
+              2. Even where the shape *was* dense as designed, this scrim
+                 and the vignette below it both paint burgundy over the same
+                 area and compound: 0.90 linear + 0.16 vignette layered on
+                 top does not add to 1.06, it composes to ~92% effective
+                 coverage (1-(1-0.90)(1-0.16)) — under 10% of the original
+                 video was ever getting through at the masthead, which is
+                 exactly the near-solid wash the screenshot showed.
 
-              Asked afterward to bring the overall intensity down, "from
-              ground back up." The 0-46% span (through the eyebrow) is the
-              actual tight constraint — that's what "reduce intensity from
-              the ground back up" bottoms out at without breaking contrast
-              again, so it stayed. But the ground itself (60-100%, under the
-              heading/description/buttons) was carrying far more density
-              than it needed: those landmarks measured 10.4:1 and 8.1:1 with
-              real margin to spare. Eased that half down substantially —
-              bottom edge 0.98 -> 0.48 — with zero cost to the masthead's
-              margin, since nothing above 46% moved. Worst case (mantra,
-              which sits in the untouched upper half) is unchanged at 4.70:1. */}
+              Direction, quoted directly: "the chest level upward part of
+              the video [should be] much clearer than the bottom part...
+              halfway upward it is quite clear, however... the text is also
+              quite visible." That is two requirements pulling against each
+              other at the same location, and no reshaping of a translucent
+              wash resolves both there — solving for guaranteed small-text
+              contrast in that zone requires ~85-90% coverage; "quite
+              clear" video means nowhere near that. Something else has to
+              carry legibility. See the text-stroke treatment on the
+              masthead/eyebrow elements below — that is the actual fix for
+              the text; this gradient's job now is only to be the ombre the
+              brief described: genuinely monotonic, strong only near the
+              base, and clear enough through the upper two-thirds that the
+              model reads as a photograph again, not a color field. Video
+              visibility now runs roughly 70% at the wordmark down to 39%
+              at the description, versus ~8-10% before. */}
           <div
             className="hidden md:block"
             style={{
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(to bottom, rgba(110,0,37,0.28) 0%, rgba(110,0,37,0.45) 10%, rgba(110,0,37,0.68) 18%, rgba(110,0,37,0.85) 26%, rgba(110,0,37,0.90) 36%, rgba(110,0,37,0.92) 46%, rgba(110,0,37,0.78) 60%, rgba(110,0,37,0.62) 75%, rgba(110,0,37,0.48) 100%)",
+                "linear-gradient(to bottom, rgba(110,0,37,0.14) 0%, rgba(110,0,37,0.20) 15%, rgba(110,0,37,0.28) 30%, rgba(110,0,37,0.36) 46%, rgba(110,0,37,0.46) 58%, rgba(110,0,37,0.60) 70%, rgba(110,0,37,0.76) 84%, rgba(110,0,37,0.90) 100%)",
               pointerEvents: "none",
             }}
           />
 
-          {/* Desktop vignette — closes the left/right edges on wide monitors.
-              Lighter touch than before (0.20 vs 0.32 peak): the linear
-              gradient above is now doing most of the protection work on
-              its own, at real density everywhere text can land, so this
-              only needs to finish the job at the frame's far edges. */}
+          {/* Desktop vignette — pulled back sharply above the vertical
+              center (0.06 flat through 45%, where the masthead sits) so it
+              stops stacking on top of the linear gradient there and
+              compounding into near-total coverage. It now only does real
+              work in the lower half, closing the left/right edges under
+              the heading/description on wide monitors. */}
           <div
             className="hidden md:block"
             style={{
               position: "absolute",
               inset: 0,
               background:
-                "radial-gradient(68% 86% at 50% 50%, rgba(110,0,37,0.20) 0%, rgba(110,0,37,0.12) 55%, rgba(110,0,37,0) 85%)",
+                "radial-gradient(68% 86% at 50% 50%, rgba(110,0,37,0.06) 0%, rgba(110,0,37,0.06) 45%, rgba(110,0,37,0.16) 70%, rgba(110,0,37,0.12) 100%)",
               pointerEvents: "none",
             }}
           />
@@ -1291,12 +1291,16 @@ const VIVAPage = () => {
           >
             {/* ── MASTHEAD LOCKUP ──────────────────────────────────────────
                 Wordmark, attribution and mantra read as one unit. No backing
-                plate — client direction, same as mobile: the gradient itself
-                should carry legibility. The scrim above was reshaped so its
-                peak sits over this block's actual position (roughly 22-46%
-                down the frame) instead of dead center; text-shadow restored
-                on each element as the per-element backup it always had
-                before the plate existed. */}
+                plate, and the scrim behind this block is now deliberately
+                light — "chest level upward... much clearer... halfway
+                upward it is quite clear" was the direction, and a
+                translucent wash cannot be both clear and reliably dark
+                enough for small text at the same spot. So legibility here
+                no longer comes from the background at all: each element
+                carries its own thin stroke (a hard-edged outline around the
+                glyphs, the same trick subtitles use to stay readable over
+                any footage) plus a stronger shadow, both independent of
+                whatever the film is doing underneath. */}
             <div>
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
@@ -1312,7 +1316,8 @@ const VIVAPage = () => {
                   // Optical centring: the trailing letterspace pushes the word
                   // left of true-center, same correction mobile's wordmark uses.
                   textIndent: "0.34em",
-                  textShadow: "0 1px 12px rgba(60,0,20,0.6)",
+                  WebkitTextStroke: "0.6px rgba(30,0,8,0.85)",
+                  textShadow: "0 1px 14px rgba(30,0,8,0.75)",
                 }}
               >
                 VIVA
@@ -1334,7 +1339,10 @@ const VIVAPage = () => {
                   color: "rgba(255,255,255,0.82)",
                   margin: "10px 0 0 0",
                   fontWeight: 500,
-                  textShadow: "0 1px 10px rgba(60,0,20,0.55)",
+                  // Thinner stroke than the wordmark — at 9-10px a 0.6px
+                  // outline reads as a blob, not an edge.
+                  WebkitTextStroke: "0.4px rgba(30,0,8,0.8)",
+                  textShadow: "0 1px 10px rgba(30,0,8,0.7)",
                 }}
               >
                 By Viera Amber
@@ -1369,17 +1377,18 @@ const VIVAPage = () => {
                   // Descender clearance for the 'y' in "by"
                   lineHeight: 1.3,
                   paddingBottom: 2,
-                  textShadow: "0 1px 12px rgba(60,0,20,0.6)",
+                  WebkitTextStroke: "0.5px rgba(30,0,8,0.8)",
+                  textShadow: "0 1px 14px rgba(30,0,8,0.75)",
                 }}
               >
                 For her, by her.
               </motion.p>
             </div>
 
-            {/* Eyebrow — back to plain floating text, no chip. This and
-                mantra measured tightest without the plate; the reshaped
-                gradient plus each element's own text-shadow is what
-                carries them now. */}
+            {/* Eyebrow — back to plain floating text, no chip. Same stroke
+                treatment as the masthead — the reshaped gradient behind it
+                is deliberately light now, so the glyphs carry their own
+                edge instead of leaning on background density. */}
             <motion.p
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1392,7 +1401,8 @@ const VIVAPage = () => {
                 textTransform: "uppercase",
                 color: GOLD,
                 margin: "clamp(38px, 4.4vw, 60px) 0 clamp(18px, 2vw, 26px) 0",
-                textShadow: "0 1px 12px rgba(60,0,20,0.6)",
+                WebkitTextStroke: "0.5px rgba(30,0,8,0.8)",
+                textShadow: "0 1px 14px rgba(30,0,8,0.75)",
               }}
             >
               The Maiden Collection
