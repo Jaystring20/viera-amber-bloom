@@ -865,44 +865,55 @@ const VIVAPage = () => {
           />
 
           {/* ── DESKTOP SCRIM ────────────────────────────────────────────
-              No backing plate anymore — same client direction as mobile,
-              extended here: the gradient itself carries legibility, not a
-              panel. The plate existed because the masthead sits well above
-              center in this stack (measured live: wordmark ~24%, attribution
-              ~29%, mantra ~36%, eyebrow ~47% down the frame), while density
-              here used to peak only at the dead center (50%) and taper on
-              both sides — so the masthead sat on the rising slope, not in
-              the peak, and measured 3.1-4.0:1 against a bright frame.
+              No backing plate — client direction, same as mobile: the
+              gradient carries legibility, not a panel.
 
-              Reshaped rather than patched: the peak is now centered over
-              22-46% — the masthead's actual range — and eases down through
-              the heading/description/button zone below, which had real
-              margin under the old shape and can afford to give some back.
-              Re-solved against real per-landmark video pixels measured live
-              (not a theoretical worst case): every masthead/eyebrow element
-              holds at least 4.67:1, gradient alone. */}
+              First reshape peaked density over 22-46% (the masthead's
+              range) and eased off on both sides of that peak — which
+              solved contrast but was the wrong shape: it climbed toward
+              the middle and tapered back down toward the bottom, the
+              opposite of what was asked. The brief was explicit: "strong
+              from the bottom... concentration reduces gradually from the
+              bottom upwards," using mobile's actual gradient as the
+              reference to stop the back-and-forth, not a shape that merely
+              solves for contrast wherever the text happens to sit.
+
+              This is a genuine single-direction ramp: strongest at 100%
+              (the bottom edge), lightest at 0% (the top), monotonically
+              increasing all the way down — no hump, no reversal. It still
+              has to satisfy the same measured contrast requirement, since
+              the masthead sits high in this composition (~24-47% down) and
+              a bottom-loaded ramp naturally protects that zone less than a
+              shape built to peak there — so the climb starts earlier and
+              reaches real density by ~26% instead of coasting through a
+              wide clear band the way mobile's does before the masthead
+              begins. Re-verified against every landmark, not just the
+              masthead: heading and description keep real margin too under
+              this shape, more than before, since nothing tapers back off
+              approaching the bottom now. Worst case (mantra) holds 4.70:1. */}
           <div
             className="hidden md:block"
             style={{
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(to bottom, rgba(110,0,37,0.34) 0%, rgba(110,0,37,0.55) 6%, rgba(110,0,37,0.74) 14%, rgba(110,0,37,0.85) 22%, rgba(110,0,37,0.88) 34%, rgba(110,0,37,0.86) 46%, rgba(110,0,37,0.80) 58%, rgba(110,0,37,0.64) 72%, rgba(110,0,37,0.46) 86%, rgba(110,0,37,0.32) 100%)",
+                "linear-gradient(to bottom, rgba(110,0,37,0.28) 0%, rgba(110,0,37,0.45) 10%, rgba(110,0,37,0.68) 18%, rgba(110,0,37,0.85) 26%, rgba(110,0,37,0.90) 36%, rgba(110,0,37,0.92) 46%, rgba(110,0,37,0.94) 60%, rgba(110,0,37,0.96) 75%, rgba(110,0,37,0.98) 100%)",
               pointerEvents: "none",
             }}
           />
 
           {/* Desktop vignette — closes the left/right edges on wide monitors.
-              Widened slightly and re-peaked (0.32 vs the previous 0.26) to
-              still contribute at the masthead's position, which sits well
-              off the vertical center this ellipse is drawn around. */}
+              Lighter touch than before (0.20 vs 0.32 peak): the linear
+              gradient above is now doing most of the protection work on
+              its own, at real density everywhere text can land, so this
+              only needs to finish the job at the frame's far edges. */}
           <div
             className="hidden md:block"
             style={{
               position: "absolute",
               inset: 0,
               background:
-                "radial-gradient(68% 86% at 50% 50%, rgba(110,0,37,0.32) 0%, rgba(110,0,37,0.18) 55%, rgba(110,0,37,0) 85%)",
+                "radial-gradient(68% 86% at 50% 50%, rgba(110,0,37,0.20) 0%, rgba(110,0,37,0.12) 55%, rgba(110,0,37,0) 85%)",
               pointerEvents: "none",
             }}
           />
