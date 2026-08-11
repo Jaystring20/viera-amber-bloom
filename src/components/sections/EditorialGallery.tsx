@@ -389,8 +389,20 @@ const ChapterBody = ({
   items: Artwork[];
   openOf: (art: Artwork) => () => void;
 }) => {
+  // Only ONE piece can occupy the FeatureBand slot, so only that one is
+  // excluded from the regular grid below — not every feature-flagged piece.
+  // This used to be `items.filter((a) => !a.feature)`, which was correct
+  // back when each chapter had at most one featured:true item, but the
+  // Aug-2026 category rebuild merges several of the old poetic chapters
+  // (each with its own featured piece) into single new categories — e.g.
+  // fashion-illustrations now holds what used to be atelier/heritage/
+  // fivefor5/wearable's featured pieces all at once. Excluding every
+  // feature-flagged item silently dropped all but the first one from the
+  // page entirely (confirmed missing: seq 24, 26, 44, 52, 73). Now every
+  // extra featured piece just renders in the regular grid instead of
+  // vanishing.
   const feature = items.find((a) => a.feature);
-  const rest = items.filter((a) => !a.feature);
+  const rest = items.filter((a) => a.id !== feature?.id);
 
   if (chapter.layout === "rail") {
     return (
