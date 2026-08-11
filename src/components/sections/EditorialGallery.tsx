@@ -10,13 +10,13 @@ import { X, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import {
   ARTWORKS as STATIC_ARTWORKS,
   CHAPTERS as STATIC_CHAPTERS,
-  MEDIA,
   type Artwork,
   type Chapter,
   type ChapterId,
   type Medium,
 } from "@/lib/gallery-data";
 import { supabase } from "@/lib/supabase";
+import { ILLUSTRATION_CATEGORIES, scrollToCategory } from "@/lib/illustration-categories";
 
 const GOLD = "#D97706";
 
@@ -460,16 +460,20 @@ const ChapterBody = ({
   );
 };
 
-// ─── Medium filter bar ────────────────────────────────────────────────────
-const FilterBar = ({
-  active,
-  onChange,
-}: {
-  active: Medium | "All";
-  onChange: (m: Medium | "All") => void;
-}) => {
+// ─── Category quick-nav ─────────────────────────────────────────────────────
+// Was a "Medium" filter here (All/Portrait/Couture/Fashion Design/Product/
+// Footwear/Campaign) — a second taxonomy competing with the category one the
+// hero and "Browse by Category" row use, and selecting one used to swap the
+// whole section over to a flat grid that hid every category anchor
+// underneath it (breaking the hero's scroll-to-category links whenever a
+// filter was active). This is now the SAME mechanism as the hero: every pill
+// scrolls to that category's own section below, using the identical
+// scrollToCategory() call and #category-<id> anchors. `active` reflects
+// scroll position (see the scroll-spy in the main component) rather than a
+// filter selection — there's nothing left to filter, every category's
+// section is always on the page.
+const CategoryNav = ({ active }: { active: string | null }) => {
   const reduced = useReducedMotion();
-  const options: (Medium | "All")[] = ["All", ...MEDIA];
   return (
     <div
       className="sticky top-20 z-30 -mx-6 px-6 py-3 mb-10 flex gap-2 overflow-x-auto"
@@ -479,14 +483,14 @@ const FilterBar = ({
         borderBottom: "1px solid #EBEBEB",
       }}
     >
-      {options.map((opt) => {
-        const isActive = active === opt;
+      {ILLUSTRATION_CATEGORIES.map((cat) => {
+        const isActive = active === cat.id;
         return (
           <button
-            key={opt}
+            key={cat.id}
             type="button"
-            onClick={() => onChange(opt)}
-            aria-pressed={isActive}
+            onClick={() => scrollToCategory(cat.id)}
+            aria-current={isActive ? "true" : undefined}
             className="shrink-0 transition-colors"
             style={{
               fontFamily: "DM Sans, system-ui, sans-serif",
@@ -501,9 +505,10 @@ const FilterBar = ({
               backgroundColor: isActive ? "#111111" : "transparent",
               color: isActive ? "#FFFFFF" : "#666666",
               transition: reduced ? "none" : "all 0.25s ease",
+              whiteSpace: "nowrap",
             }}
           >
-            {opt}
+            {cat.name}
           </button>
         );
       })}
@@ -514,8 +519,11 @@ const FilterBar = ({
 // ─── Main ───────────────────────────────────────────────────────────────────
 const EditorialGallery = () => {
   const reduced = useReducedMotion();
-  const [activeMedium, setActiveMedium] = useState<Medium | "All">("All");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  // Scroll-spy for the CategoryNav bar — which category section is currently
+  // in view, so its pill can highlight. Populated once the chapter sections
+  // exist in the DOM (see the IntersectionObserver effect below).
+  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
 
   // Live data — starts from static file (instant render) and updates when Supabase responds.
   // Drafts (no title/story yet — see gallery-data.ts) are filtered out of
@@ -565,16 +573,38 @@ const EditorialGallery = () => {
     return () => { cancelled = true; };
   }, []);
 
-  // Flat list = the current navigation order for the lightbox.
-  const flatList = useMemo(
-    () => (activeMedium === "All" ? artworks : artworks.filter((a) => a.medium === activeMedium)),
-    [activeMedium, artworks],
-  );
+  // Flat list = the current navigation order for the lightbox. There's only
+  // ever one view now (the category story view), so this is just `artworks`
+  // — no filter state feeds it anymore.
+  const flatList = artworks;
   const indexOf = useMemo(() => {
     const map = new Map<string, number>();
     flatList.forEach((a, i) => map.set(a.id, i));
     return map;
   }, [flatList]);
+
+  // Scroll-spy: highlight whichever category section is nearest the top of
+  // the viewport in the CategoryNav bar above. Re-runs whenever the chapter
+  // list changes (i.e. once real data replaces the static fallback).
+  useEffect(() => {
+    const sections = chapters
+      .map((c) => document.getElementById(`category-${c.id}`))
+      .filter((el): el is HTMLElement => el !== null);
+    if (sections.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting);
+        if (visible.length === 0) return;
+        // Nearest to the top of the viewport wins when several are visible.
+        const top = visible.reduce((a, b) => (a.boundingClientRect.top < b.boundingClientRect.top ? a : b));
+        setActiveCategoryId(top.target.id.replace(/^category-/, ""));
+      },
+      { rootMargin: "-140px 0px -60% 0px", threshold: 0 },
+    );
+    sections.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [chapters]);
 
   const openOf = useCallback(
     (art: Artwork) => () => setLightboxIndex(indexOf.get(art.id) ?? 0),
@@ -622,49 +652,29 @@ const EditorialGallery = () => {
           </motion.p>
         </div>
 
-        <FilterBar active={activeMedium} onChange={setActiveMedium} />
+        <CategoryNav active={activeCategoryId} />
 
-        {/* Filtered view: flat masonry */}
-        {activeMedium !== "All" ? (
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeMedium}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: reduced ? 0 : 0.3 }}
-            >
-              <p
-                style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "#666", marginBottom: 18 }}
-              >
-                {flatList.length} {activeMedium.toLowerCase()} piece{flatList.length === 1 ? "" : "s"}
-              </p>
-              <div style={{ columnGap: "12px" }} className="[column-count:2] md:[column-count:3]">
-                {flatList.map((art) => (
-                  <div key={art.id} style={{ marginBottom: 12 }}>
-                    <Tile art={art} onOpen={openOf(art)} />
-                  </div>
-                ))}
+        {/* One view now: every category's section, always on the page, in
+            the client's own PDF order — this is what the hero carousel,
+            the "Browse by Category" row, and CategoryNav above all scroll
+            into. There used to be a second "flat masonry filtered by
+            medium" view here that replaced this entirely when engaged,
+            which is what broke the hero's scroll links whenever a filter
+            was active — removed for exactly that reason. */}
+        <div className="flex flex-col gap-20 md:gap-28">
+          {chapters.map((chapter) => {
+            const items = artworks.filter((a) => a.chapter === chapter.id);
+            return (
+              // id matches categoryAnchorId() in illustration-categories.ts —
+              // this is what the hero carousel / "Browse by Category" row /
+              // CategoryNav all scroll to when a category is selected.
+              <div key={chapter.id} id={`category-${chapter.id}`}>
+                <ChapterIntro chapter={chapter} />
+                <ChapterBody chapter={chapter} items={items} openOf={openOf} />
               </div>
-            </motion.div>
-          </AnimatePresence>
-        ) : (
-          /* Story view: chapters */
-          <div className="flex flex-col gap-20 md:gap-28">
-            {chapters.map((chapter) => {
-              const items = artworks.filter((a) => a.chapter === chapter.id);
-              return (
-                // id matches categoryAnchorId() in illustration-categories.ts —
-                // this is what the hero carousel / "Browse by Category" row
-                // scroll to when a category is clicked.
-                <div key={chapter.id} id={`category-${chapter.id}`}>
-                  <ChapterIntro chapter={chapter} />
-                  <ChapterBody chapter={chapter} items={items} openOf={openOf} />
-                </div>
-              );
-            })}
-          </div>
-        )}
+            );
+          })}
+        </div>
 
         {/* Closing CTA */}
         <motion.div

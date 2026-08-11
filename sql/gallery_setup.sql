@@ -178,4 +178,14 @@ insert into va_artworks (seq, title, story, chapter_id, medium, image_url, featu
 (27, 'Forward Only',      'The sign said it; she''d already decided it.',                                                                     'speaks', 'Couture',   '/artworks/artwork_0027.webp', false),
 (5,  'Love, Medium-Rare', 'Appetite without apology — she takes her pleasures seriously.',                                                     'speaks', 'Campaign',  '/artworks/artwork_0005.webp', false)
 
-on conflict do nothing;
+-- va_artworks.seq now has a real unique constraint (added by
+-- sql/gallery_recategorize_2026-08.sql) — "on conflict do nothing" with no
+-- target used to be a no-op guard against nothing, which is exactly how 73
+-- duplicate rows happened when this file got run a second time. Targeting
+-- the constraint makes a re-run of this file an actual no-op.
+--
+-- ⚠️ This file is historical (initial seed only) — the taxonomy it inserts
+-- (muses/atelier/lagos/heritage/wearable/fivefor5/speaks) was replaced by
+-- sql/gallery_recategorize_2026-08.sql. Don't run this file on a database
+-- that's already been migrated; there's nothing left to seed.
+on conflict (seq) do nothing;

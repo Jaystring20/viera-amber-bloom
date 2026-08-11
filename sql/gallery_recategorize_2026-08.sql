@@ -24,12 +24,43 @@
 -- product/bag content; 0072 → Single Illustrations, it's a portrait) so
 -- nothing goes uncategorized, but confirm with Faith whether they should
 -- stay, move, or retire — this was NOT in her document either way.
+--
+-- ⚠️ THIS IS THE ONLY FILE TO RUN. Do not run sql/gallery_setup.sql again —
+-- va_artworks has no unique constraint on `seq` (its primary key is a
+-- random UUID), so re-running that file's INSERT doesn't hit any conflict
+-- and just duplicates every row. Step 0 below cleans up exactly that mess
+-- if it already happened; it's a no-op if it didn't.
 -- ═══════════════════════════════════════════════════════════════════════════════
+
+-- ── 0. De-duplicate va_artworks, if gallery_setup.sql was run more than
+-- once ─────────────────────────────────────────────────────────────────────
+-- Keeps one row per seq (the lowest id — an arbitrary but deterministic
+-- pick since duplicate rows are byte-identical copies) and drops the rest.
+-- Harmless / no-op when there are no duplicates.
+
+delete from va_artworks a
+using va_artworks b
+where a.seq = b.seq
+  and a.id > b.id;
 
 -- ── 1. Schema additions ──────────────────────────────────────────────────────────
 
 alter table va_gallery_chapters add column if not exists umbrella text;
 alter table va_artworks         add column if not exists is_draft boolean not null default false;
+
+-- Root cause of the duplication above: seq was never actually unique at the
+-- DB level (va_artworks' primary key is a random uuid), so any re-run of an
+-- INSERT with no matching conflict target just added more rows. This closes
+-- that door for good — after this, "on conflict (seq)" below actually works,
+-- and any future accidental re-run of this file (or gallery_setup.sql) is a
+-- true no-op instead of a silent duplicate. (Postgres has no ADD CONSTRAINT
+-- IF NOT EXISTS, hence the guard block.)
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conname = 'va_artworks_seq_key') then
+    alter table va_artworks add constraint va_artworks_seq_key unique (seq);
+  end if;
+end $$;
 
 -- ── 2. New categories (umbrella + PDF page order) ────────────────────────────────
 -- id values are stable slugs used as anchor ids on the page (#category-<id>).
@@ -117,4 +148,4 @@ insert into va_artworks (seq, title, story, chapter_id, medium, image_url, featu
   (103, '', '', 'event-programs',      'Campaign', '/artworks/artwork_0103.webp', false, true),
   (104, '', '', 'event-programs',      'Campaign', '/artworks/artwork_0104.webp', false, true),
   (105, '', '', 'event-programs',      'Campaign', '/artworks/artwork_0105.webp', false, true)
-on conflict do nothing;
+on conflict (seq) do nothing;

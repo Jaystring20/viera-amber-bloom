@@ -1,10 +1,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import Illustrations from "./pages/Illustrations.tsx";
-import CollectionPage from "./pages/CollectionPage.tsx";
 import VAGINPage from "./pages/VAGIN.tsx";
 import VAGINDashboard from "./pages/VAGINDashboard.tsx";
 import VIVAPage from "./pages/VIVA.tsx";
@@ -25,7 +24,11 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/illustrations" element={<Illustrations />} />
-          <Route path="/collections/:collectionId" element={<CollectionPage />} />
+          {/* Retired — this used a separate, now-orphaned category system
+              (CollectionId) that never matched the client's real taxonomy
+              and had no live links pointing to it anymore. Redirects rather
+              than 404s in case an old bookmark or external link still uses it. */}
+          <Route path="/collections/:collectionId" element={<Navigate to="/illustrations" replace />} />
           <Route path="/vagin" element={<VAGINPage />} />
           <Route path="/vagin-dashboard" element={<VAGINDashboard />} />
           <Route path="/viva" element={<VIVAPage />} />
