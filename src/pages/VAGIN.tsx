@@ -835,6 +835,234 @@ const VAGINPage = () => {
           </div>
         </section>
 
+        {/* ── TEAM & LEADERSHIP ──────────────────────────────────────────────── */}
+        <section
+          className="w-full py-24"
+          style={{ background: `linear-gradient(135deg, rgba(237,21,93,0.06) 0%, #FFFFFF 20%, rgba(98,1,127,0.07) 60%, rgba(237,21,93,0.06) 100%)`, borderTop: `1px solid ${PINK}35`, borderBottom: `1px solid ${PINK}35` }}
+          aria-label="Team & Leadership"
+        >
+          <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
+            <SectionHead
+              eyebrow="The Team"
+              heading="Women leading the movement"
+              body="Rooted in lived experience and evidence-based research, our team brings passion, expertise, and an unwavering commitment to girls' health and rights."
+              inView={true}
+              reduced={!!reduced}
+              accentColor={PINK}
+            />
+
+            {/* Founder Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.7 }}
+              className="mb-20 flex flex-col lg:flex-row items-center gap-10 lg:gap-16"
+              style={{ background: `linear-gradient(135deg, ${PINK}12 0%, ${PINK}08 100%)`, border: `1px solid ${PINK}35`, borderRadius: 20, padding: "48px 40px" }}
+            >
+              {/* Image */}
+              <div className="flex-shrink-0 w-full lg:w-auto" style={{ maxWidth: 280 }}>
+                <div className="relative overflow-hidden" style={{ borderRadius: 16, aspectRatio: "3/4", border: `2px solid ${PINK}40`, boxShadow: "0 24px 64px rgba(237,21,93,0.2)" }}>
+                  <img
+                    src="/faith-adigwe-founder.webp"
+                    alt="Faith Adigwe, Founder of VAGIN"
+                    className="w-full h-full object-cover"
+                    loading="eager"
+                  />
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(237,21,93,0.25) 0%, transparent 60%)" }} />
+                </div>
+              </div>
+
+              {/* Bio */}
+              <div className="flex-1">
+                <div style={{ marginBottom: 20 }}>
+                  <p className="font-body uppercase m-0" style={{ fontSize: 12, color: PINK, letterSpacing: "0.4em", marginBottom: 12, fontWeight: 600 }}>Founder & Director</p>
+                  <h3 className="font-display m-0" style={{ fontSize: "clamp(28px, 3.5vw, 42px)", fontWeight: 800, color: "#111111", lineHeight: 1.1, marginBottom: 16 }}>
+                    Faith Adigwe
+                  </h3>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 15, color: "rgba(17,17,17,0.75)", lineHeight: 1.8, margin: 0 }}>
+                    A youth innovation leader and global health researcher with over seven years of experience co-creating evidence-based solutions with adolescents and underserved communities across Nigeria, Rwanda, and Malawi.
+                  </p>
+                  <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 15, color: "rgba(17,17,17,0.75)", lineHeight: 1.8, margin: 0 }}>
+                    As the founder of the Viera Amber Girls Initiative (VAGIN), Faith leads research-informed innovations that advance gender equality and adolescent sexual and reproductive health through meaningful youth participation.
+                  </p>
+                  <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 15, color: "rgba(17,17,17,0.75)", lineHeight: 1.8, margin: 0 }}>
+                    Her work spans health advocacy, community engagement, and innovation design—always grounded in the voices of the girls she serves.
+                  </p>
+
+                  {/* Skills/Focus areas */}
+                  <div className="flex flex-wrap" style={{ gap: 8, marginTop: 12 }}>
+                    {[
+                      "Health Research",
+                      "Youth Advocacy",
+                      "Community Design",
+                      "SRHR Innovation",
+                    ].map((skill) => (
+                      <span
+                        key={skill}
+                        style={{
+                          fontFamily: "Poppins, system-ui, sans-serif",
+                          fontSize: 12,
+                          fontWeight: 500,
+                          color: PINK,
+                          background: `${PINK}15`,
+                          border: `1px solid ${PINK}35`,
+                          borderRadius: 999,
+                          padding: "6px 14px",
+                        }}
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Team members grid */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+            >
+              <h3 className="font-display" style={{ fontSize: "clamp(22px, 2.8vw, 32px)", fontWeight: 700, color: "#111111", marginBottom: 24, textAlign: "center" }}>
+                Core Team & Advisors
+              </h3>
+
+              <motion.div
+                variants={staggerV}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              >
+                {[
+                  {
+                    name: "Dr. Research Lead",
+                    role: "Research & Evaluation",
+                    bio: "Evidence-based implementation and outcome tracking",
+                    expertise: ["Data Science", "SRHR Research"],
+                    accent: PURPLE,
+                  },
+                  {
+                    name: "Community Partnerships",
+                    role: "School & Community Liaison",
+                    bio: "Building sustainable partnerships across Nigeria and Malawi",
+                    expertise: ["Community Engagement", "Program Delivery"],
+                    accent: PINK,
+                  },
+                  {
+                    name: "Program Coordinator",
+                    role: "Operations & Facilitation",
+                    bio: "Ensuring quality VaginART sessions reach every girl",
+                    expertise: ["Facilitation", "Training & Development"],
+                    accent: PURPLE_LIGHT,
+                  },
+                ].map((member, idx) => (
+                  <motion.div
+                    key={member.name}
+                    variants={cardV}
+                    whileHover={reduced ? {} : { y: -6 }}
+                    transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
+                    style={{
+                      background: `${member.accent}12`,
+                      border: `1px solid ${member.accent}35`,
+                      borderRadius: 16,
+                      padding: "32px 24px",
+                      backdropFilter: "blur(4px)",
+                    }}
+                  >
+                    <div style={{ marginBottom: 16 }}>
+                      <div
+                        style={{
+                          width: 60,
+                          height: 60,
+                          borderRadius: 12,
+                          background: `${member.accent}25`,
+                          border: `2px solid ${member.accent}45`,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginBottom: 16,
+                        }}
+                      >
+                        <Users size={28} color={member.accent} strokeWidth={1.5} />
+                      </div>
+                      <h4 className="font-display m-0" style={{ fontSize: 18, fontWeight: 700, color: "#111111", marginBottom: 4 }}>
+                        {member.name}
+                      </h4>
+                      <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 12, color: member.accent, letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 600, margin: 0, marginBottom: 10 }}>
+                        {member.role}
+                      </p>
+                    </div>
+                    <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 14, color: "rgba(17,17,17,0.65)", lineHeight: 1.65, margin: 0, marginBottom: 12 }}>
+                      {member.bio}
+                    </p>
+                    <div className="flex flex-wrap" style={{ gap: 6 }}>
+                      {member.expertise.map((exp) => (
+                        <span
+                          key={exp}
+                          style={{
+                            fontFamily: "Poppins, system-ui, sans-serif",
+                            fontSize: 11,
+                            fontWeight: 500,
+                            color: member.accent,
+                            background: `${member.accent}10`,
+                            border: `1px solid ${member.accent}25`,
+                            borderRadius: 4,
+                            padding: "3px 8px",
+                          }}
+                        >
+                          {exp}
+                        </span>
+                      ))}
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+
+              {/* CTA for partnerships */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-center mt-16"
+              >
+                <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 15, color: "rgba(17,17,17,0.65)", margin: 0, marginBottom: 16 }}>
+                  Interested in joining our mission or partnering with VAGIN?
+                </p>
+                <a
+                  href="mailto:vieraambergirls@gmail.com"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    fontFamily: "Poppins, system-ui, sans-serif",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    letterSpacing: "0.05em",
+                    textTransform: "uppercase",
+                    background: `linear-gradient(135deg, ${PURPLE} 0%, ${PINK} 100%)`,
+                    color: "#FAFAFA",
+                    border: "none",
+                    borderRadius: 999,
+                    padding: "13px 28px",
+                    textDecoration: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Get in Touch <Mail size={14} strokeWidth={2} />
+                </a>
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+
         {/* ── WHY ART (The Method — leads directly into the Programs/VaginART) ─ */}
         <section
           className="w-full py-20"
