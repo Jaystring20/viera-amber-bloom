@@ -22,12 +22,18 @@
      and overwrites the cache, so the NEXT load — not some indefinite future
      deploy — already has the update.
 
-   Bump CACHE_VERSION to retire every old cache on the next activation. Bumped
-   to v2 specifically to purge the logo/favicon bytes already stuck under v1's
-   cache-first policy on returning visitors' devices.
+   Bump CACHE_VERSION to retire every old cache on the next activation. v2
+   purged the logo/favicon bytes stuck under v1's old cache-first policy.
+   Bumped again to v3 because the actual icon FILES (icon-512.png, icon-192,
+   icon-64, apple-touch-icon, icon-maskable-512, favicon.ico) still had the
+   old orange-chevron artwork baked in until now — v2 had already cached
+   those wrong bytes under the new stale-while-revalidate policy, so without
+   this bump the first hit after v2 would still show the old icon once more
+   before quietly refreshing. v3 forces a clean break instead of an eventual
+   one.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const CACHE_VERSION = "va-v2";
+const CACHE_VERSION = "va-v3";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const ASSET_CACHE = `${CACHE_VERSION}-assets`;
 
