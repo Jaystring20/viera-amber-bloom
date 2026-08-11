@@ -1587,7 +1587,7 @@ const VAGINPage = () => {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.2 }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6"
               >
                 {[
                   {
@@ -1607,8 +1607,16 @@ const VAGINPage = () => {
                     accent: PINK,
                   },
                   {
-                    name: "Omoneh A. A.",
+                    name: "Ogunnowo Oyindamola",
                     role: "Monitoring & Evaluation Lead",
+                    bio: "Pharmacist and healthcare leader with 7+ years' experience in community healthcare systems. She has improved health outcomes for over 20,000 patients through leadership, medication safety, and public health expertise.",
+                    image: "/ogunnowo-oyindamola.webp",
+                    expertise: ["Pharmacy", "Healthcare Leadership", "Medication Safety", "Public Health"],
+                    accent: PINK,
+                  },
+                  {
+                    name: "Omoneh A. A.",
+                    role: "Nigeria Team Lead",
                     bio: "Award-winning Customer and Human Experience Executive with 7+ years of cross-sector leadership, driving initiatives in healthcare, women's empowerment, and community development through empathy-centered leadership and organizational culture transformation.",
                     image: "/omoneh-aa.webp",
                     expertise: ["Program Evaluation", "Community Development", "Women Empowerment", "Human Experience"],
