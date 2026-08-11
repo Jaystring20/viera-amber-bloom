@@ -1299,10 +1299,14 @@ const VIVAPage = () => {
                 translucent wash cannot be both clear and reliably dark
                 enough for small text at the same spot. So legibility here
                 no longer comes from the background at all: each element
-                carries its own thin stroke (a hard-edged outline around the
-                glyphs, the same trick subtitles use to stay readable over
-                any footage) plus a stronger shadow, both independent of
-                whatever the film is doing underneath. */}
+                carries its own shadow, independent of whatever the film is
+                doing underneath.
+
+                A hard-edged text-stroke used to sit alongside that shadow
+                (the subtitle trick) but the client flagged it live — it was
+                reading as a visible thin outline around the letters, not as
+                added legibility — so it's removed here. The shadow alone is
+                what's carrying contrast now. */}
             <div>
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
@@ -1330,7 +1334,9 @@ const VIVAPage = () => {
                   // back (tight 0.75->0.55, wide 0.42->0.28 alpha; wide blur
                   // 10px->6px) rather than removed outright, so some bright-
                   // frame insurance survives without the letters reading dim.
-                  WebkitTextStroke: "0.5px rgba(30,0,8,0.55)",
+                  // The text-stroke that used to sit alongside this shadow is
+                  // gone — client flagged it as a visible thin outline around
+                  // the letters, not as legibility help.
                   textShadow: "0 1px 2px rgba(30,0,8,0.55), 0 0 6px rgba(30,0,8,0.28)",
                 }}
               >
@@ -1358,12 +1364,10 @@ const VIVAPage = () => {
                   // to move to without a synthetic-bold browser fallback,
                   // so the size increase is carrying this one alone.
                   fontWeight: 500,
-                  // Thinner than the wordmark's stroke — at this size a
-                  // heavier outline reads as a blob — but same two-layer
-                  // shadow fix: this line went the softest of all four
-                  // against a bright frame, being both the smallest text
-                  // and the lowest-contrast color (white, not gold).
-                  WebkitTextStroke: "0.4px rgba(30,0,8,0.78)",
+                  // Same two-layer shadow fix as the wordmark: this line went
+                  // the softest of all four against a bright frame, being
+                  // both the smallest text and the lowest-contrast color
+                  // (white, not gold). No stroke — see wordmark comment above.
                   textShadow: "0 1px 1.5px rgba(30,0,8,0.7), 0 0 8px rgba(30,0,8,0.4)",
                 }}
               >
@@ -1405,10 +1409,9 @@ const VIVAPage = () => {
                   // Descender clearance for the 'y' in "by"
                   lineHeight: 1.3,
                   paddingBottom: 2,
-                  // Same two-layer fix as the wordmark — also thin
+                  // Same two-layer shadow fix as the wordmark — also thin
                   // Cormorant italic, needed the same insurance for a
-                  // bright frame.
-                  WebkitTextStroke: "0.5px rgba(30,0,8,0.78)",
+                  // bright frame. No stroke — see wordmark comment above.
                   textShadow: "0 1px 2px rgba(30,0,8,0.75), 0 0 9px rgba(30,0,8,0.4)",
                 }}
               >
@@ -1416,10 +1419,11 @@ const VIVAPage = () => {
               </motion.p>
             </div>
 
-            {/* Eyebrow — back to plain floating text, no chip. Same stroke
+            {/* Eyebrow — back to plain floating text, no chip. Same shadow
                 treatment as the masthead — the reshaped gradient behind it
                 is deliberately light now, so the glyphs carry their own
-                edge instead of leaning on background density. */}
+                shadow instead of leaning on background density. No stroke —
+                see wordmark comment above. */}
             <motion.p
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1432,8 +1436,7 @@ const VIVAPage = () => {
                 textTransform: "uppercase",
                 color: GOLD,
                 margin: "clamp(38px, 4.4vw, 60px) 0 clamp(18px, 2vw, 26px) 0",
-                // Same two-layer fix as the rest of the masthead.
-                WebkitTextStroke: "0.5px rgba(30,0,8,0.78)",
+                // Same two-layer shadow fix as the rest of the masthead.
                 textShadow: "0 1px 2px rgba(30,0,8,0.72), 0 0 8px rgba(30,0,8,0.4)",
               }}
             >
