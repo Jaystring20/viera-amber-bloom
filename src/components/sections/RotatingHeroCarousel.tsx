@@ -1,59 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ILLUSTRATION_CATEGORIES, type IllustrationCategory } from "@/lib/illustration-categories";
 
-export interface HeroCategory {
-  id: string;
-  name: string;
-  subcategories: string[];
-  image: string;
-  theme: string;
-}
-
-export const HERO_CATEGORIES: HeroCategory[] = [
-  {
-    id: "couture-gowns",
-    name: "Couture Gowns",
-    subcategories: [],
-    image: "artwork_0001.webp",
-    theme: "Elegance",
-  },
-  {
-    id: "bridal-designs",
-    name: "Bridal Designs",
-    subcategories: [],
-    image: "artwork_0036.webp",
-    theme: "Romance",
-  },
-  {
-    id: "lagos-culture",
-    name: "Lagos Icons",
-    subcategories: [],
-    image: "artwork_0029.webp",
-    theme: "Heritage",
-  },
-  {
-    id: "conceptual-bags",
-    name: "Conceptual Bags",
-    subcategories: [],
-    image: "artwork_0028.webp",
-    theme: "Innovation",
-  },
-  {
-    id: "jacqueline-portraits",
-    name: "Jacqueline Portraits",
-    subcategories: [],
-    image: "artwork_0024.webp",
-    theme: "Portraiture",
-  },
-  {
-    id: "#sorosoke-campaign",
-    name: "#SOROSOKE Campaign",
-    subcategories: [],
-    image: "artwork_0052.webp",
-    theme: "Movement",
-  },
-];
+// Was a hardcoded 6-item list here (Couture Gowns, Bridal Designs, Lagos
+// Icons, Conceptual Bags, Jacqueline Portraits, #SOROSOKE Campaign) whose
+// ids mostly didn't match anything real — see illustration-categories.ts
+// for the full story. HeroCategory is now just an alias so downstream code
+// (slide index math, onCategorySelect prop) didn't need reshaping.
+export type HeroCategory = IllustrationCategory;
+export const HERO_CATEGORIES: HeroCategory[] = ILLUSTRATION_CATEGORIES;
 
 const SCROLL_WORDS = [
   "Couture",
@@ -81,8 +37,6 @@ export const RotatingHeroCarousel = ({ onCategorySelect }: RotatingHeroCarouselP
   const autoplayRef = useRef<NodeJS.Timeout>();
 
   const current = HERO_CATEGORIES[currentIndex];
-  const isLastFashion = currentIndex === 4; // Last fashion category
-  const isLastLifestyle = currentIndex === HERO_CATEGORIES.length - 1; // Last lifestyle
 
   const slideVariants = {
     enter: (dir: number) => ({
@@ -200,7 +154,7 @@ export const RotatingHeroCarousel = ({ onCategorySelect }: RotatingHeroCarouselP
                   opacity: 0.8,
                 }}
               >
-                {current.theme}
+                {current.umbrella === "fashion" ? "Fashion Illustration" : "Lifestyle Illustration"}
               </motion.p>
 
               {/* Category name - stark white, elegant serif */}

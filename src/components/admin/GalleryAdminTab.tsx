@@ -15,6 +15,7 @@ export interface DBChapter {
   description: string;
   layout: string;
   sort_order: number;
+  umbrella: "fashion" | "lifestyle" | null;
 }
 
 export interface DBartwork {
@@ -27,6 +28,8 @@ export interface DBartwork {
   image_url: string;
   featured: boolean;
   created_at: string;
+  /** True = hidden from the public gallery (used for the Aug 2026 pieces pending title/story). */
+  is_draft: boolean;
 }
 
 // ── Constants ──────────────────────────────────────────────────────────────────
@@ -116,7 +119,7 @@ const GalleryAdminTab = () => {
   const [view,       setView]       = useState<"artworks" | "chapters">("artworks");
 
   const [artworkForm, setArtworkForm] = useState({
-    id: "", seq: "", title: "", story: "", chapter_id: "", medium: "Portrait", image_url: "", featured: false,
+    id: "", seq: "", title: "", story: "", chapter_id: "", medium: "Portrait", image_url: "", featured: false, is_draft: false,
   });
   const [chapterForm, setChapterForm] = useState({
     id: "", index_label: "", name: "", tagline: "", description: "", layout: "mosaic",
@@ -168,12 +171,12 @@ const GalleryAdminTab = () => {
   // ── Artwork CRUD ────────────────────────────────────────────────────────────
   const openAddArtwork = () => {
     const nextSeq = (artworks.length ? Math.max(...artworks.map(a => a.seq)) + 1 : 1);
-    setArtworkForm({ id: "", seq: String(nextSeq), title: "", story: "", chapter_id: chapters[0]?.id ?? "", medium: "Portrait", image_url: "", featured: false });
+    setArtworkForm({ id: "", seq: String(nextSeq), title: "", story: "", chapter_id: chapters[0]?.id ?? "", medium: "Portrait", image_url: "", featured: false, is_draft: false });
     setModal("add-artwork");
   };
 
   const openEditArtwork = (a: DBartwork) => {
-    setArtworkForm({ id: a.id, seq: String(a.seq), title: a.title, story: a.story, chapter_id: a.chapter_id ?? "", medium: a.medium, image_url: a.image_url, featured: a.featured });
+    setArtworkForm({ id: a.id, seq: String(a.seq), title: a.title, story: a.story, chapter_id: a.chapter_id ?? "", medium: a.medium, image_url: a.image_url, featured: a.featured, is_draft: a.is_draft });
     setModal("edit-artwork");
   };
 
@@ -188,6 +191,7 @@ const GalleryAdminTab = () => {
         medium:     artworkForm.medium,
         image_url:  artworkForm.image_url.trim(),
         featured:   artworkForm.featured,
+        is_draft:   artworkForm.is_draft,
       };
       const { error } = artworkForm.id
         ? await supabase.from("va_artworks").update(payload).eq("id", artworkForm.id)
@@ -278,7 +282,7 @@ const GalleryAdminTab = () => {
             <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13 }}>
               <thead>
                 <tr>
-                  {["", "Title", "Chapter", "Medium", "Featured", "Actions"].map(h => (
+                  {["", "Title", "Chapter", "Medium", "Featured", "Status", "Actions"].map(h => (
                     <th key={h} style={{ textAlign: "left", padding: "10px 12px", fontSize: 10, color: "rgba(250,250,250,0.4)", letterSpacing: "0.18em", textTransform: "uppercase", borderBottom: "1px solid rgba(255,255,255,0.08)", whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
@@ -296,11 +300,18 @@ const GalleryAdminTab = () => {
                         </div>
                       )}
                     </td>
-                    <td style={{ padding: "8px 12px", color: "#FAFAFA", fontWeight: 500 }}>{a.title}</td>
+                    <td style={{ padding: "8px 12px", color: a.title ? "#FAFAFA" : "rgba(250,250,250,0.3)", fontWeight: 500, fontStyle: a.title ? "normal" : "italic" }}>{a.title || "(untitled)"}</td>
                     <td style={{ padding: "8px 12px", color: "rgba(250,250,250,0.55)", fontSize: 12 }}>{chapterName(a.chapter_id)}</td>
                     <td style={{ padding: "8px 12px", color: "rgba(250,250,250,0.55)", fontSize: 12 }}>{a.medium}</td>
                     <td style={{ padding: "8px 12px" }}>
                       {a.featured && <Star size={13} color={GOLD} fill={GOLD} />}
+                    </td>
+                    <td style={{ padding: "8px 12px" }}>
+                      {a.is_draft && (
+                        <span style={{ fontSize: 10, padding: "3px 8px", borderRadius: 999, background: "rgba(217,119,6,0.15)", border: `1px solid ${GOLD}55`, color: GOLD, textTransform: "uppercase", letterSpacing: "0.1em", whiteSpace: "nowrap" }}>
+                          Draft · hidden
+                        </span>
+                      )}
                     </td>
                     <td style={{ padding: "8px 12px", whiteSpace: "nowrap" }}>
                       <button onClick={() => openEditArtwork(a)} style={{ background: `${PURPLE}30`, border: `1px solid ${PURPLE}60`, borderRadius: 6, padding: "5px 8px", cursor: "pointer", color: PL, marginRight: 6 }}><Pencil size={12} /></button>
@@ -309,7 +320,7 @@ const GalleryAdminTab = () => {
                   </tr>
                 ))}
                 {artworks.length === 0 && (
-                  <tr><td colSpan={6} style={{ padding: "32px 12px", color: "rgba(250,250,250,0.3)", textAlign: "center" }}>
+                  <tr><td colSpan={7} style={{ padding: "32px 12px", color: "rgba(250,250,250,0.3)", textAlign: "center" }}>
                     No artworks yet — run the seed SQL or add one above.
                   </td></tr>
                 )}
@@ -323,7 +334,7 @@ const GalleryAdminTab = () => {
       {!loading && view === "chapters" && (
         <div>
           <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: "24px 24px 20px", marginBottom: 12 }}>
-            <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: "rgba(250,250,250,0.4)", letterSpacing: "0.25em", textTransform: "uppercase", margin: "0 0 18px" }}>Story Chapters</p>
+            <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: "rgba(250,250,250,0.4)", letterSpacing: "0.25em", textTransform: "uppercase", margin: "0 0 18px" }}>Categories</p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 12 }}>
               {chapters.map(c => (
                 <div key={c.id} style={{ background: "rgba(255,255,255,0.035)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "16px 18px" }}>
@@ -331,15 +342,22 @@ const GalleryAdminTab = () => {
                     <div>
                       <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: PL, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600 }}>{c.index_label}</span>
                       <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 14, fontWeight: 700, color: "#FAFAFA", margin: "4px 0 2px" }}>{c.name}</p>
-                      <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, color: GOLD, margin: 0, fontStyle: "italic" }}>{c.tagline}</p>
+                      {c.tagline && (
+                        <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, color: GOLD, margin: 0, fontStyle: "italic" }}>{c.tagline}</p>
+                      )}
                     </div>
                     <button onClick={() => openEditChapter(c)} style={{ flexShrink: 0, background: `${PURPLE}30`, border: `1px solid ${PURPLE}60`, borderRadius: 6, padding: "6px 8px", cursor: "pointer", color: PL }}>
                       <Pencil size={12} />
                     </button>
                   </div>
-                  <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, color: "rgba(250,250,250,0.5)", margin: "0 0 8px", lineHeight: 1.55 }}>{c.description}</p>
+                  {c.description && (
+                    <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, color: "rgba(250,250,250,0.5)", margin: "0 0 8px", lineHeight: 1.55 }}>{c.description}</p>
+                  )}
                   <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                     <span style={{ fontSize: 10, padding: "3px 8px", borderRadius: 999, background: `${PURPLE}20`, border: `1px solid ${PURPLE}40`, color: PL, textTransform: "uppercase", letterSpacing: "0.12em" }}>{c.layout}</span>
+                    {c.umbrella && (
+                      <span style={{ fontSize: 10, padding: "3px 8px", borderRadius: 999, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(250,250,250,0.5)", textTransform: "capitalize" }}>{c.umbrella}</span>
+                    )}
                     <span style={{ fontSize: 10, color: "rgba(250,250,250,0.3)" }}>{artworks.filter(a => a.chapter_id === c.id).length} artworks</span>
                   </div>
                 </div>
@@ -347,7 +365,7 @@ const GalleryAdminTab = () => {
             </div>
           </div>
           <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: "rgba(250,250,250,0.25)", padding: "0 4px" }}>
-            Chapter IDs are fixed (referenced by artworks). You can edit names, taglines, descriptions, and layout.
+            Category IDs are fixed (referenced by artworks). You can edit names, taglines, descriptions, and layout.
           </p>
         </div>
       )}
@@ -411,13 +429,25 @@ const GalleryAdminTab = () => {
               </div>
 
               {/* Featured toggle */}
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, padding: "10px 14px", background: "rgba(255,255,255,0.04)", borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)", cursor: "pointer" }}
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, padding: "10px 14px", background: "rgba(255,255,255,0.04)", borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)", cursor: "pointer" }}
                 onClick={() => setArtworkForm(p => ({ ...p, featured: !p.featured }))}>
                 <div style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${artworkForm.featured ? GOLD : "rgba(255,255,255,0.2)"}`, background: artworkForm.featured ? `${GOLD}22` : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   {artworkForm.featured && <Star size={10} color={GOLD} fill={GOLD} />}
                 </div>
                 <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: artworkForm.featured ? GOLD : "rgba(250,250,250,0.55)" }}>
                   Featured — shown prominently in the gallery
+                </span>
+              </div>
+
+              {/* Draft toggle — the 25 Aug-2026 pieces start here with no
+                  title/story; uncheck once real copy is filled in to publish. */}
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, padding: "10px 14px", background: "rgba(255,255,255,0.04)", borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)", cursor: "pointer" }}
+                onClick={() => setArtworkForm(p => ({ ...p, is_draft: !p.is_draft }))}>
+                <div style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${artworkForm.is_draft ? GOLD : "rgba(255,255,255,0.2)"}`, background: artworkForm.is_draft ? `${GOLD}22` : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  {artworkForm.is_draft && <span style={{ width: 8, height: 8, borderRadius: 2, background: GOLD }} />}
+                </div>
+                <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: artworkForm.is_draft ? GOLD : "rgba(250,250,250,0.55)" }}>
+                  Draft — hidden from the public gallery until unchecked
                 </span>
               </div>
 

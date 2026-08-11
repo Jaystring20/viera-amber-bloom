@@ -316,6 +316,10 @@ const FeatureBand = ({ art, onOpen }: { art: Artwork; onOpen: () => void }) => {
 };
 
 // ─── Chapter intro ──────────────────────────────────────────────────────────
+// tagline/description are optional now — the client's category list uses
+// plain names with no poetic subtitle (see gallery-data.ts CHAPTERS), so
+// both are rendered only when actually present rather than leaving empty
+// italic/paragraph gaps.
 const ChapterIntro = ({ chapter }: { chapter: Chapter }) => {
   const reduced = useReducedMotion();
   return (
@@ -340,32 +344,36 @@ const ChapterIntro = ({ chapter }: { chapter: Chapter }) => {
           >
             {chapter.name}
           </h2>
-          <p
-            className="font-display"
-            style={{ fontStyle: "italic", fontSize: "clamp(14px, 1.6vw, 18px)", color: GOLD, margin: "4px 0 0" }}
-          >
-            {chapter.tagline}
-          </p>
+          {chapter.tagline && (
+            <p
+              className="font-display"
+              style={{ fontStyle: "italic", fontSize: "clamp(14px, 1.6vw, 18px)", color: GOLD, margin: "4px 0 0" }}
+            >
+              {chapter.tagline}
+            </p>
+          )}
         </div>
       </motion.div>
-      <motion.p
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: reduced ? 0 : 0.6, delay: reduced ? 0 : 0.15 }}
-        style={{
-          fontFamily: "DM Sans, system-ui, sans-serif",
-          fontWeight: 300,
-          fontSize: 15,
-          color: "#888",
-          lineHeight: 1.75,
-          maxWidth: 600,
-          margin: "16px 0 0",
-          paddingLeft: 2,
-        }}
-      >
-        {chapter.description}
-      </motion.p>
+      {chapter.description && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: reduced ? 0 : 0.6, delay: reduced ? 0 : 0.15 }}
+          style={{
+            fontFamily: "DM Sans, system-ui, sans-serif",
+            fontWeight: 300,
+            fontSize: 15,
+            color: "#888",
+            lineHeight: 1.75,
+            maxWidth: 600,
+            margin: "16px 0 0",
+            paddingLeft: 2,
+          }}
+        >
+          {chapter.description}
+        </motion.p>
+      )}
       <div aria-hidden className="mt-6" style={{ width: 56, height: 2, backgroundColor: GOLD, opacity: 0.5 }} />
     </div>
   );
@@ -510,7 +518,9 @@ const EditorialGallery = () => {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   // Live data — starts from static file (instant render) and updates when Supabase responds.
-  const [artworks, setArtworks] = useState<Artwork[]>(STATIC_ARTWORKS);
+  // Drafts (no title/story yet — see gallery-data.ts) are filtered out of
+  // both sources here, once, rather than at every render site downstream.
+  const [artworks, setArtworks] = useState<Artwork[]>(STATIC_ARTWORKS.filter(a => !a.draft));
   const [chapters, setChapters] = useState<Chapter[]>(STATIC_CHAPTERS);
 
   useEffect(() => {
@@ -523,16 +533,20 @@ const EditorialGallery = () => {
         ]);
         if (cancelled) return;
         if (arts && arts.length > 0) {
-          setArtworks(arts.map((a): Artwork => ({
-            id: a.id,
-            n: a.seq,
-            title: a.title,
-            story: a.story,
-            chapter: (a.chapter_id ?? "speaks") as ChapterId,
-            medium: a.medium as Medium,
-            image: a.image_url,
-            feature: a.featured,
-          })));
+          setArtworks(arts
+            .filter((a) => !a.is_draft)
+            .map((a): Artwork => ({
+              id: a.id,
+              n: a.seq,
+              title: a.title,
+              story: a.story,
+              // "single-illustrations" is the catch-all bucket now — the old
+              // fallback ("speaks") was a poetic chapter id that no longer exists.
+              chapter: (a.chapter_id ?? "single-illustrations") as ChapterId,
+              medium: a.medium as Medium,
+              image: a.image_url,
+              feature: a.featured,
+            })));
         }
         if (chaps && chaps.length > 0) {
           setChapters(chaps.map((c): Chapter => ({
@@ -640,7 +654,10 @@ const EditorialGallery = () => {
             {chapters.map((chapter) => {
               const items = artworks.filter((a) => a.chapter === chapter.id);
               return (
-                <div key={chapter.id} id={`chapter-${chapter.id}`}>
+                // id matches categoryAnchorId() in illustration-categories.ts —
+                // this is what the hero carousel / "Browse by Category" row
+                // scroll to when a category is clicked.
+                <div key={chapter.id} id={`category-${chapter.id}`}>
                   <ChapterIntro chapter={chapter} />
                   <ChapterBody chapter={chapter} items={items} openOf={openOf} />
                 </div>

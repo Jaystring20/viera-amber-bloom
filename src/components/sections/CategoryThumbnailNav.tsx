@@ -1,61 +1,14 @@
 import { useState, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ILLUSTRATION_CATEGORIES, type IllustrationCategory } from "@/lib/illustration-categories";
 
-export interface CategoryThumbnail {
-  id: string;
-  name: string;
-  umbrella: "fashion" | "lifestyle";
-  image: string;
-  pieceCount?: number;
-}
-
-export const CATEGORY_THUMBNAILS: CategoryThumbnail[] = [
-  // Fashion Illustration collections
-  {
-    id: "couture-gowns",
-    name: "Couture Gowns",
-    umbrella: "fashion",
-    image: "artwork_0001.webp",
-    pieceCount: 20,
-  },
-  {
-    id: "bridal-designs",
-    name: "Bridal Designs",
-    umbrella: "fashion",
-    image: "artwork_0036.webp",
-    pieceCount: 5,
-  },
-  {
-    id: "lagos-culture",
-    name: "Lagos Icons",
-    umbrella: "fashion",
-    image: "artwork_0029.webp",
-    pieceCount: 13,
-  },
-  {
-    id: "conceptual-bags",
-    name: "Conceptual Bags",
-    umbrella: "fashion",
-    image: "artwork_0028.webp",
-    pieceCount: 3,
-  },
-  // Lifestyle Illustration collections
-  {
-    id: "jacqueline-portraits",
-    name: "Jacqueline Portraits",
-    umbrella: "lifestyle",
-    image: "artwork_0024.webp",
-    pieceCount: 4,
-  },
-  {
-    id: "#sorosoke-campaign",
-    name: "#SOROSOKE Campaign",
-    umbrella: "lifestyle",
-    image: "artwork_0052.webp",
-    pieceCount: 12,
-  },
-];
+// Was its own hardcoded 6-item list, out of sync with both the hero
+// carousel's list AND the DB — see illustration-categories.ts. pieceCount
+// isn't tracked here anymore; the DB is the source of truth for counts if
+// that's ever needed again.
+export type CategoryThumbnail = IllustrationCategory;
+export const CATEGORY_THUMBNAILS: CategoryThumbnail[] = ILLUSTRATION_CATEGORIES;
 
 interface CategoryThumbnailNavProps {
   onCategorySelect?: (category: CategoryThumbnail) => void;

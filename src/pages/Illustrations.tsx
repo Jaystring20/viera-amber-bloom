@@ -6,7 +6,7 @@ import RotatingHeroCarousel from "@/components/sections/RotatingHeroCarousel";
 import CategoryThumbnailNav from "@/components/sections/CategoryThumbnailNav";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { scrollToCategory } from "@/lib/illustration-categories";
 import {
   fadeSlideUp,
   fadeIn,
@@ -18,7 +18,6 @@ import {
 
 const Illustrations = () => {
   const reduced = useReducedMotion();
-  const navigate = useNavigate();
 
   const appsRef = useRef<HTMLDivElement>(null);
   const processRef = useRef<HTMLDivElement>(null);
@@ -31,8 +30,14 @@ const Illustrations = () => {
   const staggerVariants = useReducedVariants(staggerContainer);
   const cardVariants = useReducedVariants(cardItem);
 
-  const handleCategorySelect = (collectionId: string) => {
-    navigate(`/collections/${collectionId}`);
+  // Was navigate(`/collections/${collectionId}`) — a separate page, and one
+  // whose ids mostly didn't match anything real (see
+  // illustration-categories.ts). The client's direction was explicit: a
+  // category click should land on that category's own section further down
+  // this same page, in sync with "Browse by Category" above it — so this is
+  // now an in-page scroll instead of a navigation.
+  const handleCategorySelect = (categoryId: string) => {
+    scrollToCategory(categoryId);
   };
 
   return (
