@@ -1624,13 +1624,18 @@ const VAGINPage = () => {
                   },
                   {
                     name: "Aron Sadrick Eryau",
-                    role: "Research & Healthcare Lead",
+                    role: "Finance & Fundraising Lead",
                     bio: "Midwife, global health researcher, and healthcare leader with 5+ years of experience advancing maternal, newborn, and sexual and reproductive health. As a Teaching Fellow in Nursing and Midwifery, he drives evidence-informed education, research, and health systems strengthening.",
                     image: "/aron-sadrick-eryau.webp",
                     expertise: ["Midwifery", "Health Research", "SRHR", "Health Systems Strengthening"],
                     accent: PINK,
                   },
-                ].map((member) => (
+                ].map((member, idx) => {
+                  const [expanded, setExpanded] = useState(false);
+                  const bioPreview = member.bio.substring(0, 100) + "...";
+                  const showReadMore = member.bio.length > 100;
+
+                  return (
                   <motion.div
                     key={member.name}
                     variants={cardV}
@@ -1666,32 +1671,32 @@ const VAGINPage = () => {
                         </h3>
                       </div>
 
-                      <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 13.5, color: "rgba(250,250,250,0.7)", lineHeight: 1.65, margin: "0 0 14px 0" }}>
-                        {member.bio}
+                      <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 13.5, color: "rgba(250,250,250,0.7)", lineHeight: 1.65, margin: "0 0 12px 0" }}>
+                        {expanded ? member.bio : bioPreview}
                       </p>
 
-                      <div className="flex flex-wrap" style={{ gap: 6 }}>
-                        {member.expertise.map((exp) => (
-                          <span
-                            key={exp}
-                            style={{
-                              fontFamily: "Poppins, system-ui, sans-serif",
-                              fontSize: 10,
-                              fontWeight: 500,
-                              color: member.accent,
-                              background: `${member.accent}15`,
-                              border: `1px solid ${member.accent}30`,
-                              borderRadius: 4,
-                              padding: "3px 8px",
-                            }}
-                          >
-                            {exp}
-                          </span>
-                        ))}
-                      </div>
+                      {showReadMore && (
+                        <button
+                          onClick={() => setExpanded(!expanded)}
+                          style={{
+                            fontFamily: "Poppins, system-ui, sans-serif",
+                            fontSize: 12,
+                            fontWeight: 600,
+                            color: member.accent,
+                            background: "none",
+                            border: "none",
+                            padding: "4px 0",
+                            cursor: "pointer",
+                            textDecoration: "underline",
+                          }}
+                        >
+                          {expanded ? "Read Less" : "Read More"}
+                        </button>
+                      )}
                     </div>
                   </motion.div>
-                ))}
+                );
+                })}
               </motion.div>
             </motion.div>
 
