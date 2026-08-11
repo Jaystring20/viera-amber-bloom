@@ -10,9 +10,11 @@ import { X, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import {
   ARTWORKS as STATIC_ARTWORKS,
   CHAPTERS as STATIC_CHAPTERS,
+  COLLECTIONS as STATIC_COLLECTIONS,
   type Artwork,
   type Chapter,
   type ChapterId,
+  type IllustrationCollection,
   type Medium,
 } from "@/lib/gallery-data";
 import { supabase } from "@/lib/supabase";
@@ -384,10 +386,12 @@ const ChapterBody = ({
   chapter,
   items,
   openOf,
+  collections = [],
 }: {
   chapter: Chapter;
   items: Artwork[];
   openOf: (art: Artwork) => () => void;
+  collections?: IllustrationCollection[];
 }) => {
   // Only ONE piece can occupy the FeatureBand slot, so only that one is
   // excluded from the regular grid below — not every feature-flagged piece.
@@ -457,17 +461,54 @@ const ChapterBody = ({
     );
   }
 
-  // default: mosaic — feature band (if any) + masonry columns
+  // default: mosaic — feature band (if any) + masonry columns, optionally grouped by collection
+  const collectionsInChapter = collections.filter((c) => c.categoryId === chapter.id).sort((a, b) => a.sortOrder - b.sortOrder);
+  const collectionIds = new Set(collectionsInChapter.map((c) => c.id));
+  const itemsWithCollection = rest.filter((art) => art.collectionId && collectionIds.has(art.collectionId));
+  const itemsWithoutCollection = rest.filter((art) => !art.collectionId || !collectionIds.has(art.collectionId));
+
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-12">
       {feature && <FeatureBand art={feature} onOpen={openOf(feature)} />}
-      <div style={{ columnGap: "12px" }} className="[column-count:2] md:[column-count:3]">
-        {rest.map((art) => (
-          <div key={art.id} style={{ marginBottom: 12 }}>
-            <Tile art={art} onOpen={openOf(art)} />
+
+      {/* Collections (with items grouped under each) */}
+      {collectionsInChapter.map((collection) => {
+        const collectionItems = rest.filter((art) => art.collectionId === collection.id);
+        if (collectionItems.length === 0) return null;
+
+        return (
+          <div key={collection.id} className="flex flex-col gap-4">
+            <div>
+              <h3 className="font-display" style={{ fontSize: "clamp(18px, 2vw, 28px)", fontWeight: 600, color: "#FAFAFA", margin: 0, lineHeight: 1.1 }}>
+                {collection.name}
+              </h3>
+              {collection.description && (
+                <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontWeight: 300, fontSize: 14, color: "#888", margin: "6px 0 0", lineHeight: 1.6 }}>
+                  {collection.description}
+                </p>
+              )}
+            </div>
+            <div style={{ columnGap: "12px" }} className="[column-count:2] md:[column-count:3]">
+              {collectionItems.map((art) => (
+                <div key={art.id} style={{ marginBottom: 12 }}>
+                  <Tile art={art} onOpen={openOf(art)} />
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
-      </div>
+        );
+      })}
+
+      {/* Standalone items (no collection) */}
+      {itemsWithoutCollection.length > 0 && (
+        <div style={{ columnGap: "12px" }} className="[column-count:2] md:[column-count:3]">
+          {itemsWithoutCollection.map((art) => (
+            <div key={art.id} style={{ marginBottom: 12 }}>
+              <Tile art={art} onOpen={openOf(art)} />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -542,6 +583,7 @@ const EditorialGallery = () => {
   // both sources here, once, rather than at every render site downstream.
   const [artworks, setArtworks] = useState<Artwork[]>(STATIC_ARTWORKS.filter(a => !a.draft));
   const [chapters, setChapters] = useState<Chapter[]>(STATIC_CHAPTERS);
+  const [collections, setCollections] = useState<IllustrationCollection[]>(STATIC_COLLECTIONS);
 
   useEffect(() => {
     let cancelled = false;
@@ -682,7 +724,7 @@ const EditorialGallery = () => {
               // CategoryNav all scroll to when a category is selected.
               <div key={chapter.id} id={`category-${chapter.id}`}>
                 <ChapterIntro chapter={chapter} />
-                <ChapterBody chapter={chapter} items={items} openOf={openOf} />
+                <ChapterBody chapter={chapter} items={items} openOf={openOf} collections={collections} />
               </div>
             );
           })}

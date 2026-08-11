@@ -56,6 +56,9 @@ export interface Artwork {
   feature?: boolean;
   collection?: CollectionId;
   umbrella?: "fashion" | "lifestyle";
+  /** Themed collection this piece belongs to (e.g. "eden-collection", "time-will-tell").
+      Most pieces are null — only works with extra writeups/annotations have collections. */
+  collectionId?: string;
   /** True for pieces with no title/story yet — kept out of the public gallery. */
   draft?: boolean;
 }
@@ -67,6 +70,16 @@ export interface Chapter {
   tagline: string;
   description: string;
   layout: "mosaic" | "rail" | "feature";
+}
+
+export interface IllustrationCollection {
+  id: string;
+  categoryId: ChapterId;
+  name: string;
+  description?: string;
+  sortOrder: number;
+  /** For "Time Will Tell" and similar, optional segment label (e.g. "Past", "Present", "Future"). */
+  segment?: string;
 }
 
 export const MEDIA: Medium[] = [
@@ -94,6 +107,31 @@ export const CHAPTERS: Chapter[] = [
   { id: "event-programs",        index: "09", name: "Event Programs",        tagline: "", description: "", layout: "mosaic" },
 ];
 
+// Themed collections within categories. Most artworks don't belong to a
+// collection (collectionId = null); only pieces with extra writeups/annotations.
+export const COLLECTIONS: IllustrationCollection[] = [
+  // ── Fashion Illustrations ────────────────────────────────────────────────
+  { id: "red-wine-dress",        categoryId: "fashion-illustrations", name: "The Red-Wine Dress",              description: "If red wine was a dress, she would be a captivating blend of elegance and sophistication.", sortOrder: 10 },
+  { id: "corn-row-dress",        categoryId: "fashion-illustrations", name: "The Corn-Row Dress",            description: "Inspired by the Nigerian corn row \"all-back\" hairstyles.", sortOrder: 20 },
+  { id: "teyana-met-gala-2025",  categoryId: "fashion-illustrations", name: "The Teyana Taylor's 2025 Met Gala", description: "The Teyana Taylor's 2025 Met gala inspired outfit.", sortOrder: 30 },
+  { id: "eden-collection",       categoryId: "fashion-illustrations", name: "The Eden Collection",           description: "Inspired by the Biblical story of creation.", sortOrder: 40 },
+  { id: "oppenheimer-barbie",    categoryId: "fashion-illustrations", name: "The Oppenheimer-Barbie Collection", description: "Inspired by the movies.", sortOrder: 50 },
+  { id: "time-will-tell",        categoryId: "fashion-illustrations", name: "Time Will Tell Collection",      description: "Inspired by the way men dressed over the years.", sortOrder: 60 },
+  { id: "five-for-five",         categoryId: "fashion-illustrations", name: "#5for5 Campaign",                description: "An artistic expression of advocacy for human rights and good governance in Nigeria during the October 2020 #EndSARS protest.", sortOrder: 70 },
+  { id: "portrait-series",       categoryId: "fashion-illustrations", name: "Portrait Series",               description: "Editorial portraiture with sophisticated styling and jewelry focus.", sortOrder: 80 },
+  { id: "seven-day-ready-wear",  categoryId: "fashion-illustrations", name: "7-Day Ready to Wear Collection", description: "A collection of versatile, mix-and-match ready-to-wear designs with coordinated color palettes.", sortOrder: 90 },
+
+  // ── Shoes ────────────────────────────────────────────────────────────────
+  { id: "ta-lo-pa-chief",        categoryId: "shoes",                 name: "Ta Lo Pa Chief Shoe Collection", description: "Inspired by Lagos crime stories. Numbered evidence-tag styled platform clogs.", sortOrder: 10 },
+
+  // ── Bags ─────────────────────────────────────────────────────────────────
+  { id: "ride-or-die-bags",      categoryId: "bags",                  name: "The Ride or Die Bags",          description: "Inspired by the steering wheels of cars such as Tesla.", sortOrder: 10 },
+  { id: "aski-eko-bag",          categoryId: "bags",                  name: "The Aski Eko Bag Collection",    description: "Inspired by elements of Lagos traffic. Danfo-bus styled accessories.", sortOrder: 20 },
+
+  // ── Single Illustrations ─────────────────────────────────────────────────
+  { id: "christmas-new-year",    categoryId: "single-illustrations",  name: "Christmas and New Year Illustrations", description: "Seasonal lifestyle illustrations celebrating the festive period.", sortOrder: 10 },
+];
+
 const img = (n: number) => `/artworks/artwork_${String(n).padStart(4, "0")}.webp`;
 const mk = (
   n: number,
@@ -105,6 +143,7 @@ const mk = (
   collection?: CollectionId,
   umbrella?: "fashion" | "lifestyle",
   draft = false,
+  collectionId?: string,
 ): Artwork => ({
   id: `art-${String(n).padStart(4, "0")}`,
   n,
@@ -116,6 +155,7 @@ const mk = (
   feature,
   collection,
   umbrella,
+  collectionId,
   draft,
 });
 
