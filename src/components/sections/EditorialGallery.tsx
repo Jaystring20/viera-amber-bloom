@@ -527,44 +527,131 @@ const ChapterBody = ({
 // section is always on the page.
 const CategoryNav = ({ active }: { active: string | null }) => {
   const reduced = useReducedMotion();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const checkScroll = useCallback(() => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkScroll();
+    window.addEventListener("resize", checkScroll);
+    return () => window.removeEventListener("resize", checkScroll);
+  }, [checkScroll]);
+
+  const scroll = (direction: "left" | "right") => {
+    if (scrollRef.current) {
+      const scrollAmount = 200;
+      scrollRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: reduced ? "auto" : "smooth",
+      });
+      setTimeout(checkScroll, 100);
+    }
+  };
+
   return (
-    <div
-      className="sticky top-20 z-30 -mx-6 px-6 py-3 mb-10 flex gap-2 overflow-x-auto"
-      style={{
-        backgroundColor: "rgba(250,250,250,0.95)",
-        backdropFilter: "blur(10px)",
-        borderBottom: "1px solid #EBEBEB",
-      }}
-    >
-      {ILLUSTRATION_CATEGORIES.map((cat) => {
-        const isActive = active === cat.id;
-        return (
-          <button
-            key={cat.id}
-            type="button"
-            onClick={() => scrollToCategory(cat.id)}
-            aria-current={isActive ? "true" : undefined}
-            className="shrink-0 transition-colors"
-            style={{
-              fontFamily: "DM Sans, system-ui, sans-serif",
-              fontSize: 11,
-              letterSpacing: "1.5px",
-              textTransform: "uppercase",
-              padding: "9px 16px",
-              minHeight: 40,
-              borderRadius: 999,
-              cursor: "pointer",
-              border: `1px solid ${isActive ? "#111111" : "#CCCCCC"}`,
-              backgroundColor: isActive ? "#111111" : "transparent",
-              color: isActive ? "#FFFFFF" : "#666666",
-              transition: reduced ? "none" : "all 0.25s ease",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {cat.name}
-          </button>
-        );
-      })}
+    <div className="sticky top-20 z-30 mb-10 flex items-center gap-3">
+      {/* Left arrow */}
+      <motion.button
+        type="button"
+        onClick={() => scroll("left")}
+        disabled={!canScrollLeft}
+        aria-label="Scroll categories left"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: canScrollLeft ? 1 : 0.3 }}
+        transition={{ duration: reduced ? 0 : 0.25 }}
+        className="shrink-0 grid place-items-center transition-colors"
+        style={{
+          width: 40,
+          height: 40,
+          borderRadius: "50%",
+          border: "1px solid #CCCCCC",
+          backgroundColor: canScrollLeft ? "#FAFAFA" : "transparent",
+          color: canScrollLeft ? "#111111" : "#CCCCCC",
+          cursor: canScrollLeft ? "pointer" : "not-allowed",
+          display: "flex",
+        }}
+      >
+        <ChevronLeft size={18} />
+      </motion.button>
+
+      {/* Scrollable container */}
+      <div
+        ref={scrollRef}
+        className="-mx-6 px-6 py-3 flex gap-2 overflow-x-auto flex-1"
+        style={{
+          backgroundColor: "rgba(250,250,250,0.95)",
+          backdropFilter: "blur(10px)",
+          borderBottom: "1px solid #EBEBEB",
+          scrollSnapType: "x mandatory",
+          WebkitOverflowScrolling: "touch",
+        }}
+        onScroll={checkScroll}
+        role="list"
+        aria-label="Browse by category"
+      >
+        {ILLUSTRATION_CATEGORIES.map((cat) => {
+          const isActive = active === cat.id;
+          return (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => scrollToCategory(cat.id)}
+              aria-current={isActive ? "true" : undefined}
+              className="shrink-0 transition-colors"
+              style={{
+                fontFamily: "DM Sans, system-ui, sans-serif",
+                fontSize: 11,
+                letterSpacing: "1.5px",
+                textTransform: "uppercase",
+                padding: "9px 16px",
+                minHeight: 40,
+                borderRadius: 999,
+                cursor: "pointer",
+                border: `1px solid ${isActive ? "#111111" : "#CCCCCC"}`,
+                backgroundColor: isActive ? "#111111" : "transparent",
+                color: isActive ? "#FFFFFF" : "#666666",
+                transition: reduced ? "none" : "all 0.25s ease",
+                whiteSpace: "nowrap",
+                scrollSnapAlign: "start",
+              }}
+            >
+              {cat.name}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Right arrow */}
+      <motion.button
+        type="button"
+        onClick={() => scroll("right")}
+        disabled={!canScrollRight}
+        aria-label="Scroll categories right"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: canScrollRight ? 1 : 0.3 }}
+        transition={{ duration: reduced ? 0 : 0.25 }}
+        className="shrink-0 grid place-items-center transition-colors"
+        style={{
+          width: 40,
+          height: 40,
+          borderRadius: "50%",
+          border: "1px solid #CCCCCC",
+          backgroundColor: canScrollRight ? "#FAFAFA" : "transparent",
+          color: canScrollRight ? "#111111" : "#CCCCCC",
+          cursor: canScrollRight ? "pointer" : "not-allowed",
+          display: "flex",
+        }}
+      >
+        <ChevronRight size={18} />
+      </motion.button>
     </div>
   );
 };
