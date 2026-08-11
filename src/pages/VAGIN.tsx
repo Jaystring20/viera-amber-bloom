@@ -1587,7 +1587,7 @@ const VAGINPage = () => {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.2 }}
-                className="grid grid-cols-1 md:grid-cols-2 gap-8"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
               >
                 {[
                   {
@@ -1604,6 +1604,22 @@ const VAGINPage = () => {
                     bio: "Faith-driven medical doctor, entrepreneur, pastor, and writer passionate about serving God and transforming lives through medicine, ministry, and leadership.",
                     image: "/elizabeth-alamaja.webp",
                     expertise: ["Leadership", "Administration", "Healthcare", "Ministry"],
+                    accent: PINK,
+                  },
+                  {
+                    name: "Omoneh A. A.",
+                    role: "Monitoring & Evaluation Lead",
+                    bio: "Award-winning Customer and Human Experience Executive with 7+ years of cross-sector leadership, driving initiatives in healthcare, women's empowerment, and community development through empathy-centered leadership and organizational culture transformation.",
+                    image: "/omoneh-aa.webp",
+                    expertise: ["Program Evaluation", "Community Development", "Women Empowerment", "Human Experience"],
+                    accent: PINK,
+                  },
+                  {
+                    name: "Aron Sadrick Eryau",
+                    role: "Research & Healthcare Lead",
+                    bio: "Midwife, global health researcher, and healthcare leader with 5+ years of experience advancing maternal, newborn, and sexual and reproductive health. As a Teaching Fellow in Nursing and Midwifery, he drives evidence-informed education, research, and health systems strengthening.",
+                    image: "/aron-sadrick-eryau.webp",
+                    expertise: ["Midwifery", "Health Research", "SRHR", "Health Systems Strengthening"],
                     accent: PINK,
                   },
                 ].map((member) => (
