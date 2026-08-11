@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
-import logoSrc from "@/assets/viera-amber-logo-dark.png";
+import logoSrc from "@/assets/viera-amber-logo.png";
 
 /* ════════════════════════════════════════════════════════════════════════
    HERO — Jacqueline, masthead band
@@ -341,6 +341,14 @@ const HeroSection = () => {
                   width: "clamp(172px, 30vw, 420px)",
                   height: "auto",
                   display: "block",
+                  // Reverted: this file's source asset is the white hollow-
+                  // outline mark, so it needs recoloring for a light
+                  // background. A dilated, pre-colored dark asset replaced
+                  // this for one revision to make the mark bolder, but the
+                  // client flagged it as too thick — back to the original,
+                  // unmodified stroke weight rather than guessing at some
+                  // in-between thickness.
+                  filter: "brightness(0) saturate(0)",
                 }}
               />
             </motion.h1>
