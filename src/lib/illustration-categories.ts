@@ -34,7 +34,7 @@ export const ILLUSTRATION_CATEGORIES: IllustrationCategory[] = [
   { id: "product-illustrations", name: "Product Illustrations", umbrella: "lifestyle", image: "artwork_0071.webp" },
   { id: "birthday-couple",       name: "Birthday & Couple Illustrations", umbrella: "lifestyle", image: "artwork_0089.webp" },
   { id: "book-covers",           name: "Book Covers",           umbrella: "lifestyle", image: "artwork_0098.webp" },
-  { id: "event-programs",        name: "Event Programs",        umbrella: "lifestyle", image: "artwork_0024.webp" },
+  { id: "event-programs",        name: "Event Programs",        umbrella: "lifestyle", image: "artwork_0101.webp" },
 ];
 
 export const categoryAnchorId = (id: string) => `category-${id}`;

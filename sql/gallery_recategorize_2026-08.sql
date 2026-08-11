@@ -78,9 +78,11 @@ delete from va_gallery_chapters where id in
 
 -- ── 5. New pieces from "New illustrations.zip" — drafts, no title/story yet ─────
 -- image_url paths assume the webp files have been deployed to /public/artworks/
--- (artwork_0074.webp … artwork_0098.webp). is_draft = true keeps these off the
+-- (artwork_0074.webp … artwork_0105.webp). is_draft = true keeps these off the
 -- public site until Faith supplies real title/story text and an admin clears
--- the draft flag.
+-- the draft flag. artwork_0099–0105 (the 2 new Bags + 5 Event Programs) were
+-- extracted directly from the PDF catalogue itself, not the higher-res zip —
+-- no full-resolution source existed for these at the time this was written.
 
 insert into va_artworks (seq, title, story, chapter_id, medium, image_url, featured, is_draft) values
   (74, '', '', 'bridal-designs',       'Couture',  '/artworks/artwork_0074.webp', false, true),
@@ -107,5 +109,12 @@ insert into va_artworks (seq, title, story, chapter_id, medium, image_url, featu
   (95, '', '', 'birthday-couple',      'Portrait', '/artworks/artwork_0095.webp', false, true),
   (96, '', '', 'birthday-couple',      'Portrait', '/artworks/artwork_0096.webp', false, true),
   (97, '', '', 'birthday-couple',      'Portrait', '/artworks/artwork_0097.webp', false, true),
-  (98, '', '', 'book-covers',          'Campaign', '/artworks/artwork_0098.webp', false, true)
+  (98, '', '', 'book-covers',          'Campaign', '/artworks/artwork_0098.webp', false, true),
+  (99, '', '', 'bags',                 'Product',  '/artworks/artwork_0099.webp', false, true),
+  (100, '', '', 'bags',                'Product',  '/artworks/artwork_0100.webp', false, true),
+  (101, '', '', 'event-programs',      'Campaign', '/artworks/artwork_0101.webp', false, true),
+  (102, '', '', 'event-programs',      'Campaign', '/artworks/artwork_0102.webp', false, true),
+  (103, '', '', 'event-programs',      'Campaign', '/artworks/artwork_0103.webp', false, true),
+  (104, '', '', 'event-programs',      'Campaign', '/artworks/artwork_0104.webp', false, true),
+  (105, '', '', 'event-programs',      'Campaign', '/artworks/artwork_0105.webp', false, true)
 on conflict do nothing;

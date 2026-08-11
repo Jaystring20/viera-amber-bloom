@@ -239,6 +239,16 @@ export const ARTWORKS: Artwork[] = [
   mk(96, "", "", "birthday-couple",       "Portrait",       false, undefined, undefined, true),
   mk(97, "", "", "birthday-couple",       "Portrait",       false, undefined, undefined, true),
   mk(98, "", "", "book-covers",           "Campaign",       false, undefined, undefined, true),
+
+  // artwork_0099–0105: the 2 new Bags + 5 Event Programs pieces, extracted
+  // directly from the PDF catalogue (no full-res source existed yet).
+  mk(99,  "", "", "bags",            "Product",  false, undefined, undefined, true),
+  mk(100, "", "", "bags",            "Product",  false, undefined, undefined, true),
+  mk(101, "", "", "event-programs",  "Campaign", false, undefined, undefined, true),
+  mk(102, "", "", "event-programs",  "Campaign", false, undefined, undefined, true),
+  mk(103, "", "", "event-programs",  "Campaign", false, undefined, undefined, true),
+  mk(104, "", "", "event-programs",  "Campaign", false, undefined, undefined, true),
+  mk(105, "", "", "event-programs",  "Campaign", false, undefined, undefined, true),
 ];
 
 // Collection helpers
