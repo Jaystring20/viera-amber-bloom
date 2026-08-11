@@ -942,25 +942,28 @@ const VAGINPage = () => {
               >
                 {[
                   {
-                    name: "Dr. Research Lead",
-                    role: "Research & Evaluation",
-                    bio: "Evidence-based implementation and outcome tracking",
-                    expertise: ["Data Science", "SRHR Research"],
+                    name: "Dr. Elizabeth Alamaja",
+                    role: "Secretary & Administrative Lead",
+                    bio: "Faith-driven medical doctor, entrepreneur, pastor, and writer passionate about serving God and transforming lives through medicine, ministry, and leadership.",
+                    expertise: ["Leadership", "Administration", "Healthcare", "Ministry"],
+                    accent: PINK,
+                    image: "/elizabeth-alamaja.webp",
+                  },
+                  {
+                    name: "Research & Evaluation",
+                    role: "Program Evaluation Lead",
+                    bio: "Evidence-based implementation and outcome tracking to measure impact and refine VaginART delivery.",
+                    expertise: ["Data Science", "SRHR Research", "Evaluation"],
                     accent: PURPLE,
+                    image: null,
                   },
                   {
                     name: "Community Partnerships",
                     role: "School & Community Liaison",
-                    bio: "Building sustainable partnerships across Nigeria and Malawi",
-                    expertise: ["Community Engagement", "Program Delivery"],
-                    accent: PINK,
-                  },
-                  {
-                    name: "Program Coordinator",
-                    role: "Operations & Facilitation",
-                    bio: "Ensuring quality VaginART sessions reach every girl",
-                    expertise: ["Facilitation", "Training & Development"],
+                    bio: "Building sustainable partnerships across Nigeria and Malawi to ensure every school and community reaches our girls.",
+                    expertise: ["Community Engagement", "Program Delivery", "Partnerships"],
                     accent: PURPLE_LIGHT,
+                    image: null,
                   },
                 ].map((member, idx) => (
                   <motion.div
@@ -972,54 +975,73 @@ const VAGINPage = () => {
                       background: `${member.accent}12`,
                       border: `1px solid ${member.accent}35`,
                       borderRadius: 16,
-                      padding: "32px 24px",
+                      padding: member.image ? "0" : "32px 24px",
                       backdropFilter: "blur(4px)",
+                      overflow: "hidden",
                     }}
                   >
-                    <div style={{ marginBottom: 16 }}>
-                      <div
-                        style={{
-                          width: 60,
-                          height: 60,
-                          borderRadius: 12,
-                          background: `${member.accent}25`,
-                          border: `2px solid ${member.accent}45`,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          marginBottom: 16,
-                        }}
-                      >
-                        <Users size={28} color={member.accent} strokeWidth={1.5} />
+                    {/* Image section for Elizabeth */}
+                    {member.image && (
+                      <div style={{ position: "relative", aspectRatio: "1/1.2", marginBottom: 0, overflow: "hidden" }}>
+                        <img
+                          src={member.image}
+                          alt={member.name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                        <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, ${member.accent}40 0%, transparent 60%)` }} />
                       </div>
-                      <h4 className="font-display m-0" style={{ fontSize: 18, fontWeight: 700, color: "#111111", marginBottom: 4 }}>
-                        {member.name}
-                      </h4>
-                      <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 12, color: member.accent, letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 600, margin: 0, marginBottom: 10 }}>
-                        {member.role}
+                    )}
+
+                    {/* Content section */}
+                    <div style={{ padding: member.image ? "24px" : "0" }}>
+                      <div style={{ marginBottom: 16 }}>
+                        {!member.image && (
+                          <div
+                            style={{
+                              width: 60,
+                              height: 60,
+                              borderRadius: 12,
+                              background: `${member.accent}25`,
+                              border: `2px solid ${member.accent}45`,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              marginBottom: 16,
+                            }}
+                          >
+                            <Users size={28} color={member.accent} strokeWidth={1.5} />
+                          </div>
+                        )}
+                        <h4 className="font-display m-0" style={{ fontSize: 18, fontWeight: 700, color: "#111111", marginBottom: 4 }}>
+                          {member.name}
+                        </h4>
+                        <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 12, color: member.accent, letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 600, margin: 0, marginBottom: 10 }}>
+                          {member.role}
+                        </p>
+                      </div>
+                      <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 14, color: "rgba(17,17,17,0.65)", lineHeight: 1.65, margin: 0, marginBottom: 12 }}>
+                        {member.bio}
                       </p>
-                    </div>
-                    <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 14, color: "rgba(17,17,17,0.65)", lineHeight: 1.65, margin: 0, marginBottom: 12 }}>
-                      {member.bio}
-                    </p>
-                    <div className="flex flex-wrap" style={{ gap: 6 }}>
-                      {member.expertise.map((exp) => (
-                        <span
-                          key={exp}
-                          style={{
-                            fontFamily: "Poppins, system-ui, sans-serif",
-                            fontSize: 11,
-                            fontWeight: 500,
-                            color: member.accent,
-                            background: `${member.accent}10`,
-                            border: `1px solid ${member.accent}25`,
-                            borderRadius: 4,
-                            padding: "3px 8px",
-                          }}
-                        >
-                          {exp}
-                        </span>
-                      ))}
+                      <div className="flex flex-wrap" style={{ gap: 6 }}>
+                        {member.expertise.map((exp) => (
+                          <span
+                            key={exp}
+                            style={{
+                              fontFamily: "Poppins, system-ui, sans-serif",
+                              fontSize: 11,
+                              fontWeight: 500,
+                              color: member.accent,
+                              background: `${member.accent}10`,
+                              border: `1px solid ${member.accent}25`,
+                              borderRadius: 4,
+                              padding: "3px 8px",
+                            }}
+                          >
+                            {exp}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </motion.div>
                 ))}
