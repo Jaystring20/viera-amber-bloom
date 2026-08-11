@@ -1587,7 +1587,7 @@ const VAGINPage = () => {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.2 }}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6"
+                className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8"
               >
                 {[
                   {
