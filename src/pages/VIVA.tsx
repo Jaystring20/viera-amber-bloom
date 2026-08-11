@@ -1816,6 +1816,222 @@ const VIVAPage = () => {
       </section>
 
       {/* ═══════════════════════════════════════════════════════
+          BETWEEN-PILLAR VISUAL BREATHING ROOM — Editorial moment
+          A lifestyle image breaks the text density and adds visual
+          rhythm between the Philosophy pillars and the Shop section.
+          Split-screen on desktop (image + descriptive moment), stacked
+          on mobile. Maintains editorial calm with minimal copy overlay.
+          ═══════════════════════════════════════════════════════ */}
+      <section className="w-full" style={{ background: CREAM, paddingTop: 80, paddingBottom: 80 }}>
+        <div className="mx-auto px-6" style={{ maxWidth: 1280 }}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Image: left on desktop, top on mobile */}
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+              viewport={{ once: true, margin: "0px 0px -80px 0px" }}
+              className="order-2 lg:order-1"
+              style={{
+                position: "relative",
+                overflow: "hidden",
+                borderRadius: "2px",
+                aspectRatio: "4/5",
+              }}
+            >
+              <img
+                src="/viva/lifestyle/lifestyle-01-single-product.webp"
+                alt="VIVA Editorial — Woman embodying structured fluidity and artistic agency"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center",
+                  display: "block",
+                }}
+                loading="lazy"
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "linear-gradient(to bottom, rgba(0,0,0,0) 60%, rgba(110,0,37,0.06) 100%)",
+                  pointerEvents: "none",
+                }}
+              />
+            </motion.div>
+
+            {/* Text: right on desktop, bottom on mobile */}
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.12, ease: "easeOut" }}
+              viewport={{ once: true, margin: "0px 0px -80px 0px" }}
+              className="order-1 lg:order-2"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                gap: 24,
+              }}
+            >
+              {/* Eyebrow */}
+              <p
+                style={{
+                  fontFamily: "DM Sans, system-ui, sans-serif",
+                  fontSize: 11,
+                  color: BURGUNDY,
+                  letterSpacing: "4px",
+                  textTransform: "uppercase",
+                  margin: 0,
+                  opacity: 0.6,
+                }}
+              >
+                The VIVA Philosophy in Motion
+              </p>
+
+              {/* Moment description */}
+              <div>
+                <h3
+                  style={{
+                    fontFamily: CORMORANT,
+                    fontSize: "clamp(24px, 3.5vw, 36px)",
+                    fontWeight: 400,
+                    fontStyle: "italic",
+                    color: BURGUNDY,
+                    margin: "0 0 16px 0",
+                    lineHeight: 1.3,
+                  }}
+                >
+                  Where precision meets the body in motion.
+                </h3>
+                <p
+                  style={{
+                    fontFamily: "DM Sans, system-ui, sans-serif",
+                    fontSize: "clamp(14px, 1.1vw, 16px)",
+                    color: DARK_TEXT,
+                    margin: 0,
+                    lineHeight: 1.75,
+                    opacity: 0.75,
+                    maxWidth: "50ch",
+                  }}
+                >
+                  Structured Fluidity is where every stitch aligns with intention. The body is a canvas for movement — our garments hold that motion with precision, then release it with grace.
+                </p>
+              </div>
+
+              {/* Accent rule */}
+              <div style={{ width: 32, height: 1, background: GOLD, opacity: 0.5 }} />
+
+              {/* Supporting insight */}
+              <p
+                style={{
+                  fontFamily: CORMORANT,
+                  fontSize: "clamp(14px, 1.3vw, 17px)",
+                  fontStyle: "italic",
+                  color: BURGUNDY,
+                  margin: 0,
+                  lineHeight: 1.65,
+                  opacity: 0.68,
+                }}
+              >
+                Every garment is a declaration of who you are.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════
+          COLLECTION HEADER — Batya lifestyle moment
+          Full-bleed lifestyle image introduces the collection with
+          an overlay badge. Contextualizes the craftsmanship behind
+          each collection through premium visual storytelling.
+          ═══════════════════════════════════════════════════════ */}
+      <section className="w-full" style={{ background: ALABASTER, paddingTop: 0, paddingBottom: 0, position: "relative" }}>
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+          style={{
+            position: "relative",
+            width: "100%",
+            aspectRatio: "16/10",
+            overflow: "hidden",
+            background: BURGUNDY,
+          }}
+        >
+          {/* Lifestyle hero image for Batya Collection */}
+          <img
+            src="/viva/lifestyle/lifestyle-03-duo-moment.webp"
+            alt="Batya Collection — Women in heritage-inspired styling with structured silhouettes"
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center",
+              display: "block",
+            }}
+            fetchPriority="high"
+          />
+
+          {/* Dark scrim overlay for text legibility */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: "linear-gradient(to bottom, rgba(110,0,37,0.15) 0%, rgba(110,0,37,0.32) 100%)",
+              pointerEvents: "none",
+            }}
+          />
+
+          {/* Collection badge overlay — bottom center */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+            style={{
+              position: "absolute",
+              bottom: "clamp(32px, 6vw, 56px)",
+              left: "50%",
+              transform: "translateX(-50%)",
+              textAlign: "center",
+              pointerEvents: "none",
+            }}
+          >
+            <p style={{
+              fontFamily: CORMORANT,
+              fontSize: "clamp(24px, 3.5vw, 42px)",
+              fontWeight: 400,
+              color: GOLD,
+              margin: 0,
+              lineHeight: 1.2,
+              textShadow: "0 2px 12px rgba(0,0,0,0.4)",
+              letterSpacing: "-0.01em",
+            }}>
+              Batya
+            </p>
+            <p style={{
+              fontFamily: "DM Sans, system-ui, sans-serif",
+              fontSize: "clamp(12px, 1.2vw, 14px)",
+              fontWeight: 400,
+              color: "rgba(250,249,246,0.85)",
+              margin: "6px 0 0 0",
+              letterSpacing: "2px",
+              textTransform: "uppercase",
+              textShadow: "0 1px 8px rgba(0,0,0,0.3)",
+            }}>
+              Daughters of Adonai
+            </p>
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════
           SHOP — garments + illustration prints, WhatsApp checkout
           ═══════════════════════════════════════════════════════ */}
       <section id="viva-shop" className="w-full" style={{ background: ALABASTER, paddingTop: 80, paddingBottom: 80 }}>
