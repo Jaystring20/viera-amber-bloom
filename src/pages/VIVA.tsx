@@ -1551,6 +1551,161 @@ const VIVAPage = () => {
       </section>
 
       {/* ═══════════════════════════════════════════════════════
+          LIFESTYLE INTERSTITIAL — Aesthetic moments, premium editorial
+          Three curated lifestyle shots that contextualize VIVA's brand
+          feeling: luxury, heritage, everyday elegance. Strategic
+          placement between lookbook (product) and philosophy (values).
+          ═══════════════════════════════════════════════════════ */}
+      <section className="w-full" style={{ background: ALABASTER, paddingTop: 96, paddingBottom: 96 }}>
+        <div className="mx-auto px-6" style={{ maxWidth: 1280 }}>
+          {/* Lifestyle intro eyebrow */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+            style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: BURGUNDY, letterSpacing: "4px", textTransform: "uppercase", marginBottom: 24, opacity: 0.6, textAlign: "center" }}
+          >
+            The VIVA Lifestyle
+          </motion.p>
+
+          {/* Three-image grid: responsive masonry feel on desktop, stacked on mobile */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-6">
+            {/* Image 1 — Single with Bag (Portrait, featured) */}
+            <motion.div
+              initial={{ opacity: 0, y: 32 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+              viewport={{ once: true, margin: "0px 0px -80px 0px" }}
+              className="lg:col-span-1 md:row-span-2"
+              style={{
+                position: "relative",
+                overflow: "hidden",
+                borderRadius: "2px",
+                aspectRatio: "9/12",
+              }}
+            >
+              <img
+                src="/viva/lifestyle/lifestyle-01-single-product.webp"
+                alt="VIVA Lifestyle — Woman in burgundy holding VIVA shopping bag"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center",
+                  display: "block",
+                }}
+                loading="lazy"
+              />
+              {/* Subtle gradient overlay for text legibility if needed */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "linear-gradient(to bottom, rgba(0,0,0,0) 60%, rgba(110,0,37,0.08) 100%)",
+                  pointerEvents: "none",
+                }}
+              />
+            </motion.div>
+
+            {/* Image 2 — Editorial (Portrait) */}
+            <motion.div
+              initial={{ opacity: 0, y: 32 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.12, ease: "easeOut" }}
+              viewport={{ once: true, margin: "0px 0px -80px 0px" }}
+              className="lg:col-span-1"
+              style={{
+                position: "relative",
+                overflow: "hidden",
+                borderRadius: "2px",
+                aspectRatio: "9/12",
+              }}
+            >
+              <img
+                src="/viva/lifestyle/lifestyle-02-landscape-editorial.webp"
+                alt="VIVA Editorial — Styled moments in earth tones"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center",
+                  display: "block",
+                }}
+                loading="lazy"
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "linear-gradient(to bottom, rgba(0,0,0,0) 60%, rgba(110,0,37,0.08) 100%)",
+                  pointerEvents: "none",
+                }}
+              />
+            </motion.div>
+
+            {/* Image 3 — Duo Moment (Landscape, spans full width on md) */}
+            <motion.div
+              initial={{ opacity: 0, y: 32 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.24, ease: "easeOut" }}
+              viewport={{ once: true, margin: "0px 0px -80px 0px" }}
+              className="md:col-span-2 lg:col-span-1 lg:row-span-2"
+              style={{
+                position: "relative",
+                overflow: "hidden",
+                borderRadius: "2px",
+                aspectRatio: "16/12",
+              }}
+            >
+              <img
+                src="/viva/lifestyle/lifestyle-03-duo-moment.webp"
+                alt="VIVA Community — Two women in styled VIVA aesthetics"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center",
+                  display: "block",
+                }}
+                loading="lazy"
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "linear-gradient(to bottom, rgba(0,0,0,0) 60%, rgba(110,0,37,0.08) 100%)",
+                  pointerEvents: "none",
+                }}
+              />
+            </motion.div>
+          </div>
+
+          {/* Lifestyle tagline — appears below images on mobile/tablet, can be repositioned */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.36 }}
+            viewport={{ once: true, margin: "0px 0px -80px 0px" }}
+            style={{
+              fontFamily: CORMORANT,
+              fontSize: "clamp(18px, 2.2vw, 26px)",
+              fontStyle: "italic",
+              fontWeight: 400,
+              color: BURGUNDY,
+              margin: "56px auto 0",
+              textAlign: "center",
+              maxWidth: 600,
+              lineHeight: 1.5,
+              opacity: 0.8,
+            }}
+          >
+            Luxury crafted for the woman who wears her confidence out loud.
+          </motion.p>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════
           PHILOSOPHY — editorial triptych, visual-first
           ═══════════════════════════════════════════════════════ */}
       <section className="w-full" style={{ background: CREAM, position: "relative", overflow: "hidden" }}>
