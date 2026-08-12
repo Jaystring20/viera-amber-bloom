@@ -1706,131 +1706,542 @@ const VIVAPage = () => {
       </section>
 
       {/* ═══════════════════════════════════════════════════════
-          BATYA CURATED EDITORIAL MOMENT — shopping repositioned
-          as a narrative, not a transaction. Editorial-first, commerce
-          woven in seamlessly. This moves shopping to the top (before
-          Philosophy) making it easier to discover while maintaining
-          the premium, sophisticated aesthetic.
+          SHOP CATALOGUE — Products only (no narrative)
+          Clean, easy-to-browse collection grid positioned at the top
+          for effortless shopping discovery.
           ═══════════════════════════════════════════════════════ */}
-      <section className="w-full" style={{ background: ALABASTER, paddingTop: 0, paddingBottom: 0, position: "relative", overflow: "hidden" }}>
-        {/* Hero lifestyle image — sets the editorial tone */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-          style={{
-            position: "relative",
-            width: "100%",
-            aspectRatio: "16/10",
-            overflow: "hidden",
-            background: BURGUNDY,
-          }}
-        >
-          <img
-            src="/viva/lifestyle/lifestyle-03-duo-moment.webp"
-            alt="Batya Collection — Women in heritage-inspired styling with structured silhouettes"
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              objectPosition: "center",
-              display: "block",
-            }}
-            fetchPriority="high"
-          />
+      <section id="viva-shop" className="w-full" style={{ background: ALABASTER, paddingTop: 80, paddingBottom: 80 }}>
+        <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
 
-          {/* Scrim overlay for text legibility */}
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              background: "linear-gradient(to bottom, rgba(110,0,37,0.1) 0%, rgba(110,0,37,0.2) 100%)",
-              pointerEvents: "none",
-            }}
-          />
-
-          {/* Editorial badge — bottom center */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-            style={{
-              position: "absolute",
-              bottom: "clamp(32px, 6vw, 56px)",
-              left: "50%",
-              transform: "translateX(-50%)",
-              textAlign: "center",
-              pointerEvents: "none",
-            }}
-          >
-            <p style={{
-              fontFamily: CORMORANT,
-              fontSize: "clamp(24px, 3.5vw, 42px)",
-              fontWeight: 400,
-              color: GOLD,
-              margin: 0,
-              lineHeight: 1.2,
-              textShadow: "0 2px 12px rgba(0,0,0,0.4)",
-              letterSpacing: "-0.01em",
-            }}>
-              Batya
-            </p>
-            <p style={{
-              fontFamily: "DM Sans, system-ui, sans-serif",
-              fontSize: "clamp(12px, 1.2vw, 14px)",
-              fontWeight: 400,
-              color: "rgba(250,249,246,0.85)",
-              margin: "6px 0 0 0",
-              letterSpacing: "2px",
-              textTransform: "uppercase",
-              textShadow: "0 1px 8px rgba(0,0,0,0.3)",
-            }}>
-              Daughters of Adonai
-            </p>
-          </motion.div>
-        </motion.div>
-
-        {/* Split-screen editorial + collection grid */}
-        <div className="mx-auto px-6" style={{ maxWidth: 1100, paddingTop: 80, paddingBottom: 80 }}>
-          <div className="grid lg:grid-cols-5 gap-12 lg:gap-16" style={{ alignItems: "start" }}>
-
-            {/* LEFT: Editorial narrative (35% on desktop, full on mobile) */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true, margin: "0px 0px -80px 0px" }}
-              className="lg:col-span-2 flex flex-col"
-            >
-              {/* Eyebrow */}
+          {/* Shop controls header */}
+          <div className="flex items-center justify-between mb-12" style={{ flexWrap: "wrap", gap: 12 }}>
+            <div>
               <p style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
                 fontSize: 10,
                 color: BURGUNDY,
                 letterSpacing: "5px",
                 textTransform: "uppercase",
-                margin: "0 0 12px 0",
+                margin: "0 0 6px 0",
                 opacity: 0.65,
               }}>Maiden Collection</p>
-
-              {/* Title */}
-              <h1 style={{
+              <h2 style={{
                 fontFamily: CORMORANT,
-                fontSize: "clamp(28px, 3.5vw, 44px)",
+                fontSize: "clamp(28px, 4vw, 48px)",
+                fontWeight: 400,
+                color: BURGUNDY,
+                margin: 0,
+                lineHeight: 1.1,
+              }}>
+                Batya: Daughters of Adonai
+              </h2>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              {/* Currency toggle */}
+              <div style={{ display: "flex", border: `1px solid ${BURG_ALPHA}`, borderRadius: 4, overflow: "hidden" }}>
+                {(["NGN", "USD"] as const).map((c) => (
+                  <button key={c} onClick={() => setCurrency(c)} style={{
+                    fontFamily: "DM Sans, system-ui, sans-serif",
+                    fontSize: 9,
+                    letterSpacing: "1.5px",
+                    fontWeight: 600,
+                    padding: "7px 14px",
+                    border: "none",
+                    cursor: "pointer",
+                    background: currency === c ? BURGUNDY : "transparent",
+                    color: currency === c ? ALABASTER : BURGUNDY,
+                    transition: "all 0.2s",
+                    textTransform: "uppercase",
+                  }}>{c}</button>
+                ))}
+              </div>
+              {/* Cart button */}
+              <button onClick={() => setCartOpen(true)} style={{
+                position: "relative",
+                background: BURGUNDY,
+                border: "none",
+                borderRadius: 4,
+                padding: "8px 12px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                fontFamily: "DM Sans, system-ui, sans-serif",
+                fontSize: 9,
+                letterSpacing: "1.5px",
+                color: GOLD,
+                textTransform: "uppercase",
+                fontWeight: 600,
+                transition: "all 0.2s",
+              }}>
+                <ShoppingBag size={13} />
+                Cart
+                {cartCount > 0 && (
+                  <span style={{
+                    position: "absolute",
+                    top: -6,
+                    right: -6,
+                    width: 16,
+                    height: 16,
+                    borderRadius: "50%",
+                    background: GOLD,
+                    color: DARK_TEXT,
+                    fontSize: 8,
+                    fontWeight: 700,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}>{cartCount}</span>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* GARMENTS GRID */}
+          <div style={{ marginBottom: 64 }}>
+            <p style={{
+              fontFamily: "DM Sans, system-ui, sans-serif",
+              fontSize: 8,
+              color: BURGUNDY,
+              letterSpacing: "3.5px",
+              textTransform: "uppercase",
+              margin: "0 0 16px 0",
+              paddingBottom: 12,
+              borderBottom: `1px solid ${BURG_ALPHA}`,
+              opacity: 0.6,
+            }}>Garments</p>
+
+            <div ref={shopRef} className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))" }}>
+              {catalogue.filter(p => p.type === "garment").map((product, i) => {
+                const currentImageIndex = getCarouselIndex(product.id);
+                const currentImage = product.images[currentImageIndex];
+                return (
+                  <motion.div key={product.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: i * 0.08 }}
+                    viewport={{ once: true }}
+                    whileHover={reduced ? {} : { y: -4, transition: { duration: 0.2 } }}
+                    style={{
+                      background: "#fff",
+                      borderRadius: 4,
+                      overflow: "hidden",
+                      border: `1px solid ${BURG_ALPHA}`,
+                      boxShadow: "0 2px 12px rgba(110,0,37,0.06)",
+                    }}
+                  >
+                    {/* Image with carousel */}
+                    <div style={{
+                      aspectRatio: "3/4",
+                      overflow: "hidden",
+                      position: "relative",
+                      cursor: "pointer",
+                      background: "rgba(110,0,37,0.03)",
+                    }}
+                      onClick={() => {
+                        setSelectedProductForDetail(product);
+                        setDetailModalOpen(true);
+                      }}>
+                      <AnimatePresence mode="wait">
+                        <motion.img
+                          key={currentImage}
+                          src={currentImage}
+                          alt={product.title}
+                          loading="lazy"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.25 }}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            objectPosition: "top",
+                            display: "block",
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!reduced) (e.currentTarget as HTMLImageElement).style.transform = "scale(1.04)";
+                          }}
+                          onMouseLeave={(e) => {
+                            (e.currentTarget as HTMLImageElement).style.transform = "scale(1)";
+                          }}
+                        />
+                      </AnimatePresence>
+                      <span style={{
+                        position: "absolute",
+                        top: 8,
+                        left: 8,
+                        fontFamily: "DM Sans, system-ui, sans-serif",
+                        fontSize: 7,
+                        letterSpacing: "1.5px",
+                        textTransform: "uppercase",
+                        background: "rgba(110,0,37,0.9)",
+                        color: GOLD,
+                        padding: "3px 7px",
+                        borderRadius: 2,
+                      }}>{product.badge}</span>
+
+                      {/* Carousel controls */}
+                      {product.images.length > 1 && (
+                        <>
+                          <motion.button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              prevImage(product.id, product.images.length);
+                            }}
+                            whileHover={reduced ? {} : { scale: 1.08 }}
+                            whileTap={reduced ? {} : { scale: 0.94 }}
+                            style={{
+                              position: "absolute",
+                              left: 8,
+                              top: "50%",
+                              transform: "translateY(-50%)",
+                              background: "rgba(255,255,255,0.85)",
+                              border: "none",
+                              borderRadius: "50%",
+                              width: 30,
+                              height: 30,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              cursor: "pointer",
+                              zIndex: 10,
+                              color: BURGUNDY,
+                            }}
+                          >
+                            <ChevronLeft size={15} strokeWidth={1.5} />
+                          </motion.button>
+
+                          <motion.button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              nextImage(product.id, product.images.length);
+                            }}
+                            whileHover={reduced ? {} : { scale: 1.08 }}
+                            whileTap={reduced ? {} : { scale: 0.94 }}
+                            style={{
+                              position: "absolute",
+                              right: 8,
+                              top: "50%",
+                              transform: "translateY(-50%)",
+                              background: "rgba(255,255,255,0.85)",
+                              border: "none",
+                              borderRadius: "50%",
+                              width: 30,
+                              height: 30,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              cursor: "pointer",
+                              zIndex: 10,
+                              color: BURGUNDY,
+                            }}
+                          >
+                            <ChevronRight size={15} strokeWidth={1.5} />
+                          </motion.button>
+
+                          <div style={{
+                            position: "absolute",
+                            bottom: 8,
+                            left: "50%",
+                            transform: "translateX(-50%)",
+                            display: "flex",
+                            gap: 5,
+                            zIndex: 10,
+                          }}>
+                            {product.images.map((_, idx) => (
+                              <div
+                                key={idx}
+                                style={{
+                                  width: 4,
+                                  height: 4,
+                                  borderRadius: "50%",
+                                  background: idx === currentImageIndex ? BURGUNDY : "rgba(110,0,37,0.25)",
+                                  transition: "all 0.3s",
+                                }}
+                              />
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Product info */}
+                    <div style={{ padding: "14px 12px" }}>
+                      <p style={{
+                        fontFamily: "DM Sans, system-ui, sans-serif",
+                        fontSize: 7,
+                        color: BURGUNDY,
+                        opacity: 0.4,
+                        letterSpacing: "2.5px",
+                        textTransform: "uppercase",
+                        margin: "0 0 3px 0",
+                      }}>{product.subtitle}</p>
+                      <h3 style={{
+                        fontFamily: CORMORANT,
+                        fontSize: 16,
+                        fontWeight: 600,
+                        color: DARK_TEXT,
+                        margin: "0 0 6px 0",
+                        lineHeight: 1.1,
+                      }}>{product.title}</h3>
+                      <p style={{
+                        fontFamily: "DM Sans, system-ui, sans-serif",
+                        fontSize: 10,
+                        color: "rgba(34,26,26,0.45)",
+                        lineHeight: 1.4,
+                        margin: "0 0 10px 0",
+                      }}>{product.desc}</p>
+
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                        <div>
+                          <span style={{
+                            fontFamily: CORMORANT,
+                            fontSize: 16,
+                            fontWeight: 600,
+                            color: BURGUNDY,
+                          }}>
+                            {currency === "NGN" ? `₦${product.priceNGN.toLocaleString()}` : `$${product.priceUSD}`}
+                          </span>
+                          <span style={{
+                            fontFamily: "DM Sans, system-ui, sans-serif",
+                            fontSize: 7.5,
+                            color: "rgba(110,0,37,0.3)",
+                            marginLeft: 4,
+                          }}>
+                            {currency === "NGN" ? `/ $${product.priceUSD}` : `/ ₦${product.priceNGN.toLocaleString()}`}
+                          </span>
+                        </div>
+                        <motion.button
+                          onClick={() => addToCart(product)}
+                          whileHover={reduced ? {} : { scale: 1.04 }}
+                          whileTap={reduced ? {} : { scale: 0.96 }}
+                          style={{
+                            fontFamily: "DM Sans, system-ui, sans-serif",
+                            fontSize: 7.5,
+                            letterSpacing: "1.5px",
+                            textTransform: "uppercase",
+                            fontWeight: 600,
+                            background: BURGUNDY,
+                            color: GOLD,
+                            border: "none",
+                            borderRadius: 3,
+                            padding: "6px 10px",
+                            cursor: "pointer",
+                            transition: "all 0.2s",
+                          }}
+                        >
+                          Add
+                        </motion.button>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* PRINTS GRID */}
+          <div>
+            <p style={{
+              fontFamily: "DM Sans, system-ui, sans-serif",
+              fontSize: 8,
+              color: BURGUNDY,
+              letterSpacing: "3.5px",
+              textTransform: "uppercase",
+              margin: "0 0 16px 0",
+              paddingBottom: 12,
+              borderBottom: `1px solid ${BURG_ALPHA}`,
+              opacity: 0.6,
+            }}>Illustration Prints</p>
+
+            <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))" }}>
+              {catalogue.filter(p => p.type === "print").map((product, i) => (
+                <motion.div key={product.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: i * 0.08 }}
+                  viewport={{ once: true }}
+                  whileHover={reduced ? {} : { y: -3, transition: { duration: 0.2 } }}
+                  style={{
+                    background: "#fff",
+                    borderRadius: 4,
+                    overflow: "hidden",
+                    border: `1px solid ${BURG_ALPHA}`,
+                    boxShadow: "0 1px 8px rgba(110,0,37,0.05)",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
+                  <div style={{ width: "100%", aspectRatio: "3/4", overflow: "hidden", background: "rgba(110,0,37,0.03)" }}>
+                    <img src={product.images[0]} alt={product.title} loading="lazy"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        objectPosition: "top",
+                        display: "block",
+                      }} />
+                  </div>
+
+                  <div style={{ padding: "10px 10px 8px", flex: 1, display: "flex", flexDirection: "column" }}>
+                    <span style={{
+                      fontFamily: "DM Sans, system-ui, sans-serif",
+                      fontSize: 6.5,
+                      letterSpacing: "1.5px",
+                      textTransform: "uppercase",
+                      background: `rgba(212,175,55,0.12)`,
+                      color: `rgba(110,0,37,0.65)`,
+                      padding: "2px 6px",
+                      borderRadius: 2,
+                      display: "inline-block",
+                      marginBottom: 4,
+                      width: "fit-content",
+                    }}>{product.badge}</span>
+                    <h3 style={{
+                      fontFamily: CORMORANT,
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: DARK_TEXT,
+                      margin: "0 0 2px 0",
+                    }}>{product.title}</h3>
+                    <p style={{
+                      fontFamily: "DM Sans, system-ui, sans-serif",
+                      fontSize: 8.5,
+                      color: "rgba(34,26,26,0.4)",
+                      lineHeight: 1.3,
+                      margin: "0 0 8px 0",
+                    }}>{product.subtitle}</p>
+
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "auto" }}>
+                      <span style={{
+                        fontFamily: CORMORANT,
+                        fontSize: 14,
+                        fontWeight: 600,
+                        color: BURGUNDY,
+                      }}>
+                        {currency === "NGN" ? `₦${product.priceNGN.toLocaleString()}` : `$${product.priceUSD}`}
+                      </span>
+                      <motion.button
+                        onClick={() => addToCart(product)}
+                        whileHover={reduced ? {} : { scale: 1.04 }}
+                        whileTap={reduced ? {} : { scale: 0.96 }}
+                        style={{
+                          fontFamily: "DM Sans, system-ui, sans-serif",
+                          fontSize: 7,
+                          letterSpacing: "1.5px",
+                          textTransform: "uppercase",
+                          fontWeight: 600,
+                          background: BURGUNDY,
+                          color: GOLD,
+                          border: "none",
+                          borderRadius: 3,
+                          padding: "5px 8px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Add
+                      </motion.button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════
+          EDITORIAL MASONRY — Lifestyle + Narrative
+          Hero landscape image (60%) paired with editorial narrative (40%),
+          then two portrait images below in supporting grid.
+          Creates editorial "L" or "F" reading pattern—sophisticated,
+          unconventional, and perfectly balanced.
+          ═══════════════════════════════════════════════════════ */}
+      <section className="w-full" style={{ background: ALABASTER, paddingTop: 96, paddingBottom: 96 }}>
+        <div className="mx-auto px-6" style={{ maxWidth: 1280 }}>
+
+          {/* ROW 1: MASONRY HERO — Large landscape image + Narrative text */}
+          <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 mb-16" style={{ alignItems: "start" }}>
+
+            {/* Landscape hero image (60% on desktop, full on mobile) */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.7 }}
+              viewport={{ once: true, margin: "0px 0px -80px 0px" }}
+              className="lg:col-span-7"
+              style={{
+                position: "relative",
+                aspectRatio: "16/10",
+                overflow: "hidden",
+                borderRadius: 2,
+                background: BURGUNDY,
+              }}
+            >
+              <img
+                src="/viva/lifestyle/lifestyle-03-duo-moment.webp"
+                alt="Batya Collection — Women in heritage-inspired styling"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center",
+                  display: "block",
+                }}
+              />
+              {/* Subtle scrim for depth */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "linear-gradient(to bottom, rgba(110,0,37,0.08) 0%, rgba(110,0,37,0.15) 100%)",
+                  pointerEvents: "none",
+                }}
+              />
+            </motion.div>
+
+            {/* Narrative text column (40% on desktop, full on mobile) */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              viewport={{ once: true, margin: "0px 0px -80px 0px" }}
+              className="lg:col-span-5"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "flex-start",
+              }}
+            >
+              {/* Eyebrow */}
+              <p style={{
+                fontFamily: "DM Sans, system-ui, sans-serif",
+                fontSize: "clamp(9px, 1vw, 11px)",
+                color: BURGUNDY,
+                letterSpacing: "5px",
+                textTransform: "uppercase",
+                margin: "0 0 12px 0",
+                opacity: 0.65,
+                fontWeight: 500,
+              }}>The Batya Moment</p>
+
+              {/* Serif headline */}
+              <h2 style={{
+                fontFamily: CORMORANT,
+                fontSize: "clamp(28px, 3.5vw, 42px)",
                 fontWeight: 400,
                 fontStyle: "italic",
                 color: BURGUNDY,
-                margin: "0 0 20px 0",
+                margin: "0 0 24px 0",
                 lineHeight: 1.2,
               }}>
                 Daughters of Adonai
-              </h1>
+              </h2>
 
-              {/* Editorial copy — narrative, not commercial */}
+              {/* Editorial narrative */}
               <div style={{ marginBottom: 32 }}>
                 <p style={{
                   fontFamily: "DM Sans, system-ui, sans-serif",
@@ -1857,19 +2268,19 @@ const VIVAPage = () => {
                 {[
                   { value: "Made to Order", detail: "Bespoke Fit" },
                   { value: "48–72hrs", detail: "Delivery" },
-                  { value: "Heritage Craft", detail: "Heritage-Inspired" },
+                  { value: "Heritage Craft", detail: "Artisan-Inspired" },
                 ].map((item, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, x: -12 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: i * 0.1 }}
+                    transition={{ duration: 0.5, delay: i * 0.08 }}
                     viewport={{ once: true }}
                     style={{ marginBottom: i < 2 ? 16 : 0 }}
                   >
                     <p style={{
                       fontFamily: CORMORANT,
-                      fontSize: 16,
+                      fontSize: "clamp(14px, 1.3vw, 18px)",
                       fontWeight: 600,
                       color: BURGUNDY,
                       margin: 0,
@@ -1878,11 +2289,12 @@ const VIVAPage = () => {
                     </p>
                     <p style={{
                       fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontSize: 9,
+                      fontSize: "clamp(8px, 0.9vw, 10px)",
                       color: "rgba(110,0,37,0.5)",
                       margin: "4px 0 0 0",
                       letterSpacing: "1.5px",
                       textTransform: "uppercase",
+                      fontWeight: 500,
                     }}>
                       {item.detail}
                     </p>
@@ -1890,448 +2302,97 @@ const VIVAPage = () => {
                 ))}
               </div>
 
-              {/* Call to action — subtle, elegant */}
+              {/* Elegant CTA */}
               <p style={{
                 fontFamily: CORMORANT,
-                fontSize: "clamp(14px, 1.2vw, 16px)",
+                fontSize: "clamp(14px, 1.1vw, 16px)",
                 fontStyle: "italic",
                 color: BURGUNDY,
                 opacity: 0.8,
                 lineHeight: 1.6,
-                marginTop: 32,
+                marginTop: "auto",
               }}>
-                Browse the collection below. Each piece is ready to be yours.
+                Scroll below to explore the collection.
               </p>
             </motion.div>
-
-            {/* RIGHT: Product collection grid (65% on desktop, full on mobile) */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              viewport={{ once: true, margin: "0px 0px -80px 0px" }}
-              className="lg:col-span-3 flex flex-col"
-            >
-              {/* Shop controls header */}
-              <div className="flex items-center justify-between mb-8" style={{ flexWrap: "wrap", gap: 12 }}>
-                {/* Currency toggle */}
-                <div style={{ display: "flex", border: `1px solid ${BURG_ALPHA}`, borderRadius: 4, overflow: "hidden" }}>
-                  {(["NGN", "USD"] as const).map((c) => (
-                    <button key={c} onClick={() => setCurrency(c)} style={{
-                      fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontSize: 9,
-                      letterSpacing: "1.5px",
-                      fontWeight: 600,
-                      padding: "7px 14px",
-                      border: "none",
-                      cursor: "pointer",
-                      background: currency === c ? BURGUNDY : "transparent",
-                      color: currency === c ? ALABASTER : BURGUNDY,
-                      transition: "all 0.2s",
-                      textTransform: "uppercase",
-                    }}>{c}</button>
-                  ))}
-                </div>
-                {/* Cart button */}
-                <button onClick={() => setCartOpen(true)} style={{
-                  position: "relative",
-                  background: BURGUNDY,
-                  border: "none",
-                  borderRadius: 4,
-                  padding: "8px 12px",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: 9,
-                  letterSpacing: "1.5px",
-                  color: GOLD,
-                  textTransform: "uppercase",
-                  fontWeight: 600,
-                  transition: "all 0.2s",
-                }}>
-                  <ShoppingBag size={13} />
-                  Cart
-                  {cartCount > 0 && (
-                    <span style={{
-                      position: "absolute",
-                      top: -6,
-                      right: -6,
-                      width: 16,
-                      height: 16,
-                      borderRadius: "50%",
-                      background: GOLD,
-                      color: DARK_TEXT,
-                      fontSize: 8,
-                      fontWeight: 700,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}>{cartCount}</span>
-                  )}
-                </button>
-              </div>
-
-              {/* GARMENTS GRID */}
-              <div style={{ marginBottom: 48 }}>
-                <p style={{
-                  fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: 8,
-                  color: BURGUNDY,
-                  letterSpacing: "3.5px",
-                  textTransform: "uppercase",
-                  margin: "0 0 16px 0",
-                  paddingBottom: 12,
-                  borderBottom: `1px solid ${BURG_ALPHA}`,
-                  opacity: 0.6,
-                }}>Garments</p>
-
-                <div ref={shopRef} className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))" }}>
-                  {catalogue.filter(p => p.type === "garment").map((product, i) => {
-                    const currentImageIndex = getCarouselIndex(product.id);
-                    const currentImage = product.images[currentImageIndex];
-                    return (
-                      <motion.div key={product.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: i * 0.08 }}
-                        viewport={{ once: true }}
-                        whileHover={reduced ? {} : { y: -4, transition: { duration: 0.2 } }}
-                        style={{
-                          background: "#fff",
-                          borderRadius: 4,
-                          overflow: "hidden",
-                          border: `1px solid ${BURG_ALPHA}`,
-                          boxShadow: "0 2px 12px rgba(110,0,37,0.06)",
-                        }}
-                      >
-                        {/* Image with carousel */}
-                        <div style={{
-                          aspectRatio: "3/4",
-                          overflow: "hidden",
-                          position: "relative",
-                          cursor: "pointer",
-                          background: "rgba(110,0,37,0.03)",
-                        }}
-                          onClick={() => {
-                            setSelectedProductForDetail(product);
-                            setDetailModalOpen(true);
-                          }}>
-                          <AnimatePresence mode="wait">
-                            <motion.img
-                              key={currentImage}
-                              src={currentImage}
-                              alt={product.title}
-                              loading="lazy"
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                              transition={{ duration: 0.25 }}
-                              style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "cover",
-                                objectPosition: "top",
-                                display: "block",
-                              }}
-                              onMouseEnter={(e) => {
-                                if (!reduced) (e.currentTarget as HTMLImageElement).style.transform = "scale(1.04)";
-                              }}
-                              onMouseLeave={(e) => {
-                                (e.currentTarget as HTMLImageElement).style.transform = "scale(1)";
-                              }}
-                            />
-                          </AnimatePresence>
-                          <span style={{
-                            position: "absolute",
-                            top: 8,
-                            left: 8,
-                            fontFamily: "DM Sans, system-ui, sans-serif",
-                            fontSize: 7,
-                            letterSpacing: "1.5px",
-                            textTransform: "uppercase",
-                            background: "rgba(110,0,37,0.9)",
-                            color: GOLD,
-                            padding: "3px 7px",
-                            borderRadius: 2,
-                          }}>{product.badge}</span>
-
-                          {/* Carousel controls — minimal, subtle */}
-                          {product.images.length > 1 && (
-                            <>
-                              {/* Left arrow */}
-                              <motion.button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  prevImage(product.id, product.images.length);
-                                }}
-                                whileHover={reduced ? {} : { scale: 1.08 }}
-                                whileTap={reduced ? {} : { scale: 0.94 }}
-                                style={{
-                                  position: "absolute",
-                                  left: 8,
-                                  top: "50%",
-                                  transform: "translateY(-50%)",
-                                  background: "rgba(255,255,255,0.85)",
-                                  border: "none",
-                                  borderRadius: "50%",
-                                  width: 30,
-                                  height: 30,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  cursor: "pointer",
-                                  zIndex: 10,
-                                  color: BURGUNDY,
-                                }}
-                              >
-                                <ChevronLeft size={15} strokeWidth={1.5} />
-                              </motion.button>
-
-                              {/* Right arrow */}
-                              <motion.button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  nextImage(product.id, product.images.length);
-                                }}
-                                whileHover={reduced ? {} : { scale: 1.08 }}
-                                whileTap={reduced ? {} : { scale: 0.94 }}
-                                style={{
-                                  position: "absolute",
-                                  right: 8,
-                                  top: "50%",
-                                  transform: "translateY(-50%)",
-                                  background: "rgba(255,255,255,0.85)",
-                                  border: "none",
-                                  borderRadius: "50%",
-                                  width: 30,
-                                  height: 30,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  cursor: "pointer",
-                                  zIndex: 10,
-                                  color: BURGUNDY,
-                                }}
-                              >
-                                <ChevronRight size={15} strokeWidth={1.5} />
-                              </motion.button>
-
-                              {/* Carousel indicator */}
-                              <div style={{
-                                position: "absolute",
-                                bottom: 8,
-                                left: "50%",
-                                transform: "translateX(-50%)",
-                                display: "flex",
-                                gap: 5,
-                                zIndex: 10,
-                              }}>
-                                {product.images.map((_, idx) => (
-                                  <div
-                                    key={idx}
-                                    style={{
-                                      width: 4,
-                                      height: 4,
-                                      borderRadius: "50%",
-                                      background: idx === currentImageIndex ? BURGUNDY : "rgba(110,0,37,0.25)",
-                                      transition: "all 0.3s",
-                                    }}
-                                  />
-                                ))}
-                              </div>
-                            </>
-                          )}
-                        </div>
-
-                        {/* Product info */}
-                        <div style={{ padding: "14px 12px" }}>
-                          <p style={{
-                            fontFamily: "DM Sans, system-ui, sans-serif",
-                            fontSize: 7,
-                            color: BURGUNDY,
-                            opacity: 0.4,
-                            letterSpacing: "2.5px",
-                            textTransform: "uppercase",
-                            margin: "0 0 3px 0",
-                          }}>{product.subtitle}</p>
-                          <h3 style={{
-                            fontFamily: CORMORANT,
-                            fontSize: 16,
-                            fontWeight: 600,
-                            color: DARK_TEXT,
-                            margin: "0 0 6px 0",
-                            lineHeight: 1.1,
-                          }}>{product.title}</h3>
-                          <p style={{
-                            fontFamily: "DM Sans, system-ui, sans-serif",
-                            fontSize: 10,
-                            color: "rgba(34,26,26,0.45)",
-                            lineHeight: 1.4,
-                            margin: "0 0 10px 0",
-                          }}>{product.desc}</p>
-
-                          {/* Price + Add button */}
-                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                            <div>
-                              <span style={{
-                                fontFamily: CORMORANT,
-                                fontSize: 16,
-                                fontWeight: 600,
-                                color: BURGUNDY,
-                              }}>
-                                {currency === "NGN" ? `₦${product.priceNGN.toLocaleString()}` : `$${product.priceUSD}`}
-                              </span>
-                              <span style={{
-                                fontFamily: "DM Sans, system-ui, sans-serif",
-                                fontSize: 7.5,
-                                color: "rgba(110,0,37,0.3)",
-                                marginLeft: 4,
-                              }}>
-                                {currency === "NGN" ? `/ $${product.priceUSD}` : `/ ₦${product.priceNGN.toLocaleString()}`}
-                              </span>
-                            </div>
-                            <motion.button
-                              onClick={() => addToCart(product)}
-                              whileHover={reduced ? {} : { scale: 1.04 }}
-                              whileTap={reduced ? {} : { scale: 0.96 }}
-                              style={{
-                                fontFamily: "DM Sans, system-ui, sans-serif",
-                                fontSize: 7.5,
-                                letterSpacing: "1.5px",
-                                textTransform: "uppercase",
-                                fontWeight: 600,
-                                background: BURGUNDY,
-                                color: GOLD,
-                                border: "none",
-                                borderRadius: 3,
-                                padding: "6px 10px",
-                                cursor: "pointer",
-                                transition: "all 0.2s",
-                              }}
-                            >
-                              Add
-                            </motion.button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* ILLUSTRATION PRINTS GRID */}
-              <div>
-                <p style={{
-                  fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: 8,
-                  color: BURGUNDY,
-                  letterSpacing: "3.5px",
-                  textTransform: "uppercase",
-                  margin: "0 0 16px 0",
-                  paddingBottom: 12,
-                  borderBottom: `1px solid ${BURG_ALPHA}`,
-                  opacity: 0.6,
-                }}>Illustration Prints</p>
-
-                <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))" }}>
-                  {catalogue.filter(p => p.type === "print").map((product, i) => (
-                    <motion.div key={product.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: i * 0.08 }}
-                      viewport={{ once: true }}
-                      whileHover={reduced ? {} : { y: -3, transition: { duration: 0.2 } }}
-                      style={{
-                        background: "#fff",
-                        borderRadius: 4,
-                        overflow: "hidden",
-                        border: `1px solid ${BURG_ALPHA}`,
-                        boxShadow: "0 1px 8px rgba(110,0,37,0.05)",
-                        display: "flex",
-                        flexDirection: "column",
-                      }}
-                    >
-                      {/* Print image */}
-                      <div style={{ width: "100%", aspectRatio: "3/4", overflow: "hidden", background: "rgba(110,0,37,0.03)" }}>
-                        <img src={product.images[0]} alt={product.title} loading="lazy"
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                            objectPosition: "top",
-                            display: "block",
-                          }} />
-                      </div>
-
-                      {/* Print info */}
-                      <div style={{ padding: "10px 10px 8px", flex: 1, display: "flex", flexDirection: "column" }}>
-                        <span style={{
-                          fontFamily: "DM Sans, system-ui, sans-serif",
-                          fontSize: 6.5,
-                          letterSpacing: "1.5px",
-                          textTransform: "uppercase",
-                          background: `rgba(212,175,55,0.12)`,
-                          color: `rgba(110,0,37,0.65)`,
-                          padding: "2px 6px",
-                          borderRadius: 2,
-                          display: "inline-block",
-                          marginBottom: 4,
-                          width: "fit-content",
-                        }}>{product.badge}</span>
-                        <h3 style={{
-                          fontFamily: CORMORANT,
-                          fontSize: 14,
-                          fontWeight: 600,
-                          color: DARK_TEXT,
-                          margin: "0 0 2px 0",
-                        }}>{product.title}</h3>
-                        <p style={{
-                          fontFamily: "DM Sans, system-ui, sans-serif",
-                          fontSize: 8.5,
-                          color: "rgba(34,26,26,0.4)",
-                          lineHeight: 1.3,
-                          margin: "0 0 8px 0",
-                        }}>{product.subtitle}</p>
-
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "auto" }}>
-                          <span style={{
-                            fontFamily: CORMORANT,
-                            fontSize: 14,
-                            fontWeight: 600,
-                            color: BURGUNDY,
-                          }}>
-                            {currency === "NGN" ? `₦${product.priceNGN.toLocaleString()}` : `$${product.priceUSD}`}
-                          </span>
-                          <motion.button
-                            onClick={() => addToCart(product)}
-                            whileHover={reduced ? {} : { scale: 1.04 }}
-                            whileTap={reduced ? {} : { scale: 0.96 }}
-                            style={{
-                              fontFamily: "DM Sans, system-ui, sans-serif",
-                              fontSize: 7,
-                              letterSpacing: "1.5px",
-                              textTransform: "uppercase",
-                              fontWeight: 600,
-                              background: BURGUNDY,
-                              color: GOLD,
-                              border: "none",
-                              borderRadius: 3,
-                              padding: "5px 8px",
-                              cursor: "pointer",
-                            }}
-                          >
-                            Add
-                          </motion.button>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
           </div>
+
+          {/* ROW 2: SUPPORTING PORTRAITS — Two images side-by-side */}
+          <motion.div
+            initial={{ opacity: 0, y: 32 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            viewport={{ once: true, margin: "0px 0px -80px 0px" }}
+            className="grid md:grid-cols-2 gap-6 lg:gap-8"
+          >
+            {/* Portrait 1 */}
+            <div
+              style={{
+                position: "relative",
+                aspectRatio: "3/4",
+                overflow: "hidden",
+                borderRadius: 2,
+                background: BURGUNDY,
+              }}
+            >
+              <img
+                src="/viva/lifestyle/lifestyle-01-single-product.webp"
+                alt="Batya Collection — Single lifestyle moment"
+                loading="lazy"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center",
+                  display: "block",
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "linear-gradient(to bottom, rgba(110,0,37,0.06) 0%, rgba(110,0,37,0.12) 100%)",
+                  pointerEvents: "none",
+                }}
+              />
+            </div>
+
+            {/* Portrait 2 */}
+            <div
+              style={{
+                position: "relative",
+                aspectRatio: "3/4",
+                overflow: "hidden",
+                borderRadius: 2,
+                background: BURGUNDY,
+              }}
+            >
+              <img
+                src="/viva/lifestyle/lifestyle-02-landscape-editorial.webp"
+                alt="Batya Collection — Editorial lifestyle"
+                loading="lazy"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center",
+                  display: "block",
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "linear-gradient(to bottom, rgba(110,0,37,0.06) 0%, rgba(110,0,37,0.12) 100%)",
+                  pointerEvents: "none",
+                }}
+              />
+            </div>
+          </motion.div>
         </div>
       </section>
 
