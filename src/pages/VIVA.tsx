@@ -1549,45 +1549,142 @@ const VIVAPage = () => {
           </div>
         </div>
       </section>
+          PHILOSOPHY — editorial triptych, visual-first
+          ═══════════════════════════════════════════════════════ */}
+      <section className="w-full" style={{ background: CREAM, position: "relative", overflow: "hidden" }}>
+        {/* Top rule */}
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: BURGUNDY, opacity: 0.18 }} />
+
+        {/* Section header — centred editorial */}
+        <div className="mx-auto px-6" style={{ maxWidth: 1100, paddingTop: 80, paddingBottom: 64, textAlign: "center" }}>
+          <motion.p
+            variants={fadeVariants} initial="hidden"
+            animate={pillarsInView ? "visible" : "hidden"}
+            style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 9, color: BURGUNDY, letterSpacing: "6px", textTransform: "uppercase", marginBottom: 18, opacity: 0.55 }}
+          >The VIVA Philosophy</motion.p>
+
+          <motion.h2
+            variants={slideUpVariants} initial="hidden"
+            animate={pillarsInView ? "visible" : "hidden"}
+            style={{ fontFamily: CORMORANT, fontSize: "clamp(30px, 4.5vw, 56px)", fontWeight: 400, fontStyle: "italic", color: DARK_TEXT, margin: "0 auto 0", lineHeight: 1.1, maxWidth: 640 }}
+          >
+            She wears her confidence out loud.
+          </motion.h2>
+        </div>
+
+        {/* Divider rule */}
+        <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
+          <div style={{ height: 1, background: BURGUNDY, opacity: 0.12 }} />
+        </div>
+
+        {/* Three pillars triptych */}
+        <motion.div
+          ref={pillarsRef}
+          variants={staggerVariants} initial="hidden"
+          animate={pillarsInView ? "visible" : "hidden"}
+          className="mx-auto grid grid-cols-1 md:grid-cols-3"
+          style={{ maxWidth: 1100 }}
+        >
+          {PILLARS.map((p, i) => (
+            <motion.div
+              key={p.heading}
+              variants={cardVariants}
+              className={i < 2 ? "md:border-r border-b md:border-b-0" : ""}
+              style={{
+                padding: "clamp(40px, 5vw, 72px) clamp(24px, 3.5vw, 52px)",
+                borderColor: "rgba(110,0,37,0.12)",
+                position: "relative",
+                textAlign: "center",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 0,
+              }}
+            >
+              {/* Roman numeral watermark */}
+              <div aria-hidden="true" style={{
+                position: "absolute",
+                bottom: "10%",
+                right: i === 2 ? "6%" : "auto",
+                left: i === 0 ? "6%" : "auto",
+                ...(i === 1 ? { left: "50%", transform: "translateX(-50%)" } : {}),
+                fontFamily: CORMORANT,
+                fontSize: "clamp(80px, 11vw, 130px)",
+                fontWeight: 700,
+                color: BURGUNDY,
+                opacity: 0.045,
+                lineHeight: 1,
+                pointerEvents: "none",
+                userSelect: "none",
+              }}>
+                {p.numeral}
+              </div>
+
+              {/* Icon mark */}
+              <div style={{ color: BURGUNDY, opacity: 0.7, marginBottom: 28 }}>
+                {PILLAR_ICONS[i]}
+              </div>
+
+              {/* Gold rule */}
+              <div style={{ width: 28, height: 1, background: GOLD, opacity: 0.55, marginBottom: 28 }} />
+
+              {/* Pillar heading */}
+              <h3 style={{
+                fontFamily: CORMORANT,
+                fontSize: "clamp(20px, 2.2vw, 27px)",
+                fontWeight: 600,
+                color: DARK_TEXT,
+                margin: "0 0 20px",
+                lineHeight: 1.15,
+                letterSpacing: "0.02em",
+              }}>{p.heading}</h3>
+
+              {/* Single evocative line */}
+              <p style={{
+                fontFamily: CORMORANT,
+                fontStyle: "italic",
+                fontSize: "clamp(14px, 1.35vw, 17px)",
+                color: BURGUNDY,
+                opacity: 0.72,
+                margin: 0,
+                lineHeight: 1.65,
+                maxWidth: 220,
+              }}>{p.line}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Bottom rule */}
+        <div style={{ height: 1, background: BURGUNDY, opacity: 0.1 }} />
+      </section>
 
       {/* ═══════════════════════════════════════════════════════
-          LIFESTYLE INTERSTITIAL — Aesthetic moments, premium editorial
-          Three curated lifestyle shots that contextualize VIVA's brand
-          feeling: luxury, heritage, everyday elegance. Strategic
-          placement between lookbook (product) and philosophy (values).
+          BETWEEN-PILLAR VISUAL BREATHING ROOM — Editorial moment
+          A lifestyle image breaks the text density and adds visual
+          rhythm between the Philosophy pillars and the Shop section.
+          Split-screen on desktop (image + descriptive moment), stacked
+          on mobile. Maintains editorial calm with minimal copy overlay.
           ═══════════════════════════════════════════════════════ */}
-      <section className="w-full" style={{ background: ALABASTER, paddingTop: 96, paddingBottom: 96 }}>
+      <section className="w-full" style={{ background: CREAM, paddingTop: 80, paddingBottom: 80 }}>
         <div className="mx-auto px-6" style={{ maxWidth: 1280 }}>
-          {/* Lifestyle intro eyebrow */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-            style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, color: BURGUNDY, letterSpacing: "4px", textTransform: "uppercase", marginBottom: 24, opacity: 0.6, textAlign: "center" }}
-          >
-            The VIVA Lifestyle
-          </motion.p>
-
-          {/* Three-image grid: responsive masonry feel on desktop, stacked on mobile */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-6">
-            {/* Image 1 — Single with Bag (Portrait, featured) */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Image: left on desktop, top on mobile */}
             <motion.div
-              initial={{ opacity: 0, y: 32 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, ease: "easeOut" }}
               viewport={{ once: true, margin: "0px 0px -80px 0px" }}
-              className="lg:col-span-1 md:row-span-2"
+              className="order-2 lg:order-1"
               style={{
                 position: "relative",
                 overflow: "hidden",
                 borderRadius: "2px",
-                aspectRatio: "9/12",
+                aspectRatio: "4/5",
               }}
             >
               <img
                 src="/viva/lifestyle/lifestyle-01-single-product.webp"
-                alt="VIVA Lifestyle — Woman in burgundy holding VIVA shopping bag"
+                alt="VIVA Editorial — Woman embodying structured fluidity and artistic agency"
                 style={{
                   width: "100%",
                   height: "100%",
@@ -1597,113 +1694,107 @@ const VIVAPage = () => {
                 }}
                 loading="lazy"
               />
-              {/* Subtle gradient overlay for text legibility if needed */}
               <div
                 style={{
                   position: "absolute",
                   inset: 0,
-                  background: "linear-gradient(to bottom, rgba(0,0,0,0) 60%, rgba(110,0,37,0.08) 100%)",
+                  background: "linear-gradient(to bottom, rgba(0,0,0,0) 60%, rgba(110,0,37,0.06) 100%)",
                   pointerEvents: "none",
                 }}
               />
             </motion.div>
 
-            {/* Image 2 — Editorial (Portrait) */}
+            {/* Text: right on desktop, bottom on mobile */}
             <motion.div
-              initial={{ opacity: 0, y: 32 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, delay: 0.12, ease: "easeOut" }}
               viewport={{ once: true, margin: "0px 0px -80px 0px" }}
-              className="lg:col-span-1"
+              className="order-1 lg:order-2"
               style={{
-                position: "relative",
-                overflow: "hidden",
-                borderRadius: "2px",
-                aspectRatio: "9/12",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                gap: 24,
               }}
             >
-              <img
-                src="/viva/lifestyle/lifestyle-02-landscape-editorial.webp"
-                alt="VIVA Editorial — Styled moments in earth tones"
+              {/* Eyebrow */}
+              <p
                 style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  objectPosition: "center",
-                  display: "block",
+                  fontFamily: "DM Sans, system-ui, sans-serif",
+                  fontSize: 11,
+                  color: BURGUNDY,
+                  letterSpacing: "4px",
+                  textTransform: "uppercase",
+                  margin: 0,
+                  opacity: 0.6,
                 }}
-                loading="lazy"
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  background: "linear-gradient(to bottom, rgba(0,0,0,0) 60%, rgba(110,0,37,0.08) 100%)",
-                  pointerEvents: "none",
-                }}
-              />
-            </motion.div>
+              >
+                The VIVA Philosophy in Motion
+              </p>
 
-            {/* Image 3 — Duo Moment (Landscape, spans full width on md) */}
-            <motion.div
-              initial={{ opacity: 0, y: 32 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.24, ease: "easeOut" }}
-              viewport={{ once: true, margin: "0px 0px -80px 0px" }}
-              className="md:col-span-2 lg:col-span-1 lg:row-span-2"
-              style={{
-                position: "relative",
-                overflow: "hidden",
-                borderRadius: "2px",
-                aspectRatio: "16/12",
-              }}
-            >
-              <img
-                src="/viva/lifestyle/lifestyle-03-duo-moment.webp"
-                alt="VIVA Community — Two women in styled VIVA aesthetics"
+              {/* Moment description */}
+              <div>
+                <h3
+                  style={{
+                    fontFamily: CORMORANT,
+                    fontSize: "clamp(24px, 3.5vw, 36px)",
+                    fontWeight: 400,
+                    fontStyle: "italic",
+                    color: BURGUNDY,
+                    margin: "0 0 16px 0",
+                    lineHeight: 1.3,
+                  }}
+                >
+                  Where precision meets the body in motion.
+                </h3>
+                <p
+                  style={{
+                    fontFamily: "DM Sans, system-ui, sans-serif",
+                    fontSize: "clamp(14px, 1.1vw, 16px)",
+                    color: DARK_TEXT,
+                    margin: 0,
+                    lineHeight: 1.75,
+                    opacity: 0.75,
+                    maxWidth: "50ch",
+                  }}
+                >
+                  Structured Fluidity is where every stitch aligns with intention. The body is a canvas for movement — our garments hold that motion with precision, then release it with grace.
+                </p>
+              </div>
+
+              {/* Accent rule */}
+              <div style={{ width: 32, height: 1, background: GOLD, opacity: 0.5 }} />
+
+              {/* Supporting insight */}
+              <p
                 style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  objectPosition: "center",
-                  display: "block",
+                  fontFamily: CORMORANT,
+                  fontSize: "clamp(14px, 1.3vw, 17px)",
+                  fontStyle: "italic",
+                  color: BURGUNDY,
+                  margin: 0,
+                  lineHeight: 1.65,
+                  opacity: 0.68,
                 }}
-                loading="lazy"
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  background: "linear-gradient(to bottom, rgba(0,0,0,0) 60%, rgba(110,0,37,0.08) 100%)",
-                  pointerEvents: "none",
-                }}
-              />
+              >
+                Every garment is a declaration of who you are.
+              </p>
             </motion.div>
           </div>
-
-          {/* Lifestyle tagline — appears below images on mobile/tablet, can be repositioned */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.36 }}
-            viewport={{ once: true, margin: "0px 0px -80px 0px" }}
-            style={{
-              fontFamily: CORMORANT,
-              fontSize: "clamp(18px, 2.2vw, 26px)",
-              fontStyle: "italic",
-              fontWeight: 400,
-              color: BURGUNDY,
-              margin: "56px auto 0",
-              textAlign: "center",
-              maxWidth: 600,
-              lineHeight: 1.5,
-              opacity: 0.8,
-            }}
-          >
-            Luxury crafted for the woman who wears her confidence out loud.
-          </motion.p>
         </div>
       </section>
+
+      {/* Old Collection Header and Shop sections removed here and consolidated
+          into the new BATYA CURATED EDITORIAL MOMENT section above (positioned
+          before Philosophy for easier shopping access). The modals and FABs
+          below remain unchanged. */}
+
+      {/* ═══════════════════════════════════════════════════════
+          Modals, FABs, and interactive elements
+          ═══════════════════════════════════════════════════════ */}
+
+      {/* ═══════════════════════════════════════════════════════
 
       {/* ═══════════════════════════════════════════════════════
           SHOP CATALOGUE — Products only (no narrative)
@@ -2395,252 +2486,6 @@ const VIVAPage = () => {
           </motion.div>
         </div>
       </section>
-
-      {/* ═══════════════════════════════════════════════════════
-          PHILOSOPHY — editorial triptych, visual-first
-          ═══════════════════════════════════════════════════════ */}
-      <section className="w-full" style={{ background: CREAM, position: "relative", overflow: "hidden" }}>
-        {/* Top rule */}
-        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: BURGUNDY, opacity: 0.18 }} />
-
-        {/* Section header — centred editorial */}
-        <div className="mx-auto px-6" style={{ maxWidth: 1100, paddingTop: 80, paddingBottom: 64, textAlign: "center" }}>
-          <motion.p
-            variants={fadeVariants} initial="hidden"
-            animate={pillarsInView ? "visible" : "hidden"}
-            style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 9, color: BURGUNDY, letterSpacing: "6px", textTransform: "uppercase", marginBottom: 18, opacity: 0.55 }}
-          >The VIVA Philosophy</motion.p>
-
-          <motion.h2
-            variants={slideUpVariants} initial="hidden"
-            animate={pillarsInView ? "visible" : "hidden"}
-            style={{ fontFamily: CORMORANT, fontSize: "clamp(30px, 4.5vw, 56px)", fontWeight: 400, fontStyle: "italic", color: DARK_TEXT, margin: "0 auto 0", lineHeight: 1.1, maxWidth: 640 }}
-          >
-            She wears her confidence out loud.
-          </motion.h2>
-        </div>
-
-        {/* Divider rule */}
-        <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
-          <div style={{ height: 1, background: BURGUNDY, opacity: 0.12 }} />
-        </div>
-
-        {/* Three pillars triptych */}
-        <motion.div
-          ref={pillarsRef}
-          variants={staggerVariants} initial="hidden"
-          animate={pillarsInView ? "visible" : "hidden"}
-          className="mx-auto grid grid-cols-1 md:grid-cols-3"
-          style={{ maxWidth: 1100 }}
-        >
-          {PILLARS.map((p, i) => (
-            <motion.div
-              key={p.heading}
-              variants={cardVariants}
-              className={i < 2 ? "md:border-r border-b md:border-b-0" : ""}
-              style={{
-                padding: "clamp(40px, 5vw, 72px) clamp(24px, 3.5vw, 52px)",
-                borderColor: "rgba(110,0,37,0.12)",
-                position: "relative",
-                textAlign: "center",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 0,
-              }}
-            >
-              {/* Roman numeral watermark */}
-              <div aria-hidden="true" style={{
-                position: "absolute",
-                bottom: "10%",
-                right: i === 2 ? "6%" : "auto",
-                left: i === 0 ? "6%" : "auto",
-                ...(i === 1 ? { left: "50%", transform: "translateX(-50%)" } : {}),
-                fontFamily: CORMORANT,
-                fontSize: "clamp(80px, 11vw, 130px)",
-                fontWeight: 700,
-                color: BURGUNDY,
-                opacity: 0.045,
-                lineHeight: 1,
-                pointerEvents: "none",
-                userSelect: "none",
-              }}>
-                {p.numeral}
-              </div>
-
-              {/* Icon mark */}
-              <div style={{ color: BURGUNDY, opacity: 0.7, marginBottom: 28 }}>
-                {PILLAR_ICONS[i]}
-              </div>
-
-              {/* Gold rule */}
-              <div style={{ width: 28, height: 1, background: GOLD, opacity: 0.55, marginBottom: 28 }} />
-
-              {/* Pillar heading */}
-              <h3 style={{
-                fontFamily: CORMORANT,
-                fontSize: "clamp(20px, 2.2vw, 27px)",
-                fontWeight: 600,
-                color: DARK_TEXT,
-                margin: "0 0 20px",
-                lineHeight: 1.15,
-                letterSpacing: "0.02em",
-              }}>{p.heading}</h3>
-
-              {/* Single evocative line */}
-              <p style={{
-                fontFamily: CORMORANT,
-                fontStyle: "italic",
-                fontSize: "clamp(14px, 1.35vw, 17px)",
-                color: BURGUNDY,
-                opacity: 0.72,
-                margin: 0,
-                lineHeight: 1.65,
-                maxWidth: 220,
-              }}>{p.line}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Bottom rule */}
-        <div style={{ height: 1, background: BURGUNDY, opacity: 0.1 }} />
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════
-          BETWEEN-PILLAR VISUAL BREATHING ROOM — Editorial moment
-          A lifestyle image breaks the text density and adds visual
-          rhythm between the Philosophy pillars and the Shop section.
-          Split-screen on desktop (image + descriptive moment), stacked
-          on mobile. Maintains editorial calm with minimal copy overlay.
-          ═══════════════════════════════════════════════════════ */}
-      <section className="w-full" style={{ background: CREAM, paddingTop: 80, paddingBottom: 80 }}>
-        <div className="mx-auto px-6" style={{ maxWidth: 1280 }}>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            {/* Image: left on desktop, top on mobile */}
-            <motion.div
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-              viewport={{ once: true, margin: "0px 0px -80px 0px" }}
-              className="order-2 lg:order-1"
-              style={{
-                position: "relative",
-                overflow: "hidden",
-                borderRadius: "2px",
-                aspectRatio: "4/5",
-              }}
-            >
-              <img
-                src="/viva/lifestyle/lifestyle-01-single-product.webp"
-                alt="VIVA Editorial — Woman embodying structured fluidity and artistic agency"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  objectPosition: "center",
-                  display: "block",
-                }}
-                loading="lazy"
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  background: "linear-gradient(to bottom, rgba(0,0,0,0) 60%, rgba(110,0,37,0.06) 100%)",
-                  pointerEvents: "none",
-                }}
-              />
-            </motion.div>
-
-            {/* Text: right on desktop, bottom on mobile */}
-            <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, delay: 0.12, ease: "easeOut" }}
-              viewport={{ once: true, margin: "0px 0px -80px 0px" }}
-              className="order-1 lg:order-2"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                gap: 24,
-              }}
-            >
-              {/* Eyebrow */}
-              <p
-                style={{
-                  fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: 11,
-                  color: BURGUNDY,
-                  letterSpacing: "4px",
-                  textTransform: "uppercase",
-                  margin: 0,
-                  opacity: 0.6,
-                }}
-              >
-                The VIVA Philosophy in Motion
-              </p>
-
-              {/* Moment description */}
-              <div>
-                <h3
-                  style={{
-                    fontFamily: CORMORANT,
-                    fontSize: "clamp(24px, 3.5vw, 36px)",
-                    fontWeight: 400,
-                    fontStyle: "italic",
-                    color: BURGUNDY,
-                    margin: "0 0 16px 0",
-                    lineHeight: 1.3,
-                  }}
-                >
-                  Where precision meets the body in motion.
-                </h3>
-                <p
-                  style={{
-                    fontFamily: "DM Sans, system-ui, sans-serif",
-                    fontSize: "clamp(14px, 1.1vw, 16px)",
-                    color: DARK_TEXT,
-                    margin: 0,
-                    lineHeight: 1.75,
-                    opacity: 0.75,
-                    maxWidth: "50ch",
-                  }}
-                >
-                  Structured Fluidity is where every stitch aligns with intention. The body is a canvas for movement — our garments hold that motion with precision, then release it with grace.
-                </p>
-              </div>
-
-              {/* Accent rule */}
-              <div style={{ width: 32, height: 1, background: GOLD, opacity: 0.5 }} />
-
-              {/* Supporting insight */}
-              <p
-                style={{
-                  fontFamily: CORMORANT,
-                  fontSize: "clamp(14px, 1.3vw, 17px)",
-                  fontStyle: "italic",
-                  color: BURGUNDY,
-                  margin: 0,
-                  lineHeight: 1.65,
-                  opacity: 0.68,
-                }}
-              >
-                Every garment is a declaration of who you are.
-              </p>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Old Collection Header and Shop sections removed here and consolidated
-          into the new BATYA CURATED EDITORIAL MOMENT section above (positioned
-          before Philosophy for easier shopping access). The modals and FABs
-          below remain unchanged. */}
-
-      {/* ═══════════════════════════════════════════════════════
-          Modals, FABs, and interactive elements
-          ═══════════════════════════════════════════════════════ */}
 
       {/* ═══════════════════════════════════════════════════════
           ENQUIRY — deep burgundy accent
