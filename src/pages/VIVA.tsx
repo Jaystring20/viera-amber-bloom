@@ -33,75 +33,200 @@ const LOOKBOOK = [
 // UI can drive it, but keeps this as the offline/empty-table answer — a
 // storefront that renders nothing when a query fails reads as broken.
 const SHOP_PRODUCTS: ShopProduct[] = [
+  // ═══════════════════════════════════════════════════════════
+  // SECTION 1: AJOGÚN (THE INHERITANCE)
+  // Heritage tops and sets with 4 style variants
+  // ═══════════════════════════════════════════════════════════
+
   {
-    id: "heritage",
-    title: "The Heritage",
-    subtitle: "Look 01 · Batya Collection",
+    id: "ajogun-patched-top",
+    title: "Ajogún Patched Aṣọ-Òkè Top",
+    subtitle: "The Inheritance · Heritage Collection",
     type: "garment" as const,
     badge: "Made to Order",
-    images: ["/viva/look-1.webp", "/viva/look-2.webp", "/viva/look-3.webp"],
-    priceNGN: 180000,
-    priceUSD: 115,
-    desc: "Olive woven kimono · wide-leg pleated denim · gold cuffs. Bespoke fit, made to your measurements.",
-    fullDesc: "This Heritage piece combines traditional tailoring with modern sensibility. The olive woven kimono drapes beautifully over wide-leg pleated denim, finished with delicate gold cuffs. Every measurement is taken to perfection for your bespoke fit. Crafted to celebrate structured fluidity—where precision meets the body in motion.",
-    materials: "100% premium cotton kimono · sustainable denim · 18k gold-plated cuffs",
-    care: "Dry clean recommended. Gentle hand wash for delicate pieces. Store in cool, dry place."
+    images: ["/viva/ajogun-patched-1.webp", "/viva/ajogun-patched-2.webp", "/viva/ajogun-patched-3.webp"],
+    priceNGN: 40000,
+    priceUSD: 26,
+    desc: "Heritage Aṣọ-Òkè top in signature patched weave. Select Top Only (₦40,000) or add Plain Pants (₦15,000) for the full set (₦65,000).",
+    fullDesc: "The Ajogún Patched Aṣọ-Òkè Top celebrates traditional heritage craftsmanship. The patched weave technique creates visual depth and texture, rooted in ancestral practices. Offered as a standalone top or paired with our Plain Pants for the complete ceremonial set. Made to your measurements for perfect fit.",
+    materials: "100% premium Aṣọ-Òkè fabric · hand-patched weave · bespoke tailoring",
+    care: "Dry clean recommended. Handle with care to preserve the patched weave integrity. Store in cool, dry environment."
   },
+
   {
-    id: "bold",
-    title: "The Bold",
-    subtitle: "Look 02 · Batya Collection",
-    type: "garment" as const,
-    badge: "Limited",
-    images: ["/viva/look-2.webp", "/viva/look-1.webp", "/viva/look-3.webp"],
-    priceNGN: 195000,
-    priceUSD: 126,
-    desc: "Hot-pink structured crop · wide-leg denim · statement earrings. Confidence, personalised.",
-    fullDesc: "The Bold is a declaration of artistic agency. The hot-pink structured crop defines your silhouette with precision tailoring, paired with comfortable wide-leg denim and statement-making earrings. This is fashion as confidence—personalised, powerful, and unapologetically you.",
-    materials: "Structured cotton blend crop · premium denim · statement jewelry",
-    care: "Machine wash cold. Line dry. Iron on low heat if needed."
-  },
-  {
-    id: "artist",
-    title: "The Artist",
-    subtitle: "Look 03 · Batya Collection",
+    id: "ajogun-plain-top",
+    title: "Ajogún Plain Aṣọ-Òkè Top",
+    subtitle: "The Inheritance · Heritage Collection",
     type: "garment" as const,
     badge: "Made to Order",
-    images: ["/viva/look-3.webp", "/viva/look-1.webp", "/viva/look-2.webp"],
-    priceNGN: 188000,
-    priceUSD: 121,
-    desc: "Chartreuse palazzo · structured crop · layered gold jewellery. Chromatic freedom in fabric.",
-    fullDesc: "Chromatic freedom is the heart of The Artist. The chartreuse palazzo pants flow with artistic fluidity, balanced by a structured crop top. Layered gold jewellery adds depth and dimension. This piece celebrates your identity as a creative force—dressed in who you are, and whose you are.",
-    materials: "Linen-blend palazzo pants · structured cotton crop · layered gold jewelry",
-    care: "Hand wash recommended. Lay flat to dry. Store jewelry separately."
+    images: ["/viva/ajogun-plain-1.webp", "/viva/ajogun-plain-2.webp", "/viva/ajogun-plain-3.webp"],
+    priceNGN: 40000,
+    priceUSD: 26,
+    desc: "Heritage Aṣọ-Òkè top in clean, plain weave. Choose Top Only (₦40,000) or pair with Plain Pants (₦15,000) for full set (₦65,000).",
+    fullDesc: "The Ajogún Plain Aṣọ-Òkè Top showcases the elegant simplicity of traditional woven fabric. The unadorned weave allows the richness of the fabric itself to take center stage. A versatile heritage piece, offered solo or as a complete ceremonial set when paired with matching pants. Custom-fitted to your measurements.",
+    materials: "100% premium Aṣọ-Òkè fabric · plain weave · bespoke tailoring",
+    care: "Dry clean recommended. Gentle hand wash for delicate preservation. Store away from direct sunlight."
   },
+
   {
-    id: "print-01",
-    title: "Batya No.1",
-    subtitle: "Fashion Illustration · A3 Giclée",
+    id: "ajogun-one-sleeved",
+    title: "One-Sleeved Ajogún Top",
+    subtitle: "The Inheritance · Heritage Collection",
+    type: "garment" as const,
+    badge: "Made to Order",
+    images: ["/viva/ajogun-one-sleeved-1.webp", "/viva/ajogun-one-sleeved-2.webp", "/viva/ajogun-one-sleeved-3.webp"],
+    priceNGN: 40000,
+    priceUSD: 26,
+    desc: "Architectural one-sleeved Aṣọ-Òkè top, a bold reinterpretation of heritage. Top Only (₦40,000) or with Plain Pants (₦15,000) for set (₦65,000).",
+    fullDesc: "The One-Sleeved Ajogún Top modernizes ancestral design while honoring tradition. This architectural piece features asymmetrical tailoring in premium Aṣọ-Òkè fabric, creating visual impact with structured elegance. Offered independently or as part of the complete ceremonial ensemble. Made to your exact measurements.",
+    materials: "100% premium Aṣọ-Òkè fabric · architectural cut · bespoke tailoring",
+    care: "Dry clean recommended. Lay flat to dry. Preserve the architectural seams with careful handling."
+  },
+
+  {
+    id: "ajogun-other-fabrics",
+    title: "Ajogún Top: Other Fabrics",
+    subtitle: "The Inheritance · Heritage Collection",
+    type: "garment" as const,
+    badge: "Premium Sourcing",
+    images: ["/viva/ajogun-akwete-1.webp", "/viva/ajogun-akwete-2.webp", "/viva/ajogun-akwete-3.webp"],
+    priceNGN: 50000,
+    priceUSD: 32,
+    desc: "Ajogún top in whole-piece fabrics (Akwẹ́tẹ́, specialty textiles). Top Only (₦50,000). Pairs beautifully with Ajogún Pants (₦25,000).",
+    fullDesc: "The Ajogún Top in Premium Fabrics elevates the collection with exclusive whole-piece textiles like Akwẹ́tẹ́ and custom-sourced materials. Each piece is unique, celebrating the depth and richness of these rare fabrics. Made to your measurements. Can be styled with the Ajogún Pants for a coordinated heritage set.",
+    materials: "100% Akwẹ́tẹ́ or specialty sourced fabrics · whole-piece construction · bespoke tailoring",
+    care: "Dry clean only. These premium fabrics require specialized care. Store in archival-quality tissue."
+  },
+
+  // STANDALONE PANTS OPTIONS FOR AJOGÚN
+  {
+    id: "plain-pants",
+    title: "Plain Pants",
+    subtitle: "The Inheritance · Heritage Collection",
+    type: "garment" as const,
+    badge: "Add-on",
+    images: ["/viva/plain-pants-1.webp", "/viva/plain-pants-2.webp"],
+    priceNGN: 15000,
+    priceUSD: 10,
+    desc: "Elegant plain pants. Add to any Ajogún Top (₦40,000–₦50,000) or purchase standalone (₦15,000).",
+    fullDesc: "These plain heritage pants are the perfect complement to any Ajogún Top, creating a balanced ceremonial set. Crafted in premium fabric with impeccable tailoring, they work beautifully as a standalone piece or as part of the Ajogún collection. Made to your measurements.",
+    materials: "100% premium heritage fabric · expert tailoring · bespoke fit",
+    care: "Dry clean recommended. Lay flat to dry. Store in cool, dry place."
+  },
+
+  {
+    id: "ajogun-pants",
+    title: "Ajogún Pants",
+    subtitle: "The Inheritance · Heritage Collection",
+    type: "garment" as const,
+    badge: "Made to Order",
+    images: ["/viva/ajogun-pants-1.webp", "/viva/ajogun-pants-2.webp"],
+    priceNGN: 25000,
+    priceUSD: 16,
+    desc: "Custom Ajogún pants in premium heritage fabric. Standalone or pair with Ajogún Top: Other Fabrics (₦50,000) for premium set (₦75,000).",
+    fullDesc: "The Ajogún Pants showcase heritage tailoring with custom construction. These premium trousers complement the Ajogún collection perfectly, especially when paired with our premium fabric tops. Offered as a standalone piece or as part of a coordinated set. Bespoke fitting to your measurements.",
+    materials: "100% premium heritage fabric · custom tailoring · bespoke construction",
+    care: "Dry clean recommended. Preserve fabric quality with proper storage."
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // SECTION 2: NKÀ (CRAFTSMANSHIP)
+  // Artisan garment designs with 2 fabric variants
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: "nka-adire",
+    title: "Nkà Garment: Àdịrẹ",
+    subtitle: "Craftsmanship · Artisan Collection",
+    type: "garment" as const,
+    badge: "Signature Fabric",
+    images: ["/viva/nka-adire-1.webp", "/viva/nka-adire-2.webp", "/viva/nka-adire-3.webp"],
+    priceNGN: 25000,
+    priceUSD: 16,
+    desc: "Artisan-designed garment in signature Àdịrẹ fabric. Resist-dyed textile celebrating craftsmanship and artistic expression.",
+    fullDesc: "The Nkà Garment in Àdịrẹ is a celebration of artisan mastery. The Àdịrẹ resist-dyed fabric features intricate patterns that speak to centuries of textile tradition. Each piece is uniquely designed to express artistic agency—a wearable declaration of craftsmanship. Made to your measurements for personalized fit.",
+    materials: "100% Àdịrẹ resist-dyed fabric · artisan construction · bespoke tailoring",
+    care: "Hand wash in cool water. Use color-safe detergent. Lay flat to dry to preserve the resist-dye patterns."
+  },
+
+  {
+    id: "nka-silk-crepe",
+    title: "Nkà Garment: Silk & Crepe",
+    subtitle: "Craftsmanship · Artisan Collection",
+    type: "garment" as const,
+    badge: "Premium Fabrics",
+    images: ["/viva/nka-silk-1.webp", "/viva/nka-silk-2.webp", "/viva/nka-silk-3.webp"],
+    priceNGN: 20000,
+    priceUSD: 13,
+    desc: "Artisan garment in luxurious silk and crepe blends. Light, flowing fabric for sophisticated expression of artistic identity.",
+    fullDesc: "The Nkà Garment in Silk & Crepe offers sophistication through lightweight, flowing fabrics. The crepe drape and silk sheen create movement and elegance, perfect for artistic expression. Each design celebrates individual craftsmanship and the wearer's unique identity. Custom-fitted to your measurements.",
+    materials: "Silk and crepe blend · artisan design · bespoke tailoring",
+    care: "Hand wash or dry clean. Air dry away from direct sunlight. Iron on low heat if needed."
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // SECTION 3: T-SHIRTS & PRINTS
+  // Graphic apparel and artwork prints
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: "daughters-tee",
+    title: "Daughter of Adonai T-Shirt",
+    subtitle: "Graphic Apparel · XL",
+    type: "garment" as const,
+    badge: "Graphic Tee",
+    images: ["/viva/daughters-tee-front.webp", "/viva/daughters-tee-back.webp"],
+    priceNGN: 25000,
+    priceUSD: 16,
+    desc: "Statement graphic tee featuring 'Daughter of Adonai' print. Premium cotton with artistic design celebrating sacred identity.",
+    fullDesc: "The Daughter of Adonai T-Shirt is a wearable declaration of identity and heritage. The artistic print is carefully crafted onto premium cotton, creating a piece that is both comfortable and meaningful. Wear it as a statement of who you are and whose you are.",
+    materials: "100% premium cotton · screen-printed graphic · bespoke sizing",
+    care: "Machine wash cold. Turn inside out before washing to protect the print. Tumble dry low or air dry."
+  },
+
+  {
+    id: "art-print-01",
+    title: "Art Print: Daughters Series No.1",
+    subtitle: "Giclée on Cotton Rag · A3",
     type: "print" as const,
-    badge: "Edition / 30",
-    images: ["/viva/look-4.jpeg", "/viva/look-1.webp"],
+    badge: "Limited Edition / 30",
+    images: ["/viva/art-print-daughters-1.webp"],
     priceNGN: 35000,
     priceUSD: 22,
-    desc: "Archival giclée on 300gsm cotton rag. Signed + numbered. Ships in a protective tube.",
-    fullDesc: "Batya No.1 is a limited-edition fashion illustration printed on archival-quality 300gsm cotton rag paper. Each print is hand-signed and numbered as part of the Daughters of Adonai series. Ships in a protective tube with certificate of authenticity.",
+    desc: "Limited-edition archival giclée print on 300gsm cotton rag. Hand-signed and numbered. Celebrates the Daughters of Adonai narrative.",
+    fullDesc: "Art Print No.1 from the Daughters Series is a stunning archival-quality print created by Viera Amber. Printed on premium 300gsm cotton rag paper using archival pigment inks, each print is hand-signed and numbered as part of the limited edition of 30. Ships in protective tube with certificate of authenticity.",
     materials: "300gsm cotton rag paper · archival pigment inks · hand-signed and numbered",
-    care: "Frame under UV-protective glass. Keep away from direct sunlight to preserve colors."
+    care: "Frame under UV-protective glass. Display away from direct sunlight. Keep away from moisture."
   },
+
   {
-    id: "print-02",
-    title: "Heritage Print",
-    subtitle: "Fashion Illustration · A3 Giclée",
+    id: "art-print-02",
+    title: "Art Print: Daughters Series No.2",
+    subtitle: "Giclée on Cotton Rag · A3",
     type: "print" as const,
-    badge: "Edition / 30",
-    images: ["/viva/look-1.webp", "/viva/look-4.jpeg"],
+    badge: "Limited Edition / 30",
+    images: ["/viva/art-print-daughters-2.webp"],
     priceNGN: 35000,
     priceUSD: 22,
-    desc: "The Heritage silhouette in ink and gouache. Signed by Viera Amber. Edition of 30.",
-    fullDesc: "The Heritage Print captures the essence of the iconic silhouette through ink and gouache artistry. This limited edition celebrates the craftsmanship and attention to detail that defines VIVA. Each piece is a gallery-worthy work created by Viera Amber herself.",
-    materials: "300gsm cotton rag paper · ink and gouache · hand-signed",
-    care: "Frame under glass. Avoid moisture. Display away from heat sources."
+    desc: "Limited-edition archival giclée print on 300gsm cotton rag. Hand-signed and numbered. Part of the Daughters of Adonai collection.",
+    fullDesc: "Art Print No.2 from the Daughters Series continues the narrative of identity, heritage, and artistic expression. Created by Viera Amber and printed on premium archival paper, each of the 30 limited-edition prints is hand-signed and numbered. Ships in protective tube with certificate of authenticity.",
+    materials: "300gsm cotton rag paper · archival pigment inks · hand-signed and numbered",
+    care: "Frame under UV-protective glass. Avoid direct sunlight exposure. Store in archival-quality conditions."
+  },
+
+  {
+    id: "art-print-03",
+    title: "Art Print: Heritage Narrative",
+    subtitle: "Giclée on Cotton Rag · A3",
+    type: "print" as const,
+    badge: "Limited Edition / 30",
+    images: ["/viva/art-print-heritage.webp"],
+    priceNGN: 35000,
+    priceUSD: 22,
+    desc: "Limited-edition archival giclée celebrating heritage, craftsmanship, and ancestral continuity. Hand-signed by Viera Amber.",
+    fullDesc: "The Heritage Narrative print is a meditation on ancestral connection and the continuation of tradition through artistic expression. This archival-quality giclée is printed on premium 300gsm cotton rag paper and hand-signed as part of the limited edition of 30. Each print comes with certificate of authenticity.",
+    materials: "300gsm cotton rag paper · archival pigment inks · hand-signed and numbered",
+    care: "Frame under UV-protective glass. Protect from moisture and direct heat. Display in stable environment."
   },
 ];
 
@@ -1549,6 +1674,8 @@ const VIVAPage = () => {
           </div>
         </div>
       </section>
+
+      {/* ═══════════════════════════════════════════════════════
           PHILOSOPHY — editorial triptych, visual-first
           ═══════════════════════════════════════════════════════ */}
       <section className="w-full" style={{ background: CREAM, position: "relative", overflow: "hidden" }}>
@@ -2994,10 +3121,10 @@ const VIVAPage = () => {
                     <label
                       htmlFor="try-on-file-input"
                       style={{
-                        display: "block", width: "100%", aspectRatio: personPhotoPreview ? "auto" : "4/3",
+                        display: "flex", width: "100%", aspectRatio: personPhotoPreview ? "auto" : "4/3",
                         minHeight: 240, border: `2px dashed ${personPhotoPreview ? "transparent" : BURGUNDY}55`,
                         borderRadius: 12, background: "#FAFAFA", cursor: "pointer", overflow: "hidden",
-                        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12,
+                        flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12,
                         transition: "all 0.2s",
                       }}
                       onMouseEnter={(e) => {
