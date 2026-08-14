@@ -21,6 +21,19 @@ export interface Product {
   fitDetails?: string;
   featured?: boolean;
   active?: boolean;
+  // Extended fields for complex variant/combo systems (e.g., Ajogún Collection)
+  isVariantProduct?: boolean;
+  variants?: Array<{
+    id: string;
+    name: string;
+    images: string[];
+    materials?: string;
+    care?: string;
+    options?: {
+      topOnly?: { NGN: number; USD: number };
+      topWithPants?: { NGN: number; USD: number };
+    };
+  }>;
 }
 
 /** Database row -> the shape the storefront renders. */
