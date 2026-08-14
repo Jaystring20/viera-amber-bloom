@@ -188,18 +188,24 @@ const SHOP_PRODUCTS: ShopProduct[] = [
   // near-identical listings previously shared that one photo — removed per
   // client direction rather than presenting fabricated variety.
   {
+    // NOTE: the only source image here is actually a t-shirt product photo
+    // (a model wearing a "DND" graphic tee), not a fine-art print — the
+    // original paper-stock / hand-signed / archival-inks copy was invented
+    // and has been removed. Kept as a print listing per client direction
+    // pending real print artwork; copy now describes only what the image
+    // actually shows.
     id: "art-print-daughters",
-    title: "Art Print: Daughters of Adonai",
-    subtitle: "Giclée on Cotton Rag · A3",
+    title: "Visual Graphic Print",
+    subtitle: "Daughters of Adonai Collection",
     type: "print" as const,
-    badge: "Limited Edition / 30",
+    badge: "Graphic Art",
     images: ["/viva/collection/prints/art_print_1.jpeg"],
     priceNGN: 35000,
     priceUSD: 22,
-    desc: "Limited-edition archival giclée print on 300gsm cotton rag. Hand-signed and numbered. Celebrates the Daughters of Adonai narrative.",
-    fullDesc: "This archival-quality print was created by Viera Amber and printed on premium 300gsm cotton rag paper using archival pigment inks. Hand-signed and numbered as part of a limited edition of 30. Ships in a protective tube with a certificate of authenticity.",
-    materials: "300gsm cotton rag paper · archival pigment inks · hand-signed and numbered",
-    care: "Frame under UV-protective glass. Display away from direct sunlight. Keep away from moisture."
+    desc: "A visual graphic piece from the Daughters of Adonai collection, celebrating bold self-expression.",
+    fullDesc: "Part of VIVA's visual graphic collection, this piece captures the confident, self-possessed spirit at the heart of the Daughters of Adonai narrative. Reach out for details on format and sizing.",
+    materials: "Details available on enquiry",
+    care: "Handle with care."
   },
 ];
 
