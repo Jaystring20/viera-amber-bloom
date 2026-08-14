@@ -951,6 +951,13 @@ const VIVAPage = () => {
   // Product detail modal state
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedProductForDetail, setSelectedProductForDetail] = useState<ShopProduct | null>(null);
+  // Top / Pants / Both selection for products with purchaseOptions (the
+  // Ajogún styles), scoped to the modal — the grid card's own toggle lives
+  // in AjogunStyleCard's local state and is intentionally independent, so
+  // opening the modal always starts from Top Only rather than inheriting
+  // whatever was last selected on the card underneath it.
+  const [modalPurchaseOption, setModalPurchaseOption] = useState<"topOnly" | "pantsOnly" | "both">("topOnly");
+  useEffect(() => { setModalPurchaseOption("topOnly"); }, [selectedProductForDetail?.id]);
 
   const cartCount = cart.reduce((s, i) => s + i.qty, 0);
   const cartTotal = cart.reduce((s, i) => {
@@ -3685,14 +3692,63 @@ const VIVAPage = () => {
                   <p style={{ fontFamily: "DM Sans", fontSize: 14, letterSpacing: "2px", textTransform: "uppercase", color: BURGUNDY, margin: "0 0 12px 0", fontWeight: 600 }}>
                     {selectedProductForDetail.badge}
                   </p>
-                  <div style={{ marginBottom: 20 }}>
-                    <span style={{ fontFamily: CORMORANT, fontSize: 28, fontWeight: 700, color: BURGUNDY }}>
-                      {currency === "NGN" ? `₦${selectedProductForDetail.priceNGN.toLocaleString()}` : `$${selectedProductForDetail.priceUSD}`}
-                    </span>
-                    <span style={{ fontFamily: "DM Sans", fontSize: 11, color: `rgba(110,0,37,0.5)`, marginLeft: 12 }}>
-                      {currency === "NGN" ? `/ $${selectedProductForDetail.priceUSD}` : `/ ₦${selectedProductForDetail.priceNGN.toLocaleString()}`}
-                    </span>
-                  </div>
+
+                  {/* Top / Pants / Both toggle — the modal previously always
+                      showed the base Top Only price with no way to select
+                      Pants or the Set, so opening a card's detail view and
+                      adding to cart from there silently ignored whatever
+                      combination the shopper actually wanted. Same toggle,
+                      same three options, as the grid card. */}
+                  {selectedProductForDetail.purchaseOptions ? (
+                    <>
+                      <div style={{ display: "flex", border: `1px solid ${BURG_ALPHA}`, borderRadius: 4, overflow: "hidden", marginBottom: 16 }}>
+                        {(["topOnly", "pantsOnly", "both"] as const).map((opt) => {
+                          const opts = selectedProductForDetail.purchaseOptions!;
+                          const available = Boolean(opts[opt]);
+                          const active = modalPurchaseOption === opt;
+                          return (
+                            <button
+                              key={opt}
+                              onClick={() => available && setModalPurchaseOption(opt)}
+                              disabled={!available}
+                              style={{
+                                flex: 1, fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, letterSpacing: "0.5px",
+                                padding: "10px 6px", border: "none", cursor: available ? "pointer" : "not-allowed", transition: "all 0.15s",
+                                background: active ? BURGUNDY : "transparent",
+                                color: active ? GOLD : DARK_TEXT,
+                                opacity: available ? 1 : 0.3,
+                                fontWeight: active ? 600 : 400,
+                              }}
+                            >{AJOGUN_OPTION_LABEL[opt]}</button>
+                          );
+                        })}
+                      </div>
+                      {(() => {
+                        const price = selectedProductForDetail.purchaseOptions[modalPurchaseOption]
+                          ?? selectedProductForDetail.purchaseOptions.topOnly
+                          ?? { NGN: selectedProductForDetail.priceNGN, USD: selectedProductForDetail.priceUSD };
+                        return (
+                          <div style={{ marginBottom: 20 }}>
+                            <span style={{ fontFamily: CORMORANT, fontSize: 28, fontWeight: 700, color: BURGUNDY }}>
+                              {currency === "NGN" ? `₦${price.NGN.toLocaleString()}` : `$${price.USD}`}
+                            </span>
+                            <span style={{ fontFamily: "DM Sans", fontSize: 11, color: `rgba(110,0,37,0.5)`, marginLeft: 12 }}>
+                              {currency === "NGN" ? `/ $${price.USD}` : `/ ₦${price.NGN.toLocaleString()}`}
+                            </span>
+                          </div>
+                        );
+                      })()}
+                    </>
+                  ) : (
+                    <div style={{ marginBottom: 20 }}>
+                      <span style={{ fontFamily: CORMORANT, fontSize: 28, fontWeight: 700, color: BURGUNDY }}>
+                        {currency === "NGN" ? `₦${selectedProductForDetail.priceNGN.toLocaleString()}` : `$${selectedProductForDetail.priceUSD}`}
+                      </span>
+                      <span style={{ fontFamily: "DM Sans", fontSize: 11, color: `rgba(110,0,37,0.5)`, marginLeft: 12 }}>
+                        {currency === "NGN" ? `/ $${selectedProductForDetail.priceUSD}` : `/ ₦${selectedProductForDetail.priceNGN.toLocaleString()}`}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Description */}
@@ -3727,7 +3783,19 @@ const VIVAPage = () => {
                 <div style={{ display: "flex", gap: 12 }}>
                   <motion.button
                     onClick={() => {
-                      addToCart(selectedProductForDetail);
+                      if (selectedProductForDetail.purchaseOptions) {
+                        const opts = selectedProductForDetail.purchaseOptions;
+                        const price = opts[modalPurchaseOption] ?? opts.topOnly
+                          ?? { NGN: selectedProductForDetail.priceNGN, USD: selectedProductForDetail.priceUSD };
+                        addToCart(selectedProductForDetail, {
+                          key: modalPurchaseOption,
+                          label: `${selectedProductForDetail.title} · ${AJOGUN_OPTION_LABEL[modalPurchaseOption]}`,
+                          priceNGN: price.NGN,
+                          priceUSD: price.USD,
+                        });
+                      } else {
+                        addToCart(selectedProductForDetail);
+                      }
                       setDetailModalOpen(false);
                     }}
                     whileHover={reduced ? {} : { scale: 1.02 }}
