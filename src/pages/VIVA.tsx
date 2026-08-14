@@ -494,21 +494,22 @@ const AjogunStyleCard = ({ product, currency, reduced, currentImageIndex, onPrev
         )}
       </div>
 
-      {/* Product info */}
-      <div style={{ padding: "14px 12px" }}>
+      {/* Product info — same scale as the standard garment card so all
+          eight cards in the grid (4 Ajogún + others) read as one family. */}
+      <div style={{ padding: "18px 16px" }}>
         <p style={{
-          fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 7, color: BURGUNDY, opacity: 0.4,
-          letterSpacing: "2.5px", textTransform: "uppercase", margin: "0 0 3px 0",
+          fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 8, color: BURGUNDY, opacity: 0.4,
+          letterSpacing: "2.5px", textTransform: "uppercase", margin: "0 0 4px 0",
         }}>{product.subtitle}</p>
-        <h3 style={{ fontFamily: CORMORANT, fontSize: 16, fontWeight: 600, color: DARK_TEXT, margin: "0 0 6px 0", lineHeight: 1.1 }}>
+        <h3 style={{ fontFamily: CORMORANT, fontSize: 20, fontWeight: 600, color: DARK_TEXT, margin: "0 0 8px 0", lineHeight: 1.15 }}>
           {product.title}
         </h3>
-        <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: "rgba(34,26,26,0.45)", lineHeight: 1.4, margin: "0 0 10px 0" }}>
+        <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, color: "rgba(34,26,26,0.45)", lineHeight: 1.5, margin: "0 0 14px 0" }}>
           {product.desc}
         </p>
 
         {/* Flat 3-way toggle — replaces the old nested style/option pickers */}
-        <div style={{ display: "flex", border: `1px solid ${BURG_ALPHA}`, borderRadius: 4, overflow: "hidden", marginBottom: 10 }}>
+        <div style={{ display: "flex", border: `1px solid ${BURG_ALPHA}`, borderRadius: 4, overflow: "hidden", marginBottom: 14 }}>
           {(["topOnly", "pantsOnly", "both"] as AjogunOption[]).map((opt) => {
             const available = Boolean(opts[opt]);
             const active = option === opt;
@@ -518,8 +519,8 @@ const AjogunStyleCard = ({ product, currency, reduced, currentImageIndex, onPrev
                 onClick={() => available && setOption(opt)}
                 disabled={!available}
                 style={{
-                  flex: 1, fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 9, letterSpacing: "0.5px",
-                  padding: "7px 4px", border: "none", cursor: available ? "pointer" : "not-allowed", transition: "all 0.15s",
+                  flex: 1, fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10.5, letterSpacing: "0.5px",
+                  padding: "9px 4px", border: "none", cursor: available ? "pointer" : "not-allowed", transition: "all 0.15s",
                   background: active ? BURGUNDY : "transparent",
                   color: active ? GOLD : DARK_TEXT,
                   opacity: available ? 1 : 0.3,
@@ -532,10 +533,10 @@ const AjogunStyleCard = ({ product, currency, reduced, currentImageIndex, onPrev
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
           <div>
-            <span style={{ fontFamily: CORMORANT, fontSize: 16, fontWeight: 600, color: BURGUNDY }}>
+            <span style={{ fontFamily: CORMORANT, fontSize: 20, fontWeight: 600, color: BURGUNDY }}>
               {fmt(price)}
             </span>
-            <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 7.5, color: "rgba(110,0,37,0.3)", marginLeft: 4 }}>
+            <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 9, color: "rgba(110,0,37,0.3)", marginLeft: 4 }}>
               {currency === "NGN" ? `/ $${price.USD}` : `/ ₦${price.NGN.toLocaleString()}`}
             </span>
           </div>
@@ -544,9 +545,9 @@ const AjogunStyleCard = ({ product, currency, reduced, currentImageIndex, onPrev
             whileHover={reduced ? {} : { scale: 1.04 }}
             whileTap={reduced ? {} : { scale: 0.96 }}
             style={{
-              fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 7.5, letterSpacing: "1.5px", textTransform: "uppercase",
+              fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 9, letterSpacing: "1.5px", textTransform: "uppercase",
               fontWeight: 600, background: BURGUNDY, color: GOLD, border: "none", borderRadius: 3,
-              padding: "6px 10px", cursor: "pointer", transition: "all 0.2s",
+              padding: "8px 14px", cursor: "pointer", transition: "all 0.2s",
             }}
           >Add</motion.button>
         </div>
@@ -2188,7 +2189,15 @@ const VIVAPage = () => {
           for effortless shopping discovery.
           ═══════════════════════════════════════════════════════ */}
       <section id="viva-shop" className="w-full" style={{ background: ALABASTER, paddingTop: 80, paddingBottom: 80 }}>
-        <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
+        {/* Widened to match (not trail) the Editorial Masonry section below —
+            the client's complaint was that lifestyle/aesthetic photography
+            was reading larger and more prominent than the actual product
+            shots, when the shop is the primary job of this page. 1100 was
+            narrower than Editorial Masonry's 1280 for no functional reason;
+            matching it, plus enlarging the card grid itself (see minmax
+            below), is what actually fixes the imbalance — width alone
+            wouldn't, since auto-fill would've just added a 5th small column. */}
+        <div className="mx-auto px-6" style={{ maxWidth: 1360 }}>
 
           {/* Shop controls header */}
           <div className="flex items-center justify-between mb-12" style={{ flexWrap: "wrap", gap: 12 }}>
@@ -2288,7 +2297,16 @@ const VIVAPage = () => {
               opacity: 0.6,
             }}>Garments</p>
 
-            <div ref={shopRef} className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))" }}>
+            {/* 200px min meant 4-5 cramped columns on desktop, each card
+                landing around 250px — visibly smaller than the Editorial
+                Masonry portraits (~590px) and hero (~700px) below. Measured
+                against those two numbers directly: 380px min forces 3
+                columns on desktop instead of 4, each card landing around
+                420px — close to the portrait images and no longer reading
+                as an afterthought next to them. The shop is the page's job;
+                its images need to compete with, not lose to, the lifestyle
+                photography. */}
+            <div ref={shopRef} className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(380px, 1fr))" }}>
               {catalogue.filter(p => p.type === "garment").map((product, i) => {
                 const currentImageIndex = getCarouselIndex(product.id);
                 // Each Ajogún style is a standalone card, identical to any
@@ -2462,38 +2480,40 @@ const VIVAPage = () => {
                       )}
                     </div>
 
-                    {/* Product info */}
-                    <div style={{ padding: "14px 12px" }}>
+                    {/* Product info — sized up to match the larger card
+                        frame above; the old 16px title/price read as a
+                        caption underneath a now much bigger photo. */}
+                    <div style={{ padding: "18px 16px" }}>
                       <p style={{
                         fontFamily: "DM Sans, system-ui, sans-serif",
-                        fontSize: 7,
+                        fontSize: 8,
                         color: BURGUNDY,
                         opacity: 0.4,
                         letterSpacing: "2.5px",
                         textTransform: "uppercase",
-                        margin: "0 0 3px 0",
+                        margin: "0 0 4px 0",
                       }}>{product.subtitle}</p>
                       <h3 style={{
                         fontFamily: CORMORANT,
-                        fontSize: 16,
+                        fontSize: 20,
                         fontWeight: 600,
                         color: DARK_TEXT,
-                        margin: "0 0 6px 0",
-                        lineHeight: 1.1,
+                        margin: "0 0 8px 0",
+                        lineHeight: 1.15,
                       }}>{product.title}</h3>
                       <p style={{
                         fontFamily: "DM Sans, system-ui, sans-serif",
-                        fontSize: 10,
+                        fontSize: 12,
                         color: "rgba(34,26,26,0.45)",
-                        lineHeight: 1.4,
-                        margin: "0 0 10px 0",
+                        lineHeight: 1.5,
+                        margin: "0 0 14px 0",
                       }}>{product.desc}</p>
 
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                         <div>
                           <span style={{
                             fontFamily: CORMORANT,
-                            fontSize: 16,
+                            fontSize: 20,
                             fontWeight: 600,
                             color: BURGUNDY,
                           }}>
@@ -2501,7 +2521,7 @@ const VIVAPage = () => {
                           </span>
                           <span style={{
                             fontFamily: "DM Sans, system-ui, sans-serif",
-                            fontSize: 7.5,
+                            fontSize: 9,
                             color: "rgba(110,0,37,0.3)",
                             marginLeft: 4,
                           }}>
@@ -2514,7 +2534,7 @@ const VIVAPage = () => {
                           whileTap={reduced ? {} : { scale: 0.96 }}
                           style={{
                             fontFamily: "DM Sans, system-ui, sans-serif",
-                            fontSize: 7.5,
+                            fontSize: 9,
                             letterSpacing: "1.5px",
                             textTransform: "uppercase",
                             fontWeight: 600,
@@ -2522,7 +2542,7 @@ const VIVAPage = () => {
                             color: GOLD,
                             border: "none",
                             borderRadius: 3,
-                            padding: "6px 10px",
+                            padding: "8px 14px",
                             cursor: "pointer",
                             transition: "all 0.2s",
                           }}
@@ -2551,7 +2571,7 @@ const VIVAPage = () => {
               opacity: 0.6,
             }}>Illustration Prints</p>
 
-            <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))" }}>
+            <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))" }}>
               {catalogue.filter(p => p.type === "print").map((product, i) => (
                 <motion.div key={product.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -2580,39 +2600,39 @@ const VIVAPage = () => {
                       }} />
                   </div>
 
-                  <div style={{ padding: "10px 10px 8px", flex: 1, display: "flex", flexDirection: "column" }}>
+                  <div style={{ padding: "14px 14px 12px", flex: 1, display: "flex", flexDirection: "column" }}>
                     <span style={{
                       fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontSize: 6.5,
+                      fontSize: 7.5,
                       letterSpacing: "1.5px",
                       textTransform: "uppercase",
                       background: `rgba(212,175,55,0.12)`,
                       color: `rgba(110,0,37,0.65)`,
-                      padding: "2px 6px",
+                      padding: "3px 7px",
                       borderRadius: 2,
                       display: "inline-block",
-                      marginBottom: 4,
+                      marginBottom: 6,
                       width: "fit-content",
                     }}>{product.badge}</span>
                     <h3 style={{
                       fontFamily: CORMORANT,
-                      fontSize: 14,
+                      fontSize: 17,
                       fontWeight: 600,
                       color: DARK_TEXT,
-                      margin: "0 0 2px 0",
+                      margin: "0 0 3px 0",
                     }}>{product.title}</h3>
                     <p style={{
                       fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontSize: 8.5,
+                      fontSize: 10.5,
                       color: "rgba(34,26,26,0.4)",
-                      lineHeight: 1.3,
-                      margin: "0 0 8px 0",
+                      lineHeight: 1.4,
+                      margin: "0 0 12px 0",
                     }}>{product.subtitle}</p>
 
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "auto" }}>
                       <span style={{
                         fontFamily: CORMORANT,
-                        fontSize: 14,
+                        fontSize: 17,
                         fontWeight: 600,
                         color: BURGUNDY,
                       }}>
@@ -2624,7 +2644,7 @@ const VIVAPage = () => {
                         whileTap={reduced ? {} : { scale: 0.96 }}
                         style={{
                           fontFamily: "DM Sans, system-ui, sans-serif",
-                          fontSize: 7,
+                          fontSize: 8.5,
                           letterSpacing: "1.5px",
                           textTransform: "uppercase",
                           fontWeight: 600,
@@ -2632,7 +2652,7 @@ const VIVAPage = () => {
                           color: GOLD,
                           border: "none",
                           borderRadius: 3,
-                          padding: "5px 8px",
+                          padding: "7px 12px",
                           cursor: "pointer",
                         }}
                       >
