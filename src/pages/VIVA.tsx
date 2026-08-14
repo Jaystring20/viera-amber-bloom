@@ -2502,21 +2502,18 @@ const VIVAPage = () => {
                   </h3>
                 </div>
 
-                {/* 200px min meant 4-5 cramped columns on desktop, each card
-                    landing around 250px — visibly smaller than the Editorial
-                    Masonry portraits (~590px) and hero (~700px) below. 380px
-                    min forces 3 columns on desktop instead of 4, each card
-                    landing around 420px — close to the portrait images and
-                    no longer reading as an afterthought next to them. */}
-                {/* min(380px, 100%) instead of a bare 380px — on a mobile
-                    viewport the section's content width is well under
-                    380px, and a hard-floor minmax forces the column (and
-                    every card in it) wider than its own container, pushing
-                    the card flush against the screen edge with no right
-                    padding. Clamping the floor to the container's own width
-                    lets it shrink to fill on mobile while still enforcing
-                    380px once there is room for it on desktop. */}
-                <div ref={section.key === "ajogun" ? shopRef : undefined} className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(380px, 100%), 1fr))" }}>
+                {/* Fixed 2 columns rather than auto-fill. Auto-fill at a
+                    380px floor gave 3 columns on desktop, which reads fine
+                    for Nkà's 2 products but leaves a 4-item section (Ajogún,
+                    Daughters of Adonai) with an orphaned 4th card alone on
+                    its own row (3 + 1) — visually unbalanced. A flat 2-col
+                    grid makes every section in this loop resolve to full
+                    rows (2+2 or a single row of 2), and grid-cols-1 on
+                    mobile (Tailwind's default, no override needed) means
+                    the card is always exactly as wide as its column, so the
+                    minmax-floor-vs-container overflow bug from the previous
+                    pass can't recur here. */}
+                <div ref={section.key === "ajogun" ? shopRef : undefined} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {products.map((product, i) => {
                     const currentImageIndex = getCarouselIndex(product.id);
                     // Ajogún styles carry a Top / Pants / Both toggle; every
