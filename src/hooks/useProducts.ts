@@ -21,19 +21,15 @@ export interface Product {
   fitDetails?: string;
   featured?: boolean;
   active?: boolean;
-  // Extended fields for complex variant/combo systems (e.g., Ajogún Collection)
-  isVariantProduct?: boolean;
-  variants?: Array<{
-    id: string;
-    name: string;
-    images: string[];
-    materials?: string;
-    care?: string;
-    options?: {
-      topOnly?: { NGN: number; USD: number };
-      topWithPants?: { NGN: number; USD: number };
-    };
-  }>;
+  // Present on products sold as Top Only / Pants Only / the complete set
+  // (currently the four Ajogún styles). Each key is optional so a product
+  // can offer just two of the three (e.g. no standalone pants for a style
+  // that doesn't have a matching pants cut).
+  purchaseOptions?: {
+    topOnly?: { NGN: number; USD: number };
+    pantsOnly?: { NGN: number; USD: number };
+    both?: { NGN: number; USD: number };
+  };
 }
 
 /** Database row -> the shape the storefront renders. */

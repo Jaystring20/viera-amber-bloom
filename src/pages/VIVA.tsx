@@ -33,92 +33,95 @@ const LOOKBOOK = [
 // UI can drive it, but keeps this as the offline/empty-table answer — a
 // storefront that renders nothing when a query fails reads as broken.
 // ═══════════════════════════════════════════════════════════
-// AJOGÚN VARIANT SYSTEM — Complex E-Commerce Structure
+// AJOGÚN — four standalone style cards, each with its own
+// Top Only / Pants Only / Both toggle
 // ═══════════════════════════════════════════════════════════
 //
-// Ajogún is a SINGLE PRODUCT with 4 STYLE VARIANTS and COMBO OPTIONS
-// Customers: 1) Choose a style (Plain, Patched, One-Sleeved, Other Fabrics)
-//            2) Choose an option (Top Only OR Top + Pants combo)
-//            3) Pricing changes dynamically based on selection
-//
-interface AjogunVariant {
-  id: string;
-  name: string;
-  images: string[];
-  materials: string;
-  care: string;
-  options: { topOnly: { NGN: number; USD: number }; topWithPants: { NGN: number; USD: number } };
-}
-
-const AJOGUN_VARIANTS: AjogunVariant[] = [
-  {
-    id: "plain-aso-oke",
-    name: "Plain Aṣọ-Òkè",
-    images: ["/viva/collection/ajogun/plain/plain_1.jpeg", "/viva/collection/ajogun/plain/plain_2.jpeg", "/viva/collection/ajogun/plain/plain_3.jpeg"],
-    materials: "100% premium Aṣọ-Òkè fabric · plain weave · bespoke tailoring",
-    care: "Dry clean recommended. Gentle hand wash for delicate preservation. Store away from direct sunlight.",
-    options: {
-      topOnly: { NGN: 40000, USD: 26 },
-      topWithPants: { NGN: 65000, USD: 42 }
-    }
-  },
-  {
-    id: "patched-aso-oke",
-    name: "Patched Aṣọ-Òkè",
-    images: ["/viva/collection/ajogun/patched/patched_1.jpeg", "/viva/collection/ajogun/patched/patched_2.png"],
-    materials: "100% premium Aṣọ-Òkè fabric · hand-patched weave · bespoke tailoring",
-    care: "Dry clean recommended. Handle with care to preserve the patched weave integrity. Store in cool, dry environment.",
-    options: {
-      topOnly: { NGN: 40000, USD: 26 },
-      topWithPants: { NGN: 65000, USD: 42 }
-    }
-  },
-  {
-    id: "one-sleeved",
-    name: "One-Sleeved",
-    images: ["/viva/collection/ajogun/one-sleeved/one_sleeved_1.jpeg", "/viva/collection/ajogun/one-sleeved/one_sleeved_2.jpeg"],
-    materials: "100% premium Aṣọ-Òkè fabric · architectural cut · bespoke tailoring",
-    care: "Dry clean recommended. Lay flat to dry. Preserve the architectural seams with careful handling.",
-    options: {
-      topOnly: { NGN: 40000, USD: 26 },
-      topWithPants: { NGN: 65000, USD: 42 }
-    }
-  },
-  {
-    id: "other-fabrics",
-    name: "Other Fabrics (Akwẹ́tẹ́)",
-    images: ["/viva/collection/ajogun/other-fabrics/fabric_1.jpeg", "/viva/collection/ajogun/other-fabrics/fabric_2.jpeg", "/viva/collection/ajogun/other-fabrics/fabric_3.jpeg", "/viva/collection/ajogun/other-fabrics/fabric_4.jpeg", "/viva/collection/ajogun/other-fabrics/fabric_5.jpeg"],
-    materials: "100% Akwẹ́tẹ́ or specialty sourced fabrics · whole-piece construction · bespoke tailoring",
-    care: "Dry clean only. These premium fabrics require specialized care. Store in archival-quality tissue.",
-    options: {
-      topOnly: { NGN: 50000, USD: 32 },
-      topWithPants: { NGN: 75000, USD: 48 }
-    }
-  }
-];
+// Previously this was one card nesting a style-picker inside a
+// combo-picker inside a carousel — three decisions stacked in one box,
+// which read as confusing rather than rich. The client's direction:
+// unstack it. Four styles are four products, full stop, exactly like
+// every other card in this grid. Each one still needs to express "Top
+// Only / Pants Only / Both" because that choice is real (Ajogún is
+// made-to-order and pants are a genuine separate garment) — but it's
+// a single flat 3-way toggle per card, not a picker inside a picker.
+const AJOGUN_STANDARD_OPTIONS = {
+  topOnly:   { NGN: 40000, USD: 26 },
+  pantsOnly: { NGN: 15000, USD: 10 },
+  both:      { NGN: 65000, USD: 42 },
+};
 
 const SHOP_PRODUCTS: ShopProduct[] = [
   // ═══════════════════════════════════════════════════════════
-  // SECTION 1: AJOGÚN (THE INHERITANCE)
-  // Meta-product: variants + combo pricing handled in UI
+  // SECTION 1: AJOGÚN (THE INHERITANCE) — 4 standalone style cards
   // ═══════════════════════════════════════════════════════════
 
   {
-    id: "ajogun-collection",
-    title: "Ajogún Collection",
-    subtitle: "The Inheritance · Heritage Tops & Sets",
+    id: "ajogun-plain",
+    title: "Ajogún Plain Aṣọ-Òkè",
+    subtitle: "The Inheritance · Heritage Collection",
     type: "garment" as const,
     badge: "Made to Order",
-    images: ["/viva/collection/ajogun/plain/plain_1.jpeg", "/viva/collection/ajogun/patched/patched_1.jpeg", "/viva/collection/ajogun/one-sleeved/one_sleeved_1.jpeg", "/viva/collection/ajogun/other-fabrics/fabric_1.jpeg"],
+    images: ["/viva/collection/ajogun/plain/plain_1.jpeg", "/viva/collection/ajogun/plain/plain_2.jpeg", "/viva/collection/ajogun/plain/plain_3.jpeg"],
     priceNGN: 40000,
     priceUSD: 26,
-    desc: "Choose your Ajogún style: Plain, Patched, One-Sleeved, or Other Fabrics. Then select Top Only or Top + Pants combo for the complete ceremonial set.",
-    fullDesc: "The Ajogún Collection celebrates traditional heritage craftsmanship across four distinctive styles. Each top can be purchased as a standalone piece or paired with matching pants for a complete ceremonial ensemble. All pieces are made to your measurements for perfect fit. Prices vary by style and selected option.",
-    materials: "Premium Aṣọ-Òkè and specialty heritage fabrics · bespoke tailoring",
-    care: "Care instructions vary by fabric and style. Generally: Dry clean recommended. Store in cool, dry environment.",
-    // Extended fields for variant + combo system
-    isVariantProduct: true,
-    variants: AJOGUN_VARIANTS,
+    desc: "Heritage Aṣọ-Òkè top in clean, plain weave. Choose Top, Pants, or the complete set.",
+    fullDesc: "The Ajogún Plain Aṣọ-Òkè showcases the elegant simplicity of traditional woven fabric. The unadorned weave lets the richness of the fabric itself take center stage. Made to your measurements for a perfect fit.",
+    materials: "100% premium Aṣọ-Òkè fabric · plain weave · bespoke tailoring",
+    care: "Dry clean recommended. Gentle hand wash for delicate preservation. Store away from direct sunlight.",
+    purchaseOptions: AJOGUN_STANDARD_OPTIONS,
+  },
+
+  {
+    id: "ajogun-patched",
+    title: "Ajogún Patched Aṣọ-Òkè",
+    subtitle: "The Inheritance · Heritage Collection",
+    type: "garment" as const,
+    badge: "Made to Order",
+    images: ["/viva/collection/ajogun/patched/patched_1.jpeg", "/viva/collection/ajogun/patched/patched_2.png"],
+    priceNGN: 40000,
+    priceUSD: 26,
+    desc: "Heritage Aṣọ-Òkè top in signature patched weave. Choose Top, Pants, or the complete set.",
+    fullDesc: "The Ajogún Patched Aṣọ-Òkè celebrates traditional heritage craftsmanship. The patched weave technique creates visual depth and texture, rooted in ancestral practices. Made to your measurements for a perfect fit.",
+    materials: "100% premium Aṣọ-Òkè fabric · hand-patched weave · bespoke tailoring",
+    care: "Dry clean recommended. Handle with care to preserve the patched weave integrity. Store in cool, dry environment.",
+    purchaseOptions: AJOGUN_STANDARD_OPTIONS,
+  },
+
+  {
+    id: "ajogun-one-sleeved",
+    title: "One-Sleeved Ajogún",
+    subtitle: "The Inheritance · Heritage Collection",
+    type: "garment" as const,
+    badge: "Made to Order",
+    images: ["/viva/collection/ajogun/one-sleeved/one_sleeved_1.jpeg", "/viva/collection/ajogun/one-sleeved/one_sleeved_2.jpeg"],
+    priceNGN: 40000,
+    priceUSD: 26,
+    desc: "Architectural one-sleeved Aṣọ-Òkè top, a bold reinterpretation of heritage. Choose Top, Pants, or the complete set.",
+    fullDesc: "The One-Sleeved Ajogún modernizes ancestral design while honoring tradition. This architectural piece features asymmetrical tailoring in premium Aṣọ-Òkè fabric. Made to your exact measurements.",
+    materials: "100% premium Aṣọ-Òkè fabric · architectural cut · bespoke tailoring",
+    care: "Dry clean recommended. Lay flat to dry. Preserve the architectural seams with careful handling.",
+    purchaseOptions: AJOGUN_STANDARD_OPTIONS,
+  },
+
+  {
+    id: "ajogun-other-fabrics",
+    title: "Ajogún Top: Other Fabrics",
+    subtitle: "The Inheritance · Akwẹ́tẹ́ & Specialty Fabrics",
+    type: "garment" as const,
+    badge: "Premium Sourcing",
+    images: ["/viva/collection/ajogun/other-fabrics/fabric_1.jpeg", "/viva/collection/ajogun/other-fabrics/fabric_2.jpeg", "/viva/collection/ajogun/other-fabrics/fabric_3.jpeg", "/viva/collection/ajogun/other-fabrics/fabric_4.jpeg", "/viva/collection/ajogun/other-fabrics/fabric_5.jpeg"],
+    priceNGN: 50000,
+    priceUSD: 32,
+    desc: "Ajogún top in whole-piece fabrics (Akwẹ́tẹ́, specialty textiles). Choose Top, Pants, or the complete set.",
+    fullDesc: "The Ajogún Top in Premium Fabrics elevates the collection with exclusive whole-piece textiles like Akwẹ́tẹ́ and custom-sourced materials. Each piece is unique. Made to your measurements.",
+    materials: "100% Akwẹ́tẹ́ or specialty sourced fabrics · whole-piece construction · bespoke tailoring",
+    care: "Dry clean only. These premium fabrics require specialized care. Store in archival-quality tissue.",
+    purchaseOptions: {
+      topOnly:   { NGN: 50000, USD: 32 },
+      pantsOnly: { NGN: 25000, USD: 16 },
+      both:      { NGN: 75000, USD: 48 },
+    },
   },
 
   // Daughter of Adonai T-Shirt with color variants
@@ -365,61 +368,52 @@ const enquiryInputStyle: React.CSSProperties = {
 // approach and its verification.
 
 // ═══════════════════════════════════════════════════════════
-// AJOGÚN VARIANT CARD — style selector + combo-pricing shop card
+// AJOGÚN STYLE CARD — a standard product card with one added row:
+// a flat Top / Pants / Both toggle
 // ═══════════════════════════════════════════════════════════
 //
-// This is its own component (not inlined in the grid map) because it owns
-// three pieces of local state — which style is selected, which purchase
-// option, and which image in that style's carousel is showing — that have
-// nothing to do with the rest of the shop grid's per-product carousel state.
-// A standard product card is stateless-per-render (its carousel index lives
-// in the parent's carouselIndices map, keyed by product id) because every
-// standard product IS one purchasable thing. Ajogún is four styles times two
-// purchase options — eight priced combinations behind one card — so it needs
-// its own selection state that a single shared map can't cleanly express.
-interface AjogunCardProps {
+// Deliberately built to be visually indistinguishable from every other
+// card in the grid — same width, same carousel, same badge and type
+// scale — because the earlier version's confusion came from nesting a
+// style-picker inside a combo-picker inside its own oversized card. Each
+// Ajogún style is now just a product, full stop; it happens to have three
+// purchasable shapes instead of one. The image carousel reuses the exact
+// same shared state (getCarouselIndex / nextImage / prevImage, keyed by
+// this product's own id) that every other garment card uses — no parallel
+// carousel implementation to keep in sync.
+interface AjogunStyleCardProps {
   product: ShopProduct;
   currency: "NGN" | "USD";
   reduced: boolean;
+  currentImageIndex: number;
+  onPrevImage: () => void;
+  onNextImage: () => void;
+  onOpenDetail: () => void;
   onAddToCart: (product: ShopProduct, variant: { key: string; label: string; priceNGN: number; priceUSD: number }) => void;
 }
 
-const AjogunCard = ({ product, currency, reduced, onAddToCart }: AjogunCardProps) => {
-  const variants = product.variants ?? [];
-  const [variantIdx, setVariantIdx] = useState(0);
-  const [option, setOption] = useState<"topOnly" | "topWithPants">("topOnly");
-  const [imageIdx, setImageIdx] = useState(0);
+type AjogunOption = "topOnly" | "pantsOnly" | "both";
+const AJOGUN_OPTION_LABEL: Record<AjogunOption, string> = {
+  topOnly: "Top",
+  pantsOnly: "Pants",
+  both: "Both",
+};
 
-  const variant = variants[variantIdx];
+const AjogunStyleCard = ({ product, currency, reduced, currentImageIndex, onPrevImage, onNextImage, onOpenDetail, onAddToCart }: AjogunStyleCardProps) => {
+  const [option, setOption] = useState<AjogunOption>("topOnly");
+  const opts = product.purchaseOptions;
+  if (!opts) return null;
 
-  // Reset to the new style's first photo whenever the style changes — the
-  // previous style's image index otherwise carries over and can point past
-  // the end of a shorter carousel (e.g. One-Sleeved has 2 photos, Other
-  // Fabrics has 5).
-  useEffect(() => { setImageIdx(0); }, [variantIdx]);
-
-  if (!variant) return null;
-
-  const images = variant.images;
-  const currentImage = images[imageIdx % images.length];
-
-  const topOnly = variant.options?.topOnly ?? { NGN: product.priceNGN, USD: product.priceUSD };
-  const combo = variant.options?.topWithPants;
-  const selected = option === "topWithPants" && combo ? combo : topOnly;
-  // The add-on is derived (combo − top) rather than hard-coded, so it always
-  // reconciles with the two prices actually shown — no risk of a stale
-  // "₦15,000 pants" figure surviving a future top-price change unnoticed.
-  const pantsAddOnNGN = combo ? combo.NGN - topOnly.NGN : 0;
-  const pantsAddOnUSD = combo ? combo.USD - topOnly.USD : 0;
-
-  const fmt = (ngn: number, usd: number) => (currency === "NGN" ? `₦${ngn.toLocaleString()}` : `$${usd}`);
+  const price = opts[option] ?? opts.topOnly ?? { NGN: product.priceNGN, USD: product.priceUSD };
+  const currentImage = product.images[currentImageIndex];
+  const fmt = (p?: { NGN: number; USD: number }) => (p ? (currency === "NGN" ? `₦${p.NGN.toLocaleString()}` : `$${p.USD}`) : "—");
 
   const handleAddToCart = () => {
     onAddToCart(product, {
-      key: `${variant.id}::${option}`,
-      label: `${variant.name} · ${option === "topWithPants" ? "Top + Pants Set" : "Top Only"}`,
-      priceNGN: selected.NGN,
-      priceUSD: selected.USD,
+      key: option,
+      label: `${product.title} · ${AJOGUN_OPTION_LABEL[option]}`,
+      priceNGN: price.NGN,
+      priceUSD: price.USD,
     });
   };
 
@@ -429,25 +423,25 @@ const AjogunCard = ({ product, currency, reduced, onAddToCart }: AjogunCardProps
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       viewport={{ once: true }}
+      whileHover={reduced ? {} : { y: -4, transition: { duration: 0.2 } }}
       style={{
-        gridColumn: "span 2",
         background: "#fff",
         borderRadius: 4,
         overflow: "hidden",
         border: `1px solid ${BURG_ALPHA}`,
         boxShadow: "0 2px 12px rgba(110,0,37,0.06)",
-        display: "grid",
-        gridTemplateColumns: "minmax(200px, 320px) 1fr",
       }}
-      className="ajogun-card"
     >
-      {/* Image carousel — reflects the selected style */}
-      <div style={{ aspectRatio: "3/4", overflow: "hidden", position: "relative", background: "rgba(110,0,37,0.03)" }}>
+      {/* Image carousel — identical markup/behavior to every other garment card */}
+      <div
+        style={{ aspectRatio: "3/4", overflow: "hidden", position: "relative", cursor: "pointer", background: "rgba(110,0,37,0.03)" }}
+        onClick={onOpenDetail}
+      >
         <AnimatePresence mode="wait">
           <motion.img
             key={currentImage}
             src={currentImage}
-            alt={`${product.title} — ${variant.name}`}
+            alt={product.title}
             loading="lazy"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -462,10 +456,10 @@ const AjogunCard = ({ product, currency, reduced, onAddToCart }: AjogunCardProps
           background: "rgba(110,0,37,0.9)", color: GOLD, padding: "3px 7px", borderRadius: 2,
         }}>{product.badge}</span>
 
-        {images.length > 1 && (
+        {product.images.length > 1 && (
           <>
             <motion.button
-              onClick={() => setImageIdx(idx => (idx - 1 + images.length) % images.length)}
+              onClick={(e) => { e.stopPropagation(); onPrevImage(); }}
               whileHover={reduced ? {} : { scale: 1.08 }}
               whileTap={reduced ? {} : { scale: 0.94 }}
               style={{
@@ -477,7 +471,7 @@ const AjogunCard = ({ product, currency, reduced, onAddToCart }: AjogunCardProps
             ><ChevronLeft size={15} strokeWidth={1.5} /></motion.button>
 
             <motion.button
-              onClick={() => setImageIdx(idx => (idx + 1) % images.length)}
+              onClick={(e) => { e.stopPropagation(); onNextImage(); }}
               whileHover={reduced ? {} : { scale: 1.08 }}
               whileTap={reduced ? {} : { scale: 0.94 }}
               style={{
@@ -489,10 +483,10 @@ const AjogunCard = ({ product, currency, reduced, onAddToCart }: AjogunCardProps
             ><ChevronRight size={15} strokeWidth={1.5} /></motion.button>
 
             <div style={{ position: "absolute", bottom: 8, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 5, zIndex: 10 }}>
-              {images.map((_, idx) => (
+              {product.images.map((_, idx) => (
                 <div key={idx} style={{
                   width: 4, height: 4, borderRadius: "50%",
-                  background: idx === imageIdx ? BURGUNDY : "rgba(110,0,37,0.25)", transition: "all 0.3s",
+                  background: idx === currentImageIndex ? BURGUNDY : "rgba(110,0,37,0.25)", transition: "all 0.3s",
                 }} />
               ))}
             </div>
@@ -500,112 +494,62 @@ const AjogunCard = ({ product, currency, reduced, onAddToCart }: AjogunCardProps
         )}
       </div>
 
-      {/* Selection panel */}
-      <div style={{ padding: "16px 18px", display: "flex", flexDirection: "column", gap: 12 }}>
-        <div>
-          <p style={{
-            fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 7, color: BURGUNDY, opacity: 0.4,
-            letterSpacing: "2.5px", textTransform: "uppercase", margin: "0 0 3px 0",
-          }}>{product.subtitle}</p>
-          <h3 style={{ fontFamily: CORMORANT, fontSize: 19, fontWeight: 600, color: DARK_TEXT, margin: "0 0 6px 0", lineHeight: 1.1 }}>
-            {product.title}
-          </h3>
-          <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: "rgba(34,26,26,0.45)", lineHeight: 1.4, margin: 0 }}>
-            {product.desc}
-          </p>
-        </div>
+      {/* Product info */}
+      <div style={{ padding: "14px 12px" }}>
+        <p style={{
+          fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 7, color: BURGUNDY, opacity: 0.4,
+          letterSpacing: "2.5px", textTransform: "uppercase", margin: "0 0 3px 0",
+        }}>{product.subtitle}</p>
+        <h3 style={{ fontFamily: CORMORANT, fontSize: 16, fontWeight: 600, color: DARK_TEXT, margin: "0 0 6px 0", lineHeight: 1.1 }}>
+          {product.title}
+        </h3>
+        <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: "rgba(34,26,26,0.45)", lineHeight: 1.4, margin: "0 0 10px 0" }}>
+          {product.desc}
+        </p>
 
-        {/* Style selector — the 4 Ajogún variants */}
-        <div>
-          <p style={{
-            fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 8, color: BURGUNDY, opacity: 0.55,
-            letterSpacing: "2px", textTransform: "uppercase", margin: "0 0 6px 0",
-          }}>Style</p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-            {variants.map((v, idx) => (
+        {/* Flat 3-way toggle — replaces the old nested style/option pickers */}
+        <div style={{ display: "flex", border: `1px solid ${BURG_ALPHA}`, borderRadius: 4, overflow: "hidden", marginBottom: 10 }}>
+          {(["topOnly", "pantsOnly", "both"] as AjogunOption[]).map((opt) => {
+            const available = Boolean(opts[opt]);
+            const active = option === opt;
+            return (
               <button
-                key={v.id}
-                onClick={() => setVariantIdx(idx)}
+                key={opt}
+                onClick={() => available && setOption(opt)}
+                disabled={!available}
                 style={{
-                  fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 9.5, letterSpacing: "0.3px",
-                  padding: "6px 10px", borderRadius: 3, cursor: "pointer", transition: "all 0.15s",
-                  border: `1px solid ${idx === variantIdx ? BURGUNDY : BURG_ALPHA}`,
-                  background: idx === variantIdx ? BURGUNDY : "transparent",
-                  color: idx === variantIdx ? GOLD : DARK_TEXT,
-                  fontWeight: idx === variantIdx ? 600 : 400,
+                  flex: 1, fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 9, letterSpacing: "0.5px",
+                  padding: "7px 4px", border: "none", cursor: available ? "pointer" : "not-allowed", transition: "all 0.15s",
+                  background: active ? BURGUNDY : "transparent",
+                  color: active ? GOLD : DARK_TEXT,
+                  opacity: available ? 1 : 0.3,
+                  fontWeight: active ? 600 : 400,
                 }}
-              >{v.name}</button>
-            ))}
+              >{AJOGUN_OPTION_LABEL[opt]}</button>
+            );
+          })}
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+          <div>
+            <span style={{ fontFamily: CORMORANT, fontSize: 16, fontWeight: 600, color: BURGUNDY }}>
+              {fmt(price)}
+            </span>
+            <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 7.5, color: "rgba(110,0,37,0.3)", marginLeft: 4 }}>
+              {currency === "NGN" ? `/ $${price.USD}` : `/ ₦${price.NGN.toLocaleString()}`}
+            </span>
           </div>
+          <motion.button
+            onClick={handleAddToCart}
+            whileHover={reduced ? {} : { scale: 1.04 }}
+            whileTap={reduced ? {} : { scale: 0.96 }}
+            style={{
+              fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 7.5, letterSpacing: "1.5px", textTransform: "uppercase",
+              fontWeight: 600, background: BURGUNDY, color: GOLD, border: "none", borderRadius: 3,
+              padding: "6px 10px", cursor: "pointer", transition: "all 0.2s",
+            }}
+          >Add</motion.button>
         </div>
-
-        {/* Option selector — Top Only vs. Top + Pants combo */}
-        <div>
-          <p style={{
-            fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 8, color: BURGUNDY, opacity: 0.55,
-            letterSpacing: "2px", textTransform: "uppercase", margin: "0 0 6px 0",
-          }}>Purchase Option</p>
-          <div style={{ display: "flex", border: `1px solid ${BURG_ALPHA}`, borderRadius: 4, overflow: "hidden" }}>
-            <button
-              onClick={() => setOption("topOnly")}
-              style={{
-                flex: 1, fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, letterSpacing: "0.3px",
-                padding: "8px 10px", border: "none", cursor: "pointer", transition: "all 0.15s",
-                background: option === "topOnly" ? BURGUNDY : "transparent",
-                color: option === "topOnly" ? GOLD : DARK_TEXT,
-                fontWeight: option === "topOnly" ? 600 : 400,
-              }}
-            >Top Only</button>
-            <button
-              onClick={() => setOption("topWithPants")}
-              disabled={!combo}
-              style={{
-                flex: 1, fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, letterSpacing: "0.3px",
-                padding: "8px 10px", border: "none", cursor: combo ? "pointer" : "not-allowed", transition: "all 0.15s",
-                background: option === "topWithPants" ? BURGUNDY : "transparent",
-                color: option === "topWithPants" ? GOLD : DARK_TEXT,
-                opacity: combo ? 1 : 0.35,
-                fontWeight: option === "topWithPants" ? 600 : 400,
-              }}
-            >Top + Pants Set</button>
-          </div>
-        </div>
-
-        {/* Itemized pricing breakdown — combo price bolded, unit breakdown
-            in lighter sub-text, per the brief's typography directive. */}
-        <div style={{ background: "rgba(110,0,37,0.04)", borderRadius: 4, padding: "10px 12px" }}>
-          {option === "topWithPants" && combo ? (
-            <>
-              <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: "rgba(34,26,26,0.5)", marginBottom: 3 }}>
-                <span>Top</span><span>{fmt(topOnly.NGN, topOnly.USD)}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: "rgba(34,26,26,0.5)", marginBottom: 6, paddingBottom: 6, borderBottom: `1px solid ${BURG_ALPHA}` }}>
-                <span>+ Plain Pants</span><span>{fmt(pantsAddOnNGN, pantsAddOnUSD)}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontFamily: CORMORANT, fontSize: 15, fontWeight: 700, color: BURGUNDY }}>
-                <span>Set Total</span><span>{fmt(combo.NGN, combo.USD)}</span>
-              </div>
-            </>
-          ) : (
-            <div style={{ display: "flex", justifyContent: "space-between", fontFamily: CORMORANT, fontSize: 15, fontWeight: 700, color: BURGUNDY }}>
-              <span>Top Only</span><span>{fmt(topOnly.NGN, topOnly.USD)}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Add to cart */}
-        <motion.button
-          onClick={handleAddToCart}
-          whileHover={reduced ? {} : { scale: 1.02 }}
-          whileTap={reduced ? {} : { scale: 0.98 }}
-          style={{
-            fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase",
-            fontWeight: 600, background: BURGUNDY, color: GOLD, border: "none", borderRadius: 3,
-            padding: "11px 14px", cursor: "pointer", transition: "all 0.2s", marginTop: "auto",
-          }}
-        >
-          Add {variant.name} — {option === "topWithPants" ? "Set" : "Top"} to Cart
-        </motion.button>
       </div>
     </motion.div>
   );
@@ -2346,13 +2290,26 @@ const VIVAPage = () => {
 
             <div ref={shopRef} className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))" }}>
               {catalogue.filter(p => p.type === "garment").map((product, i) => {
-                // Ajogún is a variant/combo product (4 styles × Top Only or
-                // Top + Pants pricing) — it needs its own selector card, not
-                // the single-image-single-price card every other garment uses.
-                if (product.isVariantProduct) {
-                  return <AjogunCard key={product.id} product={product} currency={currency} reduced={reduced} onAddToCart={addToCart} />;
-                }
                 const currentImageIndex = getCarouselIndex(product.id);
+                // Each Ajogún style is a standalone card, identical to any
+                // other garment card, plus a Top / Pants / Both toggle — it
+                // shares this same carousel state (keyed by its own id) so
+                // there is exactly one carousel implementation in the grid.
+                if (product.purchaseOptions) {
+                  return (
+                    <AjogunStyleCard
+                      key={product.id}
+                      product={product}
+                      currency={currency}
+                      reduced={reduced}
+                      currentImageIndex={currentImageIndex}
+                      onPrevImage={() => prevImage(product.id, product.images.length)}
+                      onNextImage={() => nextImage(product.id, product.images.length)}
+                      onOpenDetail={() => { setSelectedProductForDetail(product); setDetailModalOpen(true); }}
+                      onAddToCart={addToCart}
+                    />
+                  );
+                }
                 const currentImage = product.images[currentImageIndex];
                 return (
                   <motion.div key={product.id}
