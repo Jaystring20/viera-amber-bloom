@@ -183,9 +183,13 @@ const SHOP_PRODUCTS: ShopProduct[] = [
   // Graphic apparel and artwork prints
   // ═══════════════════════════════════════════════════════════
 
+  // Only one confirmed print image exists right now
+  // ("Edit_tshirt_text_and_illustration_202608111230.jpeg"). Three
+  // near-identical listings previously shared that one photo — removed per
+  // client direction rather than presenting fabricated variety.
   {
-    id: "art-print-01",
-    title: "Art Print: Daughters Series No.1",
+    id: "art-print-daughters",
+    title: "Art Print: Daughters of Adonai",
     subtitle: "Giclée on Cotton Rag · A3",
     type: "print" as const,
     badge: "Limited Edition / 30",
@@ -193,39 +197,9 @@ const SHOP_PRODUCTS: ShopProduct[] = [
     priceNGN: 35000,
     priceUSD: 22,
     desc: "Limited-edition archival giclée print on 300gsm cotton rag. Hand-signed and numbered. Celebrates the Daughters of Adonai narrative.",
-    fullDesc: "Art Print No.1 from the Daughters Series is a stunning archival-quality print created by Viera Amber. Printed on premium 300gsm cotton rag paper using archival pigment inks, each print is hand-signed and numbered as part of the limited edition of 30. Ships in protective tube with certificate of authenticity.",
+    fullDesc: "This archival-quality print was created by Viera Amber and printed on premium 300gsm cotton rag paper using archival pigment inks. Hand-signed and numbered as part of a limited edition of 30. Ships in a protective tube with a certificate of authenticity.",
     materials: "300gsm cotton rag paper · archival pigment inks · hand-signed and numbered",
     care: "Frame under UV-protective glass. Display away from direct sunlight. Keep away from moisture."
-  },
-
-  {
-    id: "art-print-02",
-    title: "Art Print: Daughters Series No.2",
-    subtitle: "Giclée on Cotton Rag · A3",
-    type: "print" as const,
-    badge: "Limited Edition / 30",
-    images: ["/viva/collection/prints/art_print_1.jpeg"],
-    priceNGN: 35000,
-    priceUSD: 22,
-    desc: "Limited-edition archival giclée print on 300gsm cotton rag. Hand-signed and numbered. Part of the Daughters of Adonai collection.",
-    fullDesc: "Art Print No.2 from the Daughters Series continues the narrative of identity, heritage, and artistic expression. Created by Viera Amber and printed on premium archival paper, each of the 30 limited-edition prints is hand-signed and numbered. Ships in protective tube with certificate of authenticity.",
-    materials: "300gsm cotton rag paper · archival pigment inks · hand-signed and numbered",
-    care: "Frame under UV-protective glass. Avoid direct sunlight exposure. Store in archival-quality conditions."
-  },
-
-  {
-    id: "art-print-03",
-    title: "Art Print: Heritage Narrative",
-    subtitle: "Giclée on Cotton Rag · A3",
-    type: "print" as const,
-    badge: "Limited Edition / 30",
-    images: ["/viva/collection/prints/art_print_1.jpeg"],
-    priceNGN: 35000,
-    priceUSD: 22,
-    desc: "Limited-edition archival giclée celebrating heritage, craftsmanship, and ancestral continuity. Hand-signed by Viera Amber.",
-    fullDesc: "The Heritage Narrative print is a meditation on ancestral connection and the continuation of tradition through artistic expression. This archival-quality giclée is printed on premium 300gsm cotton rag paper and hand-signed as part of the limited edition of 30. Each print comes with certificate of authenticity.",
-    materials: "300gsm cotton rag paper · archival pigment inks · hand-signed and numbered",
-    care: "Frame under UV-protective glass. Protect from moisture and direct heat. Display in stable environment."
   },
 ];
 
@@ -879,6 +853,9 @@ const VIVAPage = () => {
   // Auto-play carousel. Re-armed when the catalogue changes so products
   // arriving from the table get intervals too, and a removed product's
   // interval is cleared rather than left ticking against a stale id.
+  // 2000ms read as a blink-and-you-miss-it flicker on product photography —
+  // 3000ms gives each image enough time to actually register before the
+  // next one arrives.
   useEffect(() => {
     if (reduced) return;
     const intervals = catalogue
@@ -886,7 +863,7 @@ const VIVAPage = () => {
       .map(product =>
         setInterval(() => {
           nextImage(product.id, product.images.length);
-        }, 2000),
+        }, 3000),
       );
     return () => intervals.forEach(clearInterval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
