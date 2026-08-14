@@ -166,7 +166,10 @@ const SHOP_PRODUCTS: ShopProduct[] = [
     subtitle: "Craftsmanship · Artisan Collection",
     type: "garment" as const,
     badge: "Premium Fabrics",
-    images: ["/viva/collection/nka/silk_crepe_1.jpeg", "/viva/collection/apparel/apparel_1.jpeg"],
+    // Single confirmed image ("Nkà garment other fabrics.jpeg"). The second
+    // slot previously borrowed a Daughter of Adonai apparel photo — removed
+    // per client direction to not mix collections.
+    images: ["/viva/collection/nka/silk_crepe_1.jpeg"],
     priceNGN: 20000,
     priceUSD: 13,
     desc: "Artisan garment in luxurious silk and crepe blends. Light, flowing fabric for sophisticated expression of artistic identity.",
