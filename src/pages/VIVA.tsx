@@ -2508,7 +2508,15 @@ const VIVAPage = () => {
                     min forces 3 columns on desktop instead of 4, each card
                     landing around 420px — close to the portrait images and
                     no longer reading as an afterthought next to them. */}
-                <div ref={section.key === "ajogun" ? shopRef : undefined} className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(380px, 1fr))" }}>
+                {/* min(380px, 100%) instead of a bare 380px — on a mobile
+                    viewport the section's content width is well under
+                    380px, and a hard-floor minmax forces the column (and
+                    every card in it) wider than its own container, pushing
+                    the card flush against the screen edge with no right
+                    padding. Clamping the floor to the container's own width
+                    lets it shrink to fill on mobile while still enforcing
+                    380px once there is room for it on desktop. */}
+                <div ref={section.key === "ajogun" ? shopRef : undefined} className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(380px, 100%), 1fr))" }}>
                   {products.map((product, i) => {
                     const currentImageIndex = getCarouselIndex(product.id);
                     // Ajogún styles carry a Top / Pants / Both toggle; every
@@ -2565,7 +2573,7 @@ const VIVAPage = () => {
               opacity: 0.6,
             }}>Illustration Prints</p>
 
-            <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))" }}>
+            <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(220px, 100%), 1fr))" }}>
               {catalogue.filter(p => p.type === "print").map((product, i) => (
                 <motion.div key={product.id}
                   initial={{ opacity: 0, y: 20 }}
