@@ -62,6 +62,7 @@ const SHOP_PRODUCTS: ShopProduct[] = [
     subtitle: "The Inheritance · Heritage Collection",
     type: "garment" as const,
     badge: "Made to Order",
+    collection: "ajogun",
     images: ["/viva/collection/ajogun/plain/plain_1.jpeg", "/viva/collection/ajogun/plain/plain_2.jpeg", "/viva/collection/ajogun/plain/plain_3.jpeg"],
     priceNGN: 40000,
     priceUSD: 26,
@@ -78,6 +79,7 @@ const SHOP_PRODUCTS: ShopProduct[] = [
     subtitle: "The Inheritance · Heritage Collection",
     type: "garment" as const,
     badge: "Made to Order",
+    collection: "ajogun",
     images: ["/viva/collection/ajogun/patched/patched_1.jpeg", "/viva/collection/ajogun/patched/patched_2.png"],
     priceNGN: 40000,
     priceUSD: 26,
@@ -94,6 +96,7 @@ const SHOP_PRODUCTS: ShopProduct[] = [
     subtitle: "The Inheritance · Heritage Collection",
     type: "garment" as const,
     badge: "Made to Order",
+    collection: "ajogun",
     images: ["/viva/collection/ajogun/one-sleeved/one_sleeved_1.jpeg", "/viva/collection/ajogun/one-sleeved/one_sleeved_2.jpeg"],
     priceNGN: 40000,
     priceUSD: 26,
@@ -110,6 +113,7 @@ const SHOP_PRODUCTS: ShopProduct[] = [
     subtitle: "The Inheritance · Akwẹ́tẹ́ & Specialty Fabrics",
     type: "garment" as const,
     badge: "Premium Sourcing",
+    collection: "ajogun",
     images: ["/viva/collection/ajogun/other-fabrics/fabric_1.jpeg", "/viva/collection/ajogun/other-fabrics/fabric_2.jpeg", "/viva/collection/ajogun/other-fabrics/fabric_3.jpeg", "/viva/collection/ajogun/other-fabrics/fabric_4.jpeg", "/viva/collection/ajogun/other-fabrics/fabric_5.jpeg"],
     priceNGN: 50000,
     priceUSD: 32,
@@ -124,25 +128,8 @@ const SHOP_PRODUCTS: ShopProduct[] = [
     },
   },
 
-  // Daughter of Adonai T-Shirt with color variants
-  {
-    id: "daughters-tee-collection",
-    title: "Daughter of Adonai T-Shirt",
-    subtitle: "Graphic Apparel · Available in Multiple Colors",
-    type: "garment" as const,
-    badge: "Graphic Tee",
-    images: ["/viva/collection/daughter-of-adonai/tshirt_1.jpeg", "/viva/collection/daughter-of-adonai/tshirt_2.jpeg", "/viva/collection/daughter-of-adonai/tshirt_3.jpeg", "/viva/collection/daughter-of-adonai/tshirt_4.jpeg"],
-    priceNGN: 25000,
-    priceUSD: 16,
-    desc: "Statement graphic tee featuring 'Daughter of Adonai' print in premium cotton. Available in multiple color styles.",
-    fullDesc: "The Daughter of Adonai T-Shirt is a wearable declaration of identity and heritage. The artistic print is carefully crafted onto premium cotton, creating a piece that is both comfortable and meaningful. Wear it as a statement of who you are and whose you are. Choose from available color variants.",
-    materials: "100% premium cotton · screen-printed graphic · bespoke sizing",
-    care: "Machine wash cold. Turn inside out before washing to protect the print. Tumble dry low or air dry."
-  },
-
   // ═══════════════════════════════════════════════════════════
-  // SECTION 2: NKÀ (CRAFTSMANSHIP)
-  // Artisan garment designs with 2 fabric variants
+  // SECTION 2: NKÀ (THE CRAFTSMANSHIP)
   // ═══════════════════════════════════════════════════════════
 
   {
@@ -151,6 +138,7 @@ const SHOP_PRODUCTS: ShopProduct[] = [
     subtitle: "Craftsmanship · Artisan Collection",
     type: "garment" as const,
     badge: "Signature Fabric",
+    collection: "nka",
     images: ["/viva/collection/nka/adire_1.jpeg", "/viva/collection/nka/adire_2.jpeg"],
     priceNGN: 25000,
     priceUSD: 16,
@@ -166,6 +154,7 @@ const SHOP_PRODUCTS: ShopProduct[] = [
     subtitle: "Craftsmanship · Artisan Collection",
     type: "garment" as const,
     badge: "Premium Fabrics",
+    collection: "nka",
     // Single confirmed image ("Nkà garment other fabrics.jpeg"). The second
     // slot previously borrowed a Daughter of Adonai apparel photo — removed
     // per client direction to not mix collections.
@@ -179,8 +168,91 @@ const SHOP_PRODUCTS: ShopProduct[] = [
   },
 
   // ═══════════════════════════════════════════════════════════
-  // SECTION 3: T-SHIRTS & PRINTS
-  // Graphic apparel and artwork prints
+  // SECTION 3: DAUGHTERS OF ADONAI COLLECTION
+  // T-shirt sold separately from Pants — pants come in 3 styles, all
+  // sharing the signature ring-hardware detail at the hem. Photos are
+  // shared between the T-shirt and Pants listings where a single outfit
+  // shot shows both pieces — normal for outfit photography, not a mixup.
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: "daughters-tee",
+    title: "Daughter of Adonai T-Shirt",
+    subtitle: "Daughters of Adonai · Graphic Apparel",
+    type: "garment" as const,
+    badge: "Graphic Tee",
+    collection: "daughters",
+    images: [
+      "/viva/collection/daughter-of-adonai/crop-denim-white.jpeg",
+      "/viva/collection/daughter-of-adonai/crop-denim-black.jpeg",
+      "/viva/collection/daughter-of-adonai/dnd-graphic-white.jpeg",
+    ],
+    priceNGN: 25000,
+    priceUSD: 16,
+    desc: "Statement graphic tee in premium cotton, available in white and black. Sold separately from the pants shown styled with it.",
+    fullDesc: "The Daughter of Adonai T-Shirt is a wearable declaration of identity and heritage. The artistic print is carefully crafted onto premium cotton, creating a piece that is both comfortable and meaningful. Available in white and black.",
+    materials: "100% premium cotton · screen-printed graphic · bespoke sizing",
+    care: "Machine wash cold. Turn inside out before washing to protect the print. Tumble dry low or air dry."
+  },
+
+  {
+    id: "daughters-pants-crop-denim",
+    title: "Daughters of Adonai Pants: 3/4 Denim",
+    subtitle: "Daughters of Adonai · Signature Ring Hardware",
+    type: "garment" as const,
+    badge: "Signature Hardware",
+    collection: "daughters",
+    images: [
+      "/viva/collection/daughter-of-adonai/crop-denim-white.jpeg",
+      "/viva/collection/daughter-of-adonai/crop-denim-black.jpeg",
+    ],
+    priceNGN: 25000,
+    priceUSD: 16,
+    desc: "Cropped 3/4-length denim with the collection's signature ring hardware connecting the hem pieces. Sold separately from the tee.",
+    fullDesc: "These cropped denim pants carry the Daughters of Adonai signature: metal rings connecting cut pieces at the hem, a distinctive detail that sets them apart from standard denim. A 3/4 length for a cropped, modern silhouette.",
+    materials: "Premium denim · signature ring hardware · bespoke fit",
+    care: "Machine wash cold, inside out. Line dry to preserve the hardware finish."
+  },
+
+  {
+    id: "daughters-pants-full-denim",
+    title: "Daughters of Adonai Pants: Full Denim",
+    subtitle: "Daughters of Adonai · Signature Ring Hardware",
+    type: "garment" as const,
+    badge: "Signature Hardware",
+    collection: "daughters",
+    images: [
+      "/viva/collection/daughter-of-adonai/full-denim-black.jpeg",
+      "/viva/collection/daughter-of-adonai/full-denim-white.jpeg",
+    ],
+    priceNGN: 25000,
+    priceUSD: 16,
+    desc: "Full-length wide-leg denim with the collection's signature ring hardware connecting the hem pieces. Sold separately from the tee.",
+    fullDesc: "The full-length version of the signature ring-hardware denim: a relaxed, wide-leg cut that runs to the floor, with the same metal-ring hem detail as the 3/4 version. A more elongated, statement silhouette.",
+    materials: "Premium denim · signature ring hardware · bespoke fit",
+    care: "Machine wash cold, inside out. Line dry to preserve the hardware finish."
+  },
+
+  {
+    id: "daughters-pants-silk-cream",
+    title: "Daughters of Adonai Pants: 3/4 Silk",
+    subtitle: "Daughters of Adonai · Signature Ring Hardware",
+    type: "garment" as const,
+    badge: "Signature Hardware",
+    collection: "daughters",
+    images: [
+      "/viva/collection/daughter-of-adonai/silk-cream-white.jpeg",
+    ],
+    priceNGN: 25000,
+    priceUSD: 16,
+    desc: "Cropped 3/4-length silk in a soft cream tone, with the collection's signature ring hardware at the hem. Sold separately from the tee.",
+    fullDesc: "A softer counterpart to the denim styles: cream silk cut to the same 3/4 length, finished with the same signature ring hardware connecting the hem pieces. A more fluid alternative for the same statement detail.",
+    materials: "Silk · signature ring hardware · bespoke fit",
+    care: "Dry clean recommended. Handle the hardware finish with care."
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // PRINTS
   // ═══════════════════════════════════════════════════════════
 
   // Only one confirmed print image exists right now
@@ -525,6 +597,143 @@ const AjogunStyleCard = ({ product, currency, reduced, currentImageIndex, onPrev
           </div>
           <motion.button
             onClick={handleAddToCart}
+            whileHover={reduced ? {} : { scale: 1.04 }}
+            whileTap={reduced ? {} : { scale: 0.96 }}
+            style={{
+              fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 9, letterSpacing: "1.5px", textTransform: "uppercase",
+              fontWeight: 600, background: BURGUNDY, color: GOLD, border: "none", borderRadius: 3,
+              padding: "8px 14px", cursor: "pointer", transition: "all 0.2s",
+            }}
+          >Add</motion.button>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════
+// STANDARD GARMENT CARD — single-image-carousel, single-price card
+// ═══════════════════════════════════════════════════════════
+//
+// Extracted out of the grid's .map() so it can be reused across three
+// separately-labeled collection sections (Ajogún, Nkà, Daughters of
+// Adonai) without three copies of the same ~200-line block drifting out
+// of sync with each other.
+interface StandardGarmentCardProps {
+  product: ShopProduct;
+  currency: "NGN" | "USD";
+  reduced: boolean;
+  index: number;
+  currentImageIndex: number;
+  onPrevImage: () => void;
+  onNextImage: () => void;
+  onOpenDetail: () => void;
+  onAddToCart: (product: ShopProduct) => void;
+}
+
+const StandardGarmentCard = ({ product, currency, reduced, index, currentImageIndex, onPrevImage, onNextImage, onOpenDetail, onAddToCart }: StandardGarmentCardProps) => {
+  const currentImage = product.images[currentImageIndex];
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: index * 0.08 }}
+      viewport={{ once: true }}
+      whileHover={reduced ? {} : { y: -4, transition: { duration: 0.2 } }}
+      style={{
+        background: "#fff",
+        borderRadius: 4,
+        overflow: "hidden",
+        border: `1px solid ${BURG_ALPHA}`,
+        boxShadow: "0 2px 12px rgba(110,0,37,0.06)",
+      }}
+    >
+      {/* Image with carousel */}
+      <div style={{ aspectRatio: "3/4", overflow: "hidden", position: "relative", cursor: "pointer", background: "rgba(110,0,37,0.03)" }}
+        onClick={onOpenDetail}>
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={currentImage}
+            src={currentImage}
+            alt={product.title}
+            loading="lazy"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block" }}
+            onMouseEnter={(e) => { if (!reduced) (e.currentTarget as HTMLImageElement).style.transform = "scale(1.04)"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLImageElement).style.transform = "scale(1)"; }}
+          />
+        </AnimatePresence>
+        <span style={{
+          position: "absolute", top: 8, left: 8,
+          fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 7, letterSpacing: "1.5px", textTransform: "uppercase",
+          background: "rgba(110,0,37,0.9)", color: GOLD, padding: "3px 7px", borderRadius: 2,
+        }}>{product.badge}</span>
+
+        {product.images.length > 1 && (
+          <>
+            <motion.button
+              onClick={(e) => { e.stopPropagation(); onPrevImage(); }}
+              whileHover={reduced ? {} : { scale: 1.08 }}
+              whileTap={reduced ? {} : { scale: 0.94 }}
+              style={{
+                position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)",
+                background: "rgba(255,255,255,0.85)", border: "none", borderRadius: "50%",
+                width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", zIndex: 10, color: BURGUNDY,
+              }}
+            ><ChevronLeft size={15} strokeWidth={1.5} /></motion.button>
+
+            <motion.button
+              onClick={(e) => { e.stopPropagation(); onNextImage(); }}
+              whileHover={reduced ? {} : { scale: 1.08 }}
+              whileTap={reduced ? {} : { scale: 0.94 }}
+              style={{
+                position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
+                background: "rgba(255,255,255,0.85)", border: "none", borderRadius: "50%",
+                width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", zIndex: 10, color: BURGUNDY,
+              }}
+            ><ChevronRight size={15} strokeWidth={1.5} /></motion.button>
+
+            <div style={{ position: "absolute", bottom: 8, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 5, zIndex: 10 }}>
+              {product.images.map((_, idx) => (
+                <div key={idx} style={{
+                  width: 4, height: 4, borderRadius: "50%",
+                  background: idx === currentImageIndex ? BURGUNDY : "rgba(110,0,37,0.25)", transition: "all 0.3s",
+                }} />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Product info */}
+      <div style={{ padding: "18px 16px" }}>
+        <p style={{
+          fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 8, color: BURGUNDY, opacity: 0.4,
+          letterSpacing: "2.5px", textTransform: "uppercase", margin: "0 0 4px 0",
+        }}>{product.subtitle}</p>
+        <h3 style={{ fontFamily: CORMORANT, fontSize: 20, fontWeight: 600, color: DARK_TEXT, margin: "0 0 8px 0", lineHeight: 1.15 }}>
+          {product.title}
+        </h3>
+        <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, color: "rgba(34,26,26,0.45)", lineHeight: 1.5, margin: "0 0 14px 0" }}>
+          {product.desc}
+        </p>
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+          <div>
+            <span style={{ fontFamily: CORMORANT, fontSize: 20, fontWeight: 600, color: BURGUNDY }}>
+              {currency === "NGN" ? `₦${product.priceNGN.toLocaleString()}` : `$${product.priceUSD}`}
+            </span>
+            <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 9, color: "rgba(110,0,37,0.3)", marginLeft: 4 }}>
+              {currency === "NGN" ? `/ $${product.priceUSD}` : `/ ₦${product.priceNGN.toLocaleString()}`}
+            </span>
+          </div>
+          <motion.button
+            onClick={() => onAddToCart(product)}
             whileHover={reduced ? {} : { scale: 1.04 }}
             whileTap={reduced ? {} : { scale: 0.96 }}
             style={{
@@ -2269,279 +2478,78 @@ const VIVAPage = () => {
             </div>
           </div>
 
-          {/* GARMENTS GRID */}
-          <div style={{ marginBottom: 64 }}>
-            <p style={{
-              fontFamily: "DM Sans, system-ui, sans-serif",
-              fontSize: 8,
-              color: BURGUNDY,
-              letterSpacing: "3.5px",
-              textTransform: "uppercase",
-              margin: "0 0 16px 0",
-              paddingBottom: 12,
-              borderBottom: `1px solid ${BURG_ALPHA}`,
-              opacity: 0.6,
-            }}>Garments</p>
+          {/* THREE COLLECTION SECTIONS — Ajogún, Nkà, Daughters of Adonai.
+              Each renders in its own labeled block instead of one flat
+              "Garments" grid, so a shopper can tell at a glance which
+              collection a piece belongs to. Same 380px card size and card
+              components as before — only the grouping is new. */}
+          {([
+            { key: "ajogun" as const, eyebrow: "The Inheritance", title: "Ajogún Collection" },
+            { key: "nka" as const, eyebrow: "The Craftsmanship", title: "Nkà Garment Collection" },
+            { key: "daughters" as const, eyebrow: "Graphic Apparel", title: "Daughters of Adonai Collection" },
+          ]).map(section => {
+            const products = catalogue.filter(p => p.type === "garment" && p.collection === section.key);
+            if (products.length === 0) return null;
+            return (
+              <div key={section.key} style={{ marginBottom: 64 }}>
+                <div style={{ marginBottom: 16, paddingBottom: 12, borderBottom: `1px solid ${BURG_ALPHA}` }}>
+                  <p style={{
+                    fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 8, color: BURGUNDY, opacity: 0.6,
+                    letterSpacing: "3.5px", textTransform: "uppercase", margin: "0 0 4px 0",
+                  }}>{section.eyebrow}</p>
+                  <h3 style={{ fontFamily: CORMORANT, fontSize: 24, fontWeight: 600, color: DARK_TEXT, margin: 0, lineHeight: 1.15 }}>
+                    {section.title}
+                  </h3>
+                </div>
 
-            {/* 200px min meant 4-5 cramped columns on desktop, each card
-                landing around 250px — visibly smaller than the Editorial
-                Masonry portraits (~590px) and hero (~700px) below. Measured
-                against those two numbers directly: 380px min forces 3
-                columns on desktop instead of 4, each card landing around
-                420px — close to the portrait images and no longer reading
-                as an afterthought next to them. The shop is the page's job;
-                its images need to compete with, not lose to, the lifestyle
-                photography. */}
-            <div ref={shopRef} className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(380px, 1fr))" }}>
-              {catalogue.filter(p => p.type === "garment").map((product, i) => {
-                const currentImageIndex = getCarouselIndex(product.id);
-                // Each Ajogún style is a standalone card, identical to any
-                // other garment card, plus a Top / Pants / Both toggle — it
-                // shares this same carousel state (keyed by its own id) so
-                // there is exactly one carousel implementation in the grid.
-                if (product.purchaseOptions) {
-                  return (
-                    <AjogunStyleCard
-                      key={product.id}
-                      product={product}
-                      currency={currency}
-                      reduced={reduced}
-                      currentImageIndex={currentImageIndex}
-                      onPrevImage={() => prevImage(product.id, product.images.length)}
-                      onNextImage={() => nextImage(product.id, product.images.length)}
-                      onOpenDetail={() => { setSelectedProductForDetail(product); setDetailModalOpen(true); }}
-                      onAddToCart={addToCart}
-                    />
-                  );
-                }
-                const currentImage = product.images[currentImageIndex];
-                return (
-                  <motion.div key={product.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: i * 0.08 }}
-                    viewport={{ once: true }}
-                    whileHover={reduced ? {} : { y: -4, transition: { duration: 0.2 } }}
-                    style={{
-                      background: "#fff",
-                      borderRadius: 4,
-                      overflow: "hidden",
-                      border: `1px solid ${BURG_ALPHA}`,
-                      boxShadow: "0 2px 12px rgba(110,0,37,0.06)",
-                    }}
-                  >
-                    {/* Image with carousel */}
-                    <div style={{
-                      aspectRatio: "3/4",
-                      overflow: "hidden",
-                      position: "relative",
-                      cursor: "pointer",
-                      background: "rgba(110,0,37,0.03)",
-                    }}
-                      onClick={() => {
-                        setSelectedProductForDetail(product);
-                        setDetailModalOpen(true);
-                      }}>
-                      <AnimatePresence mode="wait">
-                        <motion.img
-                          key={currentImage}
-                          src={currentImage}
-                          alt={product.title}
-                          loading="lazy"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: 0.25 }}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                            objectPosition: "top",
-                            display: "block",
-                          }}
-                          onMouseEnter={(e) => {
-                            if (!reduced) (e.currentTarget as HTMLImageElement).style.transform = "scale(1.04)";
-                          }}
-                          onMouseLeave={(e) => {
-                            (e.currentTarget as HTMLImageElement).style.transform = "scale(1)";
-                          }}
+                {/* 200px min meant 4-5 cramped columns on desktop, each card
+                    landing around 250px — visibly smaller than the Editorial
+                    Masonry portraits (~590px) and hero (~700px) below. 380px
+                    min forces 3 columns on desktop instead of 4, each card
+                    landing around 420px — close to the portrait images and
+                    no longer reading as an afterthought next to them. */}
+                <div ref={section.key === "ajogun" ? shopRef : undefined} className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(380px, 1fr))" }}>
+                  {products.map((product, i) => {
+                    const currentImageIndex = getCarouselIndex(product.id);
+                    // Ajogún styles carry a Top / Pants / Both toggle; every
+                    // other garment is a single-image-carousel, single-price
+                    // card. Both share the same carousel state (keyed by
+                    // product id) so there is one carousel implementation
+                    // for the whole shop, not one per section.
+                    if (product.purchaseOptions) {
+                      return (
+                        <AjogunStyleCard
+                          key={product.id}
+                          product={product}
+                          currency={currency}
+                          reduced={reduced}
+                          currentImageIndex={currentImageIndex}
+                          onPrevImage={() => prevImage(product.id, product.images.length)}
+                          onNextImage={() => nextImage(product.id, product.images.length)}
+                          onOpenDetail={() => { setSelectedProductForDetail(product); setDetailModalOpen(true); }}
+                          onAddToCart={addToCart}
                         />
-                      </AnimatePresence>
-                      <span style={{
-                        position: "absolute",
-                        top: 8,
-                        left: 8,
-                        fontFamily: "DM Sans, system-ui, sans-serif",
-                        fontSize: 7,
-                        letterSpacing: "1.5px",
-                        textTransform: "uppercase",
-                        background: "rgba(110,0,37,0.9)",
-                        color: GOLD,
-                        padding: "3px 7px",
-                        borderRadius: 2,
-                      }}>{product.badge}</span>
-
-                      {/* Carousel controls */}
-                      {product.images.length > 1 && (
-                        <>
-                          <motion.button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              prevImage(product.id, product.images.length);
-                            }}
-                            whileHover={reduced ? {} : { scale: 1.08 }}
-                            whileTap={reduced ? {} : { scale: 0.94 }}
-                            style={{
-                              position: "absolute",
-                              left: 8,
-                              top: "50%",
-                              transform: "translateY(-50%)",
-                              background: "rgba(255,255,255,0.85)",
-                              border: "none",
-                              borderRadius: "50%",
-                              width: 30,
-                              height: 30,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              cursor: "pointer",
-                              zIndex: 10,
-                              color: BURGUNDY,
-                            }}
-                          >
-                            <ChevronLeft size={15} strokeWidth={1.5} />
-                          </motion.button>
-
-                          <motion.button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              nextImage(product.id, product.images.length);
-                            }}
-                            whileHover={reduced ? {} : { scale: 1.08 }}
-                            whileTap={reduced ? {} : { scale: 0.94 }}
-                            style={{
-                              position: "absolute",
-                              right: 8,
-                              top: "50%",
-                              transform: "translateY(-50%)",
-                              background: "rgba(255,255,255,0.85)",
-                              border: "none",
-                              borderRadius: "50%",
-                              width: 30,
-                              height: 30,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              cursor: "pointer",
-                              zIndex: 10,
-                              color: BURGUNDY,
-                            }}
-                          >
-                            <ChevronRight size={15} strokeWidth={1.5} />
-                          </motion.button>
-
-                          <div style={{
-                            position: "absolute",
-                            bottom: 8,
-                            left: "50%",
-                            transform: "translateX(-50%)",
-                            display: "flex",
-                            gap: 5,
-                            zIndex: 10,
-                          }}>
-                            {product.images.map((_, idx) => (
-                              <div
-                                key={idx}
-                                style={{
-                                  width: 4,
-                                  height: 4,
-                                  borderRadius: "50%",
-                                  background: idx === currentImageIndex ? BURGUNDY : "rgba(110,0,37,0.25)",
-                                  transition: "all 0.3s",
-                                }}
-                              />
-                            ))}
-                          </div>
-                        </>
-                      )}
-                    </div>
-
-                    {/* Product info — sized up to match the larger card
-                        frame above; the old 16px title/price read as a
-                        caption underneath a now much bigger photo. */}
-                    <div style={{ padding: "18px 16px" }}>
-                      <p style={{
-                        fontFamily: "DM Sans, system-ui, sans-serif",
-                        fontSize: 8,
-                        color: BURGUNDY,
-                        opacity: 0.4,
-                        letterSpacing: "2.5px",
-                        textTransform: "uppercase",
-                        margin: "0 0 4px 0",
-                      }}>{product.subtitle}</p>
-                      <h3 style={{
-                        fontFamily: CORMORANT,
-                        fontSize: 20,
-                        fontWeight: 600,
-                        color: DARK_TEXT,
-                        margin: "0 0 8px 0",
-                        lineHeight: 1.15,
-                      }}>{product.title}</h3>
-                      <p style={{
-                        fontFamily: "DM Sans, system-ui, sans-serif",
-                        fontSize: 12,
-                        color: "rgba(34,26,26,0.45)",
-                        lineHeight: 1.5,
-                        margin: "0 0 14px 0",
-                      }}>{product.desc}</p>
-
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                        <div>
-                          <span style={{
-                            fontFamily: CORMORANT,
-                            fontSize: 20,
-                            fontWeight: 600,
-                            color: BURGUNDY,
-                          }}>
-                            {currency === "NGN" ? `₦${product.priceNGN.toLocaleString()}` : `$${product.priceUSD}`}
-                          </span>
-                          <span style={{
-                            fontFamily: "DM Sans, system-ui, sans-serif",
-                            fontSize: 9,
-                            color: "rgba(110,0,37,0.3)",
-                            marginLeft: 4,
-                          }}>
-                            {currency === "NGN" ? `/ $${product.priceUSD}` : `/ ₦${product.priceNGN.toLocaleString()}`}
-                          </span>
-                        </div>
-                        <motion.button
-                          onClick={() => addToCart(product)}
-                          whileHover={reduced ? {} : { scale: 1.04 }}
-                          whileTap={reduced ? {} : { scale: 0.96 }}
-                          style={{
-                            fontFamily: "DM Sans, system-ui, sans-serif",
-                            fontSize: 9,
-                            letterSpacing: "1.5px",
-                            textTransform: "uppercase",
-                            fontWeight: 600,
-                            background: BURGUNDY,
-                            color: GOLD,
-                            border: "none",
-                            borderRadius: 3,
-                            padding: "8px 14px",
-                            cursor: "pointer",
-                            transition: "all 0.2s",
-                          }}
-                        >
-                          Add
-                        </motion.button>
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
+                      );
+                    }
+                    return (
+                      <StandardGarmentCard
+                        key={product.id}
+                        product={product}
+                        currency={currency}
+                        reduced={reduced}
+                        index={i}
+                        currentImageIndex={currentImageIndex}
+                        onPrevImage={() => prevImage(product.id, product.images.length)}
+                        onNextImage={() => nextImage(product.id, product.images.length)}
+                        onOpenDetail={() => { setSelectedProductForDetail(product); setDetailModalOpen(true); }}
+                        onAddToCart={addToCart}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
 
           {/* PRINTS GRID */}
           <div>

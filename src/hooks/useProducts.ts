@@ -30,6 +30,11 @@ export interface Product {
     pantsOnly?: { NGN: number; USD: number };
     both?: { NGN: number; USD: number };
   };
+  // Which of the three shop collections this product belongs to, so the
+  // storefront can group products into their own labeled sections instead
+  // of one flat "Garments" grid. Optional so a DB row without this column
+  // yet still renders (falls into an "Other" bucket rather than vanishing).
+  collection?: "ajogun" | "nka" | "daughters";
 }
 
 /** Database row -> the shape the storefront renders. */
