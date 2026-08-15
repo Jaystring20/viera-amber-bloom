@@ -2789,8 +2789,15 @@ const VIVAPage = () => {
                 </p>
               </div>
 
-              {/* Trust signals */}
-              <div style={{ marginBottom: 32 }}>
+              {/* Trust signals — was a vertical stack with a fixed 16px gap
+                  between each, which read fine on its own but left the rest
+                  of this column's width empty next to it, and (combined with
+                  the CTA link's marginTop: "auto" below) opened up a large
+                  dead gap before "Read the full story". Laid out as a single
+                  wrapping row instead: uses the column's actual width, and
+                  the three signals now read as one connected fact instead of
+                  three stacked ones. */}
+              <div className="flex flex-wrap" style={{ gap: "20px 32px", marginBottom: 32 }}>
                 {[
                   { value: "Made to Order", detail: "Bespoke Fit" },
                   { value: "48–72hrs", detail: "Delivery" },
@@ -2798,11 +2805,10 @@ const VIVAPage = () => {
                 ].map((item, i) => (
                   <motion.div
                     key={i}
-                    initial={{ opacity: 0, x: -12 }}
-                    whileInView={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, y: 8 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: i * 0.08 }}
                     viewport={{ once: true }}
-                    style={{ marginBottom: i < 2 ? 16 : 0 }}
                   >
                     <p style={{
                       fontFamily: CORMORANT,
@@ -2810,6 +2816,7 @@ const VIVAPage = () => {
                       fontWeight: 600,
                       color: BURGUNDY,
                       margin: 0,
+                      whiteSpace: "nowrap",
                     }}>
                       {item.value}
                     </p>
@@ -2821,6 +2828,7 @@ const VIVAPage = () => {
                       letterSpacing: "1.5px",
                       textTransform: "uppercase",
                       fontWeight: 500,
+                      whiteSpace: "nowrap",
                     }}>
                       {item.detail}
                     </p>
@@ -2844,7 +2852,10 @@ const VIVAPage = () => {
                   fontStyle: "italic",
                   color: BURGUNDY,
                   lineHeight: 1.6,
-                  marginTop: "auto",
+                  // Was marginTop: "auto", which pushed this link to the
+                  // bottom of the flex column, opening a large dead gap
+                  // beneath the trust signals whenever the column's height
+                  // matched a tall sibling image. It follows directly now.
                   textDecoration: "none",
                   borderBottom: `1px solid ${BURG_ALPHA}`,
                   paddingBottom: 2,
