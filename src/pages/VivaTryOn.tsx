@@ -14,11 +14,22 @@ const CORMORANT = "Cormorant Garamond, Georgia, serif";
 const SANS = "DM Sans, system-ui, sans-serif";
 
 
-// Wearable VIVA garments (look-4 is a print, excluded).
+// Wearable VIVA garments, one representative photo per style, drawn from
+// the same three shop collections as VIVA.tsx (src/pages/VIVA.tsx) —
+// previously this list still pointed at "The Heritage / The Bold / The
+// Artist", three demo looks retired from the shop months ago, so trying
+// them on here was styling a product that no longer exists. 9 items keeps
+// the 3-column grid below in even rows (3x3) instead of an orphaned card.
 const GARMENTS = [
-  { id: "heritage", title: "The Heritage", photo: "/viva/look-1.webp", desc: "Olive woven kimono · wide-leg pleated denim · gold cuffs" },
-  { id: "bold", title: "The Bold", photo: "/viva/look-2.webp", desc: "Hot-pink structured crop · wide-leg denim · statement earrings" },
-  { id: "artist", title: "The Artist", photo: "/viva/look-3.webp", desc: "Chartreuse palazzo · structured crop · layered gold jewellery" },
+  { id: "ajogun-plain", title: "Ajogún Plain Aṣọ-Òkè", photo: "/viva/collection/ajogun/plain/plain_1.jpeg", desc: "Heritage Aṣọ-Òkè top in clean, plain weave. The Inheritance collection." },
+  { id: "ajogun-patched", title: "Ajogún Patched Aṣọ-Òkè", photo: "/viva/collection/ajogun/patched/patched_1.jpeg", desc: "Heritage Aṣọ-Òkè top in signature patched weave. The Inheritance collection." },
+  { id: "ajogun-one-sleeved", title: "One-Sleeved Ajogún", photo: "/viva/collection/ajogun/one-sleeved/one_sleeved_1.jpeg", desc: "Architectural one-sleeved Aṣọ-Òkè top. The Inheritance collection." },
+  { id: "ajogun-other-fabrics", title: "Ajogún: Other Fabrics", photo: "/viva/collection/ajogun/other-fabrics/fabric_1.jpeg", desc: "Ajogún top in Akwẹ́tẹ́ and specialty fabrics. The Inheritance collection." },
+  { id: "nka-adire", title: "Nkà Garment: Àdịrẹ", photo: "/viva/collection/nka/adire_1.jpeg", desc: "Artisan garment in signature Àdịrẹ fabric. The Craftsmanship collection." },
+  { id: "nka-silk-crepe", title: "Nkà: Silk & Crepe", photo: "/viva/collection/nka/silk_crepe_1.jpeg", desc: "Artisan garment in luxurious silk and crepe. The Craftsmanship collection." },
+  { id: "daughters-tee", title: "Daughter of Adonai Tee", photo: "/viva/collection/daughter-of-adonai/crop-denim-white.jpeg", desc: "Statement graphic tee in premium cotton, white or black." },
+  { id: "daughters-crop-denim", title: "Daughters Pants: 3/4 Denim", photo: "/viva/collection/daughter-of-adonai/crop-denim-white.jpeg", desc: "Cropped denim with the collection's signature ring hardware." },
+  { id: "daughters-full-denim", title: "Daughters Pants: Full Denim", photo: "/viva/collection/daughter-of-adonai/full-denim-white.jpeg", desc: "Full-length wide-leg denim with the signature ring hardware." },
 ];
 
 type Garment = (typeof GARMENTS)[number];
