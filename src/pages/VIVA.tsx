@@ -1283,6 +1283,32 @@ const VIVAPage = () => {
     setOrderStatus("sent");
   };
 
+  // Same shape as buildOrderMessage above: one clean message a human reads
+  // on a phone, with everything Viera needs to reply already in it.
+  const buildEnquiryMessage = () =>
+    [
+      `Hi VIVA! I have a commission enquiry.`,
+      ``,
+      `INTERESTED IN`,
+      form.interest || "General enquiry",
+      ``,
+      `DETAILS`,
+      form.message,
+      ``,
+      `CONTACT`,
+      form.name,
+      form.email,
+      ``,
+      `Please let me know next steps. Thank you!`,
+    ].join("\n");
+
+  // Every other CTA on this page (cart checkout, try-on order) hands off to
+  // WhatsApp with a pre-filled message — this form previously only saved to
+  // the database and never reached WhatsApp at all, so a commission enquiry
+  // could sit unseen until someone checked the admin inbox. Now it does
+  // both: the database save stays as the durable record (so nothing is
+  // lost if the customer closes the tab before sending), and WhatsApp opens
+  // with the enquiry already written up, ready to review and send.
   const handleEnquiry = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("loading");
@@ -1297,6 +1323,9 @@ const VIVAPage = () => {
       supabase.functions.invoke("notify-admin", {
         body: { type: "contact", data: { ...form, subject: `VIVA Enquiry: ${form.interest || "General"}` } },
       }).catch(() => {});
+      // Opened in the same click's task so mobile Safari treats it as a
+      // direct response to the tap, not an unsolicited popup.
+      window.open(whatsappLink(buildEnquiryMessage()), "_blank", "noopener,noreferrer");
       setStatus("done");
     } catch {
       setStatus("error");
