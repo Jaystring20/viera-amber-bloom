@@ -2776,7 +2776,7 @@ const VIVAPage = () => {
                   lineHeight: 1.75,
                   margin: "0 0 16px 0",
                 }}>
-                  Batya carries two women forward. One stood before Moses and claimed an inheritance the law said wasn't hers, and was declared right. One left behind a life measured entirely in what her hands had made.
+                  Two women anchor this collection. One stood before Moses and claimed the inheritance history said wasn't hers, and was declared right. One left behind a life measured entirely in what her hands had made.
                 </p>
                 <p style={{
                   fontFamily: "DM Sans, system-ui, sans-serif",
@@ -2785,7 +2785,7 @@ const VIVAPage = () => {
                   lineHeight: 1.75,
                   opacity: 0.75,
                 }}>
-                  Ajogún is for the woman claiming what already belongs to her. Nká is for the woman whose hands are her legacy. Together, they carry one line: she claims, she creates.
+                  Ajogún carries her claim. Nká carries her craft. Read both stories, and you'll recognise yourself in at least one.
                 </p>
               </div>
 
