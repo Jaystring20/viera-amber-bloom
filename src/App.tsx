@@ -7,6 +7,7 @@ import Illustrations from "./pages/Illustrations.tsx";
 import VAGINPage from "./pages/VAGIN.tsx";
 import VAGINDashboard from "./pages/VAGINDashboard.tsx";
 import VIVAPage from "./pages/VIVA.tsx";
+import VIVAStory from "./pages/VIVAStory.tsx";
 import VivaTryOn from "./pages/VivaTryOn.tsx";
 import VAMPage from "./pages/VAM.tsx";
 import VASHPage from "./pages/VASH.tsx";
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/vagin" element={<VAGINPage />} />
           <Route path="/vagin-dashboard" element={<VAGINDashboard />} />
           <Route path="/viva" element={<VIVAPage />} />
+          <Route path="/viva/story" element={<VIVAStory />} />
           <Route path="/viva/try-on" element={<VivaTryOn />} />
           <Route path="/vam" element={<VAMPage />} />
           <Route path="/vash" element={<VASHPage />} />

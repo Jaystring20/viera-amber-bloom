@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, useInView, useReducedMotion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Send, ShoppingBag, X, Plus, Minus, MessageCircle, Sparkles, Upload, AlertCircle, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowLeft, ArrowRight, Send, ShoppingBag, X, Plus, Minus, MessageCircle, Sparkles, Upload, AlertCircle, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import NavBar from "@/components/NavBar";
 import VivaLaunchModal from "@/components/VivaLaunchModal";
 import { fadeIn, fadeSlideUp, staggerContainer, cardItem, scaleXRule, inViewProps, useReducedVariants } from "@/lib/animations";
@@ -2763,7 +2763,11 @@ const VIVAPage = () => {
                 Daughters of Adonai
               </h2>
 
-              {/* Editorial narrative */}
+              {/* Editorial narrative — summarizes the real collection
+                  narrative (see VIVAStory.tsx for the full telling) rather
+                  than generic heritage copy. Kept short and specific on
+                  purpose: this is a teaser, the two women's full stories
+                  live on the story page it links to below. */}
               <div style={{ marginBottom: 32 }}>
                 <p style={{
                   fontFamily: "DM Sans, system-ui, sans-serif",
@@ -2772,7 +2776,7 @@ const VIVAPage = () => {
                   lineHeight: 1.75,
                   margin: "0 0 16px 0",
                 }}>
-                  Batya celebrates the woman who wears her heritage with precision. Each piece marries traditional tailoring with modern sensibility—structured silhouettes that honor craftsmanship, fabric that breathes, and gold accents that catch the light.
+                  Batya carries two women forward. One stood before Moses and claimed an inheritance the law said wasn't hers, and was declared right. One left behind a life measured entirely in what her hands had made.
                 </p>
                 <p style={{
                   fontFamily: "DM Sans, system-ui, sans-serif",
@@ -2781,7 +2785,7 @@ const VIVAPage = () => {
                   lineHeight: 1.75,
                   opacity: 0.75,
                 }}>
-                  This is not fast fashion. Every measurement is taken to perfection. Every garment is made to order, arriving as a bespoke piece designed for your body, your movement, your confidence.
+                  Ajogún is for the woman claiming what already belongs to her. Nká is for the woman whose hands are her legacy. Together, they carry one line: she claims, she creates.
                 </p>
               </div>
 
@@ -2824,18 +2828,35 @@ const VIVAPage = () => {
                 ))}
               </div>
 
-              {/* Elegant CTA */}
-              <p style={{
-                fontFamily: CORMORANT,
-                fontSize: "clamp(14px, 1.1vw, 16px)",
-                fontStyle: "italic",
-                color: BURGUNDY,
-                opacity: 0.8,
-                lineHeight: 1.6,
-                marginTop: "auto",
-              }}>
-                Scroll below to explore the collection.
-              </p>
+              {/* Read the Full Story — the previous line here was a plain
+                  "scroll to explore" cue with nowhere to go. This is now an
+                  actual link into the full narrative (VIVAStory.tsx), the
+                  one CTA on this page whose intent ("read the story") is
+                  distinct from every other CTA ("shop", "try on"). */}
+              <Link
+                to="/viva/story"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  fontFamily: CORMORANT,
+                  fontSize: "clamp(14px, 1.1vw, 16px)",
+                  fontStyle: "italic",
+                  color: BURGUNDY,
+                  lineHeight: 1.6,
+                  marginTop: "auto",
+                  textDecoration: "none",
+                  borderBottom: `1px solid ${BURG_ALPHA}`,
+                  paddingBottom: 2,
+                  width: "fit-content",
+                  transition: "border-color 0.2s, opacity 0.2s",
+                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = BURGUNDY; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = BURG_ALPHA; }}
+              >
+                Read the full story
+                <ArrowRight size={14} strokeWidth={1.5} />
+              </Link>
             </motion.div>
           </div>
 
