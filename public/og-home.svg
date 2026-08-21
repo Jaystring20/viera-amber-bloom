@@ -1,0 +1,75 @@
+<svg viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap');
+    </style>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FAFAFA;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F5EDE6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+
+  <!-- Left content -->
+  <g>
+    <!-- Eyebrow -->
+    <text x="80" y="110" font-family="'DM Sans', sans-serif" font-size="12" font-weight="600" letter-spacing="3" text-transform="uppercase" fill="#0A0A0A" opacity="0.5">
+      VIERA AMBER
+    </text>
+
+    <!-- Main headline -->
+    <text x="80" y="190" font-family="'Cormorant Garamond', serif" font-size="72" font-weight="400" font-style="italic" fill="#0A0A0A" letter-spacing="-1">
+      For her,
+    </text>
+    <text x="80" y="270" font-family="'Cormorant Garamond', serif" font-size="72" font-weight="400" font-style="italic" fill="#0A0A0A" letter-spacing="-1">
+      by her.
+    </text>
+
+    <!-- Subheading -->
+    <text x="80" y="330" font-family="'DM Sans', sans-serif" font-size="18" font-weight="400" fill="#0A0A0A" opacity="0.75">
+      A creative ecosystem built
+    </text>
+    <text x="80" y="360" font-family="'DM Sans', sans-serif" font-size="18" font-weight="400" fill="#0A0A0A" opacity="0.75">
+      for feminine empowerment.
+    </text>
+
+    <!-- Ecosystem arms callout -->
+    <text x="80" y="430" font-family="'DM Sans', sans-serif" font-size="14" font-weight="600" fill="#0A0A0A" opacity="0.6">
+      Illustrations · VAGIN · VIVA · VAM · VASH
+    </text>
+  </g>
+
+  <!-- Right: Ecosystem visualization -->
+  <g transform="translate(900, 315)">
+    <!-- Central circle -->
+    <circle cx="0" cy="0" r="20" fill="#0A0A0A"/>
+
+    <!-- Ecosystem arms radiating out -->
+    <!-- Illustrations (Gold/Orange) -->
+    <line x1="0" y1="0" x2="0" y2="-110" stroke="#D97706" stroke-width="3"/>
+    <circle cx="0" cy="-120" r="24" fill="#D97706"/>
+    <text x="0" y="-105" font-family="'Cormorant Garamond', serif" font-size="12" font-weight="600" fill="#FFF" text-anchor="middle" dominant-baseline="central">I</text>
+
+    <!-- VAGIN (Purple) -->
+    <line x1="0" y1="0" x2="78" y2="-78" stroke="#62017F" stroke-width="3"/>
+    <circle cx="88" cy="-88" r="24" fill="#62017F"/>
+    <text x="88" y="-73" font-family="'Cormorant Garamond', serif" font-size="12" font-weight="600" fill="#FFF" text-anchor="middle" dominant-baseline="central">V</text>
+
+    <!-- VIVA (Burgundy) -->
+    <line x1="0" y1="0" x2="110" y2="0" stroke="#6E0025" stroke-width="3"/>
+    <circle cx="130" cy="0" r="24" fill="#6E0025"/>
+    <text x="130" y="15" font-family="'Cormorant Garamond', serif" font-size="12" font-weight="600" fill="#FFF" text-anchor="middle" dominant-baseline="central">VI</text>
+
+    <!-- VAM (Gray) -->
+    <line x1="0" y1="0" x2="78" y2="78" stroke="#888888" stroke-width="3"/>
+    <circle cx="88" cy="88" r="24" fill="#888888"/>
+    <text x="88" y="103" font-family="'Cormorant Garamond', serif" font-size="12" font-weight="600" fill="#FFF" text-anchor="middle" dominant-baseline="central">VA</text>
+
+    <!-- VASH (Teal - complementary) -->
+    <line x1="0" y1="0" x2="-110" y2="0" stroke="#2D7F7A" stroke-width="3"/>
+    <circle cx="-130" cy="0" r="24" fill="#2D7F7A"/>
+    <text x="-130" y="15" font-family="'Cormorant Garamond', serif" font-size="12" font-weight="600" fill="#FFF" text-anchor="middle" dominant-baseline="central">VA</text>
+  </g>
+</svg>

@@ -1,0 +1,62 @@
+<svg viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap');
+    </style>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF8F0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFE8D1;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#D97706;stop-opacity:0.15" />
+      <stop offset="100%" style="stop-color:#D97706;stop-opacity:0.05" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+  <rect width="1200" height="630" fill="url(#goldGradient)"/>
+
+  <!-- Left content -->
+  <g>
+    <!-- Eyebrow -->
+    <text x="80" y="110" font-family="'DM Sans', sans-serif" font-size="12" font-weight="600" letter-spacing="3" text-transform="uppercase" fill="#D97706" opacity="0.7">
+      ILLUSTRATIONS
+    </text>
+
+    <!-- Main headline -->
+    <text x="80" y="190" font-family="'Cormorant Garamond', serif" font-size="72" font-weight="400" font-style="italic" fill="#D97706" letter-spacing="-1">
+      Visionary
+    </text>
+    <text x="80" y="270" font-family="'Cormorant Garamond', serif" font-size="72" font-weight="400" font-style="italic" fill="#D97706" letter-spacing="-1">
+      Art & Design
+    </text>
+
+    <!-- Subtitle -->
+    <text x="80" y="330" font-family="'DM Sans', sans-serif" font-size="18" font-weight="400" fill="#0A0A0A" opacity="0.75">
+      Gallery of contemporary illustration
+    </text>
+    <text x="80" y="360" font-family="'DM Sans', sans-serif" font-size="18" font-weight="400" fill="#0A0A0A" opacity="0.75">
+      celebrating feminine narratives.
+    </text>
+
+    <!-- Call to action -->
+    <text x="80" y="430" font-family="'Cormorant Garamond', serif" font-size="28" font-weight="600" fill="#D97706">
+      Explore the Gallery
+    </text>
+  </g>
+
+  <!-- Right: Abstract illustrative element -->
+  <g transform="translate(900, 315)">
+    <!-- Organic shapes suggesting artistic flair -->
+    <circle cx="-40" cy="-60" r="45" fill="#D97706" opacity="0.2"/>
+    <circle cx="40" cy="-40" r="35" fill="#D97706" opacity="0.25"/>
+    <circle cx="60" cy="30" r="50" fill="#D97706" opacity="0.15"/>
+    <circle cx="-20" cy="70" r="40" fill="#D97706" opacity="0.2"/>
+
+    <!-- Central accent -->
+    <circle cx="0" cy="0" r="8" fill="#D97706"/>
+    <line x1="-30" y1="0" x2="30" y2="0" stroke="#D97706" stroke-width="2" opacity="0.4"/>
+    <line x1="0" y1="-30" x2="0" y2="30" stroke="#D97706" stroke-width="2" opacity="0.4"/>
+  </g>
+</svg>
