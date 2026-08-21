@@ -6,34 +6,40 @@ import * as path from 'path';
  * Route-specific Open Graph configurations.
  * Each route gets its own og:image, title, and description.
  */
+/**
+ * Cache-busting timestamp for og-images.
+ * Update this whenever og-images are deployed to invalidate browser/CDN caches.
+ */
+const OG_CACHE_BUST = '20260821-v1';
+
 const OG_CONFIG: Record<string, { image: string; title: string; description: string }> = {
   '/': {
-    image: 'https://vieraamber.com/og-home.svg',
+    image: `https://vieraamber.com/og-home.svg?v=${OG_CACHE_BUST}`,
     title: 'Viera Amber — For her, by her.',
     description: 'A creative ecosystem built for feminine empowerment.',
   },
   '/illustrations': {
-    image: 'https://vieraamber.com/og-illustrations.svg',
+    image: `https://vieraamber.com/og-illustrations.svg?v=${OG_CACHE_BUST}`,
     title: 'Illustrations — Viera Amber',
     description: 'Gallery of contemporary illustration celebrating feminine narratives.',
   },
   '/vagin': {
-    image: 'https://vieraamber.com/og-vagin.svg',
+    image: `https://vieraamber.com/og-vagin.svg?v=${OG_CACHE_BUST}`,
     title: 'VAGIN — Viera Amber\'s Girls\' Initiative',
     description: 'Girls\' health education & leadership program for young women.',
   },
   '/viva': {
-    image: 'https://vieraamber.com/og-viva.svg',
+    image: `https://vieraamber.com/og-viva.svg?v=${OG_CACHE_BUST}`,
     title: 'VIVA — She claims. She creates.',
     description: 'Batya: Daughters of Adonai. Ajogún · The Inheritance. Nkà · The Craftsmanship.',
   },
   '/vam': {
-    image: 'https://vieraamber.com/og-home.svg',
+    image: `https://vieraamber.com/og-home.svg?v=${OG_CACHE_BUST}`,
     title: 'VAM — Viera Amber Masterclass',
     description: 'Professional masterclass in illustration, fashion, and creative direction.',
   },
   '/vash': {
-    image: 'https://vieraamber.com/og-home.svg',
+    image: `https://vieraamber.com/og-home.svg?v=${OG_CACHE_BUST}`,
     title: 'VASH — Viera Amber Shop',
     description: 'Curated marketplace for creative tools, resources, and collections.',
   },
@@ -103,9 +109,12 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
       `<meta name="twitter:image" content="${config.image}">`
     );
 
-    // Serve the HTML with proper headers
+    // Serve the HTML with aggressive cache-busting
+    // No caching to ensure fresh og: tags on every request
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300');
+    res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=0, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     res.status(200).send(html);
   } catch (error) {
     console.error('Error serving SPA:', error);
