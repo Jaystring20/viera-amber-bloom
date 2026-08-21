@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VIVA — Batya Collection</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      width: 1200px;
+      height: 630px;
+      overflow: hidden;
+      background: #FAF9F6;
+    }
+    .container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 60px 80px;
+      background: linear-gradient(135deg, #FAF9F6 0%, #F5EDE6 100%);
+    }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(110,0,37,0.08) 0%, transparent 50%, rgba(212,175,55,0.06) 100%);
+      pointer-events: none;
+    }
+    .left {
+      flex: 1;
+      position: relative;
+      z-index: 1;
+      max-width: 540px;
+    }
+    .eyebrow {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #6E0025;
+      opacity: 0.65;
+      margin-bottom: 18px;
+    }
+    .title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 72px;
+      font-weight: 400;
+      font-style: italic;
+      color: #6E0025;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      letter-spacing: -1px;
+    }
+    .subtitle {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 18px;
+      font-weight: 400;
+      color: #221A1A;
+      line-height: 1.7;
+      opacity: 0.85;
+      margin-bottom: 32px;
+    }
+    .tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: #6E0025;
+      line-height: 1.3;
+    }
+    .right {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      position: relative;
+      z-index: 1;
+    }
+    .visual-element {
+      position: relative;
+      width: 340px;
+      height: 380px;
+    }
+    .circle-bg {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 4px solid #D4AF37;
+      opacity: 0.3;
+    }
+    .accent-shape {
+      position: absolute;
+      width: 280px;
+      height: 320px;
+      top: 30px;
+      left: 30px;
+      background: linear-gradient(135deg, rgba(110,0,37,0.1) 0%, rgba(212,175,55,0.08) 100%);
+      border-radius: 45% 55% 50% 50%;
+      opacity: 0.6;
+    }
+    .text-accent {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 36px;
+      font-weight: 600;
+      color: #D4AF37;
+      font-style: italic;
+      width: 200px;
+      line-height: 1.3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="overlay"></div>
+
+    <div class="left">
+      <div class="eyebrow">Batya Collection</div>
+      <div class="title">She claims.<br>She creates.</div>
+      <div class="subtitle">Ajogún · The Inheritance<br>Nkà · The Craftsmanship</div>
+      <div class="tagline">Made to order, bespoke fit</div>
+    </div>
+
+    <div class="right">
+      <div class="visual-element">
+        <div class="circle-bg"></div>
+        <div class="accent-shape"></div>
+        <div class="text-accent">VIVA</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

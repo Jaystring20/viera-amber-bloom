@@ -1,0 +1,68 @@
+<svg viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap');
+    </style>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FAF9F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F5EDE6;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="overlayGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6E0025;stop-opacity:0.08" />
+      <stop offset="50%" style="stop-color:#6E0025;stop-opacity:0" />
+      <stop offset="100%" style="stop-color:#D4AF37;stop-opacity:0.06" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+
+  <!-- Overlay gradient -->
+  <rect width="1200" height="630" fill="url(#overlayGradient)"/>
+
+  <!-- Left content section -->
+  <g>
+    <!-- Eyebrow -->
+    <text x="80" y="110" font-family="'DM Sans', sans-serif" font-size="12" font-weight="600" letter-spacing="3" text-transform="uppercase" fill="#6E0025" opacity="0.65">
+      BATYA COLLECTION
+    </text>
+
+    <!-- Main title -->
+    <text x="80" y="190" font-family="'Cormorant Garamond', serif" font-size="72" font-weight="400" font-style="italic" fill="#6E0025" letter-spacing="-1">
+      She claims.
+    </text>
+    <text x="80" y="270" font-family="'Cormorant Garamond', serif" font-size="72" font-weight="400" font-style="italic" fill="#6E0025" letter-spacing="-1">
+      She creates.
+    </text>
+
+    <!-- Subtitle -->
+    <text x="80" y="330" font-family="'DM Sans', sans-serif" font-size="18" font-weight="400" fill="#221A1A" opacity="0.85">
+      Ajogún · The Inheritance
+    </text>
+    <text x="80" y="360" font-family="'DM Sans', sans-serif" font-size="18" font-weight="400" fill="#221A1A" opacity="0.85">
+      Nkà · The Craftsmanship
+    </text>
+
+    <!-- Tagline -->
+    <text x="80" y="420" font-family="'Cormorant Garamond', serif" font-size="28" font-weight="600" fill="#6E0025">
+      Made to order, bespoke fit
+    </text>
+  </g>
+
+  <!-- Right visual element -->
+  <g transform="translate(900, 315)">
+    <!-- Circle background -->
+    <circle cx="0" cy="0" r="170" fill="none" stroke="#D4AF37" stroke-width="4" opacity="0.3"/>
+
+    <!-- Accent organic shape -->
+    <ellipse cx="0" cy="0" rx="140" ry="160" fill="#6E0025" opacity="0.08"/>
+
+    <!-- Center "VIVA" text -->
+    <text x="0" y="0" font-family="'Cormorant Garamond', serif" font-size="36" font-weight="600" font-style="italic" fill="#D4AF37" text-anchor="middle" dominant-baseline="central">
+      VIVA
+    </text>
+  </g>
+
+  <!-- Decorative accent lines -->
+  <line x1="80" y1="460" x2="180" y2="460" stroke="#D4AF37" stroke-width="2" opacity="0.4"/>
+</svg>
