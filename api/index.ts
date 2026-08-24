@@ -15,8 +15,8 @@ const OG_CACHE_BUST = '20260821-v2';
 
 const OG_CONFIG: Record<string, { image: string; title: string; description: string }> = {
   '/': {
-    // Home: VIVA hero image (authentic page hero)
-    image: `https://vieraamber.com/viva/hero-fallback-1664.webp?v=${OG_CACHE_BUST}`,
+    // Home: Main landing page hero (Jacqueline artwork)
+    image: `https://vieraamber.com/artworks/artwork_0064.webp?v=${OG_CACHE_BUST}`,
     title: 'Viera Amber — For her, by her.',
     description: 'A creative ecosystem built for feminine empowerment.',
   },
