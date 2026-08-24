@@ -9,8 +9,9 @@ import * as path from 'path';
 /**
  * Cache-busting timestamp for og-images.
  * Update this whenever og-images are deployed to invalidate browser/CDN caches.
+ * Incremented to force Vercel edge cache clear.
  */
-const OG_CACHE_BUST = '20260821-v1';
+const OG_CACHE_BUST = '20260821-v2';
 
 const OG_CONFIG: Record<string, { image: string; title: string; description: string }> = {
   '/': {
