@@ -15,32 +15,38 @@ const OG_CACHE_BUST = '20260821-v2';
 
 const OG_CONFIG: Record<string, { image: string; title: string; description: string }> = {
   '/': {
-    image: `https://vieraamber.com/og-home.svg?v=${OG_CACHE_BUST}`,
+    // Home: VIVA hero image (authentic page hero)
+    image: `https://vieraamber.com/viva/hero-fallback-1664.webp?v=${OG_CACHE_BUST}`,
     title: 'Viera Amber — For her, by her.',
     description: 'A creative ecosystem built for feminine empowerment.',
   },
   '/illustrations': {
-    image: `https://vieraamber.com/og-illustrations.svg?v=${OG_CACHE_BUST}`,
+    // Illustrations: Actual fashion illustration from gallery
+    image: `https://vieraamber.com/artworks/artwork_0001.webp?v=${OG_CACHE_BUST}`,
     title: 'Illustrations — Viera Amber',
     description: 'Gallery of contemporary illustration celebrating feminine narratives.',
   },
   '/vagin': {
-    image: `https://vieraamber.com/og-vagin.svg?v=${OG_CACHE_BUST}`,
+    // VAGIN: Founder/leader image representing the initiative
+    image: `https://vieraamber.com/faith-adigwe-founder.webp?v=${OG_CACHE_BUST}`,
     title: 'VAGIN — Viera Amber\'s Girls\' Initiative',
     description: 'Girls\' health education & leadership program for young women.',
   },
   '/viva': {
-    image: `https://vieraamber.com/og-viva.svg?v=${OG_CACHE_BUST}`,
+    // VIVA: Lifestyle editorial image from collection
+    image: `https://vieraamber.com/viva/lifestyle/lifestyle-03-duo-moment.webp?v=${OG_CACHE_BUST}`,
     title: 'VIVA — She claims. She creates.',
     description: 'Batya: Daughters of Adonai. Ajogún · The Inheritance. Nkà · The Craftsmanship.',
   },
   '/vam': {
-    image: `https://vieraamber.com/og-home.svg?v=${OG_CACHE_BUST}`,
+    // VAM: Ecosystem hero (fallback to home)
+    image: `https://vieraamber.com/viva/hero-fallback-1664.webp?v=${OG_CACHE_BUST}`,
     title: 'VAM — Viera Amber Masterclass',
     description: 'Professional masterclass in illustration, fashion, and creative direction.',
   },
   '/vash': {
-    image: `https://vieraamber.com/og-home.svg?v=${OG_CACHE_BUST}`,
+    // VASH: Ecosystem hero (fallback to home)
+    image: `https://vieraamber.com/viva/hero-fallback-1664.webp?v=${OG_CACHE_BUST}`,
     title: 'VASH — Viera Amber Shop',
     description: 'Curated marketplace for creative tools, resources, and collections.',
   },
@@ -68,6 +74,23 @@ function getOGConfig(pathname: string): (typeof OG_CONFIG)[keyof typeof OG_CONFI
 }
 
 /**
+ * Get VIVA item image based on product ID.
+ * Maps product IDs to their primary image paths for dynamic og-images.
+ */
+function getVIVAItemImage(productId: string): string {
+  // VIVA product ID to image mapping
+  // These should match the product IDs and their first image in the catalogue
+  const viva_items: Record<string, string> = {
+    "ajogun-ajogoun-1": "https://vieraamber.com/viva/collection/ajogun/patched/patched_1.jpeg",
+    "ajogun-ajogoun-2": "https://vieraamber.com/viva/collection/ajogun/patched/patched_2.jpeg",
+    // Add more items as needed
+    // Fallback to lifestyle editorial if specific item not found
+  };
+
+  return viva_items[productId] || `https://vieraamber.com/viva/lifestyle/lifestyle-03-duo-moment.webp`;
+}
+
+/**
  * Injects route-specific og: meta tags into the HTML.
  * Called by Vercel for all requests; serves the SPA with dynamic og: tags.
  */
@@ -76,8 +99,23 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     // Extract the pathname from the request
     const pathname = req.url ? new URL(req.url, `http://${req.headers.host}`).pathname : '/';
 
+    // Extract query parameters for dynamic content (e.g., VIVA items)
+    const urlObj = req.url ? new URL(req.url, `http://${req.headers.host}`) : null;
+    const itemParam = urlObj?.searchParams.get('item');
+
     // Get the correct og: config for this route
-    const config = getOGConfig(pathname);
+    let config = getOGConfig(pathname);
+
+    // For VIVA route with item parameter, use item's image as og-image
+    if (pathname === '/viva' && itemParam) {
+      const itemImage = getVIVAItemImage(itemParam);
+      config = {
+        ...config,
+        image: `${itemImage}?v=${OG_CACHE_BUST}`,
+        title: `${itemParam.replace(/-/g, ' ')} — VIVA Collection`,
+        description: 'Batya: Daughters of Adonai collection. Made to order, bespoke fit.',
+      };
+    }
 
     // Read the built index.html from the Vite output
     const indexPath = path.join(process.cwd(), 'dist', 'index.html');
