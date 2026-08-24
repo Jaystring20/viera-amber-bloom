@@ -15,32 +15,32 @@ const OG_CACHE_BUST = '20260821-v2';
 
 const OG_CONFIG: Record<string, { image: string; title: string; description: string }> = {
   '/': {
-    image: `https://vieraamber.com/og-home.png?v=${OG_CACHE_BUST}`,
+    image: `https://vieraamber.com/og-home.svg?v=${OG_CACHE_BUST}`,
     title: 'Viera Amber — For her, by her.',
     description: 'A creative ecosystem built for feminine empowerment.',
   },
   '/illustrations': {
-    image: `https://vieraamber.com/og-illustrations.png?v=${OG_CACHE_BUST}`,
+    image: `https://vieraamber.com/og-illustrations.svg?v=${OG_CACHE_BUST}`,
     title: 'Illustrations — Viera Amber',
     description: 'Gallery of contemporary illustration celebrating feminine narratives.',
   },
   '/vagin': {
-    image: `https://vieraamber.com/og-vagin.png?v=${OG_CACHE_BUST}`,
+    image: `https://vieraamber.com/og-vagin.svg?v=${OG_CACHE_BUST}`,
     title: 'VAGIN — Viera Amber\'s Girls\' Initiative',
     description: 'Girls\' health education & leadership program for young women.',
   },
   '/viva': {
-    image: `https://vieraamber.com/og-viva.png?v=${OG_CACHE_BUST}`,
+    image: `https://vieraamber.com/og-viva.svg?v=${OG_CACHE_BUST}`,
     title: 'VIVA — She claims. She creates.',
     description: 'Batya: Daughters of Adonai. Ajogún · The Inheritance. Nkà · The Craftsmanship.',
   },
   '/vam': {
-    image: `https://vieraamber.com/og-home.png?v=${OG_CACHE_BUST}`,
+    image: `https://vieraamber.com/og-home.svg?v=${OG_CACHE_BUST}`,
     title: 'VAM — Viera Amber Masterclass',
     description: 'Professional masterclass in illustration, fashion, and creative direction.',
   },
   '/vash': {
-    image: `https://vieraamber.com/og-home.png?v=${OG_CACHE_BUST}`,
+    image: `https://vieraamber.com/og-home.svg?v=${OG_CACHE_BUST}`,
     title: 'VASH — Viera Amber Shop',
     description: 'Curated marketplace for creative tools, resources, and collections.',
   },
