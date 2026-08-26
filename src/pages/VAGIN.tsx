@@ -1353,7 +1353,7 @@ const VAGINPage = () => {
                     What does <span style={{ color: "#D97706" }}>"KOLO"</span> mean?
                   </h3>
                   <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 15, color: "rgba(250,250,250,0.72)", lineHeight: 1.85, margin: 0 }}>
-                    <span style={{ color: "#D97706", fontWeight: 600 }}>KOLO</span> is Yoruba for a <span style={{ color: "#D97706", fontWeight: 600 }}>savings pot</span>, a piggy bank. The PAD KOLO model turns menstrual health support into a community savings act: girls and their families contribute micro-amounts (around <span style={{ color: "#FAFAFA", fontWeight: 500 }}>₦700–₦1,000/month</span>). VAGIN matches those contributions with a sustainable supply of sanitary pads. Girls become <span style={{ color: "#FAFAFA", fontWeight: 500 }}>co-investors in their own health</span>, not passive recipients of charity. This ownership changes how girls relate to their own bodies and futures.
+                    <span style={{ color: "#D97706", fontWeight: 600 }}>KOLO</span> is Yoruba for a <span style={{ color: "#D97706", fontWeight: 600 }}>savings pot</span>, a piggy bank. The PAD KOLO model turns menstrual health support into a community savings act: families contribute micro-amounts (about <span style={{ color: "#FAFAFA", fontWeight: 500 }}>20–30% of a regular pad's cost each month</span>). VAGIN matches those contributions with a sustainable supply of sanitary pads. Girls become <span style={{ color: "#FAFAFA", fontWeight: 500 }}>co-investors in their own health</span>, not passive recipients of charity. This ownership changes how girls relate to their own bodies and futures.
                   </p>
                 </div>
               </div>
@@ -1408,7 +1408,12 @@ const VAGINPage = () => {
                 {[
                   { end: 3000, prefix: "", suffix: "+", staticVal: null, label: "Girls Supported" },
                   { end: 2, prefix: "", suffix: "", staticVal: null, label: "Countries" },
-                  { end: 0, prefix: "", suffix: "", staticVal: "₦700–₦1,000", label: "Min. Monthly Savings / Girl" },
+                  // Expressed as a share of local pad cost, not a naira figure.
+                  // PAD KOLO already runs in two countries (the stat beside
+                  // this one), so a ₦ amount both misstated the ask outside
+                  // Nigeria and read as though the programme were Nigeria-only.
+                  // A percentage travels: it is correct in every currency.
+                  { end: 0, prefix: "", suffix: "", staticVal: "20–30%", label: "Of A Pad's Cost, Saved Monthly" },
                   { end: 0, prefix: "", suffix: "", staticVal: "2026", label: "Year Launched" },
                 ].map(({ end, prefix, suffix, staticVal, label }) => (
                   <div key={label} className="flex flex-col items-center" style={{ gap: 6 }}>
