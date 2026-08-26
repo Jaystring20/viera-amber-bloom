@@ -641,7 +641,7 @@ const VAGINPage = () => {
               initial="hidden"
               animate={missionInView ? "visible" : "hidden"}
               className="relative overflow-hidden group"
-              style={{ borderRadius: 18, minHeight: 360, border: "1px solid rgba(237,21,93,0.2)" }}
+              style={{ borderRadius: 18, height: 380, border: "1px solid rgba(237,21,93,0.2)" }}
             >
               {/* Own slot, not vagin_team_02. That slot is shared with the
                   hero cluster, the carousel and Meet the Team, so changing
@@ -659,7 +659,14 @@ const VAGINPage = () => {
                 src={vimg("vagin_mission_01")}
                 alt="Schoolgirls in Malawi holding reusable sanitary pads outside their classroom"
                 className="w-full h-full object-cover"
-                style={{ minHeight: 360 }}
+                /* The photo is portrait (1200x1600) in a landscape panel, so
+                   the vertical crop is the whole decision. Measuring the frame:
+                   sky runs 0-25%, the school building 26-44%, the girls 44-74%,
+                   bare ground 75-100%. A centred crop would spend half its
+                   height on empty sky and dirt, so the window is biased down to
+                   land on roughly 24-81% — building as backdrop, all seven
+                   girls head to foot, a sliver of ground. */
+                style={{ objectPosition: "center 56%" }}
               />
               <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(13,0,21,0.58) 0%, rgba(98,1,127,0.68) 100%)" }} />
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-8">
