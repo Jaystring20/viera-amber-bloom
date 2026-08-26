@@ -2520,9 +2520,15 @@ const VIVAPage = () => {
               collection a piece belongs to. Same 380px card size and card
               components as before — only the grouping is new. */}
           {([
-            { key: "ajogun" as const, eyebrow: "The Inheritance", title: "Ajogún Collection" },
-            { key: "nka" as const, eyebrow: "The Craftsmanship", title: "Nkà Garment Collection" },
-            { key: "daughters" as const, eyebrow: "Graphic Apparel", title: "Daughters of Adonai Collection" },
+            // No "Collection" suffix on any of these three. There is one
+            // collection — Batya: Daughters of Adonai, named in the page
+            // heading directly above — and these are the lines within it.
+            // Calling each one a collection invented a tier the brand does
+            // not have, the same defect as the old "Heritage Collection" /
+            // "Artisan Collection" product subtitles.
+            { key: "ajogun" as const, eyebrow: "The Inheritance", title: "Ajogún" },
+            { key: "nka" as const, eyebrow: "The Craftsmanship", title: "Nkà Garment" },
+            { key: "daughters" as const, eyebrow: "Graphic Apparel", title: "Daughters of Adonai" },
           ]).map(section => {
             const products = catalogue.filter(p => p.type === "garment" && p.collection === section.key);
             if (products.length === 0) return null;
