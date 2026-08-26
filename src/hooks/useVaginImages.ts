@@ -36,9 +36,25 @@ export const useVaginImages = () => {
     };
   }, []);
 
+  // `fallbackSlot` covers the window between shipping code that references a
+  // new slot and running the migration that creates it. Without it the plain
+  // fallback resolves to /vagin-images/<newSlot>.webp — a file that does not
+  // exist for a slot that has never been uploaded to — so the page renders a
+  // broken image until the SQL is run, making deploy order load-bearing.
+  // Naming an existing slot to fall back to removes that ordering hazard: the
+  // old picture shows until the new row exists, then the new one takes over.
   const img = useCallback(
-    (slot: string) =>
-      rows.find((r) => r.slot === slot)?.image_url ?? `/vagin-images/${slot}.webp`,
+    (slot: string, fallbackSlot?: string) => {
+      const hit = rows.find((r) => r.slot === slot)?.image_url;
+      if (hit) return hit;
+      if (fallbackSlot) {
+        return (
+          rows.find((r) => r.slot === fallbackSlot)?.image_url ??
+          `/vagin-images/${fallbackSlot}.webp`
+        );
+      }
+      return `/vagin-images/${slot}.webp`;
+    },
     [rows],
   );
 

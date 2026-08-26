@@ -643,9 +643,14 @@ const VAGINPage = () => {
               className="relative overflow-hidden group"
               style={{ borderRadius: 18, minHeight: 360, border: "1px solid rgba(237,21,93,0.2)" }}
             >
+              {/* Own slot, not vagin_team_02. That slot is shared with the
+                  hero cluster, the carousel and Meet the Team, so changing
+                  the Mission photo through it silently changed three other
+                  places and left their alt text describing a picture that
+                  was no longer there. Seeded by sql/vagin_mission_slot.sql. */}
               <img
-                src={vimg("vagin_team_02")}
-                alt="VAGIN community outreach"
+                src={vimg("vagin_mission_01", "vagin_team_02")}
+                alt="Schoolgirls in Malawi holding reusable sanitary pads outside their classroom"
                 className="w-full h-full object-cover"
                 style={{ minHeight: 360 }}
               />
