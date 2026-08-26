@@ -20,23 +20,27 @@
 -- can be changed without touching the hero cluster, the reel, or the team
 -- grid.
 --
--- SEEDED WITH THE CURRENT IMAGE ON PURPOSE
+-- THIS FILE IS OPTIONAL
 --
--- image_url is set to vagin_team_02's existing file rather than left null.
--- useVaginImages resolves a slot as:
+-- The Malawi photo already ships as a static file at
+-- public/vagin-images/vagin_mission_01.webp. useVaginImages resolves a slot as:
 --
 --     rows.find(r => r.slot === slot)?.image_url ?? `/vagin-images/${slot}.webp`
 --
--- so a null (or a missing row) would fall back to /vagin-images/
--- vagin_mission_01.webp, a file that does not exist — a broken image on the
--- live page between running this and the first upload. Seeding with the
--- current file means nothing changes visually until the new photo is
--- uploaded over it.
+-- so with no row present the fallback lands on exactly that file and the
+-- panel renders the right picture already. Nothing here is needed to make the
+-- page correct.
+--
+-- What this DOES add is admin control: creating the row makes the slot appear
+-- in the dashboard under its own "Mission panel" section, so the photo can be
+-- swapped later without a code change. image_url is seeded to the static file
+-- so running this is a no-op visually.
 --
 -- AFTER RUNNING THIS
 --
---   Admin → VAGIN Images → section "Mission panel" → upload the Malawi photo.
---   Only the Mission panel changes.
+--   Admin → VAGIN Images → section "Mission panel" → upload to swap the photo.
+--   Only the Mission panel changes; the hero cluster, the carousel and Meet
+--   the Team keep vagin_team_02 and their own picture.
 --
 -- Safe to re-run: idempotent on the slot key.
 -- ═══════════════════════════════════════════════════════════════════════════
@@ -46,7 +50,7 @@ values (
   'vagin_mission_01',
   'Mission panel — Health, dignity and rights',
   'Mission panel',
-  '/vagin-images/vagin_team_02.webp',
+  '/vagin-images/vagin_mission_01.webp',
   20
 )
 on conflict (slot) do update

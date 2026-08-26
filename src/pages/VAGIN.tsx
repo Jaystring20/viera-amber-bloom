@@ -647,9 +647,16 @@ const VAGINPage = () => {
                   hero cluster, the carousel and Meet the Team, so changing
                   the Mission photo through it silently changed three other
                   places and left their alt text describing a picture that
-                  was no longer there. Seeded by sql/vagin_mission_slot.sql. */}
+                  was no longer there.
+
+                  The photo ships as a static file at
+                  public/vagin-images/vagin_mission_01.webp, which is exactly
+                  where useVaginImages falls back to when the table has no row
+                  for a slot — so this renders correctly with no DB row at
+                  all. sql/vagin_mission_slot.sql is optional, and only needed
+                  to make the slot swappable from the admin later. */}
               <img
-                src={vimg("vagin_mission_01", "vagin_team_02")}
+                src={vimg("vagin_mission_01")}
                 alt="Schoolgirls in Malawi holding reusable sanitary pads outside their classroom"
                 className="w-full h-full object-cover"
                 style={{ minHeight: 360 }}
