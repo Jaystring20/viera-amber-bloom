@@ -18,7 +18,7 @@ import {
   type Medium,
 } from "@/lib/gallery-data";
 import { supabase } from "@/lib/supabase";
-import { ILLUSTRATION_CATEGORIES, scrollToCategory } from "@/lib/illustration-categories";
+import { ILLUSTRATION_CATEGORIES, scrollToCategory, type Umbrella } from "@/lib/illustration-categories";
 
 const GOLD = "#D97706";
 
@@ -313,6 +313,54 @@ const FeatureBand = ({ art, onOpen }: { art: Artwork; onOpen: () => void }) => {
           {art.story}
         </p>
       </div>
+    </motion.div>
+  );
+};
+
+// ─── Umbrella divider ───────────────────────────────────────────────────────
+// The client's PDF splits the nine categories into two families, and asked
+// that a first-time visitor be able to tell which one they are in while
+// scrolling — not only from the "Browse by Category" rows far above. This is
+// that marker: a full-width band announcing FASHION ILLUSTRATION or LIFESTYLE
+// ILLUSTRATION, rendered once, immediately before that family's first
+// chapter.
+const UMBRELLA_LABELS: Record<Umbrella, string> = {
+  fashion: "Fashion Illustration",
+  lifestyle: "Lifestyle Illustration",
+};
+
+// chapter id → umbrella, from the single source of truth. Chapters that
+// aren't in the category list (legacy/DB-only ids) return undefined and
+// simply get no divider rather than a wrong one.
+const UMBRELLA_BY_CATEGORY = new Map<string, Umbrella>(
+  ILLUSTRATION_CATEGORIES.map((c) => [c.id, c.umbrella]),
+);
+
+const UmbrellaDivider = ({ umbrella }: { umbrella: Umbrella }) => {
+  const reduced = useReducedMotion();
+  return (
+    <motion.div
+      className="flex items-center gap-5"
+      initial={{ opacity: 0, y: reduced ? 0 : 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: reduced ? 0 : 0.5, ease: "easeOut" as const }}
+    >
+      <h2
+        style={{
+          fontFamily: "Montserrat, system-ui, sans-serif",
+          fontSize: "clamp(11px, 1.4vw, 13px)",
+          fontWeight: 600,
+          letterSpacing: "3px",
+          textTransform: "uppercase",
+          color: GOLD,
+          margin: 0,
+          whiteSpace: "nowrap",
+        }}
+      >
+        {UMBRELLA_LABELS[umbrella]}
+      </h2>
+      <div aria-hidden style={{ flex: 1, height: 1, backgroundColor: "rgba(217,119,6,0.28)" }} />
     </motion.div>
   );
 };
@@ -803,13 +851,26 @@ const EditorialGallery = () => {
             which is what broke the hero's scroll links whenever a filter
             was active — removed for exactly that reason. */}
         <div className="flex flex-col gap-20 md:gap-28">
-          {chapters.map((chapter) => {
+          {chapters.map((chapter, i) => {
             const items = artworks.filter((a) => a.chapter === chapter.id);
+            // A divider is drawn only when this chapter opens a new family —
+            // i.e. the umbrella differs from the previous chapter's. Chapters
+            // are already in the client's PDF order (fashion, then
+            // lifestyle), so this yields exactly two bands.
+            const umbrella = UMBRELLA_BY_CATEGORY.get(chapter.id);
+            const prevUmbrella = i > 0 ? UMBRELLA_BY_CATEGORY.get(chapters[i - 1].id) : undefined;
+            const opensUmbrella = umbrella !== undefined && umbrella !== prevUmbrella;
+
             return (
               // id matches categoryAnchorId() in illustration-categories.ts —
               // this is what the hero carousel / "Browse by Category" row /
               // CategoryNav all scroll to when a category is selected.
               <div key={chapter.id} id={`category-${chapter.id}`}>
+                {opensUmbrella && (
+                  <div className="mb-10 md:mb-12">
+                    <UmbrellaDivider umbrella={umbrella} />
+                  </div>
+                )}
                 <ChapterIntro chapter={chapter} />
                 <ChapterBody chapter={chapter} items={items} openOf={openOf} collections={collections} />
               </div>
