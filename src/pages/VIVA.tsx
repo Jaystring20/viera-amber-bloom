@@ -245,8 +245,8 @@ const SHOP_PRODUCTS: ShopProduct[] = [
     ],
     priceNGN: 25000,
     priceUSD: 16,
-    desc: "Cropped 3/4-length silk in a soft cream tone, with the collection's signature ring hardware at the hem. Sold separately from the tee.",
-    fullDesc: "A softer counterpart to the denim styles: cream silk cut to the same 3/4 length, finished with the same signature ring hardware connecting the hem pieces. A more fluid alternative for the same statement detail.",
+    desc: "Cropped 3/4-length silk with the collection's signature ring hardware at the hem. Sold separately from the tee.",
+    fullDesc: "A softer counterpart to the denim styles: silk cut to the same 3/4 length, finished with the same signature ring hardware connecting the hem pieces. A more fluid alternative for the same statement detail.",
     materials: "Silk · signature ring hardware · bespoke fit",
     care: "Dry clean recommended. Handle the hardware finish with care."
   },
@@ -2801,8 +2801,15 @@ const VIVAPage = () => {
               {/* Editorial narrative — summarizes the real collection
                   narrative (see VIVAStory.tsx for the full telling) rather
                   than generic heritage copy. Kept short and specific on
-                  purpose: this is a teaser, the two women's full stories
-                  live on the story page it links to below. */}
+                  purpose: this is a teaser, both full stories live on the
+                  story page it links to below.
+
+                  "Two stories", not "two women": the Ajogún side is the five
+                  daughters of Zelophehad (Mahlah, Noah, Hoglah, Milcah,
+                  Tirzah — VIVAStory.tsx), so the earlier "One stood before
+                  Moses ... wasn't hers" collapsed five women into one and
+                  read as though the Daughters' story had a single woman in
+                  it. Hence "their claim" below, against Nkà's "her craft". */}
               <div style={{ marginBottom: 32 }}>
                 <p style={{
                   fontFamily: "DM Sans, system-ui, sans-serif",
@@ -2811,7 +2818,7 @@ const VIVAPage = () => {
                   lineHeight: 1.75,
                   margin: "0 0 16px 0",
                 }}>
-                  Two women anchor this collection. One stood before Moses and claimed the inheritance history said wasn't hers, and was declared right. One left behind a life measured entirely in what her hands had made.
+                  Two stories anchor this collection. Five sisters who stood before Moses and claimed the inheritance history said wasn't theirs — and were declared right. A seamstress who left behind a life measured entirely in what her hands had made.
                 </p>
                 <p style={{
                   fontFamily: "DM Sans, system-ui, sans-serif",
@@ -2820,7 +2827,7 @@ const VIVAPage = () => {
                   lineHeight: 1.75,
                   opacity: 0.75,
                 }}>
-                  Ajogún carries her claim. Nká carries her craft. Read both stories, and you'll recognise yourself in at least one.
+                  Ajogún carries their claim. Nká carries her craft. Read both stories, and you'll recognise yourself in at least one.
                 </p>
               </div>
 

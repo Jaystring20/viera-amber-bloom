@@ -42,7 +42,7 @@ const PILLARS = [
 ];
 
 const WHAT_YOU_GET = [
-  "12 weeks of structured content",
+  "12 weeks of structured content, with customisable timing and learning",
   "Live critique sessions with Viera Amber",
   "Private student community",
   "Resource library (templates, references, palettes)",
