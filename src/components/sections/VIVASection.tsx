@@ -7,9 +7,9 @@ const GOLD = "#D4AF37";
 const GOLD_BORDER = "rgba(212,175,55,0.28)";
 
 const LOOKS = [
-  { src: "/viva/look-1.webp", name: "The Heritage", tag: "01", mood: "Power & Craft" },
-  { src: "/viva/look-2.webp", name: "The Bold",     tag: "02", mood: "Vivid Authority" },
-  { src: "/viva/look-3.webp", name: "The Artist",   tag: "03", mood: "Chromatic Freedom" },
+  { src: "/viva/collection/ajogun/patched/patched_1.jpeg", name: "Ajogún Patched", tag: "01", mood: "Heritage Weave" },
+  { src: "/viva/collection/ajogun/one-sleeved/one_sleeved_1.jpeg", name: "One-Sleeved Ajogún", tag: "02", mood: "Architectural Cut" },
+  { src: "/viva/collection/nka/adire_1.jpeg", name: "Nkà Adire", tag: "03", mood: "Artisan Expression" },
 ];
 
 const VIVASection = () => {
