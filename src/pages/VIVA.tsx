@@ -59,7 +59,7 @@ const SHOP_PRODUCTS: ShopProduct[] = [
   {
     id: "ajogun-plain",
     title: "Ajogún Plain Aṣọ-Òkè",
-    subtitle: "The Inheritance · Heritage Collection",
+    subtitle: "The Inheritance",
     type: "garment" as const,
     badge: "Made to Order",
     collection: "ajogun",
@@ -76,7 +76,7 @@ const SHOP_PRODUCTS: ShopProduct[] = [
   {
     id: "ajogun-patched",
     title: "Ajogún Patched Aṣọ-Òkè",
-    subtitle: "The Inheritance · Heritage Collection",
+    subtitle: "The Inheritance",
     type: "garment" as const,
     badge: "Made to Order",
     collection: "ajogun",
@@ -93,7 +93,7 @@ const SHOP_PRODUCTS: ShopProduct[] = [
   {
     id: "ajogun-one-sleeved",
     title: "One-Sleeved Ajogún",
-    subtitle: "The Inheritance · Heritage Collection",
+    subtitle: "The Inheritance",
     type: "garment" as const,
     badge: "Made to Order",
     collection: "ajogun",
@@ -135,7 +135,7 @@ const SHOP_PRODUCTS: ShopProduct[] = [
   {
     id: "nka-adire",
     title: "Nkà Garment: Àdịrẹ",
-    subtitle: "Craftsmanship · Artisan Collection",
+    subtitle: "The Craftsmanship",
     type: "garment" as const,
     badge: "Signature Fabric",
     collection: "nka",
@@ -151,7 +151,7 @@ const SHOP_PRODUCTS: ShopProduct[] = [
   {
     id: "nka-silk-crepe",
     title: "Nkà Garment: Silk & Crepe",
-    subtitle: "Craftsmanship · Artisan Collection",
+    subtitle: "The Craftsmanship",
     type: "garment" as const,
     badge: "Premium Fabrics",
     collection: "nka",
