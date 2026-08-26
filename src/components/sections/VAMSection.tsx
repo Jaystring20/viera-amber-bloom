@@ -74,6 +74,25 @@ const VAMSection = () => {
           className="flex flex-col items-center text-center mb-12"
           style={{ gap: 16 }}
         >
+          <motion.p
+            variants={headerVariants}
+            initial="hidden"
+            animate={headerInView ? "visible" : "hidden"}
+            transition={{ delay: reduced ? 0 : 0.05 }}
+            style={{
+              fontFamily: "DM Sans, system-ui, sans-serif",
+              fontSize: 10,
+              color: "#888888",
+              letterSpacing: "3px",
+              textTransform: "uppercase",
+              fontWeight: 600,
+              margin: 0,
+              marginBottom: 8,
+            }}
+          >
+            VAM — Viera Amber Masterclass
+          </motion.p>
+
           <motion.h2
             variants={headerVariants}
             initial="hidden"
