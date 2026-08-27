@@ -162,7 +162,7 @@ export default function VivaLaunchModal() {
   const close = () => setOpen(false);
 
   const preOrderMessage =
-    "Hi VIVA! I'd like to pre-order from the Batya collection ahead of launch and lock in the 20% pre-order discount.";
+    "Hi VIVA! I'd like to pre-order from the Batya collection ahead of launch and lock in the 5% pre-order discount.";
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -354,7 +354,7 @@ export default function VivaLaunchModal() {
               )}
 
               <p style={{ fontFamily: SANS, fontSize: 14, color: DARK_TEXT, margin: "0 0 14px 0", lineHeight: 1.6 }}>
-                Pre-order to enjoy <strong style={{ color: BURGUNDY }}>20% off</strong>.
+                Pre-order to enjoy <strong style={{ color: BURGUNDY }}>5% off</strong>.
               </p>
 
               <a
@@ -397,7 +397,7 @@ export default function VivaLaunchModal() {
                           leaving someone who just signalled real interest
                           with nothing further to do but close the window. */}
                       <p style={{ fontFamily: SANS, fontSize: 12, color: "rgba(34,26,26,0.65)", margin: "8px 0 0 0", lineHeight: 1.6 }}>
-                        Want to lock in your size before launch? Pre-order above to enjoy 20% off now.
+                        Want to lock in your size before launch? Pre-order above to enjoy 5% off now.
                       </p>
                     </motion.div>
                   ) : (
