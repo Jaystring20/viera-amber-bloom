@@ -56,6 +56,28 @@ const Index = () => {
             className="flex flex-col items-center text-center mx-auto px-6"
             style={{ maxWidth: 560, gap: 20 }}
           >
+            {/* Names the arm before the headline describes it. "The commercial
+                engine of the ecosystem." reads as a claim about the ecosystem
+                as a whole unless something says VASH first — every other
+                section on this page is labelled, so this one being bare made
+                it the only block a visitor could not place. Matches the VAM
+                eyebrow (10px / 3px tracking / #888) so the two read as one
+                system. */}
+            <p
+              style={{
+                fontFamily: "DM Sans, system-ui, sans-serif",
+                fontSize: 10,
+                color: "#888888",
+                letterSpacing: "3px",
+                textTransform: "uppercase",
+                fontWeight: 600,
+                margin: 0,
+                marginBottom: -8,
+              }}
+            >
+              VASH — Viera Amber Shop
+            </p>
+
             <h2
               className="font-display"
               style={{
