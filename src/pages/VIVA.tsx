@@ -797,7 +797,7 @@ const VIVAPage = () => {
       // ultrawide, at the cost of a little more leg cropped at the bottom —
       // the cheaper thing to lose.
       focusDesktop: "center 28%",
-      alt: "Two models in the Batya Collection — pink and olive woven kimonos with wide-leg denim",
+      alt: "Two models in the Batya Collection — traditional patterned garments in studio styling",
     },
     {
       id: "product",
