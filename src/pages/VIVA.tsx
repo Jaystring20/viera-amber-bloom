@@ -1376,38 +1376,6 @@ const VIVAPage = () => {
               This is also the layer that carries the accessible description:
               the films above are decorative duplicates and are hidden from
               assistive tech. */}
-          <img
-            src="/viva/hero-fallback-1664.webp"
-            srcSet="/viva/hero-fallback-900.webp 900w, /viva/hero-fallback-1664.webp 1664w"
-            sizes="100vw"
-            alt="Two models in the Batya Collection — a pink woven kimono top and an olive striped kimono top, both with wide-leg pleated denim and gold jewellery."
-            fetchPriority="high"
-            decoding="async"
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              // Mirrors the loop film's desktop anchor (see HERO_FILMS) so the
-              // plate and the film it precedes crop the same way — no visible
-              // jump in framing the instant the video takes over.
-              objectPosition: isDesktop ? "center 28%" : "center 38%",
-              display: "block",
-              filter: heroFilmFilter,
-            }}
-            onError={e => {
-              // Last resort: if even the plate fails, fall back to the JPEG
-              // rather than exposing burgundy with a broken-image glyph.
-              const img = e.currentTarget;
-              if (!img.dataset.fallbackTried) {
-                img.dataset.fallbackTried = "1";
-                img.srcset = "";
-                img.src = "/viva/hero-fallback.jpg";
-              }
-            }}
-          />
-
           {HERO_FILMS.map((film, i) => (
             <video
               key={film.id}
