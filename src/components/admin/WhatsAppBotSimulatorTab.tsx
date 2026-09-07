@@ -144,13 +144,19 @@ const WhatsAppBotSimulatorTab = () => {
       }
 
       // Fetch matron's actual school_id from database
-      const { data: matronData } = await supabase
+      const { data: matronData, error: matronError } = await supabase
         .from("teachers_matrons")
-        .select("school_id")
+        .select("id, name, phone, school_id")
         .eq("phone", phone)
         .single();
 
+      if (matronError) {
+        console.error("[Bot Simulator] Error fetching matron:", matronError);
+      }
+
+      console.log("[Bot Simulator] Matron data:", matronData);
       const schoolId = matronData?.school_id || "default-test-school";
+      console.log("[Bot Simulator] Using schoolId:", schoolId);
 
       // Execute command with matron's school
       const response = await executeCommand(command, phone, schoolId);
