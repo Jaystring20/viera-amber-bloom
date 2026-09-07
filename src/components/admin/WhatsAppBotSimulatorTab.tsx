@@ -143,8 +143,17 @@ const WhatsAppBotSimulatorTab = () => {
         return;
       }
 
-      // Execute command (with fake schoolId for testing)
-      const response = await executeCommand(command, phone, "default-test-school");
+      // Fetch matron's actual school_id from database
+      const { data: matronData } = await supabase
+        .from("teachers_matrons")
+        .select("school_id")
+        .eq("phone", phone)
+        .single();
+
+      const schoolId = matronData?.school_id || "default-test-school";
+
+      // Execute command with matron's school
+      const response = await executeCommand(command, phone, schoolId);
 
       // Add bot response
       setChatMessages((prev) => [

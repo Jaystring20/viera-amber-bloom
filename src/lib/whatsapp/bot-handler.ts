@@ -108,11 +108,11 @@ async function handleCheckId(
   schoolId?: string
 ): Promise<BotResponse> {
   try {
-    // Query student by ID
+    // Query student by ID (using vagin_students table)
     let query = supabase
-      .from('students')
+      .from('vagin_students')
       .select(
-        'id, first_name, last_name, school_id, balance_ngn, free_pads_used'
+        'id, name, school_id, balance_ngn, free_pads_used'
       );
 
     if (schoolId) {
@@ -134,9 +134,9 @@ async function handleCheckId(
 
     return {
       success: true,
-      message: `📊 Student: ${student.first_name} ${student.last_name}\nBalance: ₦${balance.toLocaleString('en-NG')}\nFree pads: ${freePadsRemaining}/1 remaining`,
+      message: `📊 Student: ${student.name}\nBalance: ₦${balance.toLocaleString('en-NG')}\nFree pads: ${freePadsRemaining}/1 remaining`,
       data: {
-        name: `${student.first_name} ${student.last_name}`,
+        name: student.name,
         balance,
         freePadsRemaining,
         studentId,
@@ -160,10 +160,10 @@ async function handleIssuePad(
   matronPhone?: string
 ): Promise<BotResponse> {
   try {
-    // Get student
+    // Get student (using vagin_students table)
     let query = supabase
-      .from('students')
-      .select('id, first_name, school_id, balance_ngn, free_pads_used');
+      .from('vagin_students')
+      .select('id, name, school_id, balance_ngn, free_pads_used');
 
     if (schoolId) {
       query = query.eq('school_id', schoolId);
@@ -187,7 +187,7 @@ async function handleIssuePad(
     if (padType === 'FREE' && (student.free_pads_used || 0) >= 1) {
       return {
         success: false,
-        message: `❌ Cannot issue free pad to ${student.first_name}.\nFree pads used: ${student.free_pads_used}/1\nShe must pay ₦200 for the next pad.`,
+        message: `❌ Cannot issue free pad to ${student.name}.\nFree pads used: ${student.free_pads_used}/1\nShe must pay ₦200 for the next pad.`,
       };
     }
 
@@ -234,9 +234,9 @@ async function handleIssuePad(
 
     return {
       success: true,
-      message: `✓ Pad issued to ${student.first_name}\nType: ${padType === 'FREE' ? 'Free' : '₦200'}\nNew balance: ₦${newBalance.toLocaleString('en-NG')}\nFree pads remaining: ${Math.max(0, 1 - newFreeUsed)}/1`,
+      message: `✓ Pad issued to ${student.name}\nType: ${padType === 'FREE' ? 'Free' : '₦200'}\nNew balance: ₦${newBalance.toLocaleString('en-NG')}\nFree pads remaining: ${Math.max(0, 1 - newFreeUsed)}/1`,
       data: {
-        studentName: student.first_name,
+        studentName: student.name,
         padType,
         newBalance,
         freePadsRemaining: Math.max(0, 1 - newFreeUsed),
