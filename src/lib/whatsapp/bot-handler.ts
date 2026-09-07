@@ -66,36 +66,23 @@ export async function executeCommand(
   schoolId?: string
 ): Promise<BotResponse> {
   try {
-    // If schoolId not provided, try to fetch from matron's record
-    let effectiveSchoolId = schoolId;
-    if (!effectiveSchoolId) {
-      const { data: matron } = await supabase
-        .from('teachers_matrons')
-        .select('school_id')
-        .eq('phone', fromPhone)
-        .single();
-
-      effectiveSchoolId = matron?.school_id || undefined;
-      console.log('[Bot Handler] Fetched matron school_id:', effectiveSchoolId, 'from phone:', fromPhone);
-    }
-
     switch (command.type) {
       case 'CHECK_ID':
-        return await handleCheckId(command.studentId, effectiveSchoolId);
+        return await handleCheckId(command.studentId);
 
       case 'ISSUE_PAD':
         return await handleIssuePad(
           command.studentId,
           command.padType,
-          effectiveSchoolId,
+          schoolId,
           fromPhone
         );
 
       case 'DEPOSIT':
-        return await handleDeposit(command.amount, effectiveSchoolId, fromPhone);
+        return await handleDeposit(command.amount, schoolId, fromPhone);
 
       case 'REPORT':
-        return await handleReport(command.reportType, effectiveSchoolId, fromPhone);
+        return await handleReport(command.reportType, schoolId, fromPhone);
 
       default:
         return {
@@ -121,49 +108,11 @@ async function handleCheckId(
   schoolId?: string
 ): Promise<BotResponse> {
   try {
-    console.log('[handleCheckId] Looking up student:', studentId, 'with schoolId:', schoolId);
-
-    // Query student by ID (using vagin_students table)
-    let query = supabase
+    // Query student by ID globally (student IDs are unique across all schools)
+    const { data: students, error } = await supabase
       .from('vagin_students')
-      .select(
-        'id, name, school_id, balance_ngn, free_pads_used'
-      );
-
-    if (schoolId) {
-      query = query.eq('school_id', schoolId);
-    }
-
-    const { data: students, error } = await query.eq('student_id', studentId);
-
-    console.log('[handleCheckId] Query result:', { error, studentCount: students?.length });
-
-    // If no student found and schoolId was provided, try searching without school_id filter
-    if ((error || !students || students.length === 0) && schoolId) {
-      console.log('[handleCheckId] Student not found in school', schoolId, '- trying global search');
-      const { data: globalStudents } = await supabase
-        .from('vagin_students')
-        .select('id, name, school_id, balance_ngn, free_pads_used')
-        .eq('student_id', studentId);
-
-      if (globalStudents && globalStudents.length > 0) {
-        console.log('[handleCheckId] Found student globally:', globalStudents[0]);
-        const student = globalStudents[0];
-        const freePadsRemaining = Math.max(0, 1 - (student.free_pads_used || 0));
-        const balance = student.balance_ngn || 0;
-
-        return {
-          success: true,
-          message: `📊 Student: ${student.name}\nBalance: ₦${balance.toLocaleString('en-NG')}\nFree pads: ${freePadsRemaining}/1 remaining`,
-          data: {
-            name: student.name,
-            balance,
-            freePadsRemaining,
-            studentId,
-          },
-        };
-      }
-    }
+      .select('id, name, school_id, balance_ngn, free_pads_used')
+      .eq('student_id', studentId);
 
     if (error || !students || students.length === 0) {
       return {
