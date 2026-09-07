@@ -1,0 +1,454 @@
+/**
+ * WhatsApp Webhook Handler
+ * ═════════════════════════════════════════════════════════════════
+ * Supabase Edge Function receiving WhatsApp messages from Meta.
+ * Deployed at: https://vagin.vieraamber.com/api/whatsapp/webhook
+ *
+ * Verifies webhook authenticity, parses messages, executes bot commands,
+ * and sends responses back via WhatsApp API.
+ */
+
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
+import * as crypto from "https://deno.land/std@0.208.0/crypto/mod.ts";
+
+const WEBHOOK_VERIFY_TOKEN = Deno.env.get("WHATSAPP_WEBHOOK_TOKEN") || "pad_kolo_webhook_2026_secure";
+const ACCESS_TOKEN = Deno.env.get("WHATSAPP_ACCESS_TOKEN");
+const PHONE_NUMBER_ID = Deno.env.get("VITE_WHATSAPP_PHONE_ID");
+const APP_SECRET = Deno.env.get("VITE_WHATSAPP_APP_SECRET");
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY");
+
+const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!);
+
+interface WebhookPayload {
+  object?: string;
+  entry?: Array<{
+    id: string;
+    changes: Array<{
+      value: {
+        messaging_product?: string;
+        metadata?: {
+          display_phone_number: string;
+          phone_number_id: string;
+        };
+        messages?: Array<{
+          from: string;
+          id: string;
+          timestamp: string;
+          text?: { body: string };
+          type: string;
+        }>;
+        statuses?: Array<{
+          id: string;
+          status: string;
+          timestamp: string;
+        }>;
+      };
+      field: string;
+    }>;
+  }>;
+}
+
+/**
+ * Verify webhook authenticity using HMAC-SHA256
+ */
+function verifyWebhookSignature(
+  payload: string,
+  signature: string
+): boolean {
+  try {
+    const hash = crypto
+      .createHmacSha256(new TextEncoder().encode(APP_SECRET!))
+      .update(new TextEncoder().encode(payload))
+      .digest("hex");
+
+    const expectedSignature = `sha256=${hash}`;
+    return signature === expectedSignature;
+  } catch (err) {
+    console.error("[Webhook] Verification error:", err);
+    return false;
+  }
+}
+
+/**
+ * Parse command from text
+ */
+function parseCommand(text: string): { type: string; data: Record<string, unknown> } | null {
+  const normalized = text.trim().toUpperCase();
+
+  // CHECK ID FAADSS2
+  const checkMatch = normalized.match(/^CHECK\s+ID\s+([A-Z0-9-]+)$/);
+  if (checkMatch) {
+    return { type: "CHECK_ID", data: { studentId: checkMatch[1] } };
+  }
+
+  // ISSUE PAD FAADSS2 FREE
+  const issueMatch = normalized.match(/^ISSUE\s+PAD\s+([A-Z0-9-]+)\s+(FREE|PAID)$/);
+  if (issueMatch) {
+    return {
+      type: "ISSUE_PAD",
+      data: { studentId: issueMatch[1], padType: issueMatch[2] },
+    };
+  }
+
+  // DEPOSIT 1000
+  const depositMatch = normalized.match(/^DEPOSIT\s+(\d+)$/);
+  if (depositMatch) {
+    return { type: "DEPOSIT", data: { amount: parseInt(depositMatch[1]) } };
+  }
+
+  // REPORT DAILY
+  const reportMatch = normalized.match(/^REPORT\s+(DAILY|CYCLE)$/);
+  if (reportMatch) {
+    return { type: "REPORT", data: { reportType: reportMatch[1] } };
+  }
+
+  return null;
+}
+
+/**
+ * Get matron/school info from phone number
+ */
+async function getMatronSchool(
+  fromPhone: string
+): Promise<{ schoolId: string; matronName: string } | null> {
+  try {
+    const { data, error } = await supabase
+      .from("teachers_matrons")
+      .select("school_id, name")
+      .eq("phone", fromPhone.replace(/^\+/, ""))
+      .single();
+
+    if (error || !data) {
+      console.log(`[Webhook] Matron not found for phone: ${fromPhone}`);
+      return null;
+    }
+
+    return { schoolId: data.school_id, matronName: data.name };
+  } catch (err) {
+    console.error("[Webhook] Error fetching matron:", err);
+    return null;
+  }
+}
+
+/**
+ * Send response via WhatsApp API
+ */
+async function sendWhatsAppMessage(
+  toPhone: string,
+  message: string
+): Promise<boolean> {
+  try {
+    const response = await fetch(
+      `https://graph.instagram.com/v19.0/${PHONE_NUMBER_ID}/messages`,
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${ACCESS_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messaging_product: "whatsapp",
+          recipient_type: "individual",
+          to: toPhone,
+          type: "text",
+          text: { preview_url: false, body: message },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error(`[Webhook] Send message failed: ${error}`);
+      return false;
+    }
+
+    console.log(`[Webhook] Message sent to ${toPhone}`);
+    return true;
+  } catch (err) {
+    console.error("[Webhook] Send message error:", err);
+    return false;
+  }
+}
+
+/**
+ * Execute bot command
+ */
+async function executeCommand(
+  command: { type: string; data: Record<string, unknown> },
+  schoolId: string,
+  fromPhone: string
+): Promise<string> {
+  try {
+    switch (command.type) {
+      case "CHECK_ID": {
+        const studentId = command.data.studentId as string;
+        const { data: students, error } = await supabase
+          .from("students")
+          .select("id, first_name, last_name, balance_ngn, free_pads_used")
+          .eq("school_id", schoolId)
+          .eq("student_id", studentId)
+          .single();
+
+        if (error || !students) {
+          return `❌ Student ID "${studentId}" not found.`;
+        }
+
+        const freePadsRemaining = Math.max(0, 1 - (students.free_pads_used || 0));
+        const balance = students.balance_ngn || 0;
+
+        return `📊 Student: ${students.first_name} ${students.last_name}\nBalance: ₦${balance.toLocaleString("en-NG")}\nFree pads: ${freePadsRemaining}/1 remaining`;
+      }
+
+      case "ISSUE_PAD": {
+        const studentId = command.data.studentId as string;
+        const padType = command.data.padType as string;
+
+        const { data: students, error: studentError } = await supabase
+          .from("students")
+          .select("id, first_name, balance_ngn, free_pads_used")
+          .eq("school_id", schoolId)
+          .eq("student_id", studentId)
+          .single();
+
+        if (studentError || !students) {
+          return `❌ Student ID "${studentId}" not found.`;
+        }
+
+        // Check free pad quota
+        if (padType === "FREE" && (students.free_pads_used || 0) >= 1) {
+          return `❌ Cannot issue free pad to ${students.first_name}.\nFree pads used: ${students.free_pads_used}/1\nShe must pay ₦200 for the next pad.`;
+        }
+
+        // Record transaction
+        const { error: txError } = await supabase
+          .from("pad_transactions")
+          .insert({
+            student_id: students.id,
+            school_id: schoolId,
+            transaction_type: padType === "FREE" ? "free_pad" : "paid_pad",
+            quantity: 1,
+            paid_amount: padType === "PAID" ? 200 : null,
+            issued_date: new Date().toISOString().split("T")[0],
+            issued_by: `WhatsApp Bot (${fromPhone})`,
+          });
+
+        if (txError) {
+          return `⚠️ Error recording pad: ${txError.message}`;
+        }
+
+        // Update student
+        const newBalance = padType === "PAID" ? Math.max(0, students.balance_ngn - 200) : students.balance_ngn;
+        const newFreeUsed = (students.free_pads_used || 0) + (padType === "FREE" ? 1 : 0);
+
+        await supabase
+          .from("students")
+          .update({
+            balance_ngn: newBalance,
+            free_pads_used: newFreeUsed,
+          })
+          .eq("id", students.id);
+
+        return `✓ Pad issued to ${students.first_name}\nType: ${padType === "FREE" ? "Free" : "₦200"}\nNew balance: ₦${newBalance.toLocaleString("en-NG")}\nFree pads remaining: ${Math.max(0, 1 - newFreeUsed)}/1`;
+      }
+
+      case "DEPOSIT": {
+        const amount = command.data.amount as number;
+
+        const { data: school } = await supabase
+          .from("schools")
+          .select("name, current_balance")
+          .eq("id", schoolId)
+          .single();
+
+        const schoolName = school?.name || "School";
+        const previousBalance = school?.current_balance || 0;
+
+        // Record deposit
+        await supabase
+          .from("pad_transactions")
+          .insert({
+            school_id: schoolId,
+            transaction_type: "deposit",
+            pads_issued: 0,
+            amount_ngn: amount,
+            source: "matron_deposit",
+            notes: `Via WhatsApp from ${fromPhone}`,
+          });
+
+        // Update school balance
+        const newBalance = previousBalance + amount;
+        await supabase
+          .from("schools")
+          .update({ current_balance: newBalance })
+          .eq("id", schoolId);
+
+        return `✓ Deposit recorded\nAmount: ₦${amount.toLocaleString("en-NG")}\nSchool: ${schoolName}\nNew balance: ₦${newBalance.toLocaleString("en-NG")}`;
+      }
+
+      case "REPORT": {
+        const reportType = command.data.reportType as string;
+        const today = new Date().toISOString().split("T")[0];
+
+        let query = supabase
+          .from("pad_transactions")
+          .select("transaction_type, quantity, paid_amount")
+          .eq("school_id", schoolId);
+
+        if (reportType === "DAILY") {
+          query = query.eq("issued_date", today);
+        }
+
+        const { data: transactions } = await query;
+
+        const freeIssued = transactions?.filter((t) => t.transaction_type === "free_pad").length || 0;
+        const paidIssued = transactions?.filter((t) => t.transaction_type === "paid_pad").length || 0;
+        const revenue =
+          transactions
+            ?.filter((t) => t.transaction_type === "paid_pad")
+            .reduce((sum: number, t: any) => sum + (t.paid_amount || 0), 0) || 0;
+
+        const totalPads = freeIssued + paidIssued;
+
+        return reportType === "DAILY"
+          ? `📈 Today's Report\nPads issued: ${totalPads}\nFree: ${freeIssued}\nPaid: ${paidIssued}\nRevenue: ₦${revenue.toLocaleString("en-NG")}`
+          : `📊 Cycle Report\nTotal pads issued: ${totalPads}\nRevenue: ₦${revenue.toLocaleString("en-NG")}`;
+      }
+
+      default:
+        return "❌ Command not recognized.\n\nTry: CHECK ID [student_id]\nISSUE PAD [student_id] [FREE|PAID]\nDEPOSIT [amount]\nREPORT [DAILY|CYCLE]";
+    }
+  } catch (err) {
+    console.error("[Webhook] Command execution error:", err);
+    return "⚠️ System error. Please try again later.";
+  }
+}
+
+/**
+ * Handle webhook GET (verification)
+ */
+function handleVerification(
+  verifyToken: string,
+  challenge: string
+): { statusCode: number; body: string } {
+  if (verifyToken === WEBHOOK_VERIFY_TOKEN) {
+    console.log("[Webhook] Verification successful");
+    return { statusCode: 200, body: challenge };
+  }
+
+  console.warn("[Webhook] Invalid verification token");
+  return { statusCode: 403, body: "Forbidden" };
+}
+
+/**
+ * Handle webhook POST (message)
+ */
+async function handleMessage(
+  payload: WebhookPayload,
+  signature: string
+): Promise<{ statusCode: number; body: string }> {
+  // Verify signature
+  const payloadString = JSON.stringify(payload);
+  if (!verifyWebhookSignature(payloadString, signature)) {
+    console.warn("[Webhook] Invalid signature");
+    return { statusCode: 403, body: "Forbidden" };
+  }
+
+  // Parse message
+  if (!payload.entry || payload.entry.length === 0) {
+    console.log("[Webhook] No entries in payload");
+    return { statusCode: 200, body: "ok" };
+  }
+
+  const entry = payload.entry[0];
+  if (!entry.changes || entry.changes.length === 0) {
+    return { statusCode: 200, body: "ok" };
+  }
+
+  const change = entry.changes[0];
+  const value = change.value;
+
+  // Skip status updates
+  if (!value.messages || value.messages.length === 0) {
+    console.log("[Webhook] No messages (likely a status update)");
+    return { statusCode: 200, body: "ok" };
+  }
+
+  const message = value.messages[0];
+  const fromPhone = message.from;
+  const messageText = message.text?.body;
+
+  if (!messageText) {
+    console.log("[Webhook] No text body");
+    return { statusCode: 200, body: "ok" };
+  }
+
+  console.log(`[Webhook] Message from ${fromPhone}: ${messageText}`);
+
+  // Get matron/school
+  const matronSchool = await getMatronSchool(fromPhone);
+  if (!matronSchool) {
+    await sendWhatsAppMessage(
+      fromPhone,
+      "❌ You are not registered as a PAD KÓLÓ matron. Please contact your administrator."
+    );
+    return { statusCode: 200, body: "ok" };
+  }
+
+  // Parse command
+  const command = parseCommand(messageText);
+  if (!command) {
+    await sendWhatsAppMessage(
+      fromPhone,
+      "❌ Command not recognized.\n\nTry:\nCHECK ID [student_id]\nISSUE PAD [student_id] [FREE|PAID]\nDEPOSIT [amount]\nREPORT [DAILY|CYCLE]"
+    );
+    return { statusCode: 200, body: "ok" };
+  }
+
+  // Execute command
+  const response = await executeCommand(command, matronSchool.schoolId, fromPhone);
+
+  // Send response
+  await sendWhatsAppMessage(fromPhone, response);
+
+  return { statusCode: 200, body: "ok" };
+}
+
+/**
+ * Main handler
+ */
+export default async (
+  req: Request,
+  res: any
+): Promise<void | Response> => {
+  console.log(`[Webhook] ${req.method} request received`);
+
+  try {
+    // Handle GET (verification)
+    if (req.method === "GET") {
+      const url = new URL(req.url);
+      const verifyToken = url.searchParams.get("hub.verify_token") || "";
+      const challenge = url.searchParams.get("hub.challenge") || "";
+
+      const result = handleVerification(verifyToken, challenge);
+      res.status(result.statusCode).send(result.body);
+      return;
+    }
+
+    // Handle POST (message)
+    if (req.method === "POST") {
+      const signature = req.headers.get("x-hub-signature-256") || "";
+      const payload = await req.json() as WebhookPayload;
+
+      const result = await handleMessage(payload, signature);
+      res.status(result.statusCode).json({ message: result.body });
+      return;
+    }
+
+    // Unsupported method
+    res.status(405).json({ error: "Method not allowed" });
+  } catch (err) {
+    console.error("[Webhook] Handler error:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

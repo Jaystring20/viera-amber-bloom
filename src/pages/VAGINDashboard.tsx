@@ -11,6 +11,7 @@ import {
 import GalleryAdminTab from "@/components/admin/GalleryAdminTab";
 import VAGINImagesAdminTab from "@/components/admin/VAGINImagesAdminTab";
 import BotActivityTab from "@/components/admin/BotActivityTab";
+import WhatsAppBotSimulatorTab from "@/components/admin/WhatsAppBotSimulatorTab";
 
 const PINK   = "#ED155D";
 const PURPLE = "#62017F";
@@ -848,6 +849,12 @@ const VAGINDashboard = () => {
                   </div>
                 </Card>
                 {infoBox(<><strong>Product Management:</strong> Use the dedicated Products Dashboard to create and manage all VIVA garments and prints. Changes sync in real-time to the storefront.</>, "#D97706")}
+              </motion.div>
+            )}
+
+            {activeTab === "bot" && (
+              <motion.div key="bot" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+                <WhatsAppBotSimulatorTab />
               </motion.div>
             )}
 
