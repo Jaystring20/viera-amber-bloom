@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- VaginART modules (curriculum content)
 CREATE TABLE IF NOT EXISTS vaginart_modules (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   description TEXT,
   topic TEXT NOT NULL CHECK (topic IN ('puberty', 'hygiene', 'safety', 'mental_health')),
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS vaginart_modules (
 
 -- User module progress tracking
 CREATE TABLE IF NOT EXISTS user_module_progress (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   module_id UUID NOT NULL REFERENCES vaginart_modules(id) ON DELETE CASCADE,
   completed BOOLEAN DEFAULT false,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS user_module_progress (
 
 -- PAD KOLO tracking (menstrual health & micro-savings)
 CREATE TABLE IF NOT EXISTS pad_kolo_tracking (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   girl_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   school_id UUID,
   pads_received INTEGER DEFAULT 0,
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS sponsor_profiles (
 
 -- Sponsorship links (which girls each sponsor supports)
 CREATE TABLE IF NOT EXISTS sponsorships (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   sponsor_id UUID NOT NULL REFERENCES sponsor_profiles(id) ON DELETE CASCADE,
   girl_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   monthly_contribution DECIMAL(10, 2),
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS sponsorships (
 
 -- Impact stories
 CREATE TABLE IF NOT EXISTS impact_stories (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   girl_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
   story_text TEXT NOT NULL,
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS impact_stories (
 
 -- Resources library (downloadable materials)
 CREATE TABLE IF NOT EXISTS resources (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   description TEXT,
   resource_type TEXT CHECK (resource_type IN ('guide', 'worksheet', 'infographic', 'video', 'article')),
@@ -155,7 +155,7 @@ CREATE POLICY "Users can view their own module progress"
 -- Girls can update their own progress
 CREATE POLICY "Users can update their own module progress"
   ON user_module_progress FOR INSERT
-  USING (auth.uid() = user_id);
+  WITH CHECK (auth.uid() = user_id);
 
 -- Girls can view their own PAD KOLO tracking
 CREATE POLICY "Girls can view their own pad kolo data"
