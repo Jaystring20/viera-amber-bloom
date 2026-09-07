@@ -440,10 +440,23 @@ const VAGINDashboard = () => {
     e.preventDefault(); setSaving(true);
     try {
       const payload = { name: matronForm.name, phone: matronForm.phone, school_id: matronForm.school_id || null, active: matronForm.active };
-      const { error } = matronForm.id
-        ? await supabase.from("vagin_matrons").update(payload).eq("id", matronForm.id)
-        : await supabase.from("vagin_matrons").insert(payload);
-      if (error) throw error;
+
+      // Save to vagin_matrons (dashboard table)
+      const { error: error1, data: savedData } = matronForm.id
+        ? await supabase.from("vagin_matrons").update(payload).eq("id", matronForm.id).select()
+        : await supabase.from("vagin_matrons").insert(payload).select();
+
+      if (error1) throw error1;
+
+      // Also sync to teachers_matrons (bot lookup table)
+      const matronId = matronForm.id || savedData?.[0]?.id;
+      if (matronId) {
+        const { error: error2 } = matronForm.id
+          ? await supabase.from("teachers_matrons").update(payload).eq("id", matronId)
+          : await supabase.from("teachers_matrons").insert({ id: matronId, ...payload });
+        if (error2) console.warn("Warning: could not sync to teachers_matrons", error2);
+      }
+
       showToast(matronForm.id ? "Matron updated" : "Matron added");
       closeModal(); await fetchData();
     } catch (err) { showToast(err instanceof Error ? err.message : "Error", "error"); }
@@ -491,6 +504,12 @@ const VAGINDashboard = () => {
     try {
       const { error } = await supabase.from(deleteTarget.table as any).delete().eq("id", deleteTarget.id);
       if (error) throw error;
+
+      // If deleting a matron, also delete from teachers_matrons
+      if (deleteTarget.table === "vagin_matrons") {
+        await supabase.from("teachers_matrons").delete().eq("id", deleteTarget.id);
+      }
+
       showToast(`Deleted "${deleteTarget.label}"`);
       closeModal(); setDeleteTarget(null); await fetchData();
     } catch (err) { showToast(err instanceof Error ? err.message : "Error", "error"); }
