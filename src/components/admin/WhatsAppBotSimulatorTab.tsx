@@ -71,11 +71,13 @@ const WhatsAppBotSimulatorTab = () => {
   const [sending, setSending] = useState(false);
   const [messageLog, setMessageLog] = useState<SimulatedMessage[]>([]);
   const [showHelp, setShowHelp] = useState(true);
+  const [loadingMatrons, setLoadingMatrons] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Load matrons on mount
-  useEffect(() => {
-    const loadMatrons = async () => {
+  // Load matrons from database
+  const loadMatrons = useCallback(async () => {
+    setLoadingMatrons(true);
+    try {
       const { data } = await supabase
         .from("teachers_matrons")
         .select("id, name, phone")
@@ -83,9 +85,17 @@ const WhatsAppBotSimulatorTab = () => {
         .order("name");
       if (data) {
         setMatrons(data);
-        if (data.length > 0) setSelectedPhone(data[0].phone);
+        if (data.length > 0 && !selectedPhone) setSelectedPhone(data[0].phone);
       }
-    };
+    } catch (err) {
+      console.error("Error loading matrons:", err);
+    } finally {
+      setLoadingMatrons(false);
+    }
+  }, [selectedPhone]);
+
+  // Load matrons on mount
+  useEffect(() => {
     loadMatrons();
   }, []);
 
@@ -182,7 +192,32 @@ const WhatsAppBotSimulatorTab = () => {
 
           {/* Matron Selection */}
           <div style={{ marginBottom: 12 }}>
-            <label style={{ ...labelSx, marginBottom: 6 }}>Select matron or enter phone</label>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+              <label style={labelSx}>Select matron or enter phone</label>
+              <button
+                onClick={() => loadMatrons()}
+                disabled={loadingMatrons}
+                style={{
+                  background: "rgba(237, 21, 93, 0.2)",
+                  border: "1px solid rgba(237, 21, 93, 0.5)",
+                  borderRadius: 6,
+                  padding: "4px 8px",
+                  color: PINK,
+                  cursor: loadingMatrons ? "not-allowed" : "pointer",
+                  opacity: loadingMatrons ? 0.5 : 1,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                  fontSize: 11,
+                  fontFamily: "DM Sans, system-ui, sans-serif",
+                  transition: "all 0.2s ease",
+                }}
+                title="Refresh matrons list from database"
+              >
+                <RefreshCw size={11} style={{ transform: loadingMatrons ? "rotate(360deg)" : "rotate(0deg)", transition: "transform 0.3s linear" }} />
+                Refresh
+              </button>
+            </div>
             <select
               style={inputSx}
               value={selectedPhone}
