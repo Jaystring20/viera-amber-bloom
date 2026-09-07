@@ -200,15 +200,17 @@ async function handleIssuePad(
       };
     }
 
-    // Record transaction
+    // Record transaction in vagin_transactions table
     const { error: transactionError } = await supabase
-      .from('pad_transactions')
+      .from('vagin_transactions')
       .insert({
         student_id: student.id,
         school_id: student.school_id,
         transaction_type: padType === 'FREE' ? 'free_pad' : 'paid_pad',
-        quantity: 1,
+        pads_issued: 1,
         paid_amount: padType === 'PAID' ? 200 : null,
+        amount_ngn: padType === 'PAID' ? 200 : null,
+        source: 'whatsapp_bot',
         issued_date: new Date().toISOString().split('T')[0],
         issued_by: matronPhone || 'WhatsApp Bot',
         notes: 'Issued via WhatsApp bot',
@@ -221,13 +223,13 @@ async function handleIssuePad(
       };
     }
 
-    // Update student balance and free pads count
+    // Update student balance and free pads count in vagin_students table
     const newBalance =
       padType === 'PAID' ? Math.max(0, student.balance_ngn - 200) : student.balance_ngn;
     const newFreeUsed = (student.free_pads_used || 0) + (padType === 'FREE' ? 1 : 0);
 
     const { error: updateError } = await supabase
-      .from('students')
+      .from('vagin_students')
       .update({
         balance_ngn: newBalance,
         free_pads_used: newFreeUsed,
@@ -277,7 +279,7 @@ async function handleDeposit(
 
     // Get school for context
     const { data: school } = await supabase
-      .from('schools')
+      .from('vagin_schools')
       .select('name, current_balance')
       .eq('id', schoolId)
       .single();
@@ -285,9 +287,9 @@ async function handleDeposit(
     const schoolName = school?.name || 'Unknown School';
     const previousBalance = school?.current_balance || 0;
 
-    // Record deposit in transactions
+    // Record deposit in vagin_transactions
     const { error } = await supabase
-      .from('pad_transactions')
+      .from('vagin_transactions')
       .insert({
         school_id: schoolId,
         transaction_type: 'deposit',
@@ -304,10 +306,10 @@ async function handleDeposit(
       };
     }
 
-    // Update school balance
+    // Update school balance in vagin_schools
     const newBalance = previousBalance + amount;
     await supabase
-      .from('schools')
+      .from('vagin_schools')
       .update({ current_balance: newBalance })
       .eq('id', schoolId);
 
@@ -346,10 +348,10 @@ async function handleReport(
 
     const today = new Date().toISOString().split('T')[0];
 
-    // Get today's transactions
+    // Get today's transactions from vagin_transactions
     let query = supabase
-      .from('pad_transactions')
-      .select('transaction_type, quantity, paid_amount')
+      .from('vagin_transactions')
+      .select('transaction_type, pads_issued, paid_amount, amount_ngn')
       .eq('school_id', schoolId);
 
     if (reportType === 'DAILY') {
@@ -361,14 +363,14 @@ async function handleReport(
     const summary = {
       freeIssuedToday: transactions?.filter(
         (t) => t.transaction_type === 'free_pad'
-      ).length || 0,
+      ).reduce((sum, t) => sum + (t.pads_issued || 0), 0) || 0,
       paidIssuedToday: transactions?.filter(
         (t) => t.transaction_type === 'paid_pad'
-      ).length || 0,
+      ).reduce((sum, t) => sum + (t.pads_issued || 0), 0) || 0,
       revenueToday:
         transactions
           ?.filter((t) => t.transaction_type === 'paid_pad')
-          .reduce((sum, t) => sum + (t.paid_amount || 0), 0) || 0,
+          .reduce((sum, t) => sum + (t.amount_ngn || 0), 0) || 0,
     };
 
     const totalPads = summary.freeIssuedToday + summary.paidIssuedToday;
