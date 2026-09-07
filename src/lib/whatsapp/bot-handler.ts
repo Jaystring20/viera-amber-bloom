@@ -108,11 +108,27 @@ async function handleCheckId(
   schoolId?: string
 ): Promise<BotResponse> {
   try {
+    console.log(`[CHECK ID] Looking for student: ${studentId}`);
+
+    // First, check all students to diagnose the issue
+    const { data: allStudents, error: allError } = await supabase
+      .from('vagin_students')
+      .select('id, student_id, name, school_id, balance_ngn, free_pads_used')
+      .limit(100);
+
+    console.log(`[CHECK ID] All students in DB:`, {
+      count: allStudents?.length,
+      error: allError,
+      students: allStudents?.map(s => ({ student_id: s.student_id, name: s.name }))
+    });
+
     // Query student by ID globally (student IDs are unique across all schools)
     const { data: students, error } = await supabase
       .from('vagin_students')
       .select('id, name, school_id, balance_ngn, free_pads_used')
       .eq('student_id', studentId);
+
+    console.log(`[CHECK ID] Query result for "${studentId}":`, { count: students?.length, error, students });
 
     if (error || !students || students.length === 0) {
       return {
