@@ -9,7 +9,6 @@
  */
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
-import * as crypto from "https://deno.land/std@0.208.0/crypto/mod.ts";
 
 const WEBHOOK_VERIFY_TOKEN = Deno.env.get("WHATSAPP_WEBHOOK_TOKEN") || "pad_kolo_webhook_2026_secure";
 const ACCESS_TOKEN = Deno.env.get("WHATSAPP_ACCESS_TOKEN");
@@ -52,15 +51,26 @@ interface WebhookPayload {
 /**
  * Verify webhook authenticity using HMAC-SHA256
  */
-function verifyWebhookSignature(
+async function verifyWebhookSignature(
   payload: string,
   signature: string
-): boolean {
+): Promise<boolean> {
   try {
-    const hash = crypto
-      .createHmacSha256(new TextEncoder().encode(APP_SECRET!))
-      .update(new TextEncoder().encode(payload))
-      .digest("hex");
+    const encoder = new TextEncoder();
+    const keyBuffer = encoder.encode(APP_SECRET!);
+    const key = await crypto.subtle.importKey(
+      "raw",
+      keyBuffer,
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"]
+    );
+
+    const messageBuffer = encoder.encode(payload);
+    const hashBuffer = await crypto.subtle.sign("HMAC", key, messageBuffer);
+
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hash = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 
     const expectedSignature = `sha256=${hash}`;
     return signature === expectedSignature;
@@ -350,7 +360,7 @@ async function handleMessage(
 ): Promise<{ statusCode: number; body: string }> {
   // Verify signature
   const payloadString = JSON.stringify(payload);
-  if (!verifyWebhookSignature(payloadString, signature)) {
+  if (!(await verifyWebhookSignature(payloadString, signature))) {
     console.warn("[Webhook] Invalid signature");
     return { statusCode: 403, body: "Forbidden" };
   }
