@@ -184,8 +184,8 @@ async function executeCommand(
       case "CHECK_ID": {
         const studentId = command.data.studentId as string;
         const { data: students, error } = await supabase
-          .from("students")
-          .select("id, first_name, last_name, balance_ngn, free_pads_used")
+          .from("vagin_students")
+          .select("id, name, balance_ngn, free_pads_used")
           .eq("school_id", schoolId)
           .eq("student_id", studentId)
           .single();
@@ -197,7 +197,7 @@ async function executeCommand(
         const freePadsRemaining = Math.max(0, 1 - (students.free_pads_used || 0));
         const balance = students.balance_ngn || 0;
 
-        return `📊 Student: ${students.first_name} ${students.last_name}\nBalance: ₦${balance.toLocaleString("en-NG")}\nFree pads: ${freePadsRemaining}/1 remaining`;
+        return `📊 Student: ${students.name}\nBalance: ₦${balance.toLocaleString("en-NG")}\nFree pads: ${freePadsRemaining}/1 remaining`;
       }
 
       case "ISSUE_PAD": {
@@ -205,8 +205,8 @@ async function executeCommand(
         const padType = command.data.padType as string;
 
         const { data: students, error: studentError } = await supabase
-          .from("students")
-          .select("id, first_name, balance_ngn, free_pads_used")
+          .from("vagin_students")
+          .select("id, name, balance_ngn, free_pads_used")
           .eq("school_id", schoolId)
           .eq("student_id", studentId)
           .single();
@@ -217,18 +217,19 @@ async function executeCommand(
 
         // Check free pad quota
         if (padType === "FREE" && (students.free_pads_used || 0) >= 1) {
-          return `❌ Cannot issue free pad to ${students.first_name}.\nFree pads used: ${students.free_pads_used}/1\nShe must pay ₦200 for the next pad.`;
+          return `❌ Cannot issue free pad to ${students.name}.\nFree pads used: ${students.free_pads_used}/1\nShe must pay ₦200 for the next pad.`;
         }
 
         // Record transaction
         const { error: txError } = await supabase
-          .from("pad_transactions")
+          .from("vagin_transactions")
           .insert({
             student_id: students.id,
             school_id: schoolId,
             transaction_type: padType === "FREE" ? "free_pad" : "paid_pad",
-            quantity: 1,
-            paid_amount: padType === "PAID" ? 200 : null,
+            pads_issued: 1,
+            amount_ngn: padType === "PAID" ? 200 : null,
+            source: "whatsapp_bot",
             issued_date: new Date().toISOString().split("T")[0],
             issued_by: `WhatsApp Bot (${fromPhone})`,
           });
@@ -242,21 +243,21 @@ async function executeCommand(
         const newFreeUsed = (students.free_pads_used || 0) + (padType === "FREE" ? 1 : 0);
 
         await supabase
-          .from("students")
+          .from("vagin_students")
           .update({
             balance_ngn: newBalance,
             free_pads_used: newFreeUsed,
           })
           .eq("id", students.id);
 
-        return `✓ Pad issued to ${students.first_name}\nType: ${padType === "FREE" ? "Free" : "₦200"}\nNew balance: ₦${newBalance.toLocaleString("en-NG")}\nFree pads remaining: ${Math.max(0, 1 - newFreeUsed)}/1`;
+        return `✓ Pad issued to ${students.name}\nType: ${padType === "FREE" ? "Free" : "₦200"}\nNew balance: ₦${newBalance.toLocaleString("en-NG")}\nFree pads remaining: ${Math.max(0, 1 - newFreeUsed)}/1`;
       }
 
       case "DEPOSIT": {
         const amount = command.data.amount as number;
 
         const { data: school } = await supabase
-          .from("schools")
+          .from("vagin_schools")
           .select("name, current_balance")
           .eq("id", schoolId)
           .single();
@@ -266,7 +267,7 @@ async function executeCommand(
 
         // Record deposit
         await supabase
-          .from("pad_transactions")
+          .from("vagin_transactions")
           .insert({
             school_id: schoolId,
             transaction_type: "deposit",
@@ -279,7 +280,7 @@ async function executeCommand(
         // Update school balance
         const newBalance = previousBalance + amount;
         await supabase
-          .from("schools")
+          .from("vagin_schools")
           .update({ current_balance: newBalance })
           .eq("id", schoolId);
 
@@ -291,8 +292,8 @@ async function executeCommand(
         const today = new Date().toISOString().split("T")[0];
 
         let query = supabase
-          .from("pad_transactions")
-          .select("transaction_type, quantity, paid_amount")
+          .from("vagin_transactions")
+          .select("transaction_type, pads_issued, amount_ngn")
           .eq("school_id", schoolId);
 
         if (reportType === "DAILY") {
@@ -301,12 +302,12 @@ async function executeCommand(
 
         const { data: transactions } = await query;
 
-        const freeIssued = transactions?.filter((t) => t.transaction_type === "free_pad").length || 0;
-        const paidIssued = transactions?.filter((t) => t.transaction_type === "paid_pad").length || 0;
+        const freeIssued = transactions?.filter((t) => t.transaction_type === "free_pad").reduce((sum: number, t: any) => sum + (t.pads_issued || 0), 0) || 0;
+        const paidIssued = transactions?.filter((t) => t.transaction_type === "paid_pad").reduce((sum: number, t: any) => sum + (t.pads_issued || 0), 0) || 0;
         const revenue =
           transactions
             ?.filter((t) => t.transaction_type === "paid_pad")
-            .reduce((sum: number, t: any) => sum + (t.paid_amount || 0), 0) || 0;
+            .reduce((sum: number, t: any) => sum + (t.amount_ngn || 0), 0) || 0;
 
         const totalPads = freeIssued + paidIssued;
 
