@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Droplets, Palette, School as SchoolIcon, LogOut,
   TrendingUp, Users, BookOpen, Coins,
   AlertCircle, RefreshCw, Plus, Pencil, Trash2, X,
-  GraduationCap, ClipboardList, CheckCircle2, Images, Camera, ShoppingBag,
+  GraduationCap, ClipboardList, CheckCircle2, Images, Camera, ShoppingBag, PieChart,
 } from "lucide-react";
 import GalleryAdminTab from "@/components/admin/GalleryAdminTab";
 import VAGINImagesAdminTab from "@/components/admin/VAGINImagesAdminTab";
@@ -32,11 +32,20 @@ interface Savings      { id: string; school_id: string; month: string; contribut
 // every field read `undefined`, and `undefined.replace(...)` below crashed the
 // whole tab the instant it rendered a real row.
 interface TxRow        { id: string; student_id: string | null; school_id: string | null; transaction_type: string; pads_issued: number; amount_ngn: number | null; source: string; notes: string | null; issued_by: string | null; created_at: string; voided?: boolean; voided_reason?: string | null; flagged?: boolean }
+// Backed by the school_pad_economics DB view (see migration
+// 07_school_pad_economics.sql) — a real, server-side aggregate over EVERY
+// non-voided transaction for the school, not just the 100 most recent rows
+// fetchData() pulls for the Transactions tab. market_pad_price is the local
+// retail reference price (only Nigeria's ₦700, from the project brief, is
+// known right now); null means that country's real local price hasn't been
+// confirmed yet, so "value"/"saved" can't be computed for it — never guessed.
+interface SchoolEconomics { school_id: string; school_name: string; country: string; market_pad_price: number | null; currency_symbol: string | null; free_pads: number; paid_pads: number; paid_amount_collected: number; girls_reached: number }
 
 interface DashData {
   schools: SchoolRow[]; students: Student[]; matrons: Matron[];
   distributions: Distribution[]; sessions: Session[];
   savings: Savings[]; transactions: TxRow[]; countryConfigs: CountryConfig[];
+  schoolEconomics: SchoolEconomics[];
 }
 
 // ── Maps ───────────────────────────────────────────────────────────────────────
@@ -171,6 +180,41 @@ const BarChart = ({ data, color }: { data: { label: string; value: number }[]; c
           <span style={{ fontSize: 9, color: "rgba(250,250,250,0.4)", whiteSpace: "nowrap" }}>{d.label}</span>
         </div>
       ))}
+    </div>
+  );
+};
+
+// ── StackedBarChart ────────────────────────────────────────────────────────────
+// One bar per school, split into two segments (e.g. paid-by-students vs
+// subsidized-by-VAGIN) so the funding split per school is visible at a
+// glance — the transparency view this whole tab exists for.
+const StackedBarChart = ({ data, colorA, colorB, labelA, labelB }: { data: { label: string; a: number; b: number }[]; colorA: string; colorB: string; labelA: string; labelB: string }) => {
+  const max = Math.max(...data.map(d => d.a + d.b), 1);
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 10, height: 140, marginBottom: 10 }}>
+        {data.map(d => {
+          const total = d.a + d.b;
+          const barHeight = Math.max((total / max) * 120, total > 0 ? 4 : 0);
+          const aHeight = total > 0 ? (d.a / total) * barHeight : 0;
+          const bHeight = barHeight - aHeight;
+          return (
+            <div key={d.label} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, minWidth: 0 }}>
+              <div style={{ width: "100%", display: "flex", flexDirection: "column-reverse", borderRadius: "4px 4px 0 0", overflow: "hidden" }}>
+                <motion.div initial={{ scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ duration: 0.6, ease: "easeOut" as const }}
+                  style={{ width: "100%", height: aHeight, background: colorA, transformOrigin: "bottom", opacity: 0.9 }} title={`${labelA}: ${d.a}`} />
+                <motion.div initial={{ scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ duration: 0.6, ease: "easeOut" as const, delay: 0.1 }}
+                  style={{ width: "100%", height: bHeight, background: colorB, transformOrigin: "bottom", opacity: 0.9 }} title={`${labelB}: ${d.b}`} />
+              </div>
+              <span style={{ fontSize: 9, color: "rgba(250,250,250,0.4)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" }}>{d.label}</span>
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ display: "flex", gap: 18, justifyContent: "center" }}>
+        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "rgba(250,250,250,0.5)" }}><span style={{ width: 9, height: 9, borderRadius: 2, background: colorA }} />{labelA}</span>
+        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "rgba(250,250,250,0.5)" }}><span style={{ width: 9, height: 9, borderRadius: 2, background: colorB }} />{labelB}</span>
+      </div>
     </div>
   );
 };
@@ -347,7 +391,7 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
 // MAIN DASHBOARD
 // ══════════════════════════════════════════════════════════════════════════════
 const VAGINDashboard = () => {
-  type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions" | "gallery" | "vagin_images" | "viva_products";
+  type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions" | "impact" | "gallery" | "vagin_images" | "viva_products";
   type ModalType = "add-school" | "edit-school" | "add-student" | "edit-student" | "add-matron" | "edit-matron" | "add-distribution" | "add-session" | "confirm-delete" | "bulk-import" | null;
 
   const [authed, setAuthed]         = useState<boolean | null>(null);
@@ -393,7 +437,7 @@ const VAGINDashboard = () => {
   const fetchData = useCallback(async () => {
     setLoadingData(true); setDataError(null);
     try {
-      const [s, st, m, d, se, sa, tx, cc] = await Promise.all([
+      const [s, st, m, d, se, sa, tx, cc, econ] = await Promise.all([
         supabase.from("vagin_schools").select("*").order("name"),
         supabase.from("vagin_students").select("*").order("student_id"),
         supabase.from("vagin_matrons").select("*").order("name"),
@@ -402,17 +446,23 @@ const VAGINDashboard = () => {
         supabase.from("vagin_savings").select("*").order("month"),
         supabase.from("vagin_transactions").select("*").order("created_at", { ascending: false }).limit(100),
         supabase.from("country_configs").select("*"),
+        // school_pad_economics is a DB view that aggregates server-side over
+        // EVERY real transaction per school — deliberately not derived from
+        // the capped `tx` fetch above, which would silently undercount once
+        // a school passes 100 transactions.
+        supabase.from("school_pad_economics").select("*").order("school_name"),
       ]);
       if (s.error) throw s.error;
       setData({
         schools:       s.data  as SchoolRow[],
         students:      (st.data ?? []) as Student[],
         matrons:       (m.data  ?? []) as Matron[],
-        distributions: (d.data  ?? []) as Distribution[],
+        distributions: (d.data ?? []) as Distribution[],
         sessions:      (se.data ?? []) as Session[],
         savings:       (sa.data ?? []) as Savings[],
         transactions:  (tx.data ?? []) as TxRow[],
         countryConfigs: (cc.data ?? []) as CountryConfig[],
+        schoolEconomics: (econ.data ?? []) as SchoolEconomics[],
       });
     } catch (err) { setDataError(err instanceof Error ? err.message : "Failed to load data"); }
     finally { setLoadingData(false); }
@@ -796,6 +846,38 @@ const VAGINDashboard = () => {
   const totalSessions = data?.sessions.length ?? 0;
   const totalSavings  = data ? data.savings.reduce((s, r) => s + Number(r.total_ngn), 0) : 0;
 
+  // ── Impact & Investment economics (school_pad_economics view) ──────────────
+  // Per row: real pads issued to date at this school (not an assumed full
+  // 3-pad/₦2,100 cycle — a girl one pad in shows one pad's worth), the
+  // market value of that where the local price is known, what girls
+  // actually paid, and the resulting subsidy gap. numeric/bigint columns
+  // can arrive from PostgREST as strings, so every field is coerced with
+  // Number() before arithmetic (same defensive pattern used elsewhere in
+  // this file, e.g. totalSavings above).
+  const impactRows = (data?.schoolEconomics ?? []).map(e => {
+    const freePads = Number(e.free_pads) || 0;
+    const paidPads = Number(e.paid_pads) || 0;
+    const totalPadsForSchool = freePads + paidPads;
+    const marketPrice = e.market_pad_price != null ? Number(e.market_pad_price) : null;
+    const marketValue = marketPrice != null ? totalPadsForSchool * marketPrice : null;
+    const paid = Number(e.paid_amount_collected) || 0;
+    const saved = marketValue != null ? marketValue - paid : null;
+    const girlsReached = Number(e.girls_reached) || 0;
+    return { ...e, freePads, paidPads, totalPadsForSchool, marketPrice, marketValue, paid, saved, girlsReached };
+  });
+  // Only schools whose country has a confirmed local market price count
+  // toward the org-wide totals — never silently treat "unknown" as ₦0.
+  const impactKnownRows = impactRows.filter(r => r.marketPrice != null);
+  const impactUnknownCount = impactRows.length - impactKnownRows.length;
+  // These totals assume one shared currency (true today — only Nigeria has
+  // real transaction data yet); once Malawi/Ghana/Kenya go live this needs
+  // per-currency subtotals rather than one blended sum.
+  const impactTotalMarketValue = impactKnownRows.reduce((s, r) => s + (r.marketValue ?? 0), 0);
+  const impactTotalPaid        = impactKnownRows.reduce((s, r) => s + r.paid, 0);
+  const impactTotalSaved       = impactKnownRows.reduce((s, r) => s + (r.saved ?? 0), 0);
+  const impactTotalGirls       = impactKnownRows.reduce((s, r) => s + r.girlsReached, 0);
+  const fmtMoney = (n: number, symbol: string | null) => `${symbol ?? "₦"}${fmt(Math.round(n))}`;
+
   const schoolName  = (id: string) => data?.schools.find(s => s.id === id)?.name ?? "—";
   const countryConfigFor = (country: string) => data?.countryConfigs.find(c => c.country === country);
   const dialCodeForSchool = (schoolId: string) => countryConfigFor(data?.schools.find(s => s.id === schoolId)?.country ?? "Nigeria")?.dial_code ?? "234";
@@ -823,6 +905,7 @@ const VAGINDashboard = () => {
     { id: "pad_kolo"      as TabId, label: "PAD KOLO",      Icon: Droplets },
     { id: "vaginart"      as TabId, label: "VaginART",      Icon: Palette },
     { id: "transactions"  as TabId, label: "Transactions",  Icon: ClipboardList },
+    { id: "impact"        as TabId, label: "Impact & Investment", Icon: PieChart },
     { id: "gallery"       as TabId, label: "Gallery CMS",   Icon: Images },
     { id: "vagin_images"  as TabId, label: "VAGIN Images",  Icon: Camera },
     { id: "viva_products" as TabId, label: "VIVA Products", Icon: ShoppingBag },
@@ -837,7 +920,7 @@ const VAGINDashboard = () => {
   const ILLUSTRATIONS_GOLD = "#C9974A"; // warm gallery-wall gold, distinct from GOLD (used elsewhere as a UI accent)
   const VIVA_WINE = "#8A0F35";           // Velvet Wine, lightened slightly for legibility on #080810
 
-  const VAGIN_TAB_IDS: readonly TabId[] = ["overview", "schools", "students", "matrons", "pad_kolo", "vaginart", "transactions"];
+  const VAGIN_TAB_IDS: readonly TabId[] = ["overview", "schools", "students", "matrons", "pad_kolo", "vaginart", "transactions", "impact"];
   const ILLUSTRATIONS_TAB_IDS: readonly TabId[] = ["gallery", "vagin_images"];
   const VIVA_TAB_IDS: readonly TabId[] = ["viva_products"];
   const SECTIONS = [
@@ -1197,6 +1280,55 @@ const VAGINDashboard = () => {
                   )}
                 </Card>
                 {infoBox(<><strong>Phase 2 ready:</strong> Every pad issuance, savings deposit, and balance check from the WhatsApp bot will be automatically logged here with the student ID, matron name, and channel (whatsapp / manual). This is your full audit trail for donors and stakeholders.</>, "#22C55E")}
+              </motion.div>
+            )}
+
+            {/* ── IMPACT & INVESTMENT ── */}
+            {activeTab === "impact" && (
+              <motion.div key="impact" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" style={{ marginBottom: 24 }}>
+                  <StatCard icon={Coins}      label="Market Value Invested" value={fmtNGN(impactTotalMarketValue)} sub={impactUnknownCount > 0 ? `${impactUnknownCount} school(s) missing local price` : "all schools, to date"} color={GOLD} />
+                  <StatCard icon={Droplets}   label="Paid by Students"     value={fmtNGN(impactTotalPaid)}        sub={`${fmt(impactTotalGirls)} girls reached`} color={PINK} />
+                  <StatCard icon={TrendingUp} label="Subsidized by VAGIN"  value={fmtNGN(impactTotalSaved)}       sub={impactTotalMarketValue > 0 ? `${Math.round((impactTotalSaved / impactTotalMarketValue) * 100)}% of market value` : "—"} color={PL} />
+                  <StatCard icon={Users}      label="Avg. Value per Girl"  value={impactTotalGirls > 0 ? fmtNGN(impactTotalMarketValue / impactTotalGirls) : "—"} sub={impactTotalGirls > 0 ? `${fmtNGN(impactTotalPaid / impactTotalGirls)} paid · ${fmtNGN(impactTotalSaved / impactTotalGirls)} saved` : "no pads issued yet"} color={PURPLE} />
+                </div>
+
+                <Card title="Funding split by school">
+                  {impactKnownRows.length === 0 ? (
+                    <div style={{ textAlign: "center", padding: "40px 0" }}>
+                      <PieChart size={32} color="rgba(250,250,250,0.15)" style={{ marginBottom: 12 }} />
+                      <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 14, color: "rgba(250,250,250,0.35)", margin: "0 0 6px" }}>No priced schools yet</p>
+                      <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, color: "rgba(250,250,250,0.2)", margin: 0 }}>Set a local market pad price in country_configs for at least one school's country to see the breakdown.</p>
+                    </div>
+                  ) : (
+                    <StackedBarChart
+                      data={impactKnownRows.map(r => ({ label: r.school_name, a: r.paid, b: r.saved ?? 0 }))}
+                      colorA={PINK} colorB={GOLD} labelA="Paid by students" labelB="Subsidized by VAGIN"
+                    />
+                  )}
+                </Card>
+
+                <Card title="Per-school breakdown">
+                  <Table
+                    headers={["School", "Girls Reached", "Free / Paid Pads", "Market Value", "Paid by Students", "Subsidized", "Avg / Girl"]}
+                    rows={impactRows.map(r => r.marketPrice == null ? [
+                      r.school_name,
+                      fmt(r.girlsReached),
+                      `${r.freePads} / ${r.paidPads}`,
+                      <span key="w" style={{ color: GOLD, fontSize: 11, display: "flex", alignItems: "center", gap: 5 }}><AlertCircle size={12} />local price not set</span>,
+                      "—", "—", "—",
+                    ] : [
+                      r.school_name,
+                      fmt(r.girlsReached),
+                      `${r.freePads} / ${r.paidPads}`,
+                      fmtMoney(r.marketValue ?? 0, r.currency_symbol),
+                      fmtMoney(r.paid, r.currency_symbol),
+                      fmtMoney(r.saved ?? 0, r.currency_symbol),
+                      r.girlsReached > 0 ? fmtMoney((r.marketValue ?? 0) / r.girlsReached, r.currency_symbol) : "—",
+                    ])}
+                  />
+                </Card>
+                {infoBox(<><strong>How this is calculated:</strong> Market value = real pads issued to date × the local market retail price (₦700 in Nigeria, per the project brief — 1 free + 2 subsidized pads across a 3-month cycle works out to ₦2,100 value / ₦400 paid / ₦1,700 saved per girl who completes a full cycle). Paid by students = actual amounts recorded through PAY and paid-pad issuance. Subsidized = the gap between the two — VAGIN's real contribution. This reflects real issuance so far, not an assumed complete cycle, so it grows as more pads go out.</>, PL)}
               </motion.div>
             )}
 
