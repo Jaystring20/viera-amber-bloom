@@ -4,8 +4,9 @@
  * Supabase Edge Function receiving WhatsApp messages from Meta.
  * Deployed at: https://xcwgethymuvxcalxukzy.supabase.co/functions/v1/whatsapp-webhook
  *
- * Verifies webhook authenticity, parses messages, executes bot commands,
- * and sends responses back via WhatsApp API.
+ * Verifies webhook authenticity, runs a small conversational flow
+ * (VAGIN intro → matron check → intake or command session), executes
+ * bot commands, and sends responses back via WhatsApp API.
  */
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
@@ -18,6 +19,64 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY");
 
 const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!);
+
+// A session goes stale after this long with no message — the next message
+// re-starts the conversation from the VAGIN intro rather than assuming
+// context nobody remembers anymore. Mirrors WhatsApp's own 24h customer
+// service window.
+const SESSION_TIMEOUT_MS = 24 * 60 * 60 * 1000;
+
+const VAGIN_INTRO = `👋 Welcome to *Viera Amber*!
+
+*VAGIN* — the Viera Amber Girls Initiative — supports girls' menstrual health through pad distribution, education and community impact in schools across Nigeria.
+
+To learn more, visit: www.vieraamber.com/vagin
+
+Are you a School Matron with PAD KÓLÓ?`;
+
+const VAGIN_INTRO_NUDGE = `Sorry, I didn't quite catch that — please tap one of the buttons below 👇
+
+Are you a School Matron with PAD KÓLÓ?`;
+
+const CLOSING_MESSAGE = `Thanks so much for your interest in VAGIN! 💛
+
+Learn more anytime at www.vieraamber.com/vagin, or reach us directly at admin@vieraamber.com.
+
+Have a wonderful day! 🌸`;
+
+const COMMANDS_BLOCK = `📋 *CHECK ID* [student_id]
+   Check a student's balance & free pad status
+   e.g. CHECK ID FAADSS2
+
+📦 *ISSUE PAD* [student_id] [FREE|PAID]
+   Issue a pad to a student
+   e.g. ISSUE PAD FAADSS2 FREE
+
+💰 *DEPOSIT* [amount]
+   Record a deposit for your school
+   e.g. DEPOSIT 5000
+
+📊 *REPORT* [DAILY|CYCLE]
+   Get an activity summary
+   e.g. REPORT DAILY`;
+
+function buildActiveGreeting(name: string, schoolName: string): string {
+  return `Great to hear from you, ${name}! 👋
+
+I see you're registered with *${schoolName}*.
+
+Here's what I can do:
+
+${COMMANDS_BLOCK}
+
+Send a command whenever you're ready, ${name}. 💛`;
+}
+
+function buildActiveReminder(name: string): string {
+  return `Hi ${name}, I didn't quite catch that. Here's what I can help with:
+
+${COMMANDS_BLOCK}`;
+}
 
 interface WebhookPayload {
   object?: string;
@@ -36,6 +95,10 @@ interface WebhookPayload {
           timestamp: string;
           text?: { body: string };
           type: string;
+          interactive?: {
+            type: string;
+            button_reply?: { id: string; title: string };
+          };
         }>;
         statuses?: Array<{
           id: string;
@@ -46,6 +109,13 @@ interface WebhookPayload {
       field: string;
     }>;
   }>;
+}
+
+interface Session {
+  phone: string;
+  state: string;
+  intake_name: string | null;
+  last_message_at: string;
 }
 
 async function verifyWebhookSignature(payload: string, signature: string): Promise<boolean> {
@@ -78,27 +148,70 @@ function parseCommand(text: string): { type: string; data: Record<string, unknow
   return null;
 }
 
-async function getMatronSchool(fromPhone: string): Promise<{ schoolId: string; matronName: string } | null> {
+async function getMatronSchool(fromPhone: string): Promise<{ schoolId: string; matronName: string; schoolName: string } | null> {
   try {
-    const { data, error } = await supabase.from("teachers_matrons").select("school_id, name").eq("phone", fromPhone.replace(/^\+/, "")).single();
+    const { data, error } = await supabase
+      .from("teachers_matrons")
+      .select("school_id, name, vagin_schools(name)")
+      .eq("phone", fromPhone.replace(/^\+/, ""))
+      .single();
     if (error || !data) {
       console.log(`[Webhook] Matron not found for phone: ${fromPhone}`);
       return null;
     }
-    return { schoolId: data.school_id, matronName: data.name };
+    const school = data.vagin_schools as unknown as { name?: string } | null;
+    return { schoolId: data.school_id, matronName: data.name, schoolName: school?.name || "your school" };
   } catch (err) {
     console.error("[Webhook] Error fetching matron:", err);
     return null;
   }
 }
 
-async function sendWhatsAppMessage(toPhone: string, message: string): Promise<boolean> {
+async function getSession(phone: string): Promise<Session | null> {
   try {
-    // Ensure phone number has the + prefix for WhatsApp API
-    const formattedPhone = toPhone.startsWith('+') ? toPhone : `+${toPhone}`;
+    const { data, error } = await supabase.from("whatsapp_sessions").select("*").eq("phone", phone).single();
+    if (error || !data) return null;
+    return data as Session;
+  } catch (err) {
+    console.error("[Webhook] Error fetching session:", err);
+    return null;
+  }
+}
 
-    console.log(`[Webhook] DEBUG - Token length: ${ACCESS_TOKEN?.length}, Phone ID: ${PHONE_NUMBER_ID}`);
-    console.log(`[Webhook] Attempting to send message to ${formattedPhone}`);
+async function upsertSession(phone: string, state: string, intakeName: string | null = null): Promise<void> {
+  try {
+    await supabase.from("whatsapp_sessions").upsert(
+      { phone, state, intake_name: intakeName, last_message_at: new Date().toISOString() },
+      { onConflict: "phone" },
+    );
+  } catch (err) {
+    console.error("[Webhook] Error upserting session:", err);
+  }
+}
+
+function isSessionExpired(session: Session): boolean {
+  return Date.now() - new Date(session.last_message_at).getTime() > SESSION_TIMEOUT_MS;
+}
+
+async function notifyAdmin(type: string, data: Record<string, unknown>): Promise<void> {
+  try {
+    await fetch(`${SUPABASE_URL}/functions/v1/notify-admin`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+        "apikey": SUPABASE_ANON_KEY!,
+      },
+      body: JSON.stringify({ type, data }),
+    });
+  } catch (err) {
+    console.error("[Webhook] notify-admin call failed:", err);
+  }
+}
+
+async function sendWhatsAppPayload(toPhone: string, messagePayload: Record<string, unknown>): Promise<boolean> {
+  try {
+    const formattedPhone = toPhone.startsWith("+") ? toPhone : `+${toPhone}`;
 
     // Calculate appsecret_proof (HMAC-SHA256 of access token using app secret)
     const encoder = new TextEncoder();
@@ -109,13 +222,12 @@ async function sendWhatsAppMessage(toPhone: string, message: string): Promise<bo
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const appsecretProof = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 
-    const url = `https://graph.instagram.com/v19.0/${PHONE_NUMBER_ID}/messages?appsecret_proof=${appsecretProof}`;
-    console.log(`[Webhook] API URL: ${url}`);
+    const url = `https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages?appsecret_proof=${appsecretProof}`;
 
     const response = await fetch(url, {
       method: "POST",
       headers: { "Authorization": `Bearer ${ACCESS_TOKEN}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ messaging_product: "whatsapp", recipient_type: "individual", to: formattedPhone, type: "text", text: { preview_url: false, body: message } }),
+      body: JSON.stringify({ messaging_product: "whatsapp", recipient_type: "individual", to: formattedPhone, ...messagePayload }),
     });
 
     console.log(`[Webhook] Response status: ${response.status}`);
@@ -133,6 +245,26 @@ async function sendWhatsAppMessage(toPhone: string, message: string): Promise<bo
     console.error("[Webhook] Send message error:", err);
     return false;
   }
+}
+
+async function sendWhatsAppMessage(toPhone: string, message: string): Promise<boolean> {
+  return sendWhatsAppPayload(toPhone, { type: "text", text: { preview_url: false, body: message } });
+}
+
+async function sendVaginIntroButtons(toPhone: string, nudge = false): Promise<boolean> {
+  return sendWhatsAppPayload(toPhone, {
+    type: "interactive",
+    interactive: {
+      type: "button",
+      body: { text: nudge ? VAGIN_INTRO_NUDGE : VAGIN_INTRO },
+      action: {
+        buttons: [
+          { type: "reply", reply: { id: "MATRON_YES", title: "Yes, I'm a Matron" } },
+          { type: "reply", reply: { id: "MATRON_NO", title: "No, just inquiring" } },
+        ],
+      },
+    },
+  });
 }
 
 async function executeCommand(command: { type: string; data: Record<string, unknown> }, schoolId: string, fromPhone: string): Promise<string> {
@@ -181,7 +313,7 @@ async function executeCommand(command: { type: string; data: Record<string, unkn
         const totalPads = freeIssued + paidIssued;
         return reportType === "DAILY" ? `📈 Today's Report\nPads issued: ${totalPads}\nFree: ${freeIssued}\nPaid: ${paidIssued}\nRevenue: ₦${revenue.toLocaleString("en-NG")}` : `📊 Cycle Report\nTotal pads issued: ${totalPads}\nRevenue: ₦${revenue.toLocaleString("en-NG")}`;
       }
-      default: return "❌ Command not recognized.\n\nTry: CHECK ID [student_id]\nISSUE PAD [student_id] [FREE|PAID]\nDEPOSIT [amount]\nREPORT [DAILY|CYCLE]";
+      default: return buildActiveReminder("there");
     }
   } catch (err) {
     console.error("[Webhook] Command execution error:", err);
@@ -212,22 +344,93 @@ async function handleMessage(payload: WebhookPayload, signature: string): Promis
   if (!value.messages || value.messages.length === 0) return { statusCode: 200, body: "ok" };
   const message = value.messages[0];
   const fromPhone = message.from;
-  const messageText = message.text?.body;
-  if (!messageText) return { statusCode: 200, body: "ok" };
-  console.log(`[Webhook] Message from ${fromPhone}: ${messageText}`);
-  const matronSchool = await getMatronSchool(fromPhone);
-  if (!matronSchool) {
-    await sendWhatsAppMessage(fromPhone, "❌ You are not registered as a PAD KÓLÓ matron. Please contact your administrator.");
+
+  let messageText: string | null = null;
+  let buttonReplyId: string | null = null;
+  if (message.type === "text" && message.text?.body) {
+    messageText = message.text.body;
+  } else if (message.type === "interactive" && message.interactive?.type === "button_reply" && message.interactive.button_reply) {
+    buttonReplyId = message.interactive.button_reply.id;
+    messageText = message.interactive.button_reply.title;
+  }
+  if (!messageText && !buttonReplyId) return { statusCode: 200, body: "ok" };
+  console.log(`[Webhook] Message from ${fromPhone}: ${messageText ?? buttonReplyId}`);
+
+  const existingSession = await getSession(fromPhone);
+  const inFlow = existingSession
+    && !isSessionExpired(existingSession)
+    && existingSession.state !== "NEW"
+    && existingSession.state !== "ENDED";
+
+  if (!inFlow) {
+    await sendVaginIntroButtons(fromPhone);
+    await upsertSession(fromPhone, "AWAITING_MATRON_CONFIRM");
     return { statusCode: 200, body: "ok" };
   }
-  const command = parseCommand(messageText);
-  if (!command) {
-    await sendWhatsAppMessage(fromPhone, "❌ Command not recognized.\n\nTry:\nCHECK ID [student_id]\nISSUE PAD [student_id] [FREE|PAID]\nDEPOSIT [amount]\nREPORT [DAILY|CYCLE]");
-    return { statusCode: 200, body: "ok" };
+
+  const session = existingSession as Session;
+
+  switch (session.state) {
+    case "AWAITING_MATRON_CONFIRM": {
+      const trimmed = (messageText || "").trim();
+      const isYes = buttonReplyId === "MATRON_YES" || /^y(es)?$/i.test(trimmed);
+      const isNo = buttonReplyId === "MATRON_NO" || /^no?$/i.test(trimmed);
+      if (isYes) {
+        const matronSchool = await getMatronSchool(fromPhone);
+        if (matronSchool) {
+          await sendWhatsAppMessage(fromPhone, buildActiveGreeting(matronSchool.matronName, matronSchool.schoolName));
+          await upsertSession(fromPhone, "ACTIVE");
+        } else {
+          await sendWhatsAppMessage(fromPhone, "No problem! Let's get you set up.\n\nWhat's your full name?");
+          await upsertSession(fromPhone, "AWAITING_INTAKE_NAME");
+        }
+      } else if (isNo) {
+        await sendWhatsAppMessage(fromPhone, CLOSING_MESSAGE);
+        await upsertSession(fromPhone, "ENDED");
+      } else {
+        await sendVaginIntroButtons(fromPhone, true);
+      }
+      return { statusCode: 200, body: "ok" };
+    }
+    case "AWAITING_INTAKE_NAME": {
+      const name = (messageText || "").trim();
+      await upsertSession(fromPhone, "AWAITING_INTAKE_SCHOOL", name);
+      await sendWhatsAppMessage(fromPhone, `Thanks, ${name}! Which school are you representing?\n\n(Please share the full school name)`);
+      return { statusCode: 200, body: "ok" };
+    }
+    case "AWAITING_INTAKE_SCHOOL": {
+      const school = (messageText || "").trim();
+      const name = session.intake_name || "there";
+      await supabase.from("matron_registration_requests").insert({ phone: fromPhone, claimed_name: name, claimed_school: school });
+      await notifyAdmin("matron_registration_request", { phone: fromPhone, claimed_name: name, claimed_school: school });
+      await sendWhatsAppMessage(fromPhone, `Thank you, ${name}! 💛 We've received your details for *${school}* and our team will reach out shortly to complete your registration.\n\nIn the meantime, feel free to explore more about VAGIN at www.vieraamber.com/vagin`);
+      await upsertSession(fromPhone, "ENDED");
+      return { statusCode: 200, body: "ok" };
+    }
+    case "ACTIVE": {
+      const matronSchool = await getMatronSchool(fromPhone);
+      if (!matronSchool) {
+        // Matron record was removed/deactivated since the session started.
+        await sendVaginIntroButtons(fromPhone);
+        await upsertSession(fromPhone, "AWAITING_MATRON_CONFIRM");
+        return { statusCode: 200, body: "ok" };
+      }
+      const command = messageText ? parseCommand(messageText) : null;
+      if (!command) {
+        await sendWhatsAppMessage(fromPhone, buildActiveReminder(matronSchool.matronName));
+      } else {
+        const response = await executeCommand(command, matronSchool.schoolId, fromPhone);
+        await sendWhatsAppMessage(fromPhone, response);
+      }
+      await upsertSession(fromPhone, "ACTIVE");
+      return { statusCode: 200, body: "ok" };
+    }
+    default: {
+      await sendVaginIntroButtons(fromPhone);
+      await upsertSession(fromPhone, "AWAITING_MATRON_CONFIRM");
+      return { statusCode: 200, body: "ok" };
+    }
   }
-  const response = await executeCommand(command, matronSchool.schoolId, fromPhone);
-  await sendWhatsAppMessage(fromPhone, response);
-  return { statusCode: 200, body: "ok" };
 }
 
 Deno.serve(async (req: Request) => {
