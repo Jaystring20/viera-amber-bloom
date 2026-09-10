@@ -765,31 +765,31 @@ const VAGINDashboard = () => {
 
   // This admin serves three distinct products under one roof (VAGIN's own
   // school/matron/pad operations, the Illustrations gallery CMS, and VIVA
-  // product management) — grouped here so the sidebar makes that ownership
-  // obvious instead of presenting 11 tabs as one undifferentiated list.
+  // product management). Each section carries its OWN sub-brand's accent
+  // color (per CLAUDE.md's brand spec — VAGIN purple, gallery-wall gold for
+  // Illustrations, VIVA's velvet wine) rather than one blanket purple, so
+  // which product you're in is legible at a glance, not just by label text.
+  const ILLUSTRATIONS_GOLD = "#C9974A"; // warm gallery-wall gold, distinct from GOLD (used elsewhere as a UI accent)
+  const VIVA_WINE = "#8A0F35";           // Velvet Wine, lightened slightly for legibility on #080810
+
   const VAGIN_TAB_IDS: readonly TabId[] = ["overview", "schools", "students", "matrons", "pad_kolo", "vaginart", "transactions", "bot"];
   const ILLUSTRATIONS_TAB_IDS: readonly TabId[] = ["gallery", "vagin_images"];
   const VIVA_TAB_IDS: readonly TabId[] = ["viva_products"];
   const SECTIONS = [
-    { label: "VAGIN",                    tabs: TABS.filter(t => (VAGIN_TAB_IDS as string[]).includes(t.id)) },
-    { label: "Illustrations & Gallery",  tabs: TABS.filter(t => (ILLUSTRATIONS_TAB_IDS as string[]).includes(t.id)) },
-    { label: "VIVA",                     tabs: TABS.filter(t => (VIVA_TAB_IDS as string[]).includes(t.id)) },
+    { label: "VAGIN",                    accent: PURPLE,             tabs: TABS.filter(t => (VAGIN_TAB_IDS as string[]).includes(t.id)) },
+    { label: "Illustrations & Gallery",  accent: ILLUSTRATIONS_GOLD, tabs: TABS.filter(t => (ILLUSTRATIONS_TAB_IDS as string[]).includes(t.id)) },
+    { label: "VIVA",                     accent: VIVA_WINE,          tabs: TABS.filter(t => (VIVA_TAB_IDS as string[]).includes(t.id)) },
   ];
 
-  const sidebarItemSx = (active: boolean): React.CSSProperties => ({
-    display: "flex", alignItems: "center", gap: 9, width: "100%", textAlign: "left",
-    padding: "9px 12px", borderRadius: 8, marginBottom: 2,
-    fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, fontWeight: 500,
-    background: active ? `${PURPLE}22` : "transparent",
-    border: active ? `1px solid ${PURPLE}55` : "1px solid transparent",
-    color: active ? "#FAFAFA" : "rgba(250,250,250,0.5)",
-    cursor: "pointer", transition: "all 0.15s",
+  const sidebarItemSx = (active: boolean, accent: string): React.CSSProperties => ({
+    display: "flex", alignItems: "center", gap: 10, width: "100%", textAlign: "left",
+    padding: "8px 12px 8px 13px", borderRadius: "0 8px 8px 0", marginBottom: 1,
+    fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, fontWeight: active ? 600 : 500,
+    background: active ? `${accent}1E` : "transparent",
+    borderLeft: `2.5px solid ${active ? accent : "transparent"}`,
+    color: active ? "#FAFAFA" : "rgba(250,250,250,0.48)",
+    cursor: "pointer", transition: "background 0.15s ease, color 0.15s ease, border-color 0.15s ease",
   });
-  const sectionLabelSx: React.CSSProperties = {
-    fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, fontWeight: 600,
-    color: "rgba(250,250,250,0.3)", letterSpacing: "0.2em", textTransform: "uppercase",
-    margin: "0 0 8px", padding: "0 12px",
-  };
 
   const infoBox = (msg: React.ReactNode, color = PL) => (
     <div style={{ background: `${color}10`, border: `1px solid ${color}30`, borderRadius: 10, padding: "12px 16px", marginTop: 4 }}>
@@ -831,15 +831,17 @@ const VAGINDashboard = () => {
           </div>
 
           {/* Compact grouped tab row — visible below the lg breakpoint, where
-              the sidebar (below) is hidden in favor of this scrollable strip. */}
-          <div className="lg:hidden" style={{ display: "flex", gap: 14, borderBottom: "1px solid rgba(255,255,255,0.07)", overflowX: "auto", paddingBottom: 2 }}>
-            {SECTIONS.map(section => (
-              <div key={section.label} style={{ display: "flex", alignItems: "center", gap: 2, flexShrink: 0 }}>
-                <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, fontWeight: 600, color: "rgba(250,250,250,0.25)", letterSpacing: "0.15em", textTransform: "uppercase", padding: "0 6px", whiteSpace: "nowrap" }}>{section.label}</span>
+              the sidebar (below) is hidden in favor of this scrollable strip.
+              Same per-section accent colors as the sidebar, via the
+              underline, so the grouping reads identically at every width. */}
+          <div className="lg:hidden" style={{ display: "flex", alignItems: "stretch", gap: 4, borderBottom: "1px solid rgba(255,255,255,0.07)", overflowX: "auto", paddingBottom: 2 }}>
+            {SECTIONS.map((section, i) => (
+              <div key={section.label} style={{ display: "flex", alignItems: "center", gap: 1, flexShrink: 0, borderLeft: i > 0 ? "1px solid rgba(255,255,255,0.08)" : "none", paddingLeft: i > 0 ? 10 : 0, marginLeft: i > 0 ? 6 : 0 }}>
+                <span style={{ width: 5, height: 5, borderRadius: "50%", background: section.accent, marginRight: 7, flexShrink: 0 }} />
                 {section.tabs.map(t => (
                   <button key={t.id} onClick={() => setActiveTab(t.id)}
-                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 14px", fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, fontWeight: 500, background: "none", border: "none", cursor: "pointer", borderBottom: activeTab === t.id ? `2px solid ${PURPLE}` : "2px solid transparent", color: activeTab === t.id ? "#FAFAFA" : "rgba(250,250,250,0.4)", transition: "all 0.2s", whiteSpace: "nowrap", flexShrink: 0 }}>
-                    <t.Icon size={13} strokeWidth={1.75} />{t.label}
+                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 12px", fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, fontWeight: activeTab === t.id ? 600 : 500, background: "none", border: "none", cursor: "pointer", borderBottom: activeTab === t.id ? `2px solid ${section.accent}` : "2px solid transparent", color: activeTab === t.id ? "#FAFAFA" : "rgba(250,250,250,0.4)", transition: "all 0.2s", whiteSpace: "nowrap", flexShrink: 0 }}>
+                    <t.Icon size={13} strokeWidth={1.75} color={activeTab === t.id ? section.accent : "currentColor"} />{t.label}
                   </button>
                 ))}
               </div>
@@ -851,17 +853,31 @@ const VAGINDashboard = () => {
       {/* ── Body: sidebar (lg+) + content ── */}
       <div className="flex flex-col lg:flex-row" style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 64px", gap: 28, alignItems: "flex-start" }}>
 
-        {/* Sidebar — grouped by product, hidden below lg in favor of the
-            compact tab row in the header above. */}
-        <nav className="hidden lg:block" style={{ width: 208, flexShrink: 0, position: "sticky", top: 96 }}>
-          {SECTIONS.map(section => (
-            <div key={section.label} style={{ marginBottom: 22 }}>
-              <p style={sectionLabelSx}>{section.label}</p>
+        {/* Sidebar — a bordered rail (not floating buttons), grouped by
+            product with each section carrying its own sub-brand accent.
+            Hidden below lg in favor of the compact tab row in the header. */}
+        <nav className="hidden lg:block" style={{
+          width: 220, flexShrink: 0, position: "sticky", top: 96,
+          background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)",
+          borderRadius: 16, padding: "18px 8px", maxHeight: "calc(100vh - 120px)", overflowY: "auto",
+        }}>
+          {SECTIONS.map((section, i) => (
+            <div key={section.label}>
+              <div style={{ display: "flex", alignItems: "center", gap: 7, padding: "0 13px", marginBottom: 9 }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: section.accent, boxShadow: `0 0 7px ${section.accent}99`, flexShrink: 0 }} />
+                <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10.5, fontWeight: 700, color: "rgba(250,250,250,0.4)", letterSpacing: "0.16em", textTransform: "uppercase", margin: 0 }}>{section.label}</p>
+              </div>
               {section.tabs.map(t => (
-                <button key={t.id} onClick={() => setActiveTab(t.id)} style={sidebarItemSx(activeTab === t.id)}>
-                  <t.Icon size={14} strokeWidth={1.75} />{t.label}
-                </button>
+                <motion.button key={t.id} onClick={() => setActiveTab(t.id)}
+                  whileHover={activeTab === t.id ? {} : { x: 3 }} transition={{ duration: 0.15 }}
+                  style={sidebarItemSx(activeTab === t.id, section.accent)}>
+                  <t.Icon size={15} strokeWidth={1.75} color={activeTab === t.id ? section.accent : "currentColor"} />
+                  {t.label}
+                </motion.button>
               ))}
+              {i < SECTIONS.length - 1 && (
+                <div style={{ height: 1, background: `linear-gradient(90deg, ${section.accent}40, transparent 85%)`, margin: "16px 13px 18px 4px" }} />
+              )}
             </div>
           ))}
         </nav>
