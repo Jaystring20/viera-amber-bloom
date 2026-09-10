@@ -322,9 +322,18 @@ async function executeCommand(command: { type: string; data: Record<string, unkn
       }
       case "REPORT": {
         const reportType = command.data.reportType as string;
-        const today = new Date().toISOString().split("T")[0];
+        const now = new Date();
         let query = supabase.from("vagin_transactions").select("transaction_type, pads_issued, amount_ngn").eq("school_id", schoolId);
-        if (reportType === "DAILY") query = query.eq("issued_date", today);
+        if (reportType === "DAILY") {
+          query = query.eq("issued_date", now.toISOString().split("T")[0]);
+        } else {
+          // CYCLE = the current calendar quarter (Jan-Mar / Apr-Jun / Jul-Sep /
+          // Oct-Dec) — matches the quarterly free/paid-pad auto-reset, so
+          // "since the cycle started" means the same thing everywhere.
+          const quarterStartMonth = Math.floor(now.getUTCMonth() / 3) * 3;
+          const cycleStart = new Date(Date.UTC(now.getUTCFullYear(), quarterStartMonth, 1)).toISOString().split("T")[0];
+          query = query.gte("issued_date", cycleStart);
+        }
         const { data: transactions } = await query;
         const freeIssued = transactions?.filter((t) => t.transaction_type === "free_pad").reduce((sum: number, t: any) => sum + (t.pads_issued || 0), 0) || 0;
         const paidIssued = transactions?.filter((t) => t.transaction_type === "paid_pad").reduce((sum: number, t: any) => sum + (t.pads_issued || 0), 0) || 0;
