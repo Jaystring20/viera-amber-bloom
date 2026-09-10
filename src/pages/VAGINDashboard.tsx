@@ -473,6 +473,9 @@ const VAGINDashboard = () => {
         } else if (t.transaction_type === "free_pad") {
           patch.free_pads_used = Math.max(0, (g.free_pads_used ?? 0) - t.pads_issued);
           patch.pads_received = Math.max(0, (g.pads_received ?? 0) - t.pads_issued);
+        } else if (t.transaction_type === "student_payment") {
+          // A PAY credit reversed: take the money back off her balance.
+          patch.balance_ngn = Math.max(0, (g.balance_ngn ?? 0) - (t.amount_ngn ?? 0));
         }
         if (Object.keys(patch).length) await supabase.from("vagin_students").update(patch).eq("id", g.id);
       }
@@ -1163,13 +1166,14 @@ const VAGINDashboard = () => {
                       headers={["Time", "Type", "Student", "Issued By", "Pads", "Amount", "Source", "Status", ""]}
                       rows={data.transactions.map(t => {
                         const isBot = t.source === "whatsapp_bot" || t.source === "whatsapp";
-                        // Real values written by the bot: "free_pad" | "paid_pad" | "deposit"
-                        // (see whatsapp-webhook/index.ts) — pad issuance reads pink, a
-                        // fund deposit reads gold.
-                        const isDeposit = t.transaction_type === "deposit";
+                        // Real values written by the bot: "free_pad" | "paid_pad" |
+                        // "student_payment" | "deposit" (see whatsapp-webhook/index.ts) —
+                        // pad issuance reads pink, money coming in (a girl paying via PAY,
+                        // or the matron's school-level DEPOSIT) reads gold.
+                        const isMoneyIn = t.transaction_type === "deposit" || t.transaction_type === "student_payment";
                         return [
                         <span key="time" style={{ opacity: t.voided ? 0.4 : 1 }}>{fmtDate(t.created_at)}</span>,
-                        <span key="type" style={{ fontSize: 11, padding: "3px 10px", borderRadius: 999, background: isDeposit ? "rgba(217,119,6,0.12)" : "rgba(237,21,93,0.15)", color: isDeposit ? GOLD : PINK, border: `1px solid ${isDeposit ? "rgba(217,119,6,0.3)" : "rgba(237,21,93,0.3)"}`, textDecoration: t.voided ? "line-through" : "none", opacity: t.voided ? 0.5 : 1 }}>{t.transaction_type.replace(/_/g, " ")}</span>,
+                        <span key="type" style={{ fontSize: 11, padding: "3px 10px", borderRadius: 999, background: isMoneyIn ? "rgba(217,119,6,0.12)" : "rgba(237,21,93,0.15)", color: isMoneyIn ? GOLD : PINK, border: `1px solid ${isMoneyIn ? "rgba(217,119,6,0.3)" : "rgba(237,21,93,0.3)"}`, textDecoration: t.voided ? "line-through" : "none", opacity: t.voided ? 0.5 : 1 }}>{t.transaction_type.replace(/_/g, " ")}</span>,
                         <span key="stu" style={{ opacity: t.voided ? 0.4 : 1 }}>{studentName(t.student_id)}</span>,
                         <span key="iss" style={{ opacity: t.voided ? 0.4 : 1 }}>{t.issued_by || "—"}</span>,
                         <span key="pads" style={{ opacity: t.voided ? 0.4 : 1 }}>{t.pads_issued || "—"}</span>,

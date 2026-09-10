@@ -48,12 +48,16 @@ const COMMANDS_BLOCK = `📋 *CHECK ID* [student_id]
    Check a student's balance & free pad status
    e.g. CHECK ID FAADSS2
 
+💵 *PAY* [student_id] [amount]
+   Record what a girl paid you toward her pads
+   e.g. PAY FAADSS2 200
+
 📦 *ISSUE PAD* [student_id] [FREE|PAID]
-   Issue a pad to a student
+   Issue a pad to a student (checks her balance first for PAID)
    e.g. ISSUE PAD FAADSS2 FREE
 
 💰 *DEPOSIT* [amount]
-   Record a deposit for your school
+   Record cash you banked at the partner bank
    e.g. DEPOSIT 5000
 
 📊 *REPORT* [DAILY|CYCLE]
@@ -139,6 +143,8 @@ function parseCommand(text: string): { type: string; data: Record<string, unknow
   const normalized = text.trim().toUpperCase();
   const checkMatch = normalized.match(/^CHECK\s+ID\s+([A-Z0-9-]+)$/);
   if (checkMatch) return { type: "CHECK_ID", data: { studentId: checkMatch[1] } };
+  const payMatch = normalized.match(/^PAY\s+([A-Z0-9-]+)\s+(\d+)$/);
+  if (payMatch) return { type: "PAY", data: { studentId: payMatch[1], amount: parseInt(payMatch[2]) } };
   const issueMatch = normalized.match(/^ISSUE\s+PAD\s+([A-Z0-9-]+)\s+(FREE|PAID)$/);
   if (issueMatch) return { type: "ISSUE_PAD", data: { studentId: issueMatch[1], padType: issueMatch[2] } };
   const depositMatch = normalized.match(/^DEPOSIT\s+(\d+)$/);
@@ -297,12 +303,32 @@ async function executeCommand(command: { type: string; data: Record<string, unkn
         const balance = students.balance_ngn || 0;
         return `📊 Student: ${students.name}\nBalance: ${money(balance)}\nFree pads: ${freePadsRemaining}/1 remaining`;
       }
+      case "PAY": {
+        // The missing "Saving & Payment" step from the project brief: a girl
+        // hands cash to the matron to cover her subsidized pads, and that
+        // needs to land against HER OWN balance — not the school's pooled
+        // DEPOSIT figure — so ISSUE_PAD can actually verify she's paid
+        // before a PAID pad goes out (see the check added below).
+        const studentId = command.data.studentId as string;
+        const amount = command.data.amount as number;
+        const { data: students, error } = await supabase.from("vagin_students").select("id, name, balance_ngn").eq("school_id", schoolId).eq("student_id", studentId).single();
+        if (error || !students) return `❌ Student ID "${studentId}" not found.`;
+        const { error: txError } = await supabase.from("vagin_transactions").insert({ student_id: students.id, school_id: schoolId, transaction_type: "student_payment", pads_issued: 0, amount_ngn: amount, source: "whatsapp_bot", issued_date: new Date().toISOString().split("T")[0], issued_by: `WhatsApp Bot (${fromPhone})` });
+        if (txError) return `⚠️ Error recording payment: ${txError.message}`;
+        const newBalance = (students.balance_ngn || 0) + amount;
+        await supabase.from("vagin_students").update({ balance_ngn: newBalance }).eq("id", students.id);
+        return `✓ Payment recorded\n${students.name}: +${money(amount)}\nNew balance: ${money(newBalance)}`;
+      }
       case "ISSUE_PAD": {
         const studentId = command.data.studentId as string;
         const padType = command.data.padType as string;
         const { data: students, error: studentError } = await supabase.from("vagin_students").select("id, name, balance_ngn, free_pads_used, paid_pads_used, pads_received").eq("school_id", schoolId).eq("student_id", studentId).single();
         if (studentError || !students) return `❌ Student ID "${studentId}" not found.`;
         if (padType === "FREE" && (students.free_pads_used || 0) >= 1) return `❌ Cannot issue free pad to ${students.name}.\nFree pads used: ${students.free_pads_used}/1\nShe must pay ${money(paidPadPrice)} for the next pad.`;
+        // The brief's stated redemption check ("sufficient balance exists for
+        // paid pads") — previously missing entirely, so a PAID pad issued
+        // regardless of whether she'd actually paid in via PAY.
+        if (padType === "PAID" && (students.balance_ngn || 0) < paidPadPrice) return `❌ Insufficient balance for ${students.name}.\nBalance: ${money(students.balance_ngn || 0)}, needs ${money(paidPadPrice)}.\nHave her pay in first: PAY ${studentId} ${paidPadPrice}`;
         const { error: txError } = await supabase.from("vagin_transactions").insert({ student_id: students.id, school_id: schoolId, transaction_type: padType === "FREE" ? "free_pad" : "paid_pad", pads_issued: 1, amount_ngn: padType === "PAID" ? paidPadPrice : null, source: "whatsapp_bot", issued_date: new Date().toISOString().split("T")[0], issued_by: `WhatsApp Bot (${fromPhone})` });
         if (txError) return `⚠️ Error recording pad: ${txError.message}`;
         const newBalance = padType === "PAID" ? Math.max(0, students.balance_ngn - paidPadPrice) : students.balance_ngn;
@@ -346,9 +372,15 @@ async function executeCommand(command: { type: string; data: Record<string, unkn
         const { data: transactions } = await query;
         const freeIssued = transactions?.filter((t) => t.transaction_type === "free_pad").reduce((sum: number, t: any) => sum + (t.pads_issued || 0), 0) || 0;
         const paidIssued = transactions?.filter((t) => t.transaction_type === "paid_pad").reduce((sum: number, t: any) => sum + (t.pads_issued || 0), 0) || 0;
-        const revenue = transactions?.filter((t) => t.transaction_type === "paid_pad").reduce((sum: number, t: any) => sum + (t.amount_ngn || 0), 0) || 0;
+        const padRevenue = transactions?.filter((t) => t.transaction_type === "paid_pad").reduce((sum: number, t: any) => sum + (t.amount_ngn || 0), 0) || 0;
+        // Distinct from padRevenue: what girls actually paid in via PAY, which
+        // won't always match pad revenue 1:1 (she may pay in before she
+        // redeems, or an admin adjusts a balance directly).
+        const paymentsCollected = transactions?.filter((t) => t.transaction_type === "student_payment").reduce((sum: number, t: any) => sum + (t.amount_ngn || 0), 0) || 0;
         const totalPads = freeIssued + paidIssued;
-        return reportType === "DAILY" ? `📈 Today's Report\nPads issued: ${totalPads}\nFree: ${freeIssued}\nPaid: ${paidIssued}\nRevenue: ${money(revenue)}` : `📊 Cycle Report\nTotal pads issued: ${totalPads}\nRevenue: ${money(revenue)}`;
+        return reportType === "DAILY"
+          ? `📈 Today's Report\nPads issued: ${totalPads}\nFree: ${freeIssued}\nPaid: ${paidIssued}\nPayments collected: ${money(paymentsCollected)}\nPaid-pad revenue: ${money(padRevenue)}`
+          : `📊 Cycle Report\nTotal pads issued: ${totalPads}\nPayments collected: ${money(paymentsCollected)}\nPaid-pad revenue: ${money(padRevenue)}`;
       }
       default: return buildActiveReminder("there");
     }
