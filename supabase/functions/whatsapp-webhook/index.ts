@@ -109,7 +109,7 @@ async function sendWhatsAppMessage(toPhone: string, message: string): Promise<bo
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const appsecretProof = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 
-    const url = `https://graph.instagram.com/v19.0/${PHONE_NUMBER_ID}/messages?appsecret_proof=${appsecretProof}`;
+    const url = `https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages?appsecret_proof=${appsecretProof}`;
     console.log(`[Webhook] API URL: ${url}`);
 
     const response = await fetch(url, {
