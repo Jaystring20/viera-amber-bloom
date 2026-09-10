@@ -81,6 +81,18 @@ function formatMessage(type: string, data: Record<string, unknown>): string {
     ].join("\n");
   }
 
+  if (type === "matron_registration_request") {
+    return [
+      "🧑‍🏫 New matron registration request",
+      "",
+      `Name: ${str(data.claimed_name) ?? "—"}`,
+      `School: ${str(data.claimed_school) ?? "—"}`,
+      `Phone: ${str(data.phone) ?? "—"}`,
+      "",
+      "Verify and add them to teachers_matrons to grant access.",
+    ].join("\n");
+  }
+
   // Unknown type: still deliver something useful rather than silently
   // dropping it. A future caller that ships a new `type` shows up here
   // instead of vanishing the way every call to this function did before
