@@ -94,16 +94,40 @@ async function getMatronSchool(fromPhone: string): Promise<{ schoolId: string; m
 
 async function sendWhatsAppMessage(toPhone: string, message: string): Promise<boolean> {
   try {
-    const response = await fetch(`https://graph.instagram.com/v19.0/${PHONE_NUMBER_ID}/messages`, {
+    // Ensure phone number has the + prefix for WhatsApp API
+    const formattedPhone = toPhone.startsWith('+') ? toPhone : `+${toPhone}`;
+
+    console.log(`[Webhook] DEBUG - Token length: ${ACCESS_TOKEN?.length}, Phone ID: ${PHONE_NUMBER_ID}`);
+    console.log(`[Webhook] Attempting to send message to ${formattedPhone}`);
+
+    // Calculate appsecret_proof (HMAC-SHA256 of access token using app secret)
+    const encoder = new TextEncoder();
+    const keyBuffer = encoder.encode(APP_SECRET!);
+    const key = await crypto.subtle.importKey("raw", keyBuffer, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+    const messageBuffer = encoder.encode(ACCESS_TOKEN!);
+    const hashBuffer = await crypto.subtle.sign("HMAC", key, messageBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const appsecretProof = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+
+    const url = `https://graph.instagram.com/v19.0/${PHONE_NUMBER_ID}/messages?appsecret_proof=${appsecretProof}`;
+    console.log(`[Webhook] API URL: ${url}`);
+
+    const response = await fetch(url, {
       method: "POST",
       headers: { "Authorization": `Bearer ${ACCESS_TOKEN}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ messaging_product: "whatsapp", recipient_type: "individual", to: toPhone, type: "text", text: { preview_url: false, body: message } }),
+      body: JSON.stringify({ messaging_product: "whatsapp", recipient_type: "individual", to: formattedPhone, type: "text", text: { preview_url: false, body: message } }),
     });
+
+    console.log(`[Webhook] Response status: ${response.status}`);
+
     if (!response.ok) {
-      console.error(`[Webhook] Send message failed`);
+      const errorBody = await response.text();
+      console.error(`[Webhook] Send message failed - Status: ${response.status}, Response: ${errorBody}`);
       return false;
     }
-    console.log(`[Webhook] Message sent to ${toPhone}`);
+
+    const responseBody = await response.text();
+    console.log(`[Webhook] Message sent successfully to ${formattedPhone}, Response: ${responseBody}`);
     return true;
   } catch (err) {
     console.error("[Webhook] Send message error:", err);
