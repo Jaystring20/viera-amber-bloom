@@ -763,6 +763,34 @@ const VAGINDashboard = () => {
     { id: "bot"           as TabId, label: "Bot Activity",  Icon: Bot },
   ] as const;
 
+  // This admin serves three distinct products under one roof (VAGIN's own
+  // school/matron/pad operations, the Illustrations gallery CMS, and VIVA
+  // product management) — grouped here so the sidebar makes that ownership
+  // obvious instead of presenting 11 tabs as one undifferentiated list.
+  const VAGIN_TAB_IDS: readonly TabId[] = ["overview", "schools", "students", "matrons", "pad_kolo", "vaginart", "transactions", "bot"];
+  const ILLUSTRATIONS_TAB_IDS: readonly TabId[] = ["gallery", "vagin_images"];
+  const VIVA_TAB_IDS: readonly TabId[] = ["viva_products"];
+  const SECTIONS = [
+    { label: "VAGIN",                    tabs: TABS.filter(t => (VAGIN_TAB_IDS as string[]).includes(t.id)) },
+    { label: "Illustrations & Gallery",  tabs: TABS.filter(t => (ILLUSTRATIONS_TAB_IDS as string[]).includes(t.id)) },
+    { label: "VIVA",                     tabs: TABS.filter(t => (VIVA_TAB_IDS as string[]).includes(t.id)) },
+  ];
+
+  const sidebarItemSx = (active: boolean): React.CSSProperties => ({
+    display: "flex", alignItems: "center", gap: 9, width: "100%", textAlign: "left",
+    padding: "9px 12px", borderRadius: 8, marginBottom: 2,
+    fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, fontWeight: 500,
+    background: active ? `${PURPLE}22` : "transparent",
+    border: active ? `1px solid ${PURPLE}55` : "1px solid transparent",
+    color: active ? "#FAFAFA" : "rgba(250,250,250,0.5)",
+    cursor: "pointer", transition: "all 0.15s",
+  });
+  const sectionLabelSx: React.CSSProperties = {
+    fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, fontWeight: 600,
+    color: "rgba(250,250,250,0.3)", letterSpacing: "0.2em", textTransform: "uppercase",
+    margin: "0 0 8px", padding: "0 12px",
+  };
+
   const infoBox = (msg: React.ReactNode, color = PL) => (
     <div style={{ background: `${color}10`, border: `1px solid ${color}30`, borderRadius: 10, padding: "12px 16px", marginTop: 4 }}>
       <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, color, margin: 0, lineHeight: 1.6 }}>{msg}</p>
@@ -802,20 +830,44 @@ const VAGINDashboard = () => {
             </div>
           </div>
 
-          {/* Tabs */}
-          <div style={{ display: "flex", gap: 2, borderBottom: "1px solid rgba(255,255,255,0.07)", overflowX: "auto" }}>
-            {TABS.map(t => (
-              <button key={t.id} onClick={() => setActiveTab(t.id)}
-                style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 14px", fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, fontWeight: 500, background: "none", border: "none", cursor: "pointer", borderBottom: activeTab === t.id ? `2px solid ${PURPLE}` : "2px solid transparent", color: activeTab === t.id ? "#FAFAFA" : "rgba(250,250,250,0.4)", transition: "all 0.2s", whiteSpace: "nowrap", flexShrink: 0 }}>
-                <t.Icon size={13} strokeWidth={1.75} />{t.label}
-              </button>
+          {/* Compact grouped tab row — visible below the lg breakpoint, where
+              the sidebar (below) is hidden in favor of this scrollable strip. */}
+          <div className="lg:hidden" style={{ display: "flex", gap: 14, borderBottom: "1px solid rgba(255,255,255,0.07)", overflowX: "auto", paddingBottom: 2 }}>
+            {SECTIONS.map(section => (
+              <div key={section.label} style={{ display: "flex", alignItems: "center", gap: 2, flexShrink: 0 }}>
+                <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, fontWeight: 600, color: "rgba(250,250,250,0.25)", letterSpacing: "0.15em", textTransform: "uppercase", padding: "0 6px", whiteSpace: "nowrap" }}>{section.label}</span>
+                {section.tabs.map(t => (
+                  <button key={t.id} onClick={() => setActiveTab(t.id)}
+                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 14px", fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, fontWeight: 500, background: "none", border: "none", cursor: "pointer", borderBottom: activeTab === t.id ? `2px solid ${PURPLE}` : "2px solid transparent", color: activeTab === t.id ? "#FAFAFA" : "rgba(250,250,250,0.4)", transition: "all 0.2s", whiteSpace: "nowrap", flexShrink: 0 }}>
+                    <t.Icon size={13} strokeWidth={1.75} />{t.label}
+                  </button>
+                ))}
+              </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* ── Content ── */}
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "32px 24px 64px" }}>
+      {/* ── Body: sidebar (lg+) + content ── */}
+      <div className="flex flex-col lg:flex-row" style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 64px", gap: 28, alignItems: "flex-start" }}>
+
+        {/* Sidebar — grouped by product, hidden below lg in favor of the
+            compact tab row in the header above. */}
+        <nav className="hidden lg:block" style={{ width: 208, flexShrink: 0, position: "sticky", top: 96 }}>
+          {SECTIONS.map(section => (
+            <div key={section.label} style={{ marginBottom: 22 }}>
+              <p style={sectionLabelSx}>{section.label}</p>
+              {section.tabs.map(t => (
+                <button key={t.id} onClick={() => setActiveTab(t.id)} style={sidebarItemSx(activeTab === t.id)}>
+                  <t.Icon size={14} strokeWidth={1.75} />{t.label}
+                </button>
+              ))}
+            </div>
+          ))}
+        </nav>
+
+        {/* Content */}
+        <div style={{ flex: 1, minWidth: 0, width: "100%" }}>
         {dataError && (
           <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 8, padding: "14px 18px", marginBottom: 24 }}>
             <AlertCircle size={16} color="#EF4444" />
@@ -1080,6 +1132,7 @@ const VAGINDashboard = () => {
 
           </AnimatePresence>
         )}
+        </div>
       </div>
 
       {/* ── MODALS ── */}
