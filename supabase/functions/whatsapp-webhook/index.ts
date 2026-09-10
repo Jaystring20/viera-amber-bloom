@@ -300,14 +300,23 @@ async function executeCommand(command: { type: string; data: Record<string, unkn
       case "ISSUE_PAD": {
         const studentId = command.data.studentId as string;
         const padType = command.data.padType as string;
-        const { data: students, error: studentError } = await supabase.from("vagin_students").select("id, name, balance_ngn, free_pads_used").eq("school_id", schoolId).eq("student_id", studentId).single();
+        const { data: students, error: studentError } = await supabase.from("vagin_students").select("id, name, balance_ngn, free_pads_used, paid_pads_used, pads_received").eq("school_id", schoolId).eq("student_id", studentId).single();
         if (studentError || !students) return `❌ Student ID "${studentId}" not found.`;
         if (padType === "FREE" && (students.free_pads_used || 0) >= 1) return `❌ Cannot issue free pad to ${students.name}.\nFree pads used: ${students.free_pads_used}/1\nShe must pay ${money(paidPadPrice)} for the next pad.`;
         const { error: txError } = await supabase.from("vagin_transactions").insert({ student_id: students.id, school_id: schoolId, transaction_type: padType === "FREE" ? "free_pad" : "paid_pad", pads_issued: 1, amount_ngn: padType === "PAID" ? paidPadPrice : null, source: "whatsapp_bot", issued_date: new Date().toISOString().split("T")[0], issued_by: `WhatsApp Bot (${fromPhone})` });
         if (txError) return `⚠️ Error recording pad: ${txError.message}`;
         const newBalance = padType === "PAID" ? Math.max(0, students.balance_ngn - paidPadPrice) : students.balance_ngn;
         const newFreeUsed = (students.free_pads_used || 0) + (padType === "FREE" ? 1 : 0);
-        await supabase.from("vagin_students").update({ balance_ngn: newBalance, free_pads_used: newFreeUsed }).eq("id", students.id);
+        // paid_pads_used and pads_received previously never got touched here at
+        // all — every real pad issued via WhatsApp silently vanished from the
+        // dashboard's "Pads Received" total and the paid-pad cycle count.
+        // paid_pads_used is the cycle-scoped cap counter (reset quarterly by
+        // 05_pad_cycle_reset.sql, same as free_pads_used); pads_received is
+        // the lifetime counter the dashboard's headline "Pads Distributed"
+        // stat is built from — it must never be reset, only ever incremented.
+        const newPaidUsed = (students.paid_pads_used || 0) + (padType === "PAID" ? 1 : 0);
+        const newPadsReceived = (students.pads_received || 0) + 1;
+        await supabase.from("vagin_students").update({ balance_ngn: newBalance, free_pads_used: newFreeUsed, paid_pads_used: newPaidUsed, pads_received: newPadsReceived }).eq("id", students.id);
         return `✓ Pad issued to ${students.name}\nType: ${padType === "FREE" ? "Free" : money(paidPadPrice)}\nNew balance: ${money(newBalance)}\nFree pads remaining: ${Math.max(0, 1 - newFreeUsed)}/1`;
       }
       case "DEPOSIT": {

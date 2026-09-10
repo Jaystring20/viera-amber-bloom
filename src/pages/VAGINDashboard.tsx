@@ -508,7 +508,14 @@ const VAGINDashboard = () => {
     try {
       const freePads = Math.min(parseInt(studentForm.free_pads_used) || 0, 1);
       const paidPads = Math.min(parseInt(studentForm.paid_pads_used) || 0, 2);
-      const payload = { student_id: studentForm.student_id.toUpperCase(), name: studentForm.name, school_id: studentForm.school_id || null, class: studentForm.class || null, balance_ngn: parseFloat(studentForm.balance_ngn) || 0, free_pads_used: freePads, paid_pads_used: paidPads, pads_received: freePads + paidPads };
+      const basePayload = { student_id: studentForm.student_id.toUpperCase(), name: studentForm.name, school_id: studentForm.school_id || null, class: studentForm.class || null, balance_ngn: parseFloat(studentForm.balance_ngn) || 0, free_pads_used: freePads, paid_pads_used: paidPads };
+      // pads_received is a LIFETIME counter — incremented by the WhatsApp bot
+      // on every real pad issuance, never reset by the quarterly pad-cycle
+      // job (see 05_pad_cycle_reset.sql and whatsapp-webhook/index.ts). Only
+      // seed it here when registering a brand-new student; editing an
+      // existing one must never overwrite it with just this cycle's
+      // free+paid, or every manual edit would erase real bot-tracked history.
+      const payload = studentForm.id ? basePayload : { ...basePayload, pads_received: freePads + paidPads };
       const { error } = studentForm.id
         ? await supabase.from("vagin_students").update(payload).eq("id", studentForm.id)
         : await supabase.from("vagin_students").insert(payload);
@@ -599,6 +606,11 @@ const VAGINDashboard = () => {
     const matronIdByPhone = new Map<string, string>();
     const nextSeq = new Map<string, number>(); // schoolId -> next auto student sequence
     const dialCodeByCountry = new Map((data?.countryConfigs ?? []).map(c => [c.country, c.dial_code]));
+    // Re-importing a template to add new rows is an expected workflow (see
+    // the re-import behavior chosen for this feature) — it must not reset an
+    // already-existing student's lifetime pads_received back down to just
+    // this row's free+paid count every time the file is re-uploaded.
+    const existingStudentIds = new Set((data?.students ?? []).map(s => s.student_id));
     let schoolsCount = 0, matronsCount = 0, studentsCount = 0;
 
     for (let i = 0; i < importRows.length; i++) {
@@ -661,7 +673,8 @@ const VAGINDashboard = () => {
             student_id: studentId, name: r.student_name.trim(), school_id: schoolId,
             class: r.student_class.trim() || null,
             balance_ngn: parseFloat(r.student_balance_ngn) || 0,
-            free_pads_used: freePads, paid_pads_used: paidPads, pads_received: freePads + paidPads,
+            free_pads_used: freePads, paid_pads_used: paidPads,
+            ...(existingStudentIds.has(studentId) ? {} : { pads_received: freePads + paidPads }),
           };
           const { error } = await supabase.from("vagin_students").upsert(studentPayload, { onConflict: "student_id" });
           if (error) throw error;
@@ -739,8 +752,19 @@ const VAGINDashboard = () => {
   if (!authed) return <AdminLogin onLogin={() => setAuthed(true)} />;
 
   // ── Derived stats ─────────────────────────────────────────────────────────
-  const totalPads     = data ? data.distributions.reduce((s, d) => s + d.pads_count, 0) : 0;
-  const totalGirls    = data ? data.distributions.reduce((s, d) => s + d.girls_count, 0) : 0;
+  // "All time" totals combine two legitimate sources: manually logged field
+  // distribution events (vagin_pad_distributions — outreach events that can
+  // include girls with no individual student record) and real per-student
+  // pad issuance (vagin_students.pads_received, a lifetime counter the
+  // WhatsApp bot increments on every real ISSUE_PAD — see
+  // whatsapp-webhook/index.ts). This is deliberately NOT summed from
+  // vagin_transactions: fetchData() caps that query at 100 rows for
+  // dashboard performance, so once a school passes 100 real transactions,
+  // an "all time" total derived from it would silently start undercounting.
+  const liveGirlsReached = data ? data.students.filter(st => (st.pads_received ?? 0) > 0).length : 0;
+  const livePadsIssued   = data ? data.students.reduce((s, st) => s + (st.pads_received ?? 0), 0) : 0;
+  const totalPads     = data ? data.distributions.reduce((s, d) => s + d.pads_count, 0) + livePadsIssued : 0;
+  const totalGirls    = data ? data.distributions.reduce((s, d) => s + d.girls_count, 0) + liveGirlsReached : 0;
   const totalSessions = data?.sessions.length ?? 0;
   const totalSavings  = data ? data.savings.reduce((s, r) => s + Number(r.total_ngn), 0) : 0;
 
