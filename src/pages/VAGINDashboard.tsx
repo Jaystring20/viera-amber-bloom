@@ -61,6 +61,43 @@ const codeFromName = (name: string) =>
 const buildStudentId = (schoolCode: string, name: string, seq: number) =>
   `${schoolCode}-${studentInitials(name)}-${String(seq).padStart(3, "0")}`;
 
+// ── Bulk import (CSV) ──────────────────────────────────────────────────────────
+// One row per student (or per matron, if a school has no students yet). School
+// and matron columns repeat across every row that belongs to them — normal for
+// a flattened CSV export from Excel/Sheets.
+const IMPORT_HEADERS = [
+  "school_code", "school_name", "school_country", "school_city", "school_state_region", "school_contact_name",
+  "matron_name", "matron_phone", "matron_active",
+  "student_id", "student_name", "student_class", "student_balance_ngn", "student_free_pads_used", "student_paid_pads_used",
+] as const;
+type ImportRow = Record<typeof IMPORT_HEADERS[number], string>;
+const IMPORT_REQUIRED_HEADERS = ["school_code", "school_name", "matron_name", "matron_phone"] as const;
+
+// Minimal RFC4180 CSV parser — handles quoted fields, embedded commas, "" escapes,
+// and both \n and \r\n line endings (what Excel/Sheets actually export).
+function parseCSV(text: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let field = "";
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else inQuotes = false; }
+      else field += c;
+    } else if (c === '"') inQuotes = true;
+    else if (c === ",") { row.push(field); field = ""; }
+    else if (c === "\n" || c === "\r") {
+      if (c === "\r" && text[i + 1] === "\n") i++;
+      row.push(field); field = "";
+      if (row.some(cell => cell.trim() !== "")) rows.push(row);
+      row = [];
+    } else field += c;
+  }
+  if (field !== "" || row.length) { row.push(field); if (row.some(cell => cell.trim() !== "")) rows.push(row); }
+  return rows;
+}
+
 // ── Shared input styles ────────────────────────────────────────────────────────
 const inputSx: React.CSSProperties = {
   width: "100%", boxSizing: "border-box",
@@ -280,7 +317,7 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
 // ══════════════════════════════════════════════════════════════════════════════
 const VAGINDashboard = () => {
   type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions" | "gallery" | "vagin_images" | "viva_products" | "bot";
-  type ModalType = "add-school" | "edit-school" | "add-student" | "edit-student" | "add-matron" | "edit-matron" | "add-distribution" | "add-session" | "confirm-delete" | null;
+  type ModalType = "add-school" | "edit-school" | "add-student" | "edit-student" | "add-matron" | "edit-matron" | "add-distribution" | "add-session" | "confirm-delete" | "bulk-import" | null;
 
   const [authed, setAuthed]         = useState<boolean | null>(null);
   const [activeTab, setActiveTab]   = useState<TabId>("overview");
@@ -298,6 +335,12 @@ const VAGINDashboard = () => {
   const [matronForm, setMatronForm] = useState({ id: "", name: "", phone: "", school_id: "", active: true });
   const [distForm, setDistForm]     = useState({ school_id: "", distribution_date: today(), girls_count: "", pads_count: "", savings_collected_ngn: "0", distributed_by: "" });
   const [sessForm, setSessForm]     = useState({ school_id: "", session_date: today(), topic: "puberty", girls_attended: "", facilitator: "", delivery_format: "in_school" });
+
+  // Bulk import (CSV) state
+  const [importRows, setImportRows]     = useState<ImportRow[]>([]);
+  const [importParseErrors, setImportParseErrors] = useState<string[]>([]);
+  const [importing, setImporting]       = useState(false);
+  const [importSummary, setImportSummary] = useState<{ schools: number; matrons: number; students: number; errors: { row: number; message: string }[] } | null>(null);
 
   const showToast = (msg: string, type: "success" | "error" = "success") => {
     setToast({ msg, type });
@@ -461,6 +504,123 @@ const VAGINDashboard = () => {
       closeModal(); await fetchData();
     } catch (err) { showToast(err instanceof Error ? err.message : "Error", "error"); }
     finally { setSaving(false); }
+  };
+
+  // ── Bulk import (CSV) ─────────────────────────────────────────────────────
+  const openBulkImport = () => { setImportRows([]); setImportParseErrors([]); setImportSummary(null); setModal("bulk-import"); };
+
+  const downloadImportTemplate = () => {
+    const example = ["LGS", "Lagos Girls School", "Nigeria", "Lagos", "Lagos State", "Mrs. Adeyemi", "Mrs Bamidele", "2348038838094", "true", "", "Amara Okafor", "SS2", "0", "0", "0"];
+    const csv = `${IMPORT_HEADERS.join(",")}\n${example.join(",")}\n`;
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "vagin_bulk_import_template.csv";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportFile = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const grid = parseCSV(String(reader.result || ""));
+      if (grid.length < 1) { setImportParseErrors(["File is empty."]); setImportRows([]); return; }
+      const header = grid[0].map(h => h.trim().toLowerCase().replace(/\s+/g, "_"));
+      const missing = IMPORT_REQUIRED_HEADERS.filter(h => !header.includes(h));
+      if (missing.length) { setImportParseErrors([`Missing required column(s): ${missing.join(", ")}. Download the template to see the expected format.`]); setImportRows([]); return; }
+      const rows: ImportRow[] = grid.slice(1).map(cells => {
+        const obj = {} as ImportRow;
+        IMPORT_HEADERS.forEach(h => { obj[h] = ""; });
+        header.forEach((h, idx) => { if ((IMPORT_HEADERS as readonly string[]).includes(h)) obj[h as typeof IMPORT_HEADERS[number]] = (cells[idx] ?? "").trim(); });
+        return obj;
+      });
+      setImportRows(rows);
+      setImportParseErrors([]);
+      setImportSummary(null);
+    };
+    reader.onerror = () => setImportParseErrors(["Could not read the file."]);
+    reader.readAsText(file);
+  };
+
+  const runImport = async () => {
+    setImporting(true);
+    const errors: { row: number; message: string }[] = [];
+    const schoolIdByCode = new Map<string, string>();
+    const matronIdByPhone = new Map<string, string>();
+    const nextSeq = new Map<string, number>(); // schoolId -> next auto student sequence
+    let schoolsCount = 0, matronsCount = 0, studentsCount = 0;
+
+    for (let i = 0; i < importRows.length; i++) {
+      const r = importRows[i];
+      const rowNum = i + 2; // header row + 1-indexing
+      try {
+        const code = r.school_code.trim().toUpperCase();
+        if (!code || !r.school_name.trim()) throw new Error("Missing school_code or school_name");
+        if (!r.matron_name.trim() || !r.matron_phone.trim()) throw new Error("Missing matron_name or matron_phone");
+
+        let schoolId = schoolIdByCode.get(code);
+        if (!schoolId) {
+          const schoolPayload = {
+            name: r.school_name.trim(), code,
+            country: r.school_country.trim() || "Nigeria",
+            city: r.school_city.trim() || null,
+            state_region: r.school_state_region.trim() || null,
+            contact_name: r.school_contact_name.trim() || null,
+          };
+          const { data: saved, error } = await supabase.from("vagin_schools").upsert(schoolPayload, { onConflict: "code" }).select("id").single();
+          if (error) throw error;
+          schoolId = saved.id;
+          schoolIdByCode.set(code, schoolId);
+          schoolsCount++;
+        }
+
+        const phone = r.matron_phone.trim();
+        let matronId = matronIdByPhone.get(phone);
+        if (!matronId) {
+          const activeVal = r.matron_active.trim().toLowerCase();
+          const matronPayload = {
+            name: r.matron_name.trim(), phone, school_id: schoolId,
+            active: activeVal === "" || activeVal === "true" || activeVal === "yes" || activeVal === "1",
+          };
+          const { data: saved, error } = await supabase.from("vagin_matrons").upsert(matronPayload, { onConflict: "phone" }).select("id").single();
+          if (error) throw error;
+          matronId = saved.id;
+          // Sync to the bot's lookup table — onConflict on phone (its real unique
+          // constraint), not id, so this never collides with a pre-existing row.
+          const { error: syncErr } = await supabase.from("teachers_matrons").upsert({ id: matronId, ...matronPayload }, { onConflict: "phone" });
+          if (syncErr) console.warn("teachers_matrons sync failed for", phone, syncErr);
+          matronIdByPhone.set(phone, matronId);
+          matronsCount++;
+        }
+
+        if (r.student_name.trim()) {
+          let studentId = r.student_id.trim().toUpperCase();
+          if (!studentId) {
+            if (!nextSeq.has(schoolId)) nextSeq.set(schoolId, nextSeqForSchool(schoolId));
+            const seq = nextSeq.get(schoolId)!;
+            studentId = buildStudentId(code, r.student_name.trim(), seq);
+            nextSeq.set(schoolId, seq + 1);
+          }
+          const freePads = Math.min(parseInt(r.student_free_pads_used) || 0, 1);
+          const paidPads = Math.min(parseInt(r.student_paid_pads_used) || 0, 2);
+          const studentPayload = {
+            student_id: studentId, name: r.student_name.trim(), school_id: schoolId,
+            class: r.student_class.trim() || null,
+            balance_ngn: parseFloat(r.student_balance_ngn) || 0,
+            free_pads_used: freePads, paid_pads_used: paidPads, pads_received: freePads + paidPads,
+          };
+          const { error } = await supabase.from("vagin_students").upsert(studentPayload, { onConflict: "student_id" });
+          if (error) throw error;
+          studentsCount++;
+        }
+      } catch (err) {
+        errors.push({ row: rowNum, message: err instanceof Error ? err.message : "Unknown error" });
+      }
+    }
+
+    setImporting(false);
+    setImportSummary({ schools: schoolsCount, matrons: matronsCount, students: studentsCount, errors });
+    await fetchData();
   };
 
   // ── Distribution add ──────────────────────────────────────────────────────
@@ -660,7 +820,7 @@ const VAGINDashboard = () => {
             {/* ── SCHOOLS ── */}
             {activeTab === "schools" && (
               <motion.div key="schools" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-                <Card title="School Registry" action={<AddBtn label="Add School" onClick={openAddSchool} />}>
+                <Card title="School Registry" action={<div style={{ display: "flex", gap: 8 }}><AddBtn label="Import CSV" onClick={openBulkImport} color={GOLD} /><AddBtn label="Add School" onClick={openAddSchool} /></div>}>
                   <Table
                     headers={["Code", "Name", "Country", "City", "Contact", "Students", "Actions"]}
                     rows={data.schools.map(s => {
@@ -985,6 +1145,61 @@ const VAGINDashboard = () => {
                 <SaveBtn loading={saving} />
               </div>
             </form>
+          </Modal>
+        )}
+
+        {/* Bulk import (CSV) */}
+        {modal === "bulk-import" && (
+          <Modal key="bulk-import-modal" title="Bulk Import — Schools, Matrons & Students" onClose={closeModal} width={640}>
+            <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "rgba(250,250,250,0.6)", lineHeight: 1.6, margin: "0 0 16px" }}>
+              One row per student (or per matron, if a school has no students yet). Each row's school and matron are created or updated automatically — matrons are wired into the WhatsApp bot immediately, no extra step needed. Re-uploading later updates existing schools and adds new matrons/students without duplicating anything.
+            </p>
+            <button type="button" onClick={downloadImportTemplate} style={{ ...cancelBtnSx, marginBottom: 18 }}>Download CSV Template</button>
+
+            {!importSummary && (
+              <F label="CSV File">
+                <input type="file" accept=".csv,text/csv" style={inputSx}
+                  onChange={e => { const f = e.target.files?.[0]; if (f) handleImportFile(f); }} />
+              </F>
+            )}
+
+            {importParseErrors.length > 0 && (
+              <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 8, padding: "10px 14px", marginBottom: 14 }}>
+                {importParseErrors.map((e, i) => <p key={i} style={{ margin: 0, fontSize: 12, color: "#EF4444" }}>{e}</p>)}
+              </div>
+            )}
+
+            {importRows.length > 0 && !importSummary && (
+              <>
+                <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "rgba(250,250,250,0.75)", margin: "0 0 16px" }}>
+                  <strong style={{ color: "#FAFAFA" }}>{importRows.length}</strong> row{importRows.length === 1 ? "" : "s"} detected —{" "}
+                  <strong style={{ color: "#FAFAFA" }}>{new Set(importRows.map(r => r.school_code.trim().toUpperCase())).size}</strong> school(s),{" "}
+                  <strong style={{ color: "#FAFAFA" }}>{new Set(importRows.map(r => r.matron_phone.trim())).size}</strong> matron(s),{" "}
+                  <strong style={{ color: "#FAFAFA" }}>{importRows.filter(r => r.student_name.trim()).length}</strong> student(s).
+                </p>
+                <form onSubmit={e => { e.preventDefault(); runImport(); }} style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+                  <button type="button" onClick={closeModal} style={cancelBtnSx}>Cancel</button>
+                  <SaveBtn loading={importing} label={importing ? "Importing…" : `Import ${importRows.length} Row${importRows.length === 1 ? "" : "s"}`} />
+                </form>
+              </>
+            )}
+
+            {importSummary && (
+              <div>
+                <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "#22C55E", margin: "0 0 10px" }}>
+                  ✓ {importSummary.schools} school(s), {importSummary.matrons} matron(s), {importSummary.students} student(s) imported.
+                </p>
+                {importSummary.errors.length > 0 && (
+                  <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 8, padding: "10px 14px", maxHeight: 180, overflowY: "auto" }}>
+                    <p style={{ margin: "0 0 6px", fontSize: 12, color: "#EF4444", fontWeight: 600 }}>{importSummary.errors.length} row(s) failed:</p>
+                    {importSummary.errors.map((e, i) => <p key={i} style={{ margin: "2px 0", fontSize: 12, color: "#EF4444" }}>Row {e.row}: {e.message}</p>)}
+                  </div>
+                )}
+                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
+                  <button type="button" onClick={closeModal} style={cancelBtnSx}>Close</button>
+                </div>
+              </div>
+            )}
           </Modal>
         )}
 
