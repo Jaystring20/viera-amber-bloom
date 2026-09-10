@@ -19,6 +19,28 @@ const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY");
 
 const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!);
 
+const WELCOME_GUIDE = `👋 Welcome to PAD KÓLÓ, Matron Assistant!
+
+I help you manage pad distribution and school funds right here on WhatsApp. Here's what I can do:
+
+📋 *CHECK ID* [student_id]
+   Check a student's balance & free pad status
+   e.g. CHECK ID FAADSS2
+
+📦 *ISSUE PAD* [student_id] [FREE|PAID]
+   Issue a pad to a student
+   e.g. ISSUE PAD FAADSS2 FREE
+
+💰 *DEPOSIT* [amount]
+   Record a deposit for your school
+   e.g. DEPOSIT 5000
+
+📊 *REPORT* [DAILY|CYCLE]
+   Get an activity summary
+   e.g. REPORT DAILY
+
+Send any of these commands to get started. 💛`;
+
 interface WebhookPayload {
   object?: string;
   entry?: Array<{
@@ -181,7 +203,7 @@ async function executeCommand(command: { type: string; data: Record<string, unkn
         const totalPads = freeIssued + paidIssued;
         return reportType === "DAILY" ? `📈 Today's Report\nPads issued: ${totalPads}\nFree: ${freeIssued}\nPaid: ${paidIssued}\nRevenue: ₦${revenue.toLocaleString("en-NG")}` : `📊 Cycle Report\nTotal pads issued: ${totalPads}\nRevenue: ₦${revenue.toLocaleString("en-NG")}`;
       }
-      default: return "❌ Command not recognized.\n\nTry: CHECK ID [student_id]\nISSUE PAD [student_id] [FREE|PAID]\nDEPOSIT [amount]\nREPORT [DAILY|CYCLE]";
+      default: return WELCOME_GUIDE;
     }
   } catch (err) {
     console.error("[Webhook] Command execution error:", err);
@@ -222,7 +244,7 @@ async function handleMessage(payload: WebhookPayload, signature: string): Promis
   }
   const command = parseCommand(messageText);
   if (!command) {
-    await sendWhatsAppMessage(fromPhone, "❌ Command not recognized.\n\nTry:\nCHECK ID [student_id]\nISSUE PAD [student_id] [FREE|PAID]\nDEPOSIT [amount]\nREPORT [DAILY|CYCLE]");
+    await sendWhatsAppMessage(fromPhone, WELCOME_GUIDE);
     return { statusCode: 200, body: "ok" };
   }
   const response = await executeCommand(command, matronSchool.schoolId, fromPhone);
