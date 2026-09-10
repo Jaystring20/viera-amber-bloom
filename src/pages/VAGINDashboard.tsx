@@ -6,12 +6,11 @@ import {
   LayoutDashboard, Droplets, Palette, School as SchoolIcon, LogOut,
   TrendingUp, Users, BookOpen, Coins,
   AlertCircle, RefreshCw, Plus, Pencil, Trash2, X,
-  GraduationCap, ClipboardList, CheckCircle2, Images, Camera, Bot, ShoppingBag,
+  GraduationCap, ClipboardList, CheckCircle2, Images, Camera, ShoppingBag,
 } from "lucide-react";
 import GalleryAdminTab from "@/components/admin/GalleryAdminTab";
 import VAGINImagesAdminTab from "@/components/admin/VAGINImagesAdminTab";
 import BotActivityTab from "@/components/admin/BotActivityTab";
-import WhatsAppBotSimulatorTab from "@/components/admin/WhatsAppBotSimulatorTab";
 
 const PINK   = "#ED155D";
 const PURPLE = "#62017F";
@@ -348,13 +347,14 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
 // MAIN DASHBOARD
 // ══════════════════════════════════════════════════════════════════════════════
 const VAGINDashboard = () => {
-  type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions" | "gallery" | "vagin_images" | "viva_products" | "bot";
+  type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions" | "gallery" | "vagin_images" | "viva_products";
   type ModalType = "add-school" | "edit-school" | "add-student" | "edit-student" | "add-matron" | "edit-matron" | "add-distribution" | "add-session" | "confirm-delete" | "bulk-import" | null;
 
   const [authed, setAuthed]         = useState<boolean | null>(null);
   const [activeTab, setActiveTab]   = useState<TabId>("overview");
   const [data, setData]             = useState<DashData | null>(null);
   const [loadingData, setLoadingData] = useState(false);
+  const [liveSync, setLiveSync] = useState(false);
   const [dataError, setDataError]   = useState<string | null>(null);
   const [toast, setToast]           = useState<{ msg: string; type: "success" | "error" } | null>(null);
   const [modal, setModal]           = useState<ModalType>(null);
@@ -419,6 +419,31 @@ const VAGINDashboard = () => {
   }, []);
 
   useEffect(() => { if (authed) fetchData(); }, [authed, fetchData]);
+
+  // ── Live sync from the WhatsApp bot ─────────────────────────────────────
+  // The bot writes straight to these tables the instant a matron issues a
+  // pad or logs a deposit (see whatsapp-webhook/index.ts) — without this,
+  // an already-open dashboard would only find out on next page load or a
+  // manual Refresh click. One shared channel across every table this
+  // dashboard reads, refetching on any change; several tables typically
+  // change together for one real action (e.g. ISSUE_PAD writes both
+  // vagin_transactions and vagin_students), so bursts are debounced into a
+  // single fetchData() rather than firing once per row event.
+  useEffect(() => {
+    if (!authed) return;
+    let debounceTimer: ReturnType<typeof setTimeout>;
+    const scheduleRefetch = () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => fetchData(), 400);
+    };
+    const tables = ["vagin_transactions", "vagin_students", "vagin_schools", "vagin_matrons", "vagin_pad_distributions", "vagin_sessions", "vagin_savings"];
+    let channel = supabase.channel("vagin-dashboard-live");
+    tables.forEach(table => {
+      channel = channel.on("postgres_changes", { event: "*", schema: "public", table }, scheduleRefetch);
+    });
+    channel.subscribe(status => setLiveSync(status === "SUBSCRIBED"));
+    return () => { clearTimeout(debounceTimer); setLiveSync(false); supabase.removeChannel(channel); };
+  }, [authed, fetchData]);
 
   const handleSignOut = async () => { await supabase.auth.signOut(); setAuthed(false); setData(null); };
 
@@ -798,7 +823,6 @@ const VAGINDashboard = () => {
     { id: "gallery"       as TabId, label: "Gallery CMS",   Icon: Images },
     { id: "vagin_images"  as TabId, label: "VAGIN Images",  Icon: Camera },
     { id: "viva_products" as TabId, label: "VIVA Products", Icon: ShoppingBag },
-    { id: "bot"           as TabId, label: "Bot Activity",  Icon: Bot },
   ] as const;
 
   // This admin serves three distinct products under one roof (VAGIN's own
@@ -810,7 +834,7 @@ const VAGINDashboard = () => {
   const ILLUSTRATIONS_GOLD = "#C9974A"; // warm gallery-wall gold, distinct from GOLD (used elsewhere as a UI accent)
   const VIVA_WINE = "#8A0F35";           // Velvet Wine, lightened slightly for legibility on #080810
 
-  const VAGIN_TAB_IDS: readonly TabId[] = ["overview", "schools", "students", "matrons", "pad_kolo", "vaginart", "transactions", "bot"];
+  const VAGIN_TAB_IDS: readonly TabId[] = ["overview", "schools", "students", "matrons", "pad_kolo", "vaginart", "transactions"];
   const ILLUSTRATIONS_TAB_IDS: readonly TabId[] = ["gallery", "vagin_images"];
   const VIVA_TAB_IDS: readonly TabId[] = ["viva_products"];
   const SECTIONS = [
@@ -843,6 +867,7 @@ const VAGINDashboard = () => {
         .vagin-dash select, .vagin-dash input, .vagin-dash textarea { color-scheme: dark; }
         .vagin-dash select option { background-color: #1A0B2E; color: #FAFAFA; }
         .vagin-dash select option:checked { background-color: #62017F; color: #FFFFFF; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
       `}</style>
       <NavBar />
 
@@ -855,7 +880,12 @@ const VAGINDashboard = () => {
               <h1 className="font-display" style={{ fontSize: "clamp(22px,4vw,34px)", fontWeight: 700, color: "#FAFAFA", margin: 0, lineHeight: 1.1 }}>Impact Dashboard</h1>
               <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "rgba(250,250,250,0.45)", margin: "6px 0 0" }}>Schools · Students · Matrons · Distributions · Sessions</p>
             </div>
-            <div style={{ display: "flex", gap: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div title={liveSync ? "Connected — new WhatsApp bot activity appears here automatically" : "Reconnecting…"}
+                style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", borderRadius: 999, background: liveSync ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.06)", border: `1px solid ${liveSync ? "rgba(34,197,94,0.3)" : "rgba(255,255,255,0.12)"}` }}>
+                <span style={{ width: 7, height: 7, borderRadius: "50%", background: liveSync ? "#22C55E" : "rgba(250,250,250,0.3)", boxShadow: liveSync ? "0 0 6px #22C55E99" : "none", animation: liveSync ? "pulse 2s ease-in-out infinite" : "none" }} />
+                <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, fontWeight: 600, color: liveSync ? "#22C55E" : "rgba(250,250,250,0.4)", letterSpacing: "0.08em", textTransform: "uppercase" }}>{liveSync ? "Live" : "Connecting"}</span>
+              </div>
               <motion.button onClick={fetchData} disabled={loadingData} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
                 style={{ display: "flex", alignItems: "center", gap: 7, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(250,250,250,0.7)", borderRadius: 999, padding: "9px 18px", fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, cursor: "pointer" }}>
                 <RefreshCw size={13} style={{ animation: loadingData ? "spin 1s linear infinite" : "none" }} />
@@ -1179,12 +1209,6 @@ const VAGINDashboard = () => {
                   </div>
                 </Card>
                 {infoBox(<><strong>Product Management:</strong> Use the dedicated Products Dashboard to create and manage all VIVA garments and prints. Changes sync in real-time to the storefront.</>, "#D97706")}
-              </motion.div>
-            )}
-
-            {activeTab === "bot" && (
-              <motion.div key="bot" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-                <WhatsAppBotSimulatorTab />
               </motion.div>
             )}
 
