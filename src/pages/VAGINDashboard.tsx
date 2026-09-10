@@ -6,11 +6,13 @@ import {
   LayoutDashboard, Droplets, Palette, School as SchoolIcon, LogOut,
   TrendingUp, Users, BookOpen, Coins,
   AlertCircle, RefreshCw, Plus, Pencil, Trash2, X,
-  GraduationCap, ClipboardList, CheckCircle2, Images, Camera, ShoppingBag,
+  GraduationCap, ClipboardList, CheckCircle2, Images, Camera, ShoppingBag, PieChart, FileDown,
 } from "lucide-react";
 import GalleryAdminTab from "@/components/admin/GalleryAdminTab";
 import VAGINImagesAdminTab from "@/components/admin/VAGINImagesAdminTab";
 import BotActivityTab from "@/components/admin/BotActivityTab";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const PINK   = "#ED155D";
 const PURPLE = "#62017F";
@@ -21,7 +23,7 @@ const PL     = "#C77DFF";
 interface SchoolRow { id: string; name: string; code: string | null; country: string; state_region: string | null; contact_name: string | null; city: string | null; girls_reached: number }
 interface Student   { id: string; student_id: string; name: string; school_id: string | null; class: string | null; balance_ngn: number; free_pads_used: number; paid_pads_used: number; pads_received: number; active: boolean; created_at: string }
 interface Matron    { id: string; name: string; phone: string; school_id: string | null; active: boolean; created_at: string }
-interface CountryConfig { country: string; dial_code: string; currency_code: string; currency_symbol: string }
+interface CountryConfig { country: string; dial_code: string; currency_code: string; currency_symbol: string; paid_pad_price: number | null; market_pad_price: number | null }
 interface Distribution { id: string; school_id: string; distribution_date: string; girls_count: number; pads_count: number; savings_collected_ngn: number; distributed_by: string | null }
 interface Session      { id: string; school_id: string; session_date: string; topic: string; girls_attended: number; facilitator: string | null; delivery_format: string }
 interface Savings      { id: string; school_id: string; month: string; contributors: number; total_ngn: number }
@@ -32,11 +34,20 @@ interface Savings      { id: string; school_id: string; month: string; contribut
 // every field read `undefined`, and `undefined.replace(...)` below crashed the
 // whole tab the instant it rendered a real row.
 interface TxRow        { id: string; student_id: string | null; school_id: string | null; transaction_type: string; pads_issued: number; amount_ngn: number | null; source: string; notes: string | null; issued_by: string | null; created_at: string; voided?: boolean; voided_reason?: string | null; flagged?: boolean }
+// Backed by the school_pad_economics DB view (see migration
+// 07_school_pad_economics.sql) — a real, server-side aggregate over EVERY
+// non-voided transaction for the school, not just the 100 most recent rows
+// fetchData() pulls for the Transactions tab. market_pad_price is the local
+// retail reference price (only Nigeria's ₦700, from the project brief, is
+// known right now); null means that country's real local price hasn't been
+// confirmed yet, so "value"/"saved" can't be computed for it — never guessed.
+interface SchoolEconomics { school_id: string; school_name: string; country: string; market_pad_price: number | null; currency_symbol: string | null; free_pads: number; paid_pads: number; paid_amount_collected: number; girls_reached: number }
 
 interface DashData {
   schools: SchoolRow[]; students: Student[]; matrons: Matron[];
   distributions: Distribution[]; sessions: Session[];
   savings: Savings[]; transactions: TxRow[]; countryConfigs: CountryConfig[];
+  schoolEconomics: SchoolEconomics[];
 }
 
 // ── Maps ───────────────────────────────────────────────────────────────────────
@@ -171,6 +182,41 @@ const BarChart = ({ data, color }: { data: { label: string; value: number }[]; c
           <span style={{ fontSize: 9, color: "rgba(250,250,250,0.4)", whiteSpace: "nowrap" }}>{d.label}</span>
         </div>
       ))}
+    </div>
+  );
+};
+
+// ── StackedBarChart ────────────────────────────────────────────────────────────
+// One bar per school, split into two segments (e.g. paid-by-students vs
+// subsidized-by-VAGIN) so the funding split per school is visible at a
+// glance — the transparency view this whole tab exists for.
+const StackedBarChart = ({ data, colorA, colorB, labelA, labelB }: { data: { label: string; a: number; b: number }[]; colorA: string; colorB: string; labelA: string; labelB: string }) => {
+  const max = Math.max(...data.map(d => d.a + d.b), 1);
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 10, height: 140, marginBottom: 10 }}>
+        {data.map(d => {
+          const total = d.a + d.b;
+          const barHeight = Math.max((total / max) * 120, total > 0 ? 4 : 0);
+          const aHeight = total > 0 ? (d.a / total) * barHeight : 0;
+          const bHeight = barHeight - aHeight;
+          return (
+            <div key={d.label} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, minWidth: 0 }}>
+              <div style={{ width: "100%", display: "flex", flexDirection: "column-reverse", borderRadius: "4px 4px 0 0", overflow: "hidden" }}>
+                <motion.div initial={{ scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ duration: 0.6, ease: "easeOut" as const }}
+                  style={{ width: "100%", height: aHeight, background: colorA, transformOrigin: "bottom", opacity: 0.9 }} title={`${labelA}: ${d.a}`} />
+                <motion.div initial={{ scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ duration: 0.6, ease: "easeOut" as const, delay: 0.1 }}
+                  style={{ width: "100%", height: bHeight, background: colorB, transformOrigin: "bottom", opacity: 0.9 }} title={`${labelB}: ${d.b}`} />
+              </div>
+              <span style={{ fontSize: 9, color: "rgba(250,250,250,0.4)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" }}>{d.label}</span>
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ display: "flex", gap: 18, justifyContent: "center" }}>
+        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "rgba(250,250,250,0.5)" }}><span style={{ width: 9, height: 9, borderRadius: 2, background: colorA }} />{labelA}</span>
+        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "rgba(250,250,250,0.5)" }}><span style={{ width: 9, height: 9, borderRadius: 2, background: colorB }} />{labelB}</span>
+      </div>
     </div>
   );
 };
@@ -347,7 +393,7 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
 // MAIN DASHBOARD
 // ══════════════════════════════════════════════════════════════════════════════
 const VAGINDashboard = () => {
-  type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions" | "gallery" | "vagin_images" | "viva_products";
+  type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions" | "impact" | "gallery" | "vagin_images" | "viva_products";
   type ModalType = "add-school" | "edit-school" | "add-student" | "edit-student" | "add-matron" | "edit-matron" | "add-distribution" | "add-session" | "confirm-delete" | "bulk-import" | null;
 
   const [authed, setAuthed]         = useState<boolean | null>(null);
@@ -355,6 +401,8 @@ const VAGINDashboard = () => {
   const [data, setData]             = useState<DashData | null>(null);
   const [loadingData, setLoadingData] = useState(false);
   const [liveSync, setLiveSync] = useState(false);
+  const [reportMonth, setReportMonth] = useState(() => new Date().toISOString().slice(0, 7)); // "YYYY-MM"
+  const [exportingReport, setExportingReport] = useState(false);
   const [dataError, setDataError]   = useState<string | null>(null);
   const [toast, setToast]           = useState<{ msg: string; type: "success" | "error" } | null>(null);
   const [modal, setModal]           = useState<ModalType>(null);
@@ -393,7 +441,7 @@ const VAGINDashboard = () => {
   const fetchData = useCallback(async () => {
     setLoadingData(true); setDataError(null);
     try {
-      const [s, st, m, d, se, sa, tx, cc] = await Promise.all([
+      const [s, st, m, d, se, sa, tx, cc, econ] = await Promise.all([
         supabase.from("vagin_schools").select("*").order("name"),
         supabase.from("vagin_students").select("*").order("student_id"),
         supabase.from("vagin_matrons").select("*").order("name"),
@@ -402,17 +450,23 @@ const VAGINDashboard = () => {
         supabase.from("vagin_savings").select("*").order("month"),
         supabase.from("vagin_transactions").select("*").order("created_at", { ascending: false }).limit(100),
         supabase.from("country_configs").select("*"),
+        // school_pad_economics is a DB view that aggregates server-side over
+        // EVERY real transaction per school — deliberately not derived from
+        // the capped `tx` fetch above, which would silently undercount once
+        // a school passes 100 transactions.
+        supabase.from("school_pad_economics").select("*").order("school_name"),
       ]);
       if (s.error) throw s.error;
       setData({
         schools:       s.data  as SchoolRow[],
         students:      (st.data ?? []) as Student[],
         matrons:       (m.data  ?? []) as Matron[],
-        distributions: (d.data  ?? []) as Distribution[],
+        distributions: (d.data ?? []) as Distribution[],
         sessions:      (se.data ?? []) as Session[],
         savings:       (sa.data ?? []) as Savings[],
         transactions:  (tx.data ?? []) as TxRow[],
         countryConfigs: (cc.data ?? []) as CountryConfig[],
+        schoolEconomics: (econ.data ?? []) as SchoolEconomics[],
       });
     } catch (err) { setDataError(err instanceof Error ? err.message : "Failed to load data"); }
     finally { setLoadingData(false); }
@@ -473,6 +527,9 @@ const VAGINDashboard = () => {
         } else if (t.transaction_type === "free_pad") {
           patch.free_pads_used = Math.max(0, (g.free_pads_used ?? 0) - t.pads_issued);
           patch.pads_received = Math.max(0, (g.pads_received ?? 0) - t.pads_issued);
+        } else if (t.transaction_type === "student_payment") {
+          // A PAY credit reversed: take the money back off her balance.
+          patch.balance_ngn = Math.max(0, (g.balance_ngn ?? 0) - (t.amount_ngn ?? 0));
         }
         if (Object.keys(patch).length) await supabase.from("vagin_students").update(patch).eq("id", g.id);
       }
@@ -793,10 +850,174 @@ const VAGINDashboard = () => {
   const totalSessions = data?.sessions.length ?? 0;
   const totalSavings  = data ? data.savings.reduce((s, r) => s + Number(r.total_ngn), 0) : 0;
 
+  // ── Impact & Investment economics (school_pad_economics view) ──────────────
+  // Per row: real pads issued to date at this school (not an assumed full
+  // 3-pad/₦2,100 cycle — a girl one pad in shows one pad's worth), the
+  // market value of that where the local price is known, what girls
+  // actually paid, and the resulting subsidy gap. numeric/bigint columns
+  // can arrive from PostgREST as strings, so every field is coerced with
+  // Number() before arithmetic (same defensive pattern used elsewhere in
+  // this file, e.g. totalSavings above).
+  const impactRows = (data?.schoolEconomics ?? []).map(e => {
+    const freePads = Number(e.free_pads) || 0;
+    const paidPads = Number(e.paid_pads) || 0;
+    const totalPadsForSchool = freePads + paidPads;
+    const marketPrice = e.market_pad_price != null ? Number(e.market_pad_price) : null;
+    const marketValue = marketPrice != null ? totalPadsForSchool * marketPrice : null;
+    const paid = Number(e.paid_amount_collected) || 0;
+    const saved = marketValue != null ? marketValue - paid : null;
+    const girlsReached = Number(e.girls_reached) || 0;
+    return { ...e, freePads, paidPads, totalPadsForSchool, marketPrice, marketValue, paid, saved, girlsReached };
+  });
+  // Only schools whose country has a confirmed local market price count
+  // toward the org-wide totals — never silently treat "unknown" as ₦0.
+  const impactKnownRows = impactRows.filter(r => r.marketPrice != null);
+  const impactUnknownCount = impactRows.length - impactKnownRows.length;
+  // These totals assume one shared currency (true today — only Nigeria has
+  // real transaction data yet); once Malawi/Ghana/Kenya go live this needs
+  // per-currency subtotals rather than one blended sum.
+  const impactTotalMarketValue = impactKnownRows.reduce((s, r) => s + (r.marketValue ?? 0), 0);
+  const impactTotalPaid        = impactKnownRows.reduce((s, r) => s + r.paid, 0);
+  const impactTotalSaved       = impactKnownRows.reduce((s, r) => s + (r.saved ?? 0), 0);
+  const impactTotalGirls       = impactKnownRows.reduce((s, r) => s + r.girlsReached, 0);
+  const fmtMoney = (n: number, symbol: string | null) => `${symbol ?? "₦"}${fmt(Math.round(n))}`;
+
   const schoolName  = (id: string) => data?.schools.find(s => s.id === id)?.name ?? "—";
   const countryConfigFor = (country: string) => data?.countryConfigs.find(c => c.country === country);
   const dialCodeForSchool = (schoolId: string) => countryConfigFor(data?.schools.find(s => s.id === schoolId)?.country ?? "Nigeria")?.dial_code ?? "234";
   const studentName = (id: string | null) => id ? (data?.students.find(s => s.id === id)?.name ?? "—") : "—";
+
+  // ── Monthly Impact Report (PDF export) ──────────────────────────────────────
+  // Same economics as the Impact tab, scoped to one calendar month. Queried
+  // fresh rather than reusing the capped 100-row transaction fetch — this is
+  // a deliberate one-off action, not something re-run on every render, so a
+  // month-bounded query stays small on its own without needing a view.
+  // jsPDF's built-in fonts don't reliably render ₦/₵ or accented characters
+  // (verified — they either drop or mis-render), so the PDF spells out
+  // currency codes ("NGN 2,100") instead of symbols, unlike the on-screen UI.
+  const exportMonthlyReport = async () => {
+    if (!data) return;
+    setExportingReport(true);
+    try {
+      const monthStart = `${reportMonth}-01`;
+      const [y, m] = reportMonth.split("-").map(Number);
+      const nextMonthStart = new Date(Date.UTC(y, m, 1)).toISOString().slice(0, 10);
+
+      const { data: monthTx, error } = await supabase
+        .from("vagin_transactions")
+        .select("school_id, transaction_type, pads_issued, amount_ngn, student_id")
+        .gte("issued_date", monthStart)
+        .lt("issued_date", nextMonthStart)
+        .eq("voided", false)
+        .in("transaction_type", ["free_pad", "paid_pad"]);
+      if (error) throw error;
+
+      type Agg = { freePads: number; paidPads: number; paid: number; girls: Set<string> };
+      const bySchool = new Map<string, Agg>();
+      (monthTx ?? []).forEach(t => {
+        if (!t.school_id) return;
+        const row = bySchool.get(t.school_id) ?? { freePads: 0, paidPads: 0, paid: 0, girls: new Set<string>() };
+        if (t.transaction_type === "free_pad") row.freePads += t.pads_issued || 0;
+        if (t.transaction_type === "paid_pad") { row.paidPads += t.pads_issued || 0; row.paid += Number(t.amount_ngn) || 0; }
+        if (t.student_id) row.girls.add(t.student_id);
+        bySchool.set(t.school_id, row);
+      });
+
+      const rows = data.schools.map(s => {
+        const r = bySchool.get(s.id);
+        const cc = countryConfigFor(s.country);
+        const marketPrice = cc?.market_pad_price != null ? Number(cc.market_pad_price) : null;
+        const freePads = r?.freePads ?? 0;
+        const paidPads = r?.paidPads ?? 0;
+        const totalPadsThisMonth = freePads + paidPads;
+        const paid = r?.paid ?? 0;
+        const marketValue = marketPrice != null ? totalPadsThisMonth * marketPrice : null;
+        const saved = marketValue != null ? marketValue - paid : null;
+        const girlsReached = r?.girls.size ?? 0;
+        return { school: s.name, currencyCode: cc?.currency_code ?? "NGN", freePads, paidPads, totalPadsThisMonth, paid, marketValue, saved, girlsReached };
+      }).filter(r => r.totalPadsThisMonth > 0);
+
+      const known = rows.filter(r => r.marketValue != null);
+      const totalMarketValue = known.reduce((s, r) => s + (r.marketValue ?? 0), 0);
+      const totalPaid = known.reduce((s, r) => s + r.paid, 0);
+      const totalSaved = known.reduce((s, r) => s + (r.saved ?? 0), 0);
+      const totalGirls = known.reduce((s, r) => s + r.girlsReached, 0);
+      const unknownCount = rows.length - known.length;
+      const money = (n: number, code: string) => `${code} ${fmt(Math.round(n))}`;
+      const monthLabel = new Date(`${reportMonth}-01T00:00:00Z`).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
+
+      const doc = new jsPDF();
+      doc.setFontSize(17);
+      doc.text("VAGIN PAD KOLO - Monthly Impact Report", 14, 18);
+      doc.setFontSize(11);
+      doc.setTextColor(100);
+      doc.text(monthLabel, 14, 25);
+      doc.setFontSize(9);
+      doc.text(`Generated ${new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}`, 14, 31);
+
+      doc.setTextColor(20);
+      doc.setFontSize(9.5);
+      const intro = "This report summarizes the PAD KOLO menstrual health subsidy program for the month above. For every pad issued, a girl either receives it free (fully donor-sponsored) or pays a subsidized price, with VAGIN covering the gap between that and the local market value. Figures reflect real WhatsApp bot activity recorded this month only, not a hypothetical full cycle.";
+      const introLines = doc.splitTextToSize(intro, 182);
+      doc.text(introLines, 14, 40);
+      let y2 = 40 + introLines.length * 4.5 + 6;
+
+      doc.setFontSize(12);
+      doc.text("Summary", 14, y2);
+      y2 += 7;
+      doc.setFontSize(10);
+      const summaryLines = [
+        `Market value invested: ${money(totalMarketValue, "NGN")}`,
+        `Paid by students: ${money(totalPaid, "NGN")}`,
+        `Subsidized by VAGIN: ${money(totalSaved, "NGN")}${totalMarketValue > 0 ? ` (${Math.round((totalSaved / totalMarketValue) * 100)}% of market value)` : ""}`,
+        `Girls reached this month: ${totalGirls}`,
+      ];
+      summaryLines.forEach((line, i) => doc.text(line, 14, y2 + i * 6));
+      y2 += summaryLines.length * 6 + 6;
+
+      if (unknownCount > 0) {
+        doc.setTextColor(180, 100, 0);
+        doc.setFontSize(8.5);
+        const warn = doc.splitTextToSize(`${unknownCount} school(s) excluded from the totals above - their country has no confirmed local market pad price set yet.`, 182);
+        doc.text(warn, 14, y2);
+        y2 += warn.length * 4.5 + 4;
+        doc.setTextColor(20);
+      }
+
+      if (rows.length === 0) {
+        doc.setFontSize(10);
+        doc.text("No pad activity recorded this month.", 14, y2 + 4);
+      } else {
+        autoTable(doc, {
+          startY: y2 + 2,
+          head: [["School", "Girls", "Free/Paid Pads", "Market Value", "Paid by Students", "Subsidized"]],
+          body: rows.map(r => [
+            r.school,
+            String(r.girlsReached),
+            `${r.freePads} / ${r.paidPads}`,
+            r.marketValue != null ? money(r.marketValue, r.currencyCode) : "-",
+            money(r.paid, r.currencyCode),
+            r.saved != null ? money(r.saved, r.currencyCode) : "-",
+          ]),
+          styles: { fontSize: 9 },
+          headStyles: { fillColor: [98, 1, 127] },
+        });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const finalY = (doc as any).lastAutoTable?.finalY ?? y2 + 10;
+        doc.setFontSize(7.5);
+        doc.setTextColor(120);
+        const method = doc.splitTextToSize("Market value = pads issued this month x the local market retail price (Nigeria: NGN 700, per the project brief). Paid = amounts actually recorded via PAY and paid-pad issuance. Subsidized = the gap between the two, i.e. VAGIN's real contribution.", 182);
+        doc.text(method, 14, finalY + 10);
+      }
+
+      doc.save(`VAGIN-Impact-Report-${reportMonth}.pdf`);
+      showToast("Report exported");
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Failed to export report", "error");
+    } finally {
+      setExportingReport(false);
+    }
+  };
 
   const monthlyDist = data ? (() => {
     const byM: Record<string, number> = {};
@@ -820,6 +1041,7 @@ const VAGINDashboard = () => {
     { id: "pad_kolo"      as TabId, label: "PAD KOLO",      Icon: Droplets },
     { id: "vaginart"      as TabId, label: "VaginART",      Icon: Palette },
     { id: "transactions"  as TabId, label: "Transactions",  Icon: ClipboardList },
+    { id: "impact"        as TabId, label: "Impact & Investment", Icon: PieChart },
     { id: "gallery"       as TabId, label: "Gallery CMS",   Icon: Images },
     { id: "vagin_images"  as TabId, label: "VAGIN Images",  Icon: Camera },
     { id: "viva_products" as TabId, label: "VIVA Products", Icon: ShoppingBag },
@@ -834,7 +1056,7 @@ const VAGINDashboard = () => {
   const ILLUSTRATIONS_GOLD = "#C9974A"; // warm gallery-wall gold, distinct from GOLD (used elsewhere as a UI accent)
   const VIVA_WINE = "#8A0F35";           // Velvet Wine, lightened slightly for legibility on #080810
 
-  const VAGIN_TAB_IDS: readonly TabId[] = ["overview", "schools", "students", "matrons", "pad_kolo", "vaginart", "transactions"];
+  const VAGIN_TAB_IDS: readonly TabId[] = ["overview", "schools", "students", "matrons", "pad_kolo", "vaginart", "transactions", "impact"];
   const ILLUSTRATIONS_TAB_IDS: readonly TabId[] = ["gallery", "vagin_images"];
   const VIVA_TAB_IDS: readonly TabId[] = ["viva_products"];
   const SECTIONS = [
@@ -1163,13 +1385,14 @@ const VAGINDashboard = () => {
                       headers={["Time", "Type", "Student", "Issued By", "Pads", "Amount", "Source", "Status", ""]}
                       rows={data.transactions.map(t => {
                         const isBot = t.source === "whatsapp_bot" || t.source === "whatsapp";
-                        // Real values written by the bot: "free_pad" | "paid_pad" | "deposit"
-                        // (see whatsapp-webhook/index.ts) — pad issuance reads pink, a
-                        // fund deposit reads gold.
-                        const isDeposit = t.transaction_type === "deposit";
+                        // Real values written by the bot: "free_pad" | "paid_pad" |
+                        // "student_payment" | "deposit" (see whatsapp-webhook/index.ts) —
+                        // pad issuance reads pink, money coming in (a girl paying via PAY,
+                        // or the matron's school-level DEPOSIT) reads gold.
+                        const isMoneyIn = t.transaction_type === "deposit" || t.transaction_type === "student_payment";
                         return [
                         <span key="time" style={{ opacity: t.voided ? 0.4 : 1 }}>{fmtDate(t.created_at)}</span>,
-                        <span key="type" style={{ fontSize: 11, padding: "3px 10px", borderRadius: 999, background: isDeposit ? "rgba(217,119,6,0.12)" : "rgba(237,21,93,0.15)", color: isDeposit ? GOLD : PINK, border: `1px solid ${isDeposit ? "rgba(217,119,6,0.3)" : "rgba(237,21,93,0.3)"}`, textDecoration: t.voided ? "line-through" : "none", opacity: t.voided ? 0.5 : 1 }}>{t.transaction_type.replace(/_/g, " ")}</span>,
+                        <span key="type" style={{ fontSize: 11, padding: "3px 10px", borderRadius: 999, background: isMoneyIn ? "rgba(217,119,6,0.12)" : "rgba(237,21,93,0.15)", color: isMoneyIn ? GOLD : PINK, border: `1px solid ${isMoneyIn ? "rgba(217,119,6,0.3)" : "rgba(237,21,93,0.3)"}`, textDecoration: t.voided ? "line-through" : "none", opacity: t.voided ? 0.5 : 1 }}>{t.transaction_type.replace(/_/g, " ")}</span>,
                         <span key="stu" style={{ opacity: t.voided ? 0.4 : 1 }}>{studentName(t.student_id)}</span>,
                         <span key="iss" style={{ opacity: t.voided ? 0.4 : 1 }}>{t.issued_by || "—"}</span>,
                         <span key="pads" style={{ opacity: t.voided ? 0.4 : 1 }}>{t.pads_issued || "—"}</span>,
@@ -1193,6 +1416,64 @@ const VAGINDashboard = () => {
                   )}
                 </Card>
                 {infoBox(<><strong>Phase 2 ready:</strong> Every pad issuance, savings deposit, and balance check from the WhatsApp bot will be automatically logged here with the student ID, matron name, and channel (whatsapp / manual). This is your full audit trail for donors and stakeholders.</>, "#22C55E")}
+              </motion.div>
+            )}
+
+            {/* ── IMPACT & INVESTMENT ── */}
+            {activeTab === "impact" && (
+              <motion.div key="impact" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", gap: 10, marginBottom: 18 }}>
+                  <input type="month" value={reportMonth} onChange={e => setReportMonth(e.target.value)}
+                    style={{ ...inputSx, width: "auto", padding: "9px 12px", fontSize: 12 }} />
+                  <motion.button onClick={exportMonthlyReport} disabled={exportingReport} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                    style={{ display: "flex", alignItems: "center", gap: 7, background: `${PURPLE}22`, border: `1px solid ${PURPLE}55`, color: "#FAFAFA", borderRadius: 999, padding: "9px 18px", fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, fontWeight: 600, cursor: exportingReport ? "default" : "pointer", opacity: exportingReport ? 0.6 : 1 }}>
+                    <FileDown size={13} />
+                    {exportingReport ? "Generating…" : "Export Monthly Report (PDF)"}
+                  </motion.button>
+                </div>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" style={{ marginBottom: 24 }}>
+                  <StatCard icon={Coins}      label="Market Value Invested" value={fmtNGN(impactTotalMarketValue)} sub={impactUnknownCount > 0 ? `${impactUnknownCount} school(s) missing local price` : "all schools, to date"} color={GOLD} />
+                  <StatCard icon={Droplets}   label="Paid by Students"     value={fmtNGN(impactTotalPaid)}        sub={`${fmt(impactTotalGirls)} girls reached`} color={PINK} />
+                  <StatCard icon={TrendingUp} label="Subsidized by VAGIN"  value={fmtNGN(impactTotalSaved)}       sub={impactTotalMarketValue > 0 ? `${Math.round((impactTotalSaved / impactTotalMarketValue) * 100)}% of market value` : "—"} color={PL} />
+                  <StatCard icon={Users}      label="Avg. Value per Girl"  value={impactTotalGirls > 0 ? fmtNGN(impactTotalMarketValue / impactTotalGirls) : "—"} sub={impactTotalGirls > 0 ? `${fmtNGN(impactTotalPaid / impactTotalGirls)} paid · ${fmtNGN(impactTotalSaved / impactTotalGirls)} saved` : "no pads issued yet"} color={PURPLE} />
+                </div>
+
+                <Card title="Funding split by school">
+                  {impactKnownRows.length === 0 ? (
+                    <div style={{ textAlign: "center", padding: "40px 0" }}>
+                      <PieChart size={32} color="rgba(250,250,250,0.15)" style={{ marginBottom: 12 }} />
+                      <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 14, color: "rgba(250,250,250,0.35)", margin: "0 0 6px" }}>No priced schools yet</p>
+                      <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, color: "rgba(250,250,250,0.2)", margin: 0 }}>Set a local market pad price in country_configs for at least one school's country to see the breakdown.</p>
+                    </div>
+                  ) : (
+                    <StackedBarChart
+                      data={impactKnownRows.map(r => ({ label: r.school_name, a: r.paid, b: r.saved ?? 0 }))}
+                      colorA={PINK} colorB={GOLD} labelA="Paid by students" labelB="Subsidized by VAGIN"
+                    />
+                  )}
+                </Card>
+
+                <Card title="Per-school breakdown">
+                  <Table
+                    headers={["School", "Girls Reached", "Free / Paid Pads", "Market Value", "Paid by Students", "Subsidized", "Avg / Girl"]}
+                    rows={impactRows.map(r => r.marketPrice == null ? [
+                      r.school_name,
+                      fmt(r.girlsReached),
+                      `${r.freePads} / ${r.paidPads}`,
+                      <span key="w" style={{ color: GOLD, fontSize: 11, display: "flex", alignItems: "center", gap: 5 }}><AlertCircle size={12} />local price not set</span>,
+                      "—", "—", "—",
+                    ] : [
+                      r.school_name,
+                      fmt(r.girlsReached),
+                      `${r.freePads} / ${r.paidPads}`,
+                      fmtMoney(r.marketValue ?? 0, r.currency_symbol),
+                      fmtMoney(r.paid, r.currency_symbol),
+                      fmtMoney(r.saved ?? 0, r.currency_symbol),
+                      r.girlsReached > 0 ? fmtMoney((r.marketValue ?? 0) / r.girlsReached, r.currency_symbol) : "—",
+                    ])}
+                  />
+                </Card>
+                {infoBox(<><strong>How this is calculated:</strong> Market value = real pads issued to date × the local market retail price (₦700 in Nigeria, per the project brief — 1 free + 2 subsidized pads across a 3-month cycle works out to ₦2,100 value / ₦400 paid / ₦1,700 saved per girl who completes a full cycle). Paid by students = actual amounts recorded through PAY and paid-pad issuance. Subsidized = the gap between the two — VAGIN's real contribution. This reflects real issuance so far, not an assumed complete cycle, so it grows as more pads go out.</>, PL)}
               </motion.div>
             )}
 
