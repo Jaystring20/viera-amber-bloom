@@ -148,19 +148,34 @@ function parseCommand(text: string): { type: string; data: Record<string, unknow
   return null;
 }
 
-async function getMatronSchool(fromPhone: string): Promise<{ schoolId: string; matronName: string; schoolName: string } | null> {
+// Falls back to Naira/₦200 only if the school's country has no
+// country_configs row (or no local price set) yet — never silently mislabels
+// another country's money, but a missing local price still needs a human to
+// set the real one (logged below, not guessed).
+const DEFAULT_CURRENCY_SYMBOL = "₦";
+const DEFAULT_PAID_PAD_PRICE = 200;
+
+async function getMatronSchool(fromPhone: string): Promise<{ schoolId: string; matronName: string; schoolName: string; currencySymbol: string; paidPadPrice: number } | null> {
   try {
     const { data, error } = await supabase
       .from("teachers_matrons")
-      .select("school_id, name, vagin_schools(name)")
+      .select("school_id, name, vagin_schools(name, country)")
       .eq("phone", fromPhone.replace(/^\+/, ""))
       .single();
     if (error || !data) {
       console.log(`[Webhook] Matron not found for phone: ${fromPhone}`);
       return null;
     }
-    const school = data.vagin_schools as unknown as { name?: string } | null;
-    return { schoolId: data.school_id, matronName: data.name, schoolName: school?.name || "your school" };
+    const school = data.vagin_schools as unknown as { name?: string; country?: string } | null;
+    let currencySymbol = DEFAULT_CURRENCY_SYMBOL;
+    let paidPadPrice = DEFAULT_PAID_PAD_PRICE;
+    if (school?.country) {
+      const { data: cc } = await supabase.from("country_configs").select("currency_symbol, paid_pad_price").eq("country", school.country).maybeSingle();
+      if (cc?.currency_symbol) currencySymbol = cc.currency_symbol;
+      if (cc?.paid_pad_price != null) paidPadPrice = cc.paid_pad_price;
+      else console.warn(`[Webhook] No paid_pad_price set for ${school.country} — falling back to ${DEFAULT_PAID_PAD_PRICE}. Set the real local price in country_configs.`);
+    }
+    return { schoolId: data.school_id, matronName: data.name, schoolName: school?.name || "your school", currencySymbol, paidPadPrice };
   } catch (err) {
     console.error("[Webhook] Error fetching matron:", err);
     return null;
@@ -267,7 +282,11 @@ async function sendVaginIntroButtons(toPhone: string, nudge = false): Promise<bo
   });
 }
 
-async function executeCommand(command: { type: string; data: Record<string, unknown> }, schoolId: string, fromPhone: string): Promise<string> {
+async function executeCommand(command: { type: string; data: Record<string, unknown> }, schoolId: string, fromPhone: string, currencySymbol: string, paidPadPrice: number): Promise<string> {
+  // Universal grouping (commas) regardless of currency — avoids depending on
+  // locale/ICU support for less-common locales; the currency symbol itself
+  // carries which money it is.
+  const money = (n: number) => `${currencySymbol}${n.toLocaleString("en-US")}`;
   try {
     switch (command.type) {
       case "CHECK_ID": {
@@ -276,20 +295,20 @@ async function executeCommand(command: { type: string; data: Record<string, unkn
         if (error || !students) return `❌ Student ID "${studentId}" not found.`;
         const freePadsRemaining = Math.max(0, 1 - (students.free_pads_used || 0));
         const balance = students.balance_ngn || 0;
-        return `📊 Student: ${students.name}\nBalance: ₦${balance.toLocaleString("en-NG")}\nFree pads: ${freePadsRemaining}/1 remaining`;
+        return `📊 Student: ${students.name}\nBalance: ${money(balance)}\nFree pads: ${freePadsRemaining}/1 remaining`;
       }
       case "ISSUE_PAD": {
         const studentId = command.data.studentId as string;
         const padType = command.data.padType as string;
         const { data: students, error: studentError } = await supabase.from("vagin_students").select("id, name, balance_ngn, free_pads_used").eq("school_id", schoolId).eq("student_id", studentId).single();
         if (studentError || !students) return `❌ Student ID "${studentId}" not found.`;
-        if (padType === "FREE" && (students.free_pads_used || 0) >= 1) return `❌ Cannot issue free pad to ${students.name}.\nFree pads used: ${students.free_pads_used}/1\nShe must pay ₦200 for the next pad.`;
-        const { error: txError } = await supabase.from("vagin_transactions").insert({ student_id: students.id, school_id: schoolId, transaction_type: padType === "FREE" ? "free_pad" : "paid_pad", pads_issued: 1, amount_ngn: padType === "PAID" ? 200 : null, source: "whatsapp_bot", issued_date: new Date().toISOString().split("T")[0], issued_by: `WhatsApp Bot (${fromPhone})` });
+        if (padType === "FREE" && (students.free_pads_used || 0) >= 1) return `❌ Cannot issue free pad to ${students.name}.\nFree pads used: ${students.free_pads_used}/1\nShe must pay ${money(paidPadPrice)} for the next pad.`;
+        const { error: txError } = await supabase.from("vagin_transactions").insert({ student_id: students.id, school_id: schoolId, transaction_type: padType === "FREE" ? "free_pad" : "paid_pad", pads_issued: 1, amount_ngn: padType === "PAID" ? paidPadPrice : null, source: "whatsapp_bot", issued_date: new Date().toISOString().split("T")[0], issued_by: `WhatsApp Bot (${fromPhone})` });
         if (txError) return `⚠️ Error recording pad: ${txError.message}`;
-        const newBalance = padType === "PAID" ? Math.max(0, students.balance_ngn - 200) : students.balance_ngn;
+        const newBalance = padType === "PAID" ? Math.max(0, students.balance_ngn - paidPadPrice) : students.balance_ngn;
         const newFreeUsed = (students.free_pads_used || 0) + (padType === "FREE" ? 1 : 0);
         await supabase.from("vagin_students").update({ balance_ngn: newBalance, free_pads_used: newFreeUsed }).eq("id", students.id);
-        return `✓ Pad issued to ${students.name}\nType: ${padType === "FREE" ? "Free" : "₦200"}\nNew balance: ₦${newBalance.toLocaleString("en-NG")}\nFree pads remaining: ${Math.max(0, 1 - newFreeUsed)}/1`;
+        return `✓ Pad issued to ${students.name}\nType: ${padType === "FREE" ? "Free" : money(paidPadPrice)}\nNew balance: ${money(newBalance)}\nFree pads remaining: ${Math.max(0, 1 - newFreeUsed)}/1`;
       }
       case "DEPOSIT": {
         const amount = command.data.amount as number;
@@ -299,7 +318,7 @@ async function executeCommand(command: { type: string; data: Record<string, unkn
         await supabase.from("vagin_transactions").insert({ school_id: schoolId, transaction_type: "deposit", pads_issued: 0, amount_ngn: amount, source: "matron_deposit", notes: `Via WhatsApp from ${fromPhone}` });
         const newBalance = previousBalance + amount;
         await supabase.from("vagin_schools").update({ current_balance: newBalance }).eq("id", schoolId);
-        return `✓ Deposit recorded\nAmount: ₦${amount.toLocaleString("en-NG")}\nSchool: ${schoolName}\nNew balance: ₦${newBalance.toLocaleString("en-NG")}`;
+        return `✓ Deposit recorded\nAmount: ${money(amount)}\nSchool: ${schoolName}\nNew balance: ${money(newBalance)}`;
       }
       case "REPORT": {
         const reportType = command.data.reportType as string;
@@ -311,7 +330,7 @@ async function executeCommand(command: { type: string; data: Record<string, unkn
         const paidIssued = transactions?.filter((t) => t.transaction_type === "paid_pad").reduce((sum: number, t: any) => sum + (t.pads_issued || 0), 0) || 0;
         const revenue = transactions?.filter((t) => t.transaction_type === "paid_pad").reduce((sum: number, t: any) => sum + (t.amount_ngn || 0), 0) || 0;
         const totalPads = freeIssued + paidIssued;
-        return reportType === "DAILY" ? `📈 Today's Report\nPads issued: ${totalPads}\nFree: ${freeIssued}\nPaid: ${paidIssued}\nRevenue: ₦${revenue.toLocaleString("en-NG")}` : `📊 Cycle Report\nTotal pads issued: ${totalPads}\nRevenue: ₦${revenue.toLocaleString("en-NG")}`;
+        return reportType === "DAILY" ? `📈 Today's Report\nPads issued: ${totalPads}\nFree: ${freeIssued}\nPaid: ${paidIssued}\nRevenue: ${money(revenue)}` : `📊 Cycle Report\nTotal pads issued: ${totalPads}\nRevenue: ${money(revenue)}`;
       }
       default: return buildActiveReminder("there");
     }
@@ -419,7 +438,7 @@ async function handleMessage(payload: WebhookPayload, signature: string): Promis
       if (!command) {
         await sendWhatsAppMessage(fromPhone, buildActiveReminder(matronSchool.matronName));
       } else {
-        const response = await executeCommand(command, matronSchool.schoolId, fromPhone);
+        const response = await executeCommand(command, matronSchool.schoolId, fromPhone, matronSchool.currencySymbol, matronSchool.paidPadPrice);
         await sendWhatsAppMessage(fromPhone, response);
       }
       await upsertSession(fromPhone, "ACTIVE");

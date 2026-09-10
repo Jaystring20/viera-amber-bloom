@@ -22,6 +22,7 @@ const PL     = "#C77DFF";
 interface SchoolRow { id: string; name: string; code: string | null; country: string; state_region: string | null; contact_name: string | null; city: string | null; girls_reached: number }
 interface Student   { id: string; student_id: string; name: string; school_id: string | null; class: string | null; balance_ngn: number; free_pads_used: number; paid_pads_used: number; pads_received: number; active: boolean; created_at: string }
 interface Matron    { id: string; name: string; phone: string; school_id: string | null; active: boolean; created_at: string }
+interface CountryConfig { country: string; dial_code: string; currency_code: string; currency_symbol: string }
 interface Distribution { id: string; school_id: string; distribution_date: string; girls_count: number; pads_count: number; savings_collected_ngn: number; distributed_by: string | null }
 interface Session      { id: string; school_id: string; session_date: string; topic: string; girls_attended: number; facilitator: string | null; delivery_format: string }
 interface Savings      { id: string; school_id: string; month: string; contributors: number; total_ngn: number }
@@ -30,7 +31,7 @@ interface TxRow        { id: string; student_id: string | null; matron_id: strin
 interface DashData {
   schools: SchoolRow[]; students: Student[]; matrons: Matron[];
   distributions: Distribution[]; sessions: Session[];
-  savings: Savings[]; transactions: TxRow[];
+  savings: Savings[]; transactions: TxRow[]; countryConfigs: CountryConfig[];
 }
 
 // ── Maps ───────────────────────────────────────────────────────────────────────
@@ -60,6 +61,31 @@ const codeFromName = (name: string) =>
 // Build the globally-unique student ID: SCHOOLCODE-INITIALS-SEQ  e.g. LGS-FA-001
 const buildStudentId = (schoolCode: string, name: string, seq: number) =>
   `${schoolCode}-${studentInitials(name)}-${String(seq).padStart(3, "0")}`;
+
+// ── Phone normalization ────────────────────────────────────────────────────────
+// Canonical bot-matching format: digits only, no "+", no local trunk "0" —
+// exactly what WhatsApp sends as the inbound message's `from` field. Applied
+// at every entry point (manual matron form, CSV import) so the bot's phone
+// lookup never silently fails on a formatting mismatch.
+type PhoneResult = { ok: true; phone: string } | { ok: false; reason: string };
+function normalizePhone(raw: string, dialCode: string): PhoneResult {
+  let digits = raw.trim().replace(/[\s\-()]/g, "");
+  if (digits.startsWith("+")) digits = digits.slice(1);
+  else if (digits.startsWith("00")) digits = digits.slice(2);
+  if (!digits) return { ok: false, reason: "Phone number is required." };
+  if (!/^\d+$/.test(digits)) return { ok: false, reason: "Phone number must contain only digits (spaces/dashes/parens are fine, letters aren't)." };
+  if (digits.startsWith(dialCode)) {
+    // already carries the right country code
+  } else if (digits.startsWith("0")) {
+    digits = dialCode + digits.slice(1);
+  } else {
+    return { ok: false, reason: `Doesn't start with +${dialCode} (this school's country code) or a local "0" prefix — check the country is right.` };
+  }
+  if (digits.length < dialCode.length + 7 || digits.length > dialCode.length + 11) {
+    return { ok: false, reason: "Unexpected length for a phone number once normalized — double check the digits." };
+  }
+  return { ok: true, phone: digits };
+}
 
 // ── Bulk import (CSV) ──────────────────────────────────────────────────────────
 // One row per student (or per matron, if a school has no students yet). School
@@ -361,7 +387,7 @@ const VAGINDashboard = () => {
   const fetchData = useCallback(async () => {
     setLoadingData(true); setDataError(null);
     try {
-      const [s, st, m, d, se, sa, tx] = await Promise.all([
+      const [s, st, m, d, se, sa, tx, cc] = await Promise.all([
         supabase.from("vagin_schools").select("*").order("name"),
         supabase.from("vagin_students").select("*").order("student_id"),
         supabase.from("vagin_matrons").select("*").order("name"),
@@ -369,6 +395,7 @@ const VAGINDashboard = () => {
         supabase.from("vagin_sessions").select("*").order("session_date", { ascending: false }),
         supabase.from("vagin_savings").select("*").order("month"),
         supabase.from("vagin_transactions").select("*").order("created_at", { ascending: false }).limit(100),
+        supabase.from("country_configs").select("*"),
       ]);
       if (s.error) throw s.error;
       setData({
@@ -379,6 +406,7 @@ const VAGINDashboard = () => {
         sessions:      (se.data ?? []) as Session[],
         savings:       (sa.data ?? []) as Savings[],
         transactions:  (tx.data ?? []) as TxRow[],
+        countryConfigs: (cc.data ?? []) as CountryConfig[],
       });
     } catch (err) { setDataError(err instanceof Error ? err.message : "Failed to load data"); }
     finally { setLoadingData(false); }
@@ -480,9 +508,15 @@ const VAGINDashboard = () => {
   const openAddMatron  = () => { setMatronForm({ id: "", name: "", phone: "", school_id: data?.schools[0]?.id ?? "", active: true }); setModal("add-matron"); };
   const openEditMatron = (m: Matron) => { setMatronForm({ id: m.id, name: m.name, phone: m.phone, school_id: m.school_id ?? "", active: m.active }); setModal("edit-matron"); };
   const saveMatron = async (e: React.FormEvent) => {
-    e.preventDefault(); setSaving(true);
+    e.preventDefault();
+    const dialCode = data?.schools.find(s => s.id === matronForm.school_id)?.country
+      ? data.countryConfigs.find(c => c.country === data.schools.find(s => s.id === matronForm.school_id)!.country)?.dial_code
+      : undefined;
+    const phoneResult = normalizePhone(matronForm.phone, dialCode ?? "234");
+    if (!phoneResult.ok) { showToast(phoneResult.reason, "error"); return; }
+    setSaving(true);
     try {
-      const payload = { name: matronForm.name, phone: matronForm.phone, school_id: matronForm.school_id || null, active: matronForm.active };
+      const payload = { name: matronForm.name, phone: phoneResult.phone, school_id: matronForm.school_id || null, active: matronForm.active };
 
       // Save to vagin_matrons (dashboard table)
       const { error: error1, data: savedData } = matronForm.id
@@ -510,8 +544,9 @@ const VAGINDashboard = () => {
   const openBulkImport = () => { setImportRows([]); setImportParseErrors([]); setImportSummary(null); setModal("bulk-import"); };
 
   const downloadImportTemplate = () => {
-    const example = ["LGS", "Lagos Girls School", "Nigeria", "Lagos", "Lagos State", "Mrs. Adeyemi", "Mrs Bamidele", "2348038838094", "true", "", "Amara Okafor", "SS2", "0", "0", "0"];
-    const csv = `${IMPORT_HEADERS.join(",")}\n${example.join(",")}\n`;
+    const example1 = ["LGS", "Lagos Girls School", "Nigeria", "Lagos", "Lagos State", "Mrs. Adeyemi", "Mrs Bamidele", "08038838094", "true", "", "Amara Okafor", "SS2", "0", "0", "0"];
+    const example2 = ["BAM", "Blantyre Academy for Malawi Mission", "Malawi", "Blantyre", "Southern Region", "Mr. Banda", "Grace Phiri", "0991234567", "true", "", "Chikondi Banda", "Form 2", "0", "0", "0"];
+    const csv = `${IMPORT_HEADERS.join(",")}\n${example1.join(",")}\n${example2.join(",")}\n`;
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -548,6 +583,7 @@ const VAGINDashboard = () => {
     const schoolIdByCode = new Map<string, string>();
     const matronIdByPhone = new Map<string, string>();
     const nextSeq = new Map<string, number>(); // schoolId -> next auto student sequence
+    const dialCodeByCountry = new Map((data?.countryConfigs ?? []).map(c => [c.country, c.dial_code]));
     let schoolsCount = 0, matronsCount = 0, studentsCount = 0;
 
     for (let i = 0; i < importRows.length; i++) {
@@ -574,7 +610,10 @@ const VAGINDashboard = () => {
           schoolsCount++;
         }
 
-        const phone = r.matron_phone.trim();
+        const dialCode = dialCodeByCountry.get(r.school_country.trim() || "Nigeria") ?? "234";
+        const phoneResult = normalizePhone(r.matron_phone, dialCode);
+        if (!phoneResult.ok) throw new Error(`matron_phone: ${phoneResult.reason}`);
+        const phone = phoneResult.phone;
         let matronId = matronIdByPhone.get(phone);
         if (!matronId) {
           const activeVal = r.matron_active.trim().toLowerCase();
@@ -691,6 +730,8 @@ const VAGINDashboard = () => {
   const totalSavings  = data ? data.savings.reduce((s, r) => s + Number(r.total_ngn), 0) : 0;
 
   const schoolName  = (id: string) => data?.schools.find(s => s.id === id)?.name ?? "—";
+  const countryConfigFor = (country: string) => data?.countryConfigs.find(c => c.country === country);
+  const dialCodeForSchool = (schoolId: string) => countryConfigFor(data?.schools.find(s => s.id === schoolId)?.country ?? "Nigeria")?.dial_code ?? "234";
   const studentName = (id: string | null) => id ? (data?.students.find(s => s.id === id)?.name ?? "—") : "—";
   const matronName  = (id: string | null) => id ? (data?.matrons.find(m => m.id === id)?.name ?? "—") : "—";
 
@@ -1063,6 +1104,11 @@ const VAGINDashboard = () => {
                   <option value="Ghana">Ghana</option>
                   <option value="Kenya">Kenya</option>
                 </select>
+                {(() => { const cc = countryConfigFor(schoolForm.country); return cc && (
+                  <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: "rgba(250,250,250,0.3)", margin: "5px 0 0" }}>
+                    Phone numbers here will be normalized to +{cc.dial_code}… and the WhatsApp bot will report amounts in {cc.currency_code} ({cc.currency_symbol}).
+                  </p>
+                ); })()}
               </F>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <F label="City"><input style={inputSx} value={schoolForm.city} onChange={e => setSchoolForm(p => ({ ...p, city: e.target.value }))} placeholder="e.g. Lagos" /></F>
@@ -1124,15 +1170,17 @@ const VAGINDashboard = () => {
           <Modal key="matron-modal" title={modal === "add-matron" ? "Add Matron" : "Edit Matron"} onClose={closeModal}>
             <form onSubmit={saveMatron} style={{ display: "flex", flexDirection: "column" }}>
               <F label="Full Name *"><input required style={inputSx} value={matronForm.name} onChange={e => setMatronForm(p => ({ ...p, name: e.target.value }))} /></F>
-              <F label="WhatsApp Number * (with country code)">
-                <input required style={inputSx} value={matronForm.phone} onChange={e => setMatronForm(p => ({ ...p, phone: e.target.value }))} placeholder="+2348012345678" />
-                <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: "rgba(250,250,250,0.3)", margin: "5px 0 0" }}>Used to authenticate the matron in the WhatsApp bot.</p>
-              </F>
               <F label="School">
                 <select style={inputSx} value={matronForm.school_id} onChange={e => setMatronForm(p => ({ ...p, school_id: e.target.value }))}>
                   <option value="">— Select school —</option>
                   {schoolOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
+              </F>
+              <F label="WhatsApp Number * (with or without country code)">
+                <input required style={inputSx} value={matronForm.phone} onChange={e => setMatronForm(p => ({ ...p, phone: e.target.value }))} placeholder={`0803... or +${dialCodeForSchool(matronForm.school_id)}803...`} />
+                <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: "rgba(250,250,250,0.3)", margin: "5px 0 0" }}>
+                  Auto-normalized to +{dialCodeForSchool(matronForm.school_id)}… (the selected school's country code) on save — used to authenticate the matron in the WhatsApp bot.
+                </p>
               </F>
               <F label="Status">
                 <select style={inputSx} value={matronForm.active ? "true" : "false"} onChange={e => setMatronForm(p => ({ ...p, active: e.target.value === "true" }))}>
@@ -1152,7 +1200,7 @@ const VAGINDashboard = () => {
         {modal === "bulk-import" && (
           <Modal key="bulk-import-modal" title="Bulk Import — Schools, Matrons & Students" onClose={closeModal} width={640}>
             <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "rgba(250,250,250,0.6)", lineHeight: 1.6, margin: "0 0 16px" }}>
-              One row per student (or per matron, if a school has no students yet). Each row's school and matron are created or updated automatically — matrons are wired into the WhatsApp bot immediately, no extra step needed. Re-uploading later updates existing schools and adds new matrons/students without duplicating anything.
+              One row per student (or per matron, if a school has no students yet). Each row's school and matron are created or updated automatically — matrons are wired into the WhatsApp bot immediately, no extra step needed. Phone numbers are normalized and validated against the row's <code>school_country</code> (local "0..." or full "+country code" both work); rows with an unrecognized number are rejected individually rather than silently imported. Re-uploading later updates existing schools and adds new matrons/students without duplicating anything.
             </p>
             <button type="button" onClick={downloadImportTemplate} style={{ ...cancelBtnSx, marginBottom: 18 }}>Download CSV Template</button>
 
