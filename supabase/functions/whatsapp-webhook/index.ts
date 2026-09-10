@@ -28,9 +28,9 @@ const SESSION_TIMEOUT_MS = 24 * 60 * 60 * 1000;
 
 const VAGIN_INTRO = `👋 Welcome to *Viera Amber*!
 
-*VAGIN* — the Viera Amber Girls Initiative — supports girls' menstrual health through pad distribution, education and community impact in schools across Nigeria.
+*VAGIN* — the Viera Amber's Girls' Initiative — supports the sexual and reproductive health and rights of underserved adolescent girls.
 
-To learn more, visit: www.vieraamber.com/vagin
+To learn more, visit: https://vieraamber.com/vagin
 
 Are you a School Matron with PAD KÓLÓ?`;
 
@@ -40,7 +40,7 @@ Are you a School Matron with PAD KÓLÓ?`;
 
 const CLOSING_MESSAGE = `Thanks so much for your interest in VAGIN! 💛
 
-Learn more anytime at www.vieraamber.com/vagin, or reach us directly at admin@vieraamber.com.
+Learn more anytime at https://vieraamber.com/vagin, or reach us directly at admin@vieraamber.com.
 
 Have a wonderful day! 🌸`;
 
@@ -431,7 +431,7 @@ async function handleMessage(payload: WebhookPayload, signature: string): Promis
       const name = session.intake_name || "there";
       await supabase.from("matron_registration_requests").insert({ phone: fromPhone, claimed_name: name, claimed_school: school });
       await notifyAdmin("matron_registration_request", { phone: fromPhone, claimed_name: name, claimed_school: school });
-      await sendWhatsAppMessage(fromPhone, `Thank you, ${name}! 💛 We've received your details for *${school}* and our team will reach out shortly to complete your registration.\n\nIn the meantime, feel free to explore more about VAGIN at www.vieraamber.com/vagin`);
+      await sendWhatsAppMessage(fromPhone, `Thank you, ${name}! 💛 We've received your details for *${school}* and our team will reach out shortly to complete your registration.\n\nIn the meantime, feel free to explore more about VAGIN at https://vieraamber.com/vagin`);
       await upsertSession(fromPhone, "ENDED");
       return { statusCode: 200, body: "ok" };
     }
