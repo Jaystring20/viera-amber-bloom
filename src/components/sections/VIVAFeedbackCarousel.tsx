@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Send, Star, User, ChevronLeft, ChevronRight } from "lucide-react";
+import { Send, Star, User, ChevronLeft, ChevronRight, Check, AlertCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const BURGUNDY = "#6E0025";
@@ -9,7 +9,10 @@ const ALABASTER = "#FAF9F6";
 const CREAM = "#F5EDE6";
 const DARK_TEXT = "#221A1A";
 const BURG_ALPHA = "rgba(110,0,37,0.14)";
+const BURG_LIGHT = "rgba(110,0,37,0.08)";
 const CORMORANT = "'Cormorant Garamond', 'Playfair Display', Georgia, serif";
+const SUCCESS_COLOR = "#2E7D32";
+const ERROR_COLOR = "#C62828";
 
 interface Feedback {
   id: string;
@@ -133,25 +136,33 @@ export default function VIVAFeedbackCarousel() {
   const currentFeedback = feedbacks[currentIndex];
 
   return (
-    <section style={{ background: ALABASTER, padding: "80px 20px" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+    <section
+      style={{
+        background: ALABASTER,
+        padding: "clamp(40px, 8vw, 80px) clamp(16px, 5vw, 20px)",
+        minHeight: "100dvh",
+        display: "flex",
+        alignItems: "center",
+      }}
+    >
+      <div style={{ width: "100%", maxWidth: "1280px", margin: "0 auto" }}>
         {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          style={{ textAlign: "center", marginBottom: 60 }}
+          style={{ textAlign: "center", marginBottom: "clamp(40px, 8vw, 64px)" }}
         >
           <p
             style={{
               fontFamily: "DM Sans, system-ui, sans-serif",
-              fontSize: 12,
+              fontSize: "clamp(10px, 2.5vw, 12px)",
               letterSpacing: "2.5px",
               textTransform: "uppercase",
               color: BURGUNDY,
-              opacity: 0.5,
-              marginBottom: 12,
+              opacity: 0.6,
+              marginBottom: "clamp(8px, 2vw, 12px)",
             }}
           >
             Customer Voices
@@ -159,11 +170,12 @@ export default function VIVAFeedbackCarousel() {
           <h2
             style={{
               fontFamily: CORMORANT,
-              fontSize: "clamp(32px, 5vw, 56px)",
-              fontWeight: 600,
+              fontSize: "clamp(28px, 7vw, 52px)",
+              fontWeight: 700,
               color: DARK_TEXT,
               margin: 0,
-              lineHeight: 1.2,
+              lineHeight: 1.15,
+              letterSpacing: "-0.5px",
             }}
           >
             Wear Your Story
@@ -171,30 +183,28 @@ export default function VIVAFeedbackCarousel() {
           <p
             style={{
               fontFamily: "DM Sans, system-ui, sans-serif",
-              fontSize: 14,
-              color: "rgba(34,26,26,0.6)",
-              marginTop: 16,
-              maxWidth: "600px",
-              margin: "16px auto 0",
+              fontSize: "clamp(13px, 3vw, 15px)",
+              color: "rgba(34,26,26,0.65)",
+              marginTop: "clamp(12px, 3vw, 20px)",
+              maxWidth: "640px",
+              margin: "clamp(12px, 3vw, 20px) auto 0",
+              lineHeight: 1.6,
             }}
           >
-            Share how VIVA garments made you feel. Your feedback appears in real-time,
-            rotating for everyone to see. Every story matters.
+            Share your VIVA experience. Feedback appears instantly in our rotating gallery—
+            real voices, real stories, real impact.
           </p>
         </motion.div>
 
-        {/* Main container: Feedback carousel + Form side-by-side */}
+        {/* Main container: Feedback carousel + Form (responsive grid) */}
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
-            gap: 40,
+            gap: "clamp(24px, 6vw, 48px)",
             alignItems: "start",
-            "@media (max-width: 1024px)": {
-              gridTemplateColumns: "1fr",
-              gap: 30,
-            },
           }}
+          className="responsive-grid"
         >
           {/* Left: Rotating Feedback Carousel */}
           <motion.div
@@ -207,13 +217,14 @@ export default function VIVAFeedbackCarousel() {
               style={{
                 background: "#fff",
                 border: `1px solid ${BURG_ALPHA}`,
-                borderRadius: 8,
-                padding: 40,
-                minHeight: "400px",
+                borderRadius: 12,
+                padding: "clamp(24px, 6vw, 40px)",
+                minHeight: "clamp(380px, 55vh, 460px)",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
-                boxShadow: "0 4px 20px rgba(110,0,37,0.08)",
+                boxShadow: "0 2px 12px rgba(110,0,37,0.06)",
+                transition: "all 0.3s ease",
               }}
             >
               {loading ? (
@@ -390,48 +401,61 @@ export default function VIVAFeedbackCarousel() {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "space-between",
-                        marginTop: 32,
-                        paddingTop: 24,
+                        marginTop: "clamp(20px, 4vw, 32px)",
+                        paddingTop: "clamp(16px, 3vw, 24px)",
                         borderTop: `1px solid ${BURG_ALPHA}`,
+                        gap: "12px",
                       }}
                     >
-                      <button
+                      {/* Previous button - 44x44px minimum for touch */}
+                      <motion.button
                         onClick={goToPrevious}
+                        whileTap={{ scale: 0.95 }}
                         style={{
-                          background: "transparent",
-                          border: `1px solid ${BURG_ALPHA}`,
+                          background: BURG_LIGHT,
+                          border: `1.5px solid ${BURG_ALPHA}`,
                           borderRadius: "50%",
-                          width: 40,
-                          height: 40,
+                          width: "44px",
+                          minWidth: "44px",
+                          height: "44px",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
                           cursor: "pointer",
                           color: BURGUNDY,
-                          transition: "all 0.2s",
+                          transition: "all 0.2s ease",
+                          flexShrink: 0,
+                          padding: 0,
                         }}
                         onMouseEnter={(e) => {
                           (e.currentTarget as HTMLButtonElement).style.background =
                             BURGUNDY;
                           (e.currentTarget as HTMLButtonElement).style.color =
                             ALABASTER;
+                          (e.currentTarget as HTMLButtonElement).style.borderColor =
+                            BURGUNDY;
                         }}
                         onMouseLeave={(e) => {
                           (e.currentTarget as HTMLButtonElement).style.background =
-                            "transparent";
+                            BURG_LIGHT;
                           (e.currentTarget as HTMLButtonElement).style.color =
                             BURGUNDY;
+                          (e.currentTarget as HTMLButtonElement).style.borderColor =
+                            BURG_ALPHA;
                         }}
+                        aria-label="Previous feedback"
                       >
-                        <ChevronLeft size={18} />
-                      </button>
+                        <ChevronLeft size={20} strokeWidth={2} />
+                      </motion.button>
 
-                      {/* Indicators */}
-                      <div style={{ display: "flex", gap: 8 }}>
-                        {feedbacks.map((_, idx) => (
-                          <div
+                      {/* Indicators - paginated on mobile */}
+                      <div style={{ display: "flex", gap: "6px", flex: 1, justifyContent: "center", flexWrap: "wrap", minHeight: "12px" }}>
+                        {feedbacks.slice(0, 5).map((_, idx) => (
+                          <motion.button
                             key={idx}
                             onClick={() => setCurrentIndex(idx)}
+                            whileTap={{ scale: 1.15 }}
+                            type="button"
                             style={{
                               width: idx === currentIndex ? 24 : 8,
                               height: 8,
@@ -439,57 +463,86 @@ export default function VIVAFeedbackCarousel() {
                               background:
                                 idx === currentIndex ? BURGUNDY : BURG_ALPHA,
                               cursor: "pointer",
-                              transition: "all 0.3s",
+                              transition: "all 0.3s ease",
+                              border: "none",
+                              padding: 0,
+                              minWidth: 8,
                             }}
+                            aria-label={`Go to feedback ${idx + 1}`}
+                            aria-current={idx === currentIndex}
                           />
                         ))}
+                        {feedbacks.length > 5 && (
+                          <span
+                            style={{
+                              fontSize: "11px",
+                              color: "rgba(34,26,26,0.5)",
+                              alignSelf: "center",
+                              marginLeft: "4px",
+                            }}
+                          >
+                            +{feedbacks.length - 5}
+                          </span>
+                        )}
                       </div>
 
-                      <button
+                      {/* Next button - 44x44px minimum for touch */}
+                      <motion.button
                         onClick={goToNext}
+                        whileTap={{ scale: 0.95 }}
                         style={{
-                          background: "transparent",
-                          border: `1px solid ${BURG_ALPHA}`,
+                          background: BURG_LIGHT,
+                          border: `1.5px solid ${BURG_ALPHA}`,
                           borderRadius: "50%",
-                          width: 40,
-                          height: 40,
+                          width: "44px",
+                          minWidth: "44px",
+                          height: "44px",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
                           cursor: "pointer",
                           color: BURGUNDY,
-                          transition: "all 0.2s",
+                          transition: "all 0.2s ease",
+                          flexShrink: 0,
+                          padding: 0,
                         }}
                         onMouseEnter={(e) => {
                           (e.currentTarget as HTMLButtonElement).style.background =
                             BURGUNDY;
                           (e.currentTarget as HTMLButtonElement).style.color =
                             ALABASTER;
+                          (e.currentTarget as HTMLButtonElement).style.borderColor =
+                            BURGUNDY;
                         }}
                         onMouseLeave={(e) => {
                           (e.currentTarget as HTMLButtonElement).style.background =
-                            "transparent";
+                            BURG_LIGHT;
                           (e.currentTarget as HTMLButtonElement).style.color =
                             BURGUNDY;
+                          (e.currentTarget as HTMLButtonElement).style.borderColor =
+                            BURG_ALPHA;
                         }}
+                        aria-label="Next feedback"
                       >
-                        <ChevronRight size={18} />
-                      </button>
+                        <ChevronRight size={20} strokeWidth={2} />
+                      </motion.button>
                     </div>
                   )}
 
                   {/* Counter */}
-                  <div
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                     style={{
                       textAlign: "center",
-                      marginTop: 16,
-                      fontSize: 12,
+                      marginTop: "clamp(12px, 2vw, 16px)",
+                      fontSize: "clamp(11px, 2.5vw, 12px)",
                       color: "rgba(34,26,26,0.5)",
                       fontFamily: "DM Sans, system-ui, sans-serif",
                     }}
                   >
                     {currentIndex + 1} of {feedbacks.length}
-                  </div>
+                  </motion.div>
                 </>
               )}
             </div>
@@ -506,225 +559,291 @@ export default function VIVAFeedbackCarousel() {
               style={{
                 background: "#fff",
                 border: `1px solid ${BURG_ALPHA}`,
-                borderRadius: 8,
-                padding: 40,
-                boxShadow: "0 4px 20px rgba(110,0,37,0.08)",
+                borderRadius: 12,
+                padding: "clamp(24px, 6vw, 40px)",
+                boxShadow: "0 2px 12px rgba(110,0,37,0.06)",
+                transition: "all 0.3s ease",
               }}
             >
-              <h3
-                style={{
-                  fontFamily: CORMORANT,
-                  fontSize: 28,
-                  fontWeight: 600,
-                  color: DARK_TEXT,
-                  margin: "0 0 8px 0",
-                }}
-              >
-                Share Your Story
-              </h3>
-              <p
-                style={{
-                  fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: 13,
-                  color: "rgba(34,26,26,0.6)",
-                  margin: "0 0 32px 0",
-                }}
-              >
-                Tell us how VIVA made you feel. Your feedback appears immediately in
-                our rotating carousel above.
-              </p>
+              <div style={{ position: "relative" }}>
+                <h3
+                  style={{
+                    fontFamily: CORMORANT,
+                    fontSize: "clamp(24px, 6vw, 32px)",
+                    fontWeight: 700,
+                    color: DARK_TEXT,
+                    margin: "0 0 clamp(6px, 1.5vw, 12px) 0",
+                    letterSpacing: "-0.5px",
+                  }}
+                >
+                  Share Your Story
+                </h3>
+                <p
+                  style={{
+                    fontFamily: "DM Sans, system-ui, sans-serif",
+                    fontSize: "clamp(12px, 2.5vw, 14px)",
+                    color: "rgba(34,26,26,0.65)",
+                    margin: "0 0 clamp(24px, 5vw, 32px) 0",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Tell us how VIVA made you feel. Your feedback goes live instantly.
+                </p>
+              </div>
 
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "clamp(20px, 4vw, 28px)" }}>
                 {/* Name input */}
-                <div style={{ marginBottom: 24 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   <label
                     style={{
                       fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontSize: 12,
+                      fontSize: "clamp(11px, 2.5vw, 12px)",
                       fontWeight: 600,
                       color: DARK_TEXT,
                       textTransform: "uppercase",
                       letterSpacing: "0.5px",
-                      display: "block",
-                      marginBottom: 8,
                     }}
+                    htmlFor="feedback-name"
                   >
                     Your Name
                   </label>
                   <input
+                    id="feedback-name"
                     type="text"
                     value={formData.name}
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
                     }
-                    placeholder="Enter your name"
+                    placeholder="Your name"
                     style={{
                       width: "100%",
                       fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontSize: 14,
-                      padding: "12px 14px",
-                      border: `1px solid ${BURG_ALPHA}`,
-                      borderRadius: 6,
+                      fontSize: "clamp(13px, 3vw, 15px)",
+                      padding: "clamp(10px, 2vw, 14px) clamp(12px, 2vw, 16px)",
+                      border: `1.5px solid ${BURG_ALPHA}`,
+                      borderRadius: 8,
                       outline: "none",
                       boxSizing: "border-box",
-                      transition: "border-color 0.2s",
+                      transition: "all 0.25s ease",
+                      backgroundColor: "#fff",
+                      minHeight: "44px",
                     }}
                     onFocus={(e) => {
                       (e.currentTarget as HTMLInputElement).style.borderColor =
                         BURGUNDY;
+                      (e.currentTarget as HTMLInputElement).style.boxShadow =
+                        `0 0 0 3px ${BURG_LIGHT}`;
                     }}
                     onBlur={(e) => {
                       (e.currentTarget as HTMLInputElement).style.borderColor =
                         BURG_ALPHA;
+                      (e.currentTarget as HTMLInputElement).style.boxShadow =
+                        "none";
                     }}
                   />
                 </div>
 
                 {/* Rating */}
-                <div style={{ marginBottom: 24 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                   <label
                     style={{
                       fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontSize: 12,
+                      fontSize: "clamp(11px, 2.5vw, 12px)",
                       fontWeight: 600,
                       color: DARK_TEXT,
                       textTransform: "uppercase",
                       letterSpacing: "0.5px",
-                      display: "block",
-                      marginBottom: 12,
                     }}
                   >
-                    Rating
+                    How would you rate your experience?
                   </label>
-                  <div style={{ display: "flex", gap: 8 }}>
+                  <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                     {[1, 2, 3, 4, 5].map((star) => (
-                      <button
+                      <motion.button
                         key={star}
                         type="button"
                         onClick={() => setFormData({ ...formData, rating: star })}
+                        whileTap={{ scale: 1.2 }}
                         style={{
                           background: "transparent",
                           border: "none",
                           cursor: "pointer",
-                          padding: 0,
+                          padding: "6px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          minWidth: "44px",
+                          minHeight: "44px",
+                          transition: "transform 0.15s ease",
                         }}
+                        aria-label={`Rate ${star} stars`}
+                        aria-pressed={star <= formData.rating}
                       >
                         <Star
-                          size={24}
+                          size={28}
                           style={{
                             fill:
-                              star <= formData.rating ? GOLD : "rgba(110,0,37,0.1)",
+                              star <= formData.rating ? GOLD : "rgba(110,0,37,0.15)",
                             color:
-                              star <= formData.rating ? GOLD : "rgba(110,0,37,0.1)",
-                            transition: "all 0.2s",
+                              star <= formData.rating ? GOLD : "rgba(110,0,37,0.15)",
+                            transition: "all 0.2s ease",
                           }}
                         />
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
                 </div>
 
                 {/* Comment textarea */}
-                <div style={{ marginBottom: 24 }}>
-                  <label
-                    style={{
-                      fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontSize: 12,
-                      fontWeight: 600,
-                      color: DARK_TEXT,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.5px",
-                      display: "block",
-                      marginBottom: 8,
-                    }}
-                  >
-                    Your Feedback
-                  </label>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                    <label
+                      style={{
+                        fontFamily: "DM Sans, system-ui, sans-serif",
+                        fontSize: "clamp(11px, 2.5vw, 12px)",
+                        fontWeight: 600,
+                        color: DARK_TEXT,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.5px",
+                      }}
+                      htmlFor="feedback-comment"
+                    >
+                      Your Feedback
+                    </label>
+                    <span
+                      style={{
+                        fontSize: "clamp(10px, 2vw, 11px)",
+                        color: "rgba(34,26,26,0.5)",
+                        fontFamily: "DM Sans, system-ui, sans-serif",
+                      }}
+                    >
+                      {formData.comment.length}/300
+                    </span>
+                  </div>
                   <textarea
+                    id="feedback-comment"
                     value={formData.comment}
-                    onChange={(e) =>
-                      setFormData({ ...formData, comment: e.target.value })
-                    }
+                    onChange={(e) => {
+                      const text = e.target.value.slice(0, 300);
+                      setFormData({ ...formData, comment: text });
+                    }}
                     placeholder="Share your experience with VIVA..."
                     style={{
                       width: "100%",
                       fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontSize: 14,
-                      padding: "12px 14px",
-                      border: `1px solid ${BURG_ALPHA}`,
-                      borderRadius: 6,
+                      fontSize: "clamp(13px, 3vw, 15px)",
+                      padding: "clamp(10px, 2vw, 14px) clamp(12px, 2vw, 16px)",
+                      border: `1.5px solid ${BURG_ALPHA}`,
+                      borderRadius: 8,
                       outline: "none",
                       boxSizing: "border-box",
-                      resize: "vertical",
-                      minHeight: "120px",
-                      transition: "border-color 0.2s",
+                      resize: "none",
+                      minHeight: "clamp(100px, 20vh, 140px)",
+                      transition: "all 0.25s ease",
+                      backgroundColor: "#fff",
                     }}
+                    maxLength={300}
                     onFocus={(e) => {
                       (e.currentTarget as HTMLTextAreaElement).style.borderColor =
                         BURGUNDY;
+                      (e.currentTarget as HTMLTextAreaElement).style.boxShadow =
+                        `0 0 0 3px ${BURG_LIGHT}`;
                     }}
                     onBlur={(e) => {
                       (e.currentTarget as HTMLTextAreaElement).style.borderColor =
                         BURG_ALPHA;
+                      (e.currentTarget as HTMLTextAreaElement).style.boxShadow =
+                        "none";
                     }}
                   />
+                  <p
+                    style={{
+                      fontSize: "clamp(11px, 2vw, 12px)",
+                      color: "rgba(34,26,26,0.5)",
+                      margin: "2px 0 0 0",
+                      fontFamily: "DM Sans, system-ui, sans-serif",
+                    }}
+                  >
+                    Be specific—tell us what made your experience special.
+                  </p>
                 </div>
 
                 {/* Submit button */}
-                <button
+                <motion.button
                   type="submit"
                   disabled={isSubmitting || !formData.name.trim() || !formData.comment.trim()}
+                  whileTap={!isSubmitting ? { scale: 0.98 } : {}}
                   style={{
                     width: "100%",
                     fontFamily: "DM Sans, system-ui, sans-serif",
-                    fontSize: 13,
+                    fontSize: "clamp(12px, 2.5vw, 13px)",
                     fontWeight: 600,
                     letterSpacing: "1.5px",
                     textTransform: "uppercase",
-                    padding: "12px 20px",
+                    padding: "clamp(12px, 2.5vw, 14px) clamp(16px, 3vw, 20px)",
                     background:
-                      submitStatus === "success" ? "rgba(34,139,34,0.1)" : BURGUNDY,
-                    color: submitStatus === "success" ? "#228B22" : ALABASTER,
+                      submitStatus === "success"
+                        ? `linear-gradient(135deg, ${SUCCESS_COLOR}, rgba(46,125,50,0.8))`
+                        : submitStatus === "error"
+                        ? ERROR_COLOR
+                        : BURGUNDY,
+                    color: ALABASTER,
                     border: "none",
-                    borderRadius: 6,
-                    cursor: isSubmitting ? "not-allowed" : "pointer",
-                    opacity: isSubmitting ? 0.6 : 1,
-                    transition: "all 0.3s",
+                    borderRadius: 8,
+                    cursor:
+                      isSubmitting || !formData.name.trim() || !formData.comment.trim()
+                        ? "not-allowed"
+                        : "pointer",
+                    opacity: isSubmitting || !formData.name.trim() || !formData.comment.trim() ? 0.65 : 1,
+                    transition: "all 0.2s ease",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: 8,
+                    gap: "8px",
+                    minHeight: "44px",
+                    boxShadow: submitStatus === "success" ? `0 2px 8px rgba(46,125,50,0.2)` : "0 2px 8px rgba(110,0,37,0.15)",
                   }}
                   onMouseEnter={(e) => {
-                    if (!isSubmitting && submitStatus !== "success") {
+                    if (!isSubmitting && !(!formData.name.trim() || !formData.comment.trim()) && submitStatus !== "success") {
                       (e.currentTarget as HTMLButtonElement).style.background =
                         "rgba(110,0,37,0.9)";
+                      (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                        "0 4px 12px rgba(110,0,37,0.25)";
                     }
                   }}
                   onMouseLeave={(e) => {
-                    if (submitStatus !== "success") {
+                    if (submitStatus !== "success" && submitStatus !== "error") {
                       (e.currentTarget as HTMLButtonElement).style.background =
                         BURGUNDY;
+                      (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                        "0 2px 8px rgba(110,0,37,0.15)";
                     }
                   }}
                 >
                   {isSubmitting ? (
                     <>
-                      <div
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 0.8, loop: Infinity, ease: "linear" }}
                         style={{
-                          width: 16,
-                          height: 16,
-                          border: `2px solid ${submitStatus === "success" ? "#228B22" : ALABASTER}`,
-                          borderTop: "2px solid transparent",
+                          width: 18,
+                          height: 18,
+                          border: `2px solid ${ALABASTER}`,
+                          borderTopColor: "transparent",
                           borderRadius: "50%",
-                          animation: "spin 0.8s linear infinite",
                         }}
                       />
                       Submitting...
                     </>
                   ) : submitStatus === "success" ? (
                     <>
-                      ✓ Feedback Submitted
+                      <Check size={18} strokeWidth={3} />
+                      Feedback Submitted
+                    </>
+                  ) : submitStatus === "error" ? (
+                    <>
+                      <AlertCircle size={18} />
+                      Try Again
                     </>
                   ) : (
                     <>
@@ -732,21 +851,40 @@ export default function VIVAFeedbackCarousel() {
                       Submit Feedback
                     </>
                   )}
-                </button>
+                </motion.button>
 
-                {submitStatus === "error" && (
-                  <p
-                    style={{
-                      color: "#d32f2f",
-                      fontSize: 12,
-                      marginTop: 12,
-                      textAlign: "center",
-                      fontFamily: "DM Sans, system-ui, sans-serif",
-                    }}
-                  >
-                    Something went wrong. Please try again.
-                  </p>
-                )}
+                {/* Error message with better styling */}
+                <AnimatePresence>
+                  {submitStatus === "error" && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      style={{
+                        background: "rgba(198, 40, 40, 0.08)",
+                        border: `1px solid ${ERROR_COLOR}`,
+                        borderRadius: 8,
+                        padding: "clamp(10px, 2vw, 12px) clamp(12px, 2vw, 16px)",
+                        display: "flex",
+                        gap: "8px",
+                        alignItems: "center",
+                      }}
+                    >
+                      <AlertCircle size={16} color={ERROR_COLOR} flexShrink={0} />
+                      <p
+                        style={{
+                          color: ERROR_COLOR,
+                          fontSize: "clamp(12px, 2.5vw, 13px)",
+                          margin: 0,
+                          fontFamily: "DM Sans, system-ui, sans-serif",
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        Something went wrong. Please check your details and try again.
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </form>
 
               <style>{`
@@ -757,6 +895,43 @@ export default function VIVAFeedbackCarousel() {
             </div>
           </motion.div>
         </div>
+
+        {/* Responsive grid styles */}
+        <style>{`
+          @media (max-width: 768px) {
+            .responsive-grid {
+              grid-template-columns: 1fr !important;
+              gap: clamp(20px, 4vw, 30px) !important;
+            }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            * {
+              animation-duration: 0.01ms !important;
+              animation-iteration-count: 1 !important;
+              transition-duration: 0.01ms !important;
+            }
+          }
+
+          /* Ensure touch targets are accessible */
+          button {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+          }
+
+          /* Better text input UX on mobile */
+          input[type="text"],
+          textarea {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+          }
+
+          @supports (scrollbar-gutter: stable) {
+            html {
+              scrollbar-gutter: stable;
+            }
+          }
+        `}</style>
       </div>
     </section>
   );
