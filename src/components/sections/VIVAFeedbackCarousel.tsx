@@ -184,30 +184,30 @@ export default function VIVAFeedbackCarousel() {
           </p>
         </motion.div>
 
-        {/* Main container: Carousel + Form */}
+        {/* Main container: Full-width sections */}
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "clamp(24px, 6vw, 48px)",
-            alignItems: "start",
+            display: "flex",
+            flexDirection: "column",
+            gap: "clamp(40px, 8vw, 80px)",
+            width: "100%",
           }}
-          className="responsive-grid"
         >
-          {/* Left: Rotating Feedback Carousel - PREMIUM CARD DESIGN */}
+          {/* HERO: Full-Width Rotating Feedback Carousel */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
             viewport={{ once: true }}
+            style={{ width: "100%", maxWidth: "900px", margin: "0 auto" }}
           >
             <div
               style={{
                 background: "#fff",
                 border: `1px solid ${BURG_ALPHA}`,
                 borderRadius: 12,
-                padding: "clamp(24px, 6vw, 40px)",
-                minHeight: "clamp(380px, 55vh, 460px)",
+                padding: "clamp(32px, 6vw, 48px)",
+                minHeight: "420px",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
@@ -557,12 +557,13 @@ export default function VIVAFeedbackCarousel() {
             </div>
           </motion.div>
 
-          {/* Right: Feedback submission form */}
+          {/* CTA: Centered Feedback Form Below */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
+            style={{ width: "100%", maxWidth: "600px", margin: "0 auto" }}
           >
             <div
               style={{
@@ -889,14 +890,8 @@ export default function VIVAFeedbackCarousel() {
           </motion.div>
         </div>
 
-        {/* Responsive grid styles */}
+        {/* Global styles */}
         <style>{`
-          @media (max-width: 768px) {
-            .responsive-grid {
-              grid-template-columns: 1fr !important;
-              gap: clamp(20px, 4vw, 30px) !important;
-            }
-          }
 
           @media (prefers-reduced-motion: reduce) {
             * {
