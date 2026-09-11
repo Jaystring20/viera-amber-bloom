@@ -16,14 +16,18 @@ CREATE INDEX IF NOT EXISTS idx_viva_feedback_created_at ON viva_feedback(created
 -- Enable Row Level Security
 ALTER TABLE viva_feedback ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Allow public read access" ON viva_feedback;
+DROP POLICY IF EXISTS "Allow public insert access" ON viva_feedback;
+
 -- Create policy to allow public read access
-CREATE POLICY IF NOT EXISTS "Allow public read access"
+CREATE POLICY "Allow public read access"
   ON viva_feedback
   FOR SELECT
   USING (true);
 
 -- Create policy to allow public insert access
-CREATE POLICY IF NOT EXISTS "Allow public insert access"
+CREATE POLICY "Allow public insert access"
   ON viva_feedback
   FOR INSERT
   WITH CHECK (true);
