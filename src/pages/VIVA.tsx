@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Send, ShoppingBag, X, Plus, Minus, MessageCircle
 import { Link, useNavigate } from "react-router-dom";
 import NavBar from "@/components/NavBar";
 import VivaLaunchModal from "@/components/VivaLaunchModal";
+import VIVAFeedbackCarousel from "@/components/sections/VIVAFeedbackCarousel";
 import { fadeIn, fadeSlideUp, staggerContainer, cardItem, scaleXRule, inViewProps, useReducedVariants } from "@/lib/animations";
 import { supabase } from "@/lib/supabase";
 import { useProducts, type Product } from "@/hooks/useProducts";
@@ -2959,6 +2960,11 @@ const VIVAPage = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* ═══════════════════════════════════════════════════════
+          FEEDBACK CAROUSEL — Customer testimonials & submissions
+          ═══════════════════════════════════════════════════════ */}
+      <VIVAFeedbackCarousel />
 
       {/* ═══════════════════════════════════════════════════════
           ENQUIRY — deep burgundy accent
