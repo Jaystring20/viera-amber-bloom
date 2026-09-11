@@ -6,12 +6,13 @@ import {
   LayoutDashboard, Droplets, Palette, School as SchoolIcon, LogOut,
   TrendingUp, Users, BookOpen, Coins,
   AlertCircle, RefreshCw, Plus, Pencil, Trash2, X,
-  GraduationCap, ClipboardList, CheckCircle2, Images, Camera, Bot, ShoppingBag,
+  GraduationCap, ClipboardList, CheckCircle2, Images, Camera, ShoppingBag, PieChart, FileDown,
 } from "lucide-react";
 import GalleryAdminTab from "@/components/admin/GalleryAdminTab";
 import VAGINImagesAdminTab from "@/components/admin/VAGINImagesAdminTab";
 import BotActivityTab from "@/components/admin/BotActivityTab";
-import WhatsAppBotSimulatorTab from "@/components/admin/WhatsAppBotSimulatorTab";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const PINK   = "#ED155D";
 const PURPLE = "#62017F";
@@ -22,15 +23,31 @@ const PL     = "#C77DFF";
 interface SchoolRow { id: string; name: string; code: string | null; country: string; state_region: string | null; contact_name: string | null; city: string | null; girls_reached: number }
 interface Student   { id: string; student_id: string; name: string; school_id: string | null; class: string | null; balance_ngn: number; free_pads_used: number; paid_pads_used: number; pads_received: number; active: boolean; created_at: string }
 interface Matron    { id: string; name: string; phone: string; school_id: string | null; active: boolean; created_at: string }
+interface CountryConfig { country: string; dial_code: string; currency_code: string; currency_symbol: string; paid_pad_price: number | null; market_pad_price: number | null }
 interface Distribution { id: string; school_id: string; distribution_date: string; girls_count: number; pads_count: number; savings_collected_ngn: number; distributed_by: string | null }
 interface Session      { id: string; school_id: string; session_date: string; topic: string; girls_attended: number; facilitator: string | null; delivery_format: string }
 interface Savings      { id: string; school_id: string; month: string; contributors: number; total_ngn: number }
-interface TxRow        { id: string; student_id: string | null; matron_id: string | null; type: string; pads_issued: number; amount_ngn: number; source: string; notes: string | null; created_at: string; voided?: boolean; voided_reason?: string | null; flagged?: boolean }
+// Column names here must match vagin_transactions exactly (verified against the
+// live schema) — the previous version read `type`/`matron_id`, but the real
+// columns are `transaction_type` and `issued_by` (there is no matron_id column;
+// the bot records who acted as a free-text string instead). That mismatch made
+// every field read `undefined`, and `undefined.replace(...)` below crashed the
+// whole tab the instant it rendered a real row.
+interface TxRow        { id: string; student_id: string | null; school_id: string | null; transaction_type: string; pads_issued: number; amount_ngn: number | null; source: string; notes: string | null; issued_by: string | null; created_at: string; voided?: boolean; voided_reason?: string | null; flagged?: boolean }
+// Backed by the school_pad_economics DB view (see migration
+// 07_school_pad_economics.sql) — a real, server-side aggregate over EVERY
+// non-voided transaction for the school, not just the 100 most recent rows
+// fetchData() pulls for the Transactions tab. market_pad_price is the local
+// retail reference price (only Nigeria's ₦700, from the project brief, is
+// known right now); null means that country's real local price hasn't been
+// confirmed yet, so "value"/"saved" can't be computed for it — never guessed.
+interface SchoolEconomics { school_id: string; school_name: string; country: string; market_pad_price: number | null; currency_symbol: string | null; free_pads: number; paid_pads: number; paid_amount_collected: number; girls_reached: number }
 
 interface DashData {
   schools: SchoolRow[]; students: Student[]; matrons: Matron[];
   distributions: Distribution[]; sessions: Session[];
-  savings: Savings[]; transactions: TxRow[];
+  savings: Savings[]; transactions: TxRow[]; countryConfigs: CountryConfig[];
+  schoolEconomics: SchoolEconomics[];
 }
 
 // ── Maps ───────────────────────────────────────────────────────────────────────
@@ -60,6 +77,68 @@ const codeFromName = (name: string) =>
 // Build the globally-unique student ID: SCHOOLCODE-INITIALS-SEQ  e.g. LGS-FA-001
 const buildStudentId = (schoolCode: string, name: string, seq: number) =>
   `${schoolCode}-${studentInitials(name)}-${String(seq).padStart(3, "0")}`;
+
+// ── Phone normalization ────────────────────────────────────────────────────────
+// Canonical bot-matching format: digits only, no "+", no local trunk "0" —
+// exactly what WhatsApp sends as the inbound message's `from` field. Applied
+// at every entry point (manual matron form, CSV import) so the bot's phone
+// lookup never silently fails on a formatting mismatch.
+type PhoneResult = { ok: true; phone: string } | { ok: false; reason: string };
+function normalizePhone(raw: string, dialCode: string): PhoneResult {
+  let digits = raw.trim().replace(/[\s\-()]/g, "");
+  if (digits.startsWith("+")) digits = digits.slice(1);
+  else if (digits.startsWith("00")) digits = digits.slice(2);
+  if (!digits) return { ok: false, reason: "Phone number is required." };
+  if (!/^\d+$/.test(digits)) return { ok: false, reason: "Phone number must contain only digits (spaces/dashes/parens are fine, letters aren't)." };
+  if (digits.startsWith(dialCode)) {
+    // already carries the right country code
+  } else if (digits.startsWith("0")) {
+    digits = dialCode + digits.slice(1);
+  } else {
+    return { ok: false, reason: `Doesn't start with +${dialCode} (this school's country code) or a local "0" prefix — check the country is right.` };
+  }
+  if (digits.length < dialCode.length + 7 || digits.length > dialCode.length + 11) {
+    return { ok: false, reason: "Unexpected length for a phone number once normalized — double check the digits." };
+  }
+  return { ok: true, phone: digits };
+}
+
+// ── Bulk import (CSV) ──────────────────────────────────────────────────────────
+// One row per student (or per matron, if a school has no students yet). School
+// and matron columns repeat across every row that belongs to them — normal for
+// a flattened CSV export from Excel/Sheets.
+const IMPORT_HEADERS = [
+  "school_code", "school_name", "school_country", "school_city", "school_state_region", "school_contact_name",
+  "matron_name", "matron_phone", "matron_active",
+  "student_id", "student_name", "student_class", "student_balance_ngn", "student_free_pads_used", "student_paid_pads_used",
+] as const;
+type ImportRow = Record<typeof IMPORT_HEADERS[number], string>;
+const IMPORT_REQUIRED_HEADERS = ["school_code", "school_name", "matron_name", "matron_phone"] as const;
+
+// Minimal RFC4180 CSV parser — handles quoted fields, embedded commas, "" escapes,
+// and both \n and \r\n line endings (what Excel/Sheets actually export).
+function parseCSV(text: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let field = "";
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else inQuotes = false; }
+      else field += c;
+    } else if (c === '"') inQuotes = true;
+    else if (c === ",") { row.push(field); field = ""; }
+    else if (c === "\n" || c === "\r") {
+      if (c === "\r" && text[i + 1] === "\n") i++;
+      row.push(field); field = "";
+      if (row.some(cell => cell.trim() !== "")) rows.push(row);
+      row = [];
+    } else field += c;
+  }
+  if (field !== "" || row.length) { row.push(field); if (row.some(cell => cell.trim() !== "")) rows.push(row); }
+  return rows;
+}
 
 // ── Shared input styles ────────────────────────────────────────────────────────
 const inputSx: React.CSSProperties = {
@@ -103,6 +182,41 @@ const BarChart = ({ data, color }: { data: { label: string; value: number }[]; c
           <span style={{ fontSize: 9, color: "rgba(250,250,250,0.4)", whiteSpace: "nowrap" }}>{d.label}</span>
         </div>
       ))}
+    </div>
+  );
+};
+
+// ── StackedBarChart ────────────────────────────────────────────────────────────
+// One bar per school, split into two segments (e.g. paid-by-students vs
+// subsidized-by-VAGIN) so the funding split per school is visible at a
+// glance — the transparency view this whole tab exists for.
+const StackedBarChart = ({ data, colorA, colorB, labelA, labelB }: { data: { label: string; a: number; b: number }[]; colorA: string; colorB: string; labelA: string; labelB: string }) => {
+  const max = Math.max(...data.map(d => d.a + d.b), 1);
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 10, height: 140, marginBottom: 10 }}>
+        {data.map(d => {
+          const total = d.a + d.b;
+          const barHeight = Math.max((total / max) * 120, total > 0 ? 4 : 0);
+          const aHeight = total > 0 ? (d.a / total) * barHeight : 0;
+          const bHeight = barHeight - aHeight;
+          return (
+            <div key={d.label} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, minWidth: 0 }}>
+              <div style={{ width: "100%", display: "flex", flexDirection: "column-reverse", borderRadius: "4px 4px 0 0", overflow: "hidden" }}>
+                <motion.div initial={{ scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ duration: 0.6, ease: "easeOut" as const }}
+                  style={{ width: "100%", height: aHeight, background: colorA, transformOrigin: "bottom", opacity: 0.9 }} title={`${labelA}: ${d.a}`} />
+                <motion.div initial={{ scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ duration: 0.6, ease: "easeOut" as const, delay: 0.1 }}
+                  style={{ width: "100%", height: bHeight, background: colorB, transformOrigin: "bottom", opacity: 0.9 }} title={`${labelB}: ${d.b}`} />
+              </div>
+              <span style={{ fontSize: 9, color: "rgba(250,250,250,0.4)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" }}>{d.label}</span>
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ display: "flex", gap: 18, justifyContent: "center" }}>
+        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "rgba(250,250,250,0.5)" }}><span style={{ width: 9, height: 9, borderRadius: 2, background: colorA }} />{labelA}</span>
+        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "rgba(250,250,250,0.5)" }}><span style={{ width: 9, height: 9, borderRadius: 2, background: colorB }} />{labelB}</span>
+      </div>
     </div>
   );
 };
@@ -279,13 +393,16 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
 // MAIN DASHBOARD
 // ══════════════════════════════════════════════════════════════════════════════
 const VAGINDashboard = () => {
-  type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions" | "gallery" | "vagin_images" | "viva_products" | "bot";
-  type ModalType = "add-school" | "edit-school" | "add-student" | "edit-student" | "add-matron" | "edit-matron" | "add-distribution" | "add-session" | "confirm-delete" | null;
+  type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions" | "impact" | "gallery" | "vagin_images" | "viva_products";
+  type ModalType = "add-school" | "edit-school" | "add-student" | "edit-student" | "add-matron" | "edit-matron" | "add-distribution" | "add-session" | "confirm-delete" | "bulk-import" | null;
 
   const [authed, setAuthed]         = useState<boolean | null>(null);
   const [activeTab, setActiveTab]   = useState<TabId>("overview");
   const [data, setData]             = useState<DashData | null>(null);
   const [loadingData, setLoadingData] = useState(false);
+  const [liveSync, setLiveSync] = useState(false);
+  const [reportMonth, setReportMonth] = useState(() => new Date().toISOString().slice(0, 7)); // "YYYY-MM"
+  const [exportingReport, setExportingReport] = useState(false);
   const [dataError, setDataError]   = useState<string | null>(null);
   const [toast, setToast]           = useState<{ msg: string; type: "success" | "error" } | null>(null);
   const [modal, setModal]           = useState<ModalType>(null);
@@ -298,6 +415,12 @@ const VAGINDashboard = () => {
   const [matronForm, setMatronForm] = useState({ id: "", name: "", phone: "", school_id: "", active: true });
   const [distForm, setDistForm]     = useState({ school_id: "", distribution_date: today(), girls_count: "", pads_count: "", savings_collected_ngn: "0", distributed_by: "" });
   const [sessForm, setSessForm]     = useState({ school_id: "", session_date: today(), topic: "puberty", girls_attended: "", facilitator: "", delivery_format: "in_school" });
+
+  // Bulk import (CSV) state
+  const [importRows, setImportRows]     = useState<ImportRow[]>([]);
+  const [importParseErrors, setImportParseErrors] = useState<string[]>([]);
+  const [importing, setImporting]       = useState(false);
+  const [importSummary, setImportSummary] = useState<{ schools: number; matrons: number; students: number; errors: { row: number; message: string }[] } | null>(null);
 
   const showToast = (msg: string, type: "success" | "error" = "success") => {
     setToast({ msg, type });
@@ -318,7 +441,7 @@ const VAGINDashboard = () => {
   const fetchData = useCallback(async () => {
     setLoadingData(true); setDataError(null);
     try {
-      const [s, st, m, d, se, sa, tx] = await Promise.all([
+      const [s, st, m, d, se, sa, tx, cc, econ] = await Promise.all([
         supabase.from("vagin_schools").select("*").order("name"),
         supabase.from("vagin_students").select("*").order("student_id"),
         supabase.from("vagin_matrons").select("*").order("name"),
@@ -326,16 +449,24 @@ const VAGINDashboard = () => {
         supabase.from("vagin_sessions").select("*").order("session_date", { ascending: false }),
         supabase.from("vagin_savings").select("*").order("month"),
         supabase.from("vagin_transactions").select("*").order("created_at", { ascending: false }).limit(100),
+        supabase.from("country_configs").select("*"),
+        // school_pad_economics is a DB view that aggregates server-side over
+        // EVERY real transaction per school — deliberately not derived from
+        // the capped `tx` fetch above, which would silently undercount once
+        // a school passes 100 transactions.
+        supabase.from("school_pad_economics").select("*").order("school_name"),
       ]);
       if (s.error) throw s.error;
       setData({
         schools:       s.data  as SchoolRow[],
         students:      (st.data ?? []) as Student[],
         matrons:       (m.data  ?? []) as Matron[],
-        distributions: (d.data  ?? []) as Distribution[],
+        distributions: (d.data ?? []) as Distribution[],
         sessions:      (se.data ?? []) as Session[],
         savings:       (sa.data ?? []) as Savings[],
         transactions:  (tx.data ?? []) as TxRow[],
+        countryConfigs: (cc.data ?? []) as CountryConfig[],
+        schoolEconomics: (econ.data ?? []) as SchoolEconomics[],
       });
     } catch (err) { setDataError(err instanceof Error ? err.message : "Failed to load data"); }
     finally { setLoadingData(false); }
@@ -343,25 +474,62 @@ const VAGINDashboard = () => {
 
   useEffect(() => { if (authed) fetchData(); }, [authed, fetchData]);
 
+  // ── Live sync from the WhatsApp bot ─────────────────────────────────────
+  // The bot writes straight to these tables the instant a matron issues a
+  // pad or logs a deposit (see whatsapp-webhook/index.ts) — without this,
+  // an already-open dashboard would only find out on next page load or a
+  // manual Refresh click. One shared channel across every table this
+  // dashboard reads, refetching on any change; several tables typically
+  // change together for one real action (e.g. ISSUE_PAD writes both
+  // vagin_transactions and vagin_students), so bursts are debounced into a
+  // single fetchData() rather than firing once per row event.
+  useEffect(() => {
+    if (!authed) return;
+    let debounceTimer: ReturnType<typeof setTimeout>;
+    const scheduleRefetch = () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => fetchData(), 400);
+    };
+    const tables = ["vagin_transactions", "vagin_students", "vagin_schools", "vagin_matrons", "vagin_pad_distributions", "vagin_sessions", "vagin_savings"];
+    let channel = supabase.channel("vagin-dashboard-live");
+    tables.forEach(table => {
+      channel = channel.on("postgres_changes", { event: "*", schema: "public", table }, scheduleRefetch);
+    });
+    channel.subscribe(status => setLiveSync(status === "SUBSCRIBED"));
+    return () => { clearTimeout(debounceTimer); setLiveSync(false); supabase.removeChannel(channel); };
+  }, [authed, fetchData]);
+
   const handleSignOut = async () => { await supabase.auth.signOut(); setAuthed(false); setData(null); };
 
   // ── Void a transaction (reverses balances, keeps audit row) ────────────────
+  // Reversal branches on the live bot's real transaction_type values
+  // (free_pad / paid_pad / deposit — see whatsapp-webhook/index.ts). A deposit
+  // credits the SCHOOL's fund balance (vagin_schools.current_balance), not a
+  // student — the old code only ever touched vagin_students, so voiding a
+  // deposit silently reversed nothing.
   const voidTransaction = async (t: TxRow) => {
-    if (!window.confirm(`Void this ${t.type.replace(/_/g, " ")} transaction? Balances will be reversed; the audit row is kept.`)) return;
+    if (!window.confirm(`Void this ${t.transaction_type.replace(/_/g, " ")} transaction? Balances will be reversed; the audit row is kept.`)) return;
     await supabase.from("vagin_transactions").update({ voided: true, voided_reason: "Admin void from dashboard" }).eq("id", t.id);
-    if (t.student_id) {
+
+    if (t.transaction_type === "deposit") {
+      if (t.school_id) {
+        const { data: sch } = await supabase.from("vagin_schools").select("current_balance").eq("id", t.school_id).maybeSingle();
+        if (sch) await supabase.from("vagin_schools").update({ current_balance: Math.max(0, (sch.current_balance ?? 0) - (t.amount_ngn ?? 0)) }).eq("id", t.school_id);
+      }
+    } else if (t.student_id) {
       const { data: g } = await supabase.from("vagin_students").select("*").eq("id", t.student_id).maybeSingle();
       if (g) {
         const patch: Record<string, unknown> = {};
-        if (t.type === "paid_pads") {
+        if (t.transaction_type === "paid_pad") {
           patch.paid_pads_used = Math.max(0, (g.paid_pads_used ?? 0) - t.pads_issued);
           patch.pads_received = Math.max(0, (g.pads_received ?? 0) - t.pads_issued);
           patch.balance_ngn = (g.balance_ngn ?? 0) + (t.amount_ngn ?? 0);
-        } else if (t.type === "free_pads") {
+        } else if (t.transaction_type === "free_pad") {
           patch.free_pads_used = Math.max(0, (g.free_pads_used ?? 0) - t.pads_issued);
           patch.pads_received = Math.max(0, (g.pads_received ?? 0) - t.pads_issued);
-        } else if (t.type === "savings_deposit") {
-          patch.balance_ngn = (g.balance_ngn ?? 0) - (t.amount_ngn ?? 0);
+        } else if (t.transaction_type === "student_payment") {
+          // A PAY credit reversed: take the money back off her balance.
+          patch.balance_ngn = Math.max(0, (g.balance_ngn ?? 0) - (t.amount_ngn ?? 0));
         }
         if (Object.keys(patch).length) await supabase.from("vagin_students").update(patch).eq("id", g.id);
       }
@@ -422,7 +590,14 @@ const VAGINDashboard = () => {
     try {
       const freePads = Math.min(parseInt(studentForm.free_pads_used) || 0, 1);
       const paidPads = Math.min(parseInt(studentForm.paid_pads_used) || 0, 2);
-      const payload = { student_id: studentForm.student_id.toUpperCase(), name: studentForm.name, school_id: studentForm.school_id || null, class: studentForm.class || null, balance_ngn: parseFloat(studentForm.balance_ngn) || 0, free_pads_used: freePads, paid_pads_used: paidPads, pads_received: freePads + paidPads };
+      const basePayload = { student_id: studentForm.student_id.toUpperCase(), name: studentForm.name, school_id: studentForm.school_id || null, class: studentForm.class || null, balance_ngn: parseFloat(studentForm.balance_ngn) || 0, free_pads_used: freePads, paid_pads_used: paidPads };
+      // pads_received is a LIFETIME counter — incremented by the WhatsApp bot
+      // on every real pad issuance, never reset by the quarterly pad-cycle
+      // job (see 05_pad_cycle_reset.sql and whatsapp-webhook/index.ts). Only
+      // seed it here when registering a brand-new student; editing an
+      // existing one must never overwrite it with just this cycle's
+      // free+paid, or every manual edit would erase real bot-tracked history.
+      const payload = studentForm.id ? basePayload : { ...basePayload, pads_received: freePads + paidPads };
       const { error } = studentForm.id
         ? await supabase.from("vagin_students").update(payload).eq("id", studentForm.id)
         : await supabase.from("vagin_students").insert(payload);
@@ -437,9 +612,15 @@ const VAGINDashboard = () => {
   const openAddMatron  = () => { setMatronForm({ id: "", name: "", phone: "", school_id: data?.schools[0]?.id ?? "", active: true }); setModal("add-matron"); };
   const openEditMatron = (m: Matron) => { setMatronForm({ id: m.id, name: m.name, phone: m.phone, school_id: m.school_id ?? "", active: m.active }); setModal("edit-matron"); };
   const saveMatron = async (e: React.FormEvent) => {
-    e.preventDefault(); setSaving(true);
+    e.preventDefault();
+    const dialCode = data?.schools.find(s => s.id === matronForm.school_id)?.country
+      ? data.countryConfigs.find(c => c.country === data.schools.find(s => s.id === matronForm.school_id)!.country)?.dial_code
+      : undefined;
+    const phoneResult = normalizePhone(matronForm.phone, dialCode ?? "234");
+    if (!phoneResult.ok) { showToast(phoneResult.reason, "error"); return; }
+    setSaving(true);
     try {
-      const payload = { name: matronForm.name, phone: matronForm.phone, school_id: matronForm.school_id || null, active: matronForm.active };
+      const payload = { name: matronForm.name, phone: phoneResult.phone, school_id: matronForm.school_id || null, active: matronForm.active };
 
       // Save to vagin_matrons (dashboard table)
       const { error: error1, data: savedData } = matronForm.id
@@ -461,6 +642,134 @@ const VAGINDashboard = () => {
       closeModal(); await fetchData();
     } catch (err) { showToast(err instanceof Error ? err.message : "Error", "error"); }
     finally { setSaving(false); }
+  };
+
+  // ── Bulk import (CSV) ─────────────────────────────────────────────────────
+  const openBulkImport = () => { setImportRows([]); setImportParseErrors([]); setImportSummary(null); setModal("bulk-import"); };
+
+  const downloadImportTemplate = () => {
+    const example1 = ["LGS", "Lagos Girls School", "Nigeria", "Lagos", "Lagos State", "Mrs. Adeyemi", "Mrs Bamidele", "08038838094", "true", "", "Amara Okafor", "SS2", "0", "0", "0"];
+    const example2 = ["BAM", "Blantyre Academy for Malawi Mission", "Malawi", "Blantyre", "Southern Region", "Mr. Banda", "Grace Phiri", "0991234567", "true", "", "Chikondi Banda", "Form 2", "0", "0", "0"];
+    const csv = `${IMPORT_HEADERS.join(",")}\n${example1.join(",")}\n${example2.join(",")}\n`;
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "vagin_bulk_import_template.csv";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportFile = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const grid = parseCSV(String(reader.result || ""));
+      if (grid.length < 1) { setImportParseErrors(["File is empty."]); setImportRows([]); return; }
+      const header = grid[0].map(h => h.trim().toLowerCase().replace(/\s+/g, "_"));
+      const missing = IMPORT_REQUIRED_HEADERS.filter(h => !header.includes(h));
+      if (missing.length) { setImportParseErrors([`Missing required column(s): ${missing.join(", ")}. Download the template to see the expected format.`]); setImportRows([]); return; }
+      const rows: ImportRow[] = grid.slice(1).map(cells => {
+        const obj = {} as ImportRow;
+        IMPORT_HEADERS.forEach(h => { obj[h] = ""; });
+        header.forEach((h, idx) => { if ((IMPORT_HEADERS as readonly string[]).includes(h)) obj[h as typeof IMPORT_HEADERS[number]] = (cells[idx] ?? "").trim(); });
+        return obj;
+      });
+      setImportRows(rows);
+      setImportParseErrors([]);
+      setImportSummary(null);
+    };
+    reader.onerror = () => setImportParseErrors(["Could not read the file."]);
+    reader.readAsText(file);
+  };
+
+  const runImport = async () => {
+    setImporting(true);
+    const errors: { row: number; message: string }[] = [];
+    const schoolIdByCode = new Map<string, string>();
+    const matronIdByPhone = new Map<string, string>();
+    const nextSeq = new Map<string, number>(); // schoolId -> next auto student sequence
+    const dialCodeByCountry = new Map((data?.countryConfigs ?? []).map(c => [c.country, c.dial_code]));
+    // Re-importing a template to add new rows is an expected workflow (see
+    // the re-import behavior chosen for this feature) — it must not reset an
+    // already-existing student's lifetime pads_received back down to just
+    // this row's free+paid count every time the file is re-uploaded.
+    const existingStudentIds = new Set((data?.students ?? []).map(s => s.student_id));
+    let schoolsCount = 0, matronsCount = 0, studentsCount = 0;
+
+    for (let i = 0; i < importRows.length; i++) {
+      const r = importRows[i];
+      const rowNum = i + 2; // header row + 1-indexing
+      try {
+        const code = r.school_code.trim().toUpperCase();
+        if (!code || !r.school_name.trim()) throw new Error("Missing school_code or school_name");
+        if (!r.matron_name.trim() || !r.matron_phone.trim()) throw new Error("Missing matron_name or matron_phone");
+
+        let schoolId = schoolIdByCode.get(code);
+        if (!schoolId) {
+          const schoolPayload = {
+            name: r.school_name.trim(), code,
+            country: r.school_country.trim() || "Nigeria",
+            city: r.school_city.trim() || null,
+            state_region: r.school_state_region.trim() || null,
+            contact_name: r.school_contact_name.trim() || null,
+          };
+          const { data: saved, error } = await supabase.from("vagin_schools").upsert(schoolPayload, { onConflict: "code" }).select("id").single();
+          if (error) throw error;
+          schoolId = saved.id;
+          schoolIdByCode.set(code, schoolId);
+          schoolsCount++;
+        }
+
+        const dialCode = dialCodeByCountry.get(r.school_country.trim() || "Nigeria") ?? "234";
+        const phoneResult = normalizePhone(r.matron_phone, dialCode);
+        if (!phoneResult.ok) throw new Error(`matron_phone: ${phoneResult.reason}`);
+        const phone = phoneResult.phone;
+        let matronId = matronIdByPhone.get(phone);
+        if (!matronId) {
+          const activeVal = r.matron_active.trim().toLowerCase();
+          const matronPayload = {
+            name: r.matron_name.trim(), phone, school_id: schoolId,
+            active: activeVal === "" || activeVal === "true" || activeVal === "yes" || activeVal === "1",
+          };
+          const { data: saved, error } = await supabase.from("vagin_matrons").upsert(matronPayload, { onConflict: "phone" }).select("id").single();
+          if (error) throw error;
+          matronId = saved.id;
+          // Sync to the bot's lookup table — onConflict on phone (its real unique
+          // constraint), not id, so this never collides with a pre-existing row.
+          const { error: syncErr } = await supabase.from("teachers_matrons").upsert({ id: matronId, ...matronPayload }, { onConflict: "phone" });
+          if (syncErr) console.warn("teachers_matrons sync failed for", phone, syncErr);
+          matronIdByPhone.set(phone, matronId);
+          matronsCount++;
+        }
+
+        if (r.student_name.trim()) {
+          let studentId = r.student_id.trim().toUpperCase();
+          if (!studentId) {
+            if (!nextSeq.has(schoolId)) nextSeq.set(schoolId, nextSeqForSchool(schoolId));
+            const seq = nextSeq.get(schoolId)!;
+            studentId = buildStudentId(code, r.student_name.trim(), seq);
+            nextSeq.set(schoolId, seq + 1);
+          }
+          const freePads = Math.min(parseInt(r.student_free_pads_used) || 0, 1);
+          const paidPads = Math.min(parseInt(r.student_paid_pads_used) || 0, 2);
+          const studentPayload = {
+            student_id: studentId, name: r.student_name.trim(), school_id: schoolId,
+            class: r.student_class.trim() || null,
+            balance_ngn: parseFloat(r.student_balance_ngn) || 0,
+            free_pads_used: freePads, paid_pads_used: paidPads,
+            ...(existingStudentIds.has(studentId) ? {} : { pads_received: freePads + paidPads }),
+          };
+          const { error } = await supabase.from("vagin_students").upsert(studentPayload, { onConflict: "student_id" });
+          if (error) throw error;
+          studentsCount++;
+        }
+      } catch (err) {
+        errors.push({ row: rowNum, message: err instanceof Error ? err.message : "Unknown error" });
+      }
+    }
+
+    setImporting(false);
+    setImportSummary({ schools: schoolsCount, matrons: matronsCount, students: studentsCount, errors });
+    await fetchData();
   };
 
   // ── Distribution add ──────────────────────────────────────────────────────
@@ -525,14 +834,190 @@ const VAGINDashboard = () => {
   if (!authed) return <AdminLogin onLogin={() => setAuthed(true)} />;
 
   // ── Derived stats ─────────────────────────────────────────────────────────
-  const totalPads     = data ? data.distributions.reduce((s, d) => s + d.pads_count, 0) : 0;
-  const totalGirls    = data ? data.distributions.reduce((s, d) => s + d.girls_count, 0) : 0;
+  // "All time" totals combine two legitimate sources: manually logged field
+  // distribution events (vagin_pad_distributions — outreach events that can
+  // include girls with no individual student record) and real per-student
+  // pad issuance (vagin_students.pads_received, a lifetime counter the
+  // WhatsApp bot increments on every real ISSUE_PAD — see
+  // whatsapp-webhook/index.ts). This is deliberately NOT summed from
+  // vagin_transactions: fetchData() caps that query at 100 rows for
+  // dashboard performance, so once a school passes 100 real transactions,
+  // an "all time" total derived from it would silently start undercounting.
+  const liveGirlsReached = data ? data.students.filter(st => (st.pads_received ?? 0) > 0).length : 0;
+  const livePadsIssued   = data ? data.students.reduce((s, st) => s + (st.pads_received ?? 0), 0) : 0;
+  const totalPads     = data ? data.distributions.reduce((s, d) => s + d.pads_count, 0) + livePadsIssued : 0;
+  const totalGirls    = data ? data.distributions.reduce((s, d) => s + d.girls_count, 0) + liveGirlsReached : 0;
   const totalSessions = data?.sessions.length ?? 0;
   const totalSavings  = data ? data.savings.reduce((s, r) => s + Number(r.total_ngn), 0) : 0;
 
+  // ── Impact & Investment economics (school_pad_economics view) ──────────────
+  // Per row: real pads issued to date at this school (not an assumed full
+  // 3-pad/₦2,100 cycle — a girl one pad in shows one pad's worth), the
+  // market value of that where the local price is known, what girls
+  // actually paid, and the resulting subsidy gap. numeric/bigint columns
+  // can arrive from PostgREST as strings, so every field is coerced with
+  // Number() before arithmetic (same defensive pattern used elsewhere in
+  // this file, e.g. totalSavings above).
+  const impactRows = (data?.schoolEconomics ?? []).map(e => {
+    const freePads = Number(e.free_pads) || 0;
+    const paidPads = Number(e.paid_pads) || 0;
+    const totalPadsForSchool = freePads + paidPads;
+    const marketPrice = e.market_pad_price != null ? Number(e.market_pad_price) : null;
+    const marketValue = marketPrice != null ? totalPadsForSchool * marketPrice : null;
+    const paid = Number(e.paid_amount_collected) || 0;
+    const saved = marketValue != null ? marketValue - paid : null;
+    const girlsReached = Number(e.girls_reached) || 0;
+    return { ...e, freePads, paidPads, totalPadsForSchool, marketPrice, marketValue, paid, saved, girlsReached };
+  });
+  // Only schools whose country has a confirmed local market price count
+  // toward the org-wide totals — never silently treat "unknown" as ₦0.
+  const impactKnownRows = impactRows.filter(r => r.marketPrice != null);
+  const impactUnknownCount = impactRows.length - impactKnownRows.length;
+  // These totals assume one shared currency (true today — only Nigeria has
+  // real transaction data yet); once Malawi/Ghana/Kenya go live this needs
+  // per-currency subtotals rather than one blended sum.
+  const impactTotalMarketValue = impactKnownRows.reduce((s, r) => s + (r.marketValue ?? 0), 0);
+  const impactTotalPaid        = impactKnownRows.reduce((s, r) => s + r.paid, 0);
+  const impactTotalSaved       = impactKnownRows.reduce((s, r) => s + (r.saved ?? 0), 0);
+  const impactTotalGirls       = impactKnownRows.reduce((s, r) => s + r.girlsReached, 0);
+  const fmtMoney = (n: number, symbol: string | null) => `${symbol ?? "₦"}${fmt(Math.round(n))}`;
+
   const schoolName  = (id: string) => data?.schools.find(s => s.id === id)?.name ?? "—";
+  const countryConfigFor = (country: string) => data?.countryConfigs.find(c => c.country === country);
+  const dialCodeForSchool = (schoolId: string) => countryConfigFor(data?.schools.find(s => s.id === schoolId)?.country ?? "Nigeria")?.dial_code ?? "234";
   const studentName = (id: string | null) => id ? (data?.students.find(s => s.id === id)?.name ?? "—") : "—";
-  const matronName  = (id: string | null) => id ? (data?.matrons.find(m => m.id === id)?.name ?? "—") : "—";
+
+  // ── Monthly Impact Report (PDF export) ──────────────────────────────────────
+  // Same economics as the Impact tab, scoped to one calendar month. Queried
+  // fresh rather than reusing the capped 100-row transaction fetch — this is
+  // a deliberate one-off action, not something re-run on every render, so a
+  // month-bounded query stays small on its own without needing a view.
+  // jsPDF's built-in fonts don't reliably render ₦/₵ or accented characters
+  // (verified — they either drop or mis-render), so the PDF spells out
+  // currency codes ("NGN 2,100") instead of symbols, unlike the on-screen UI.
+  const exportMonthlyReport = async () => {
+    if (!data) return;
+    setExportingReport(true);
+    try {
+      const monthStart = `${reportMonth}-01`;
+      const [y, m] = reportMonth.split("-").map(Number);
+      const nextMonthStart = new Date(Date.UTC(y, m, 1)).toISOString().slice(0, 10);
+
+      const { data: monthTx, error } = await supabase
+        .from("vagin_transactions")
+        .select("school_id, transaction_type, pads_issued, amount_ngn, student_id")
+        .gte("issued_date", monthStart)
+        .lt("issued_date", nextMonthStart)
+        .eq("voided", false)
+        .in("transaction_type", ["free_pad", "paid_pad"]);
+      if (error) throw error;
+
+      type Agg = { freePads: number; paidPads: number; paid: number; girls: Set<string> };
+      const bySchool = new Map<string, Agg>();
+      (monthTx ?? []).forEach(t => {
+        if (!t.school_id) return;
+        const row = bySchool.get(t.school_id) ?? { freePads: 0, paidPads: 0, paid: 0, girls: new Set<string>() };
+        if (t.transaction_type === "free_pad") row.freePads += t.pads_issued || 0;
+        if (t.transaction_type === "paid_pad") { row.paidPads += t.pads_issued || 0; row.paid += Number(t.amount_ngn) || 0; }
+        if (t.student_id) row.girls.add(t.student_id);
+        bySchool.set(t.school_id, row);
+      });
+
+      const rows = data.schools.map(s => {
+        const r = bySchool.get(s.id);
+        const cc = countryConfigFor(s.country);
+        const marketPrice = cc?.market_pad_price != null ? Number(cc.market_pad_price) : null;
+        const freePads = r?.freePads ?? 0;
+        const paidPads = r?.paidPads ?? 0;
+        const totalPadsThisMonth = freePads + paidPads;
+        const paid = r?.paid ?? 0;
+        const marketValue = marketPrice != null ? totalPadsThisMonth * marketPrice : null;
+        const saved = marketValue != null ? marketValue - paid : null;
+        const girlsReached = r?.girls.size ?? 0;
+        return { school: s.name, currencyCode: cc?.currency_code ?? "NGN", freePads, paidPads, totalPadsThisMonth, paid, marketValue, saved, girlsReached };
+      }).filter(r => r.totalPadsThisMonth > 0);
+
+      const known = rows.filter(r => r.marketValue != null);
+      const totalMarketValue = known.reduce((s, r) => s + (r.marketValue ?? 0), 0);
+      const totalPaid = known.reduce((s, r) => s + r.paid, 0);
+      const totalSaved = known.reduce((s, r) => s + (r.saved ?? 0), 0);
+      const totalGirls = known.reduce((s, r) => s + r.girlsReached, 0);
+      const unknownCount = rows.length - known.length;
+      const money = (n: number, code: string) => `${code} ${fmt(Math.round(n))}`;
+      const monthLabel = new Date(`${reportMonth}-01T00:00:00Z`).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
+
+      const doc = new jsPDF();
+      doc.setFontSize(17);
+      doc.text("VAGIN PAD KOLO - Monthly Impact Report", 14, 18);
+      doc.setFontSize(11);
+      doc.setTextColor(100);
+      doc.text(monthLabel, 14, 25);
+      doc.setFontSize(9);
+      doc.text(`Generated ${new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}`, 14, 31);
+
+      doc.setTextColor(20);
+      doc.setFontSize(9.5);
+      const intro = "This report summarizes the PAD KOLO menstrual health subsidy program for the month above. For every pad issued, a girl either receives it free (fully donor-sponsored) or pays a subsidized price, with VAGIN covering the gap between that and the local market value. Figures reflect real WhatsApp bot activity recorded this month only, not a hypothetical full cycle.";
+      const introLines = doc.splitTextToSize(intro, 182);
+      doc.text(introLines, 14, 40);
+      let y2 = 40 + introLines.length * 4.5 + 6;
+
+      doc.setFontSize(12);
+      doc.text("Summary", 14, y2);
+      y2 += 7;
+      doc.setFontSize(10);
+      const summaryLines = [
+        `Market value invested: ${money(totalMarketValue, "NGN")}`,
+        `Paid by students: ${money(totalPaid, "NGN")}`,
+        `Subsidized by VAGIN: ${money(totalSaved, "NGN")}${totalMarketValue > 0 ? ` (${Math.round((totalSaved / totalMarketValue) * 100)}% of market value)` : ""}`,
+        `Girls reached this month: ${totalGirls}`,
+      ];
+      summaryLines.forEach((line, i) => doc.text(line, 14, y2 + i * 6));
+      y2 += summaryLines.length * 6 + 6;
+
+      if (unknownCount > 0) {
+        doc.setTextColor(180, 100, 0);
+        doc.setFontSize(8.5);
+        const warn = doc.splitTextToSize(`${unknownCount} school(s) excluded from the totals above - their country has no confirmed local market pad price set yet.`, 182);
+        doc.text(warn, 14, y2);
+        y2 += warn.length * 4.5 + 4;
+        doc.setTextColor(20);
+      }
+
+      if (rows.length === 0) {
+        doc.setFontSize(10);
+        doc.text("No pad activity recorded this month.", 14, y2 + 4);
+      } else {
+        autoTable(doc, {
+          startY: y2 + 2,
+          head: [["School", "Girls", "Free/Paid Pads", "Market Value", "Paid by Students", "Subsidized"]],
+          body: rows.map(r => [
+            r.school,
+            String(r.girlsReached),
+            `${r.freePads} / ${r.paidPads}`,
+            r.marketValue != null ? money(r.marketValue, r.currencyCode) : "-",
+            money(r.paid, r.currencyCode),
+            r.saved != null ? money(r.saved, r.currencyCode) : "-",
+          ]),
+          styles: { fontSize: 9 },
+          headStyles: { fillColor: [98, 1, 127] },
+        });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const finalY = (doc as any).lastAutoTable?.finalY ?? y2 + 10;
+        doc.setFontSize(7.5);
+        doc.setTextColor(120);
+        const method = doc.splitTextToSize("Market value = pads issued this month x the local market retail price (Nigeria: NGN 700, per the project brief). Paid = amounts actually recorded via PAY and paid-pad issuance. Subsidized = the gap between the two, i.e. VAGIN's real contribution.", 182);
+        doc.text(method, 14, finalY + 10);
+      }
+
+      doc.save(`VAGIN-Impact-Report-${reportMonth}.pdf`);
+      showToast("Report exported");
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Failed to export report", "error");
+    } finally {
+      setExportingReport(false);
+    }
+  };
 
   const monthlyDist = data ? (() => {
     const byM: Record<string, number> = {};
@@ -556,11 +1041,39 @@ const VAGINDashboard = () => {
     { id: "pad_kolo"      as TabId, label: "PAD KOLO",      Icon: Droplets },
     { id: "vaginart"      as TabId, label: "VaginART",      Icon: Palette },
     { id: "transactions"  as TabId, label: "Transactions",  Icon: ClipboardList },
+    { id: "impact"        as TabId, label: "Impact & Investment", Icon: PieChart },
     { id: "gallery"       as TabId, label: "Gallery CMS",   Icon: Images },
     { id: "vagin_images"  as TabId, label: "VAGIN Images",  Icon: Camera },
     { id: "viva_products" as TabId, label: "VIVA Products", Icon: ShoppingBag },
-    { id: "bot"           as TabId, label: "Bot Activity",  Icon: Bot },
   ] as const;
+
+  // This admin serves three distinct products under one roof (VAGIN's own
+  // school/matron/pad operations, the Illustrations gallery CMS, and VIVA
+  // product management). Each section carries its OWN sub-brand's accent
+  // color (per CLAUDE.md's brand spec — VAGIN purple, gallery-wall gold for
+  // Illustrations, VIVA's velvet wine) rather than one blanket purple, so
+  // which product you're in is legible at a glance, not just by label text.
+  const ILLUSTRATIONS_GOLD = "#C9974A"; // warm gallery-wall gold, distinct from GOLD (used elsewhere as a UI accent)
+  const VIVA_WINE = "#8A0F35";           // Velvet Wine, lightened slightly for legibility on #080810
+
+  const VAGIN_TAB_IDS: readonly TabId[] = ["overview", "schools", "students", "matrons", "pad_kolo", "vaginart", "transactions", "impact"];
+  const ILLUSTRATIONS_TAB_IDS: readonly TabId[] = ["gallery", "vagin_images"];
+  const VIVA_TAB_IDS: readonly TabId[] = ["viva_products"];
+  const SECTIONS = [
+    { label: "VAGIN",                    accent: PURPLE,             tabs: TABS.filter(t => (VAGIN_TAB_IDS as string[]).includes(t.id)) },
+    { label: "Illustrations & Gallery",  accent: ILLUSTRATIONS_GOLD, tabs: TABS.filter(t => (ILLUSTRATIONS_TAB_IDS as string[]).includes(t.id)) },
+    { label: "VIVA",                     accent: VIVA_WINE,          tabs: TABS.filter(t => (VIVA_TAB_IDS as string[]).includes(t.id)) },
+  ];
+
+  const sidebarItemSx = (active: boolean, accent: string): React.CSSProperties => ({
+    display: "flex", alignItems: "center", gap: 10, width: "100%", textAlign: "left",
+    padding: "8px 12px 8px 13px", borderRadius: "0 8px 8px 0", marginBottom: 1,
+    fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, fontWeight: active ? 600 : 500,
+    background: active ? `${accent}1E` : "transparent",
+    borderLeft: `2.5px solid ${active ? accent : "transparent"}`,
+    color: active ? "#FAFAFA" : "rgba(250,250,250,0.48)",
+    cursor: "pointer", transition: "background 0.15s ease, color 0.15s ease, border-color 0.15s ease",
+  });
 
   const infoBox = (msg: React.ReactNode, color = PL) => (
     <div style={{ background: `${color}10`, border: `1px solid ${color}30`, borderRadius: 10, padding: "12px 16px", marginTop: 4 }}>
@@ -576,6 +1089,7 @@ const VAGINDashboard = () => {
         .vagin-dash select, .vagin-dash input, .vagin-dash textarea { color-scheme: dark; }
         .vagin-dash select option { background-color: #1A0B2E; color: #FAFAFA; }
         .vagin-dash select option:checked { background-color: #62017F; color: #FFFFFF; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
       `}</style>
       <NavBar />
 
@@ -588,7 +1102,12 @@ const VAGINDashboard = () => {
               <h1 className="font-display" style={{ fontSize: "clamp(22px,4vw,34px)", fontWeight: 700, color: "#FAFAFA", margin: 0, lineHeight: 1.1 }}>Impact Dashboard</h1>
               <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "rgba(250,250,250,0.45)", margin: "6px 0 0" }}>Schools · Students · Matrons · Distributions · Sessions</p>
             </div>
-            <div style={{ display: "flex", gap: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div title={liveSync ? "Connected — new WhatsApp bot activity appears here automatically" : "Reconnecting…"}
+                style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", borderRadius: 999, background: liveSync ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.06)", border: `1px solid ${liveSync ? "rgba(34,197,94,0.3)" : "rgba(255,255,255,0.12)"}` }}>
+                <span style={{ width: 7, height: 7, borderRadius: "50%", background: liveSync ? "#22C55E" : "rgba(250,250,250,0.3)", boxShadow: liveSync ? "0 0 6px #22C55E99" : "none", animation: liveSync ? "pulse 2s ease-in-out infinite" : "none" }} />
+                <span style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 11, fontWeight: 600, color: liveSync ? "#22C55E" : "rgba(250,250,250,0.4)", letterSpacing: "0.08em", textTransform: "uppercase" }}>{liveSync ? "Live" : "Connecting"}</span>
+              </div>
               <motion.button onClick={fetchData} disabled={loadingData} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
                 style={{ display: "flex", alignItems: "center", gap: 7, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(250,250,250,0.7)", borderRadius: 999, padding: "9px 18px", fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, cursor: "pointer" }}>
                 <RefreshCw size={13} style={{ animation: loadingData ? "spin 1s linear infinite" : "none" }} />
@@ -601,20 +1120,60 @@ const VAGINDashboard = () => {
             </div>
           </div>
 
-          {/* Tabs */}
-          <div style={{ display: "flex", gap: 2, borderBottom: "1px solid rgba(255,255,255,0.07)", overflowX: "auto" }}>
-            {TABS.map(t => (
-              <button key={t.id} onClick={() => setActiveTab(t.id)}
-                style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 14px", fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, fontWeight: 500, background: "none", border: "none", cursor: "pointer", borderBottom: activeTab === t.id ? `2px solid ${PURPLE}` : "2px solid transparent", color: activeTab === t.id ? "#FAFAFA" : "rgba(250,250,250,0.4)", transition: "all 0.2s", whiteSpace: "nowrap", flexShrink: 0 }}>
-                <t.Icon size={13} strokeWidth={1.75} />{t.label}
-              </button>
+          {/* Compact grouped tab row — visible below the lg breakpoint, where
+              the sidebar (below) is hidden in favor of this scrollable strip.
+              Same per-section accent colors as the sidebar, via the
+              underline, so the grouping reads identically at every width. */}
+          <div className="lg:hidden" style={{ display: "flex", alignItems: "stretch", gap: 4, borderBottom: "1px solid rgba(255,255,255,0.07)", overflowX: "auto", paddingBottom: 2 }}>
+            {SECTIONS.map((section, i) => (
+              <div key={section.label} style={{ display: "flex", alignItems: "center", gap: 1, flexShrink: 0, borderLeft: i > 0 ? "1px solid rgba(255,255,255,0.08)" : "none", paddingLeft: i > 0 ? 10 : 0, marginLeft: i > 0 ? 6 : 0 }}>
+                <span style={{ width: 5, height: 5, borderRadius: "50%", background: section.accent, marginRight: 7, flexShrink: 0 }} />
+                {section.tabs.map(t => (
+                  <button key={t.id} onClick={() => setActiveTab(t.id)}
+                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 12px", fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, fontWeight: activeTab === t.id ? 600 : 500, background: "none", border: "none", cursor: "pointer", borderBottom: activeTab === t.id ? `2px solid ${section.accent}` : "2px solid transparent", color: activeTab === t.id ? "#FAFAFA" : "rgba(250,250,250,0.4)", transition: "all 0.2s", whiteSpace: "nowrap", flexShrink: 0 }}>
+                    <t.Icon size={13} strokeWidth={1.75} color={activeTab === t.id ? section.accent : "currentColor"} />{t.label}
+                  </button>
+                ))}
+              </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* ── Content ── */}
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "32px 24px 64px" }}>
+      {/* ── Body: sidebar (lg+) + content ── */}
+      <div className="flex flex-col lg:flex-row" style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 64px", gap: 28, alignItems: "flex-start" }}>
+
+        {/* Sidebar — a bordered rail (not floating buttons), grouped by
+            product with each section carrying its own sub-brand accent.
+            Hidden below lg in favor of the compact tab row in the header. */}
+        <nav className="hidden lg:block" style={{
+          width: 220, flexShrink: 0, position: "sticky", top: 96,
+          background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)",
+          borderRadius: 16, padding: "18px 8px", maxHeight: "calc(100vh - 120px)", overflowY: "auto",
+        }}>
+          {SECTIONS.map((section, i) => (
+            <div key={section.label}>
+              <div style={{ display: "flex", alignItems: "center", gap: 7, padding: "0 13px", marginBottom: 9 }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: section.accent, boxShadow: `0 0 7px ${section.accent}99`, flexShrink: 0 }} />
+                <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10.5, fontWeight: 700, color: "rgba(250,250,250,0.4)", letterSpacing: "0.16em", textTransform: "uppercase", margin: 0 }}>{section.label}</p>
+              </div>
+              {section.tabs.map(t => (
+                <motion.button key={t.id} onClick={() => setActiveTab(t.id)}
+                  whileHover={activeTab === t.id ? {} : { x: 3 }} transition={{ duration: 0.15 }}
+                  style={sidebarItemSx(activeTab === t.id, section.accent)}>
+                  <t.Icon size={15} strokeWidth={1.75} color={activeTab === t.id ? section.accent : "currentColor"} />
+                  {t.label}
+                </motion.button>
+              ))}
+              {i < SECTIONS.length - 1 && (
+                <div style={{ height: 1, background: `linear-gradient(90deg, ${section.accent}40, transparent 85%)`, margin: "16px 13px 18px 4px" }} />
+              )}
+            </div>
+          ))}
+        </nav>
+
+        {/* Content */}
+        <div style={{ flex: 1, minWidth: 0, width: "100%" }}>
         {dataError && (
           <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 8, padding: "14px 18px", marginBottom: 24 }}>
             <AlertCircle size={16} color="#EF4444" />
@@ -660,7 +1219,7 @@ const VAGINDashboard = () => {
             {/* ── SCHOOLS ── */}
             {activeTab === "schools" && (
               <motion.div key="schools" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-                <Card title="School Registry" action={<AddBtn label="Add School" onClick={openAddSchool} />}>
+                <Card title="School Registry" action={<div style={{ display: "flex", gap: 8 }}><AddBtn label="Import CSV" onClick={openBulkImport} color={GOLD} /><AddBtn label="Add School" onClick={openAddSchool} /></div>}>
                   <Table
                     headers={["Code", "Name", "Country", "City", "Contact", "Students", "Actions"]}
                     rows={data.schools.map(s => {
@@ -823,14 +1382,19 @@ const VAGINDashboard = () => {
                     </div>
                   ) : (
                     <Table
-                      headers={["Time", "Type", "Student", "Matron", "Pads", "Amount", "Source", "Status", ""]}
+                      headers={["Time", "Type", "Student", "Issued By", "Pads", "Amount", "Source", "Status", ""]}
                       rows={data.transactions.map(t => {
                         const isBot = t.source === "whatsapp_bot" || t.source === "whatsapp";
+                        // Real values written by the bot: "free_pad" | "paid_pad" |
+                        // "student_payment" | "deposit" (see whatsapp-webhook/index.ts) —
+                        // pad issuance reads pink, money coming in (a girl paying via PAY,
+                        // or the matron's school-level DEPOSIT) reads gold.
+                        const isMoneyIn = t.transaction_type === "deposit" || t.transaction_type === "student_payment";
                         return [
                         <span key="time" style={{ opacity: t.voided ? 0.4 : 1 }}>{fmtDate(t.created_at)}</span>,
-                        <span key="type" style={{ fontSize: 11, padding: "3px 10px", borderRadius: 999, background: t.type === "pad_issue" ? "rgba(237,21,93,0.15)" : "rgba(217,119,6,0.12)", color: t.type === "pad_issue" ? PINK : GOLD, border: `1px solid ${t.type === "pad_issue" ? "rgba(237,21,93,0.3)" : "rgba(217,119,6,0.3)"}`, textDecoration: t.voided ? "line-through" : "none", opacity: t.voided ? 0.5 : 1 }}>{t.type.replace(/_/g, " ")}</span>,
+                        <span key="type" style={{ fontSize: 11, padding: "3px 10px", borderRadius: 999, background: isMoneyIn ? "rgba(217,119,6,0.12)" : "rgba(237,21,93,0.15)", color: isMoneyIn ? GOLD : PINK, border: `1px solid ${isMoneyIn ? "rgba(217,119,6,0.3)" : "rgba(237,21,93,0.3)"}`, textDecoration: t.voided ? "line-through" : "none", opacity: t.voided ? 0.5 : 1 }}>{t.transaction_type.replace(/_/g, " ")}</span>,
                         <span key="stu" style={{ opacity: t.voided ? 0.4 : 1 }}>{studentName(t.student_id)}</span>,
-                        <span key="mat" style={{ opacity: t.voided ? 0.4 : 1 }}>{matronName(t.matron_id)}</span>,
+                        <span key="iss" style={{ opacity: t.voided ? 0.4 : 1 }}>{t.issued_by || "—"}</span>,
                         <span key="pads" style={{ opacity: t.voided ? 0.4 : 1 }}>{t.pads_issued || "—"}</span>,
                         <span key="amt" style={{ opacity: t.voided ? 0.4 : 1 }}>{t.amount_ngn ? fmtNGN(t.amount_ngn) : "—"}</span>,
                         <span key="src" style={{ fontSize: 11, padding: "3px 10px", borderRadius: 999, background: isBot ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.06)", color: isBot ? "#22C55E" : "rgba(250,250,250,0.5)", border: `1px solid ${isBot ? "rgba(34,197,94,0.25)" : "rgba(255,255,255,0.1)"}` }}>{t.source}</span>,
@@ -855,6 +1419,64 @@ const VAGINDashboard = () => {
               </motion.div>
             )}
 
+            {/* ── IMPACT & INVESTMENT ── */}
+            {activeTab === "impact" && (
+              <motion.div key="impact" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", gap: 10, marginBottom: 18 }}>
+                  <input type="month" value={reportMonth} onChange={e => setReportMonth(e.target.value)}
+                    style={{ ...inputSx, width: "auto", padding: "9px 12px", fontSize: 12 }} />
+                  <motion.button onClick={exportMonthlyReport} disabled={exportingReport} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                    style={{ display: "flex", alignItems: "center", gap: 7, background: `${PURPLE}22`, border: `1px solid ${PURPLE}55`, color: "#FAFAFA", borderRadius: 999, padding: "9px 18px", fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, fontWeight: 600, cursor: exportingReport ? "default" : "pointer", opacity: exportingReport ? 0.6 : 1 }}>
+                    <FileDown size={13} />
+                    {exportingReport ? "Generating…" : "Export Monthly Report (PDF)"}
+                  </motion.button>
+                </div>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" style={{ marginBottom: 24 }}>
+                  <StatCard icon={Coins}      label="Market Value Invested" value={fmtNGN(impactTotalMarketValue)} sub={impactUnknownCount > 0 ? `${impactUnknownCount} school(s) missing local price` : "all schools, to date"} color={GOLD} />
+                  <StatCard icon={Droplets}   label="Paid by Students"     value={fmtNGN(impactTotalPaid)}        sub={`${fmt(impactTotalGirls)} girls reached`} color={PINK} />
+                  <StatCard icon={TrendingUp} label="Subsidized by VAGIN"  value={fmtNGN(impactTotalSaved)}       sub={impactTotalMarketValue > 0 ? `${Math.round((impactTotalSaved / impactTotalMarketValue) * 100)}% of market value` : "—"} color={PL} />
+                  <StatCard icon={Users}      label="Avg. Value per Girl"  value={impactTotalGirls > 0 ? fmtNGN(impactTotalMarketValue / impactTotalGirls) : "—"} sub={impactTotalGirls > 0 ? `${fmtNGN(impactTotalPaid / impactTotalGirls)} paid · ${fmtNGN(impactTotalSaved / impactTotalGirls)} saved` : "no pads issued yet"} color={PURPLE} />
+                </div>
+
+                <Card title="Funding split by school">
+                  {impactKnownRows.length === 0 ? (
+                    <div style={{ textAlign: "center", padding: "40px 0" }}>
+                      <PieChart size={32} color="rgba(250,250,250,0.15)" style={{ marginBottom: 12 }} />
+                      <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 14, color: "rgba(250,250,250,0.35)", margin: "0 0 6px" }}>No priced schools yet</p>
+                      <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 12, color: "rgba(250,250,250,0.2)", margin: 0 }}>Set a local market pad price in country_configs for at least one school's country to see the breakdown.</p>
+                    </div>
+                  ) : (
+                    <StackedBarChart
+                      data={impactKnownRows.map(r => ({ label: r.school_name, a: r.paid, b: r.saved ?? 0 }))}
+                      colorA={PINK} colorB={GOLD} labelA="Paid by students" labelB="Subsidized by VAGIN"
+                    />
+                  )}
+                </Card>
+
+                <Card title="Per-school breakdown">
+                  <Table
+                    headers={["School", "Girls Reached", "Free / Paid Pads", "Market Value", "Paid by Students", "Subsidized", "Avg / Girl"]}
+                    rows={impactRows.map(r => r.marketPrice == null ? [
+                      r.school_name,
+                      fmt(r.girlsReached),
+                      `${r.freePads} / ${r.paidPads}`,
+                      <span key="w" style={{ color: GOLD, fontSize: 11, display: "flex", alignItems: "center", gap: 5 }}><AlertCircle size={12} />local price not set</span>,
+                      "—", "—", "—",
+                    ] : [
+                      r.school_name,
+                      fmt(r.girlsReached),
+                      `${r.freePads} / ${r.paidPads}`,
+                      fmtMoney(r.marketValue ?? 0, r.currency_symbol),
+                      fmtMoney(r.paid, r.currency_symbol),
+                      fmtMoney(r.saved ?? 0, r.currency_symbol),
+                      r.girlsReached > 0 ? fmtMoney((r.marketValue ?? 0) / r.girlsReached, r.currency_symbol) : "—",
+                    ])}
+                  />
+                </Card>
+                {infoBox(<><strong>How this is calculated:</strong> Market value = real pads issued to date × the local market retail price (₦700 in Nigeria, per the project brief — 1 free + 2 subsidized pads across a 3-month cycle works out to ₦2,100 value / ₦400 paid / ₦1,700 saved per girl who completes a full cycle). Paid by students = actual amounts recorded through PAY and paid-pad issuance. Subsidized = the gap between the two — VAGIN's real contribution. This reflects real issuance so far, not an assumed complete cycle, so it grows as more pads go out.</>, PL)}
+              </motion.div>
+            )}
+
             {activeTab === "viva_products" && (
               <motion.div key="viva_products" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
                 <Card title="VIVA Products Management">
@@ -871,14 +1493,9 @@ const VAGINDashboard = () => {
               </motion.div>
             )}
 
-            {activeTab === "bot" && (
-              <motion.div key="bot" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-                <WhatsAppBotSimulatorTab />
-              </motion.div>
-            )}
-
           </AnimatePresence>
         )}
+        </div>
       </div>
 
       {/* ── MODALS ── */}
@@ -903,6 +1520,11 @@ const VAGINDashboard = () => {
                   <option value="Ghana">Ghana</option>
                   <option value="Kenya">Kenya</option>
                 </select>
+                {(() => { const cc = countryConfigFor(schoolForm.country); return cc && (
+                  <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: "rgba(250,250,250,0.3)", margin: "5px 0 0" }}>
+                    Phone numbers here will be normalized to +{cc.dial_code}… and the WhatsApp bot will report amounts in {cc.currency_code} ({cc.currency_symbol}).
+                  </p>
+                ); })()}
               </F>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <F label="City"><input style={inputSx} value={schoolForm.city} onChange={e => setSchoolForm(p => ({ ...p, city: e.target.value }))} placeholder="e.g. Lagos" /></F>
@@ -964,15 +1586,17 @@ const VAGINDashboard = () => {
           <Modal key="matron-modal" title={modal === "add-matron" ? "Add Matron" : "Edit Matron"} onClose={closeModal}>
             <form onSubmit={saveMatron} style={{ display: "flex", flexDirection: "column" }}>
               <F label="Full Name *"><input required style={inputSx} value={matronForm.name} onChange={e => setMatronForm(p => ({ ...p, name: e.target.value }))} /></F>
-              <F label="WhatsApp Number * (with country code)">
-                <input required style={inputSx} value={matronForm.phone} onChange={e => setMatronForm(p => ({ ...p, phone: e.target.value }))} placeholder="+2348012345678" />
-                <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: "rgba(250,250,250,0.3)", margin: "5px 0 0" }}>Used to authenticate the matron in the WhatsApp bot.</p>
-              </F>
               <F label="School">
                 <select style={inputSx} value={matronForm.school_id} onChange={e => setMatronForm(p => ({ ...p, school_id: e.target.value }))}>
                   <option value="">— Select school —</option>
                   {schoolOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
+              </F>
+              <F label="WhatsApp Number * (with or without country code)">
+                <input required style={inputSx} value={matronForm.phone} onChange={e => setMatronForm(p => ({ ...p, phone: e.target.value }))} placeholder={`0803... or +${dialCodeForSchool(matronForm.school_id)}803...`} />
+                <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 10, color: "rgba(250,250,250,0.3)", margin: "5px 0 0" }}>
+                  Auto-normalized to +{dialCodeForSchool(matronForm.school_id)}… (the selected school's country code) on save — used to authenticate the matron in the WhatsApp bot.
+                </p>
               </F>
               <F label="Status">
                 <select style={inputSx} value={matronForm.active ? "true" : "false"} onChange={e => setMatronForm(p => ({ ...p, active: e.target.value === "true" }))}>
@@ -985,6 +1609,61 @@ const VAGINDashboard = () => {
                 <SaveBtn loading={saving} />
               </div>
             </form>
+          </Modal>
+        )}
+
+        {/* Bulk import (CSV) */}
+        {modal === "bulk-import" && (
+          <Modal key="bulk-import-modal" title="Bulk Import — Schools, Matrons & Students" onClose={closeModal} width={640}>
+            <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "rgba(250,250,250,0.6)", lineHeight: 1.6, margin: "0 0 16px" }}>
+              One row per student (or per matron, if a school has no students yet). Each row's school and matron are created or updated automatically — matrons are wired into the WhatsApp bot immediately, no extra step needed. Phone numbers are normalized and validated against the row's <code>school_country</code> (local "0..." or full "+country code" both work); rows with an unrecognized number are rejected individually rather than silently imported. Re-uploading later updates existing schools and adds new matrons/students without duplicating anything.
+            </p>
+            <button type="button" onClick={downloadImportTemplate} style={{ ...cancelBtnSx, marginBottom: 18 }}>Download CSV Template</button>
+
+            {!importSummary && (
+              <F label="CSV File">
+                <input type="file" accept=".csv,text/csv" style={inputSx}
+                  onChange={e => { const f = e.target.files?.[0]; if (f) handleImportFile(f); }} />
+              </F>
+            )}
+
+            {importParseErrors.length > 0 && (
+              <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 8, padding: "10px 14px", marginBottom: 14 }}>
+                {importParseErrors.map((e, i) => <p key={i} style={{ margin: 0, fontSize: 12, color: "#EF4444" }}>{e}</p>)}
+              </div>
+            )}
+
+            {importRows.length > 0 && !importSummary && (
+              <>
+                <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "rgba(250,250,250,0.75)", margin: "0 0 16px" }}>
+                  <strong style={{ color: "#FAFAFA" }}>{importRows.length}</strong> row{importRows.length === 1 ? "" : "s"} detected —{" "}
+                  <strong style={{ color: "#FAFAFA" }}>{new Set(importRows.map(r => r.school_code.trim().toUpperCase())).size}</strong> school(s),{" "}
+                  <strong style={{ color: "#FAFAFA" }}>{new Set(importRows.map(r => r.matron_phone.trim())).size}</strong> matron(s),{" "}
+                  <strong style={{ color: "#FAFAFA" }}>{importRows.filter(r => r.student_name.trim()).length}</strong> student(s).
+                </p>
+                <form onSubmit={e => { e.preventDefault(); runImport(); }} style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+                  <button type="button" onClick={closeModal} style={cancelBtnSx}>Cancel</button>
+                  <SaveBtn loading={importing} label={importing ? "Importing…" : `Import ${importRows.length} Row${importRows.length === 1 ? "" : "s"}`} />
+                </form>
+              </>
+            )}
+
+            {importSummary && (
+              <div>
+                <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "#22C55E", margin: "0 0 10px" }}>
+                  ✓ {importSummary.schools} school(s), {importSummary.matrons} matron(s), {importSummary.students} student(s) imported.
+                </p>
+                {importSummary.errors.length > 0 && (
+                  <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 8, padding: "10px 14px", maxHeight: 180, overflowY: "auto" }}>
+                    <p style={{ margin: "0 0 6px", fontSize: 12, color: "#EF4444", fontWeight: 600 }}>{importSummary.errors.length} row(s) failed:</p>
+                    {importSummary.errors.map((e, i) => <p key={i} style={{ margin: "2px 0", fontSize: 12, color: "#EF4444" }}>Row {e.row}: {e.message}</p>)}
+                  </div>
+                )}
+                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
+                  <button type="button" onClick={closeModal} style={cancelBtnSx}>Close</button>
+                </div>
+              </div>
+            )}
           </Modal>
         )}
 
