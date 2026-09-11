@@ -62,7 +62,6 @@ export default function VIVAFeedbackCarousel() {
         (payload) => {
           const newFeedback = payload.new as Feedback;
           setFeedbacks((prev) => [newFeedback, ...prev]);
-          // Reset to show new feedback
           setCurrentIndex(0);
         }
       )
@@ -82,7 +81,7 @@ export default function VIVAFeedbackCarousel() {
 
     autoPlayRef.current = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % feedbacks.length);
-    }, 5000); // Change every 5 seconds
+    }, 5000);
 
     return () => {
       if (autoPlayRef.current) clearInterval(autoPlayRef.current);
@@ -118,11 +117,9 @@ export default function VIVAFeedbackCarousel() {
 
       if (error) throw error;
 
-      // Clear form
       setFormData({ name: "", comment: "", rating: 5 });
       setSubmitStatus("success");
 
-      // Reset status after 2 seconds
       setTimeout(() => setSubmitStatus("idle"), 2000);
     } catch (err) {
       console.error("Failed to submit feedback:", err);
@@ -136,15 +133,7 @@ export default function VIVAFeedbackCarousel() {
   const currentFeedback = feedbacks[currentIndex];
 
   return (
-    <section
-      style={{
-        background: ALABASTER,
-        padding: "clamp(40px, 8vw, 80px) clamp(16px, 5vw, 20px)",
-        minHeight: "100dvh",
-        display: "flex",
-        alignItems: "center",
-      }}
-    >
+    <section style={{ background: ALABASTER, padding: "clamp(40px, 8vw, 80px) clamp(16px, 5vw, 20px)", minHeight: "100dvh", display: "flex", alignItems: "center" }}>
       <div style={{ width: "100%", maxWidth: "1280px", margin: "0 auto" }}>
         {/* Section header */}
         <motion.div
@@ -191,12 +180,11 @@ export default function VIVAFeedbackCarousel() {
               lineHeight: 1.6,
             }}
           >
-            Share your VIVA experience. Feedback appears instantly in our rotating gallery—
-            real voices, real stories, real impact.
+            Share your VIVA experience. Feedback appears instantly in our rotating gallery—real voices, real stories, real impact.
           </p>
         </motion.div>
 
-        {/* Main container: Feedback carousel + Form (responsive grid) */}
+        {/* Main container: Carousel + Form */}
         <div
           style={{
             display: "grid",
@@ -206,7 +194,7 @@ export default function VIVAFeedbackCarousel() {
           }}
           className="responsive-grid"
         >
-          {/* Left: Rotating Feedback Carousel */}
+          {/* Left: Rotating Feedback Carousel - PREMIUM CARD DESIGN */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -312,7 +300,7 @@ export default function VIVAFeedbackCarousel() {
                 </motion.div>
               ) : (
                 <>
-                  {/* Carousel content with animation */}
+                  {/* PREMIUM CAROUSEL CARD */}
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={currentIndex}
@@ -320,14 +308,29 @@ export default function VIVAFeedbackCarousel() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.4 }}
-                      style={{ flex: 1 }}
+                      style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}
                     >
-                      {/* Rating stars */}
-                      <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>
+                      {/* Opening Quotation Mark - Elegant Detail */}
+                      <div style={{ marginBottom: "8px" }}>
+                        <span
+                          style={{
+                            fontSize: "48px",
+                            color: GOLD,
+                            opacity: 0.3,
+                            lineHeight: "0.8",
+                            fontFamily: CORMORANT,
+                          }}
+                        >
+                          "
+                        </span>
+                      </div>
+
+                      {/* Rating Stars */}
+                      <div style={{ display: "flex", gap: 6, marginBottom: 20 }}>
                         {Array.from({ length: 5 }).map((_, i) => (
                           <Star
                             key={i}
-                            size={16}
+                            size={18}
                             style={{
                               fill: i < currentFeedback.rating ? GOLD : "rgba(110,0,37,0.1)",
                               color: i < currentFeedback.rating ? GOLD : "rgba(110,0,37,0.1)",
@@ -336,45 +339,60 @@ export default function VIVAFeedbackCarousel() {
                         ))}
                       </div>
 
-                      {/* Feedback comment */}
-                      <blockquote
-                        style={{
-                          fontFamily: "DM Sans, system-ui, sans-serif",
-                          fontSize: 16,
-                          color: DARK_TEXT,
-                          lineHeight: 1.7,
-                          margin: "0 0 24px 0",
-                          fontStyle: "italic",
-                          opacity: 0.85,
-                        }}
-                      >
-                        "{currentFeedback.comment}"
-                      </blockquote>
+                      {/* Feedback Comment - Enhanced Typography */}
+                      <div style={{ flex: 1, display: "flex", alignItems: "center", marginBottom: 28 }}>
+                        <p
+                          style={{
+                            fontFamily: "DM Sans, system-ui, sans-serif",
+                            fontSize: "clamp(14px, 2.5vw, 16px)",
+                            color: DARK_TEXT,
+                            lineHeight: 1.8,
+                            margin: 0,
+                            fontStyle: "italic",
+                            opacity: 0.9,
+                            letterSpacing: "0.2px",
+                          }}
+                        >
+                          {currentFeedback.comment}
+                        </p>
+                      </div>
 
-                      {/* Author */}
-                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      {/* Divider - Subtle Luxury Detail */}
+                      <div
+                        style={{
+                          height: "1px",
+                          background: `linear-gradient(90deg, ${BURG_ALPHA}, transparent)`,
+                          marginBottom: 20,
+                        }}
+                      />
+
+                      {/* Author Section - Clean & Elevated */}
+                      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                         <div
                           style={{
-                            width: 40,
-                            height: 40,
+                            width: 48,
+                            height: 48,
                             borderRadius: "50%",
                             background: `linear-gradient(135deg, ${BURGUNDY}, ${GOLD})`,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                             color: "#fff",
+                            flexShrink: 0,
+                            boxShadow: `0 2px 8px rgba(110,0,37,0.15)`,
                           }}
                         >
-                          <User size={20} />
+                          <User size={24} />
                         </div>
                         <div>
                           <p
                             style={{
                               fontFamily: "DM Sans, system-ui, sans-serif",
-                              fontSize: 14,
-                              fontWeight: 600,
+                              fontSize: "clamp(14px, 2.5vw, 15px)",
+                              fontWeight: 700,
                               color: DARK_TEXT,
                               margin: 0,
+                              letterSpacing: "0.3px",
                             }}
                           >
                             {currentFeedback.name}
@@ -382,19 +400,23 @@ export default function VIVAFeedbackCarousel() {
                           <p
                             style={{
                               fontFamily: "DM Sans, system-ui, sans-serif",
-                              fontSize: 11,
+                              fontSize: 12,
                               color: "rgba(34,26,26,0.5)",
                               margin: "4px 0 0 0",
                             }}
                           >
-                            {new Date(currentFeedback.created_at).toLocaleDateString()}
+                            {new Date(currentFeedback.created_at).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            })}
                           </p>
                         </div>
                       </div>
                     </motion.div>
                   </AnimatePresence>
 
-                  {/* Navigation controls */}
+                  {/* Navigation Controls */}
                   {feedbacks.length > 1 && (
                     <div
                       style={{
@@ -407,7 +429,7 @@ export default function VIVAFeedbackCarousel() {
                         gap: "12px",
                       }}
                     >
-                      {/* Previous button - 44x44px minimum for touch */}
+                      {/* Previous button */}
                       <motion.button
                         onClick={goToPrevious}
                         whileTap={{ scale: 0.95 }}
@@ -428,27 +450,21 @@ export default function VIVAFeedbackCarousel() {
                           padding: 0,
                         }}
                         onMouseEnter={(e) => {
-                          (e.currentTarget as HTMLButtonElement).style.background =
-                            BURGUNDY;
-                          (e.currentTarget as HTMLButtonElement).style.color =
-                            ALABASTER;
-                          (e.currentTarget as HTMLButtonElement).style.borderColor =
-                            BURGUNDY;
+                          e.currentTarget.style.background = BURGUNDY;
+                          e.currentTarget.style.color = "white";
+                          e.currentTarget.style.borderColor = BURGUNDY;
                         }}
                         onMouseLeave={(e) => {
-                          (e.currentTarget as HTMLButtonElement).style.background =
-                            BURG_LIGHT;
-                          (e.currentTarget as HTMLButtonElement).style.color =
-                            BURGUNDY;
-                          (e.currentTarget as HTMLButtonElement).style.borderColor =
-                            BURG_ALPHA;
+                          e.currentTarget.style.background = BURG_LIGHT;
+                          e.currentTarget.style.color = BURGUNDY;
+                          e.currentTarget.style.borderColor = BURG_ALPHA;
                         }}
                         aria-label="Previous feedback"
                       >
                         <ChevronLeft size={20} strokeWidth={2} />
                       </motion.button>
 
-                      {/* Indicators - paginated on mobile */}
+                      {/* Indicators */}
                       <div style={{ display: "flex", gap: "6px", flex: 1, justifyContent: "center", flexWrap: "wrap", minHeight: "12px" }}>
                         {feedbacks.slice(0, 5).map((_, idx) => (
                           <motion.button
@@ -460,8 +476,7 @@ export default function VIVAFeedbackCarousel() {
                               width: idx === currentIndex ? 24 : 8,
                               height: 8,
                               borderRadius: 4,
-                              background:
-                                idx === currentIndex ? BURGUNDY : BURG_ALPHA,
+                              background: idx === currentIndex ? BURGUNDY : BURG_ALPHA,
                               cursor: "pointer",
                               transition: "all 0.3s ease",
                               border: "none",
@@ -486,7 +501,7 @@ export default function VIVAFeedbackCarousel() {
                         )}
                       </div>
 
-                      {/* Next button - 44x44px minimum for touch */}
+                      {/* Next button */}
                       <motion.button
                         onClick={goToNext}
                         whileTap={{ scale: 0.95 }}
@@ -507,20 +522,14 @@ export default function VIVAFeedbackCarousel() {
                           padding: 0,
                         }}
                         onMouseEnter={(e) => {
-                          (e.currentTarget as HTMLButtonElement).style.background =
-                            BURGUNDY;
-                          (e.currentTarget as HTMLButtonElement).style.color =
-                            ALABASTER;
-                          (e.currentTarget as HTMLButtonElement).style.borderColor =
-                            BURGUNDY;
+                          e.currentTarget.style.background = BURGUNDY;
+                          e.currentTarget.style.color = "white";
+                          e.currentTarget.style.borderColor = BURGUNDY;
                         }}
                         onMouseLeave={(e) => {
-                          (e.currentTarget as HTMLButtonElement).style.background =
-                            BURG_LIGHT;
-                          (e.currentTarget as HTMLButtonElement).style.color =
-                            BURGUNDY;
-                          (e.currentTarget as HTMLButtonElement).style.borderColor =
-                            BURG_ALPHA;
+                          e.currentTarget.style.background = BURG_LIGHT;
+                          e.currentTarget.style.color = BURGUNDY;
+                          e.currentTarget.style.borderColor = BURG_ALPHA;
                         }}
                         aria-label="Next feedback"
                       >
@@ -611,9 +620,7 @@ export default function VIVAFeedbackCarousel() {
                     id="feedback-name"
                     type="text"
                     value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="Your name"
                     style={{
                       width: "100%",
@@ -629,16 +636,12 @@ export default function VIVAFeedbackCarousel() {
                       minHeight: "44px",
                     }}
                     onFocus={(e) => {
-                      (e.currentTarget as HTMLInputElement).style.borderColor =
-                        BURGUNDY;
-                      (e.currentTarget as HTMLInputElement).style.boxShadow =
-                        `0 0 0 3px ${BURG_LIGHT}`;
+                      e.currentTarget.style.borderColor = BURGUNDY;
+                      e.currentTarget.style.boxShadow = `0 0 0 3px ${BURG_LIGHT}`;
                     }}
                     onBlur={(e) => {
-                      (e.currentTarget as HTMLInputElement).style.borderColor =
-                        BURG_ALPHA;
-                      (e.currentTarget as HTMLInputElement).style.boxShadow =
-                        "none";
+                      e.currentTarget.style.borderColor = BURG_ALPHA;
+                      e.currentTarget.style.boxShadow = "none";
                     }}
                   />
                 </div>
@@ -682,10 +685,8 @@ export default function VIVAFeedbackCarousel() {
                         <Star
                           size={28}
                           style={{
-                            fill:
-                              star <= formData.rating ? GOLD : "rgba(110,0,37,0.15)",
-                            color:
-                              star <= formData.rating ? GOLD : "rgba(110,0,37,0.15)",
+                            fill: star <= formData.rating ? GOLD : "rgba(110,0,37,0.15)",
+                            color: star <= formData.rating ? GOLD : "rgba(110,0,37,0.15)",
                             transition: "all 0.2s ease",
                           }}
                         />
@@ -744,16 +745,12 @@ export default function VIVAFeedbackCarousel() {
                     }}
                     maxLength={300}
                     onFocus={(e) => {
-                      (e.currentTarget as HTMLTextAreaElement).style.borderColor =
-                        BURGUNDY;
-                      (e.currentTarget as HTMLTextAreaElement).style.boxShadow =
-                        `0 0 0 3px ${BURG_LIGHT}`;
+                      e.currentTarget.style.borderColor = BURGUNDY;
+                      e.currentTarget.style.boxShadow = `0 0 0 3px ${BURG_LIGHT}`;
                     }}
                     onBlur={(e) => {
-                      (e.currentTarget as HTMLTextAreaElement).style.borderColor =
-                        BURG_ALPHA;
-                      (e.currentTarget as HTMLTextAreaElement).style.boxShadow =
-                        "none";
+                      e.currentTarget.style.borderColor = BURG_ALPHA;
+                      e.currentTarget.style.boxShadow = "none";
                     }}
                   />
                   <p
@@ -787,7 +784,7 @@ export default function VIVAFeedbackCarousel() {
                         : submitStatus === "error"
                         ? ERROR_COLOR
                         : BURGUNDY,
-                    color: ALABASTER,
+                    color: "white",
                     border: "none",
                     borderRadius: 8,
                     cursor:
@@ -805,18 +802,14 @@ export default function VIVAFeedbackCarousel() {
                   }}
                   onMouseEnter={(e) => {
                     if (!isSubmitting && !(!formData.name.trim() || !formData.comment.trim()) && submitStatus !== "success") {
-                      (e.currentTarget as HTMLButtonElement).style.background =
-                        "rgba(110,0,37,0.9)";
-                      (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                        "0 4px 12px rgba(110,0,37,0.25)";
+                      e.currentTarget.style.background = "rgba(110,0,37,0.9)";
+                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(110,0,37,0.25)";
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (submitStatus !== "success" && submitStatus !== "error") {
-                      (e.currentTarget as HTMLButtonElement).style.background =
-                        BURGUNDY;
-                      (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                        "0 2px 8px rgba(110,0,37,0.15)";
+                      e.currentTarget.style.background = BURGUNDY;
+                      e.currentTarget.style.boxShadow = "0 2px 8px rgba(110,0,37,0.15)";
                     }
                   }}
                 >
@@ -828,7 +821,7 @@ export default function VIVAFeedbackCarousel() {
                         style={{
                           width: 18,
                           height: 18,
-                          border: `2px solid ${ALABASTER}`,
+                          border: `2px solid white`,
                           borderTopColor: "transparent",
                           borderRadius: "50%",
                         }}
@@ -853,7 +846,7 @@ export default function VIVAFeedbackCarousel() {
                   )}
                 </motion.button>
 
-                {/* Error message with better styling */}
+                {/* Error message */}
                 <AnimatePresence>
                   {submitStatus === "error" && (
                     <motion.div
@@ -870,7 +863,7 @@ export default function VIVAFeedbackCarousel() {
                         alignItems: "center",
                       }}
                     >
-                      <AlertCircle size={16} color={ERROR_COLOR} flexShrink={0} />
+                      <AlertCircle size={16} color={ERROR_COLOR} style={{ flexShrink: 0 }} />
                       <p
                         style={{
                           color: ERROR_COLOR,
@@ -913,13 +906,11 @@ export default function VIVAFeedbackCarousel() {
             }
           }
 
-          /* Ensure touch targets are accessible */
           button {
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
           }
 
-          /* Better text input UX on mobile */
           input[type="text"],
           textarea {
             font-size: 16px;
