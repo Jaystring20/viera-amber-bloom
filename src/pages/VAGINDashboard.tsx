@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import NavBar from "@/components/NavBar";
 import {
   LayoutDashboard, Droplets, Palette, School as SchoolIcon, LogOut,
-  TrendingUp, Users, BookOpen, Coins,
+  TrendingUp, Users, BookOpen, Coins, Bell,
   AlertCircle, RefreshCw, Plus, Pencil, Trash2, X,
   GraduationCap, ClipboardList, CheckCircle2, Images, Camera, ShoppingBag, PieChart, FileDown,
 } from "lucide-react";
@@ -12,6 +12,7 @@ import GalleryAdminTab from "@/components/admin/GalleryAdminTab";
 import VAGINImagesAdminTab from "@/components/admin/VAGINImagesAdminTab";
 import BotActivityTab from "@/components/admin/BotActivityTab";
 import VAGINAnalyticsDashboard from "@/components/sections/VAGINAnalyticsDashboard";
+import VAGINNotificationCenter from "@/components/sections/VAGINNotificationCenter";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -394,7 +395,7 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
 // MAIN DASHBOARD
 // ══════════════════════════════════════════════════════════════════════════════
 const VAGINDashboard = () => {
-  type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions" | "impact" | "analytics" | "gallery" | "vagin_images" | "viva_products";
+  type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions" | "impact" | "analytics" | "notifications" | "gallery" | "vagin_images" | "viva_products";
   type ModalType = "add-school" | "edit-school" | "add-student" | "edit-student" | "add-matron" | "edit-matron" | "add-distribution" | "add-session" | "confirm-delete" | "bulk-import" | null;
 
   const [authed, setAuthed]         = useState<boolean | null>(null);
@@ -1044,6 +1045,7 @@ const VAGINDashboard = () => {
     { id: "transactions"  as TabId, label: "Transactions",  Icon: ClipboardList },
     { id: "impact"        as TabId, label: "Impact & Investment", Icon: PieChart },
     { id: "analytics"     as TabId, label: "Analytics",     Icon: TrendingUp },
+    { id: "notifications" as TabId, label: "Notifications", Icon: Bell },
     { id: "gallery"       as TabId, label: "Gallery CMS",   Icon: Images },
     { id: "vagin_images"  as TabId, label: "VAGIN Images",  Icon: Camera },
     { id: "viva_products" as TabId, label: "VIVA Products", Icon: ShoppingBag },
@@ -1058,7 +1060,7 @@ const VAGINDashboard = () => {
   const ILLUSTRATIONS_GOLD = "#C9974A"; // warm gallery-wall gold, distinct from GOLD (used elsewhere as a UI accent)
   const VIVA_WINE = "#8A0F35";           // Velvet Wine, lightened slightly for legibility on #080810
 
-  const VAGIN_TAB_IDS: readonly TabId[] = ["overview", "schools", "students", "matrons", "pad_kolo", "vaginart", "transactions", "impact", "analytics"];
+  const VAGIN_TAB_IDS: readonly TabId[] = ["overview", "schools", "students", "matrons", "pad_kolo", "vaginart", "transactions", "impact", "analytics", "notifications"];
   const ILLUSTRATIONS_TAB_IDS: readonly TabId[] = ["gallery", "vagin_images"];
   const VIVA_TAB_IDS: readonly TabId[] = ["viva_products"];
   const SECTIONS = [
@@ -1483,6 +1485,13 @@ const VAGINDashboard = () => {
             {activeTab === "analytics" && (
               <motion.div key="analytics" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
                 <VAGINAnalyticsDashboard />
+              </motion.div>
+            )}
+
+            {/* ── NOTIFICATIONS ── */}
+            {activeTab === "notifications" && (
+              <motion.div key="notifications" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+                <VAGINNotificationCenter />
               </motion.div>
             )}
 
