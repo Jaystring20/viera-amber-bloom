@@ -217,13 +217,88 @@ export default function VIVAFeedbackCarousel() {
               }}
             >
               {loading ? (
-                <div style={{ textAlign: "center", color: "rgba(34,26,26,0.4)" }}>
-                  <p>Loading testimonials...</p>
-                </div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  style={{
+                    textAlign: "center",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: "100%",
+                    gap: 16,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: "50%",
+                      border: `2px solid ${BURG_ALPHA}`,
+                      borderTopColor: BURGUNDY,
+                      animation: "spin 1s linear infinite",
+                    }}
+                  />
+                  <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "rgba(34,26,26,0.5)" }}>
+                    Loading stories...
+                  </p>
+                </motion.div>
               ) : feedbacks.length === 0 ? (
-                <div style={{ textAlign: "center", color: "rgba(34,26,26,0.4)" }}>
-                  <p>Be the first to share your VIVA story.</p>
-                </div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  style={{
+                    textAlign: "center",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: "100%",
+                    gap: 24,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: "50%",
+                      background: `linear-gradient(135deg, ${BURG_ALPHA}, rgba(212,175,55,0.1))`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 40,
+                    }}
+                  >
+                    ✨
+                  </div>
+                  <div>
+                    <p
+                      style={{
+                        fontFamily: CORMORANT,
+                        fontSize: 20,
+                        fontWeight: 600,
+                        color: DARK_TEXT,
+                        margin: "0 0 8px 0",
+                      }}
+                    >
+                      Your Story Awaits
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: "DM Sans, system-ui, sans-serif",
+                        fontSize: 13,
+                        color: "rgba(34,26,26,0.6)",
+                        margin: 0,
+                        maxWidth: "280px",
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      Be the first to share how VIVA made you feel. Your feedback will appear here instantly.
+                    </p>
+                  </div>
+                </motion.div>
               ) : (
                 <>
                   {/* Carousel content with animation */}
