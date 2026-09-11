@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Send, Star, User, ChevronLeft, ChevronRight, Check, AlertCircle } from "lucide-react";
+import { motion, AnimatePresence, useReducedMotion, useMotionValue, useTransform, useAnimation } from "framer-motion";
+import { Send, Star, User, Check, AlertCircle, ChevronDown } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const BURGUNDY = "#6E0025";
@@ -193,26 +193,28 @@ export default function VIVAFeedbackCarousel() {
             width: "100%",
           }}
         >
-          {/* HERO: Full-Width Rotating Feedback Carousel */}
+          {/* HERO: Full-Width Horizontal Scrolling Carousel */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
             viewport={{ once: true }}
-            style={{ width: "100%", maxWidth: "900px", margin: "0 auto" }}
+            style={{ width: "100%", maxWidth: "100%", margin: "0 auto" }}
           >
             <div
               style={{
-                background: "#fff",
-                border: `1px solid ${BURG_ALPHA}`,
-                borderRadius: 12,
-                padding: "clamp(32px, 6vw, 48px)",
-                minHeight: "420px",
+                background: "linear-gradient(135deg, #FAF9F6 0%, rgba(255,255,255,0.5) 100%)",
+                borderRadius: 0,
+                padding: "clamp(40px, 6vw, 60px) clamp(20px, 5vw, 40px)",
+                minHeight: "clamp(600px, 70vh, 700px)",
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "space-between",
-                boxShadow: "0 2px 12px rgba(110,0,37,0.06)",
+                justifyContent: "center",
+                alignItems: "center",
+                boxShadow: "none",
                 transition: "all 0.3s ease",
+                position: "relative",
+                overflow: "hidden",
               }}
             >
               {loading ? (
@@ -299,260 +301,249 @@ export default function VIVAFeedbackCarousel() {
                   </div>
                 </motion.div>
               ) : (
-                <>
-                  {/* PREMIUM CAROUSEL CARD */}
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={currentIndex}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      transition={{ duration: 0.4 }}
-                      style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}
-                    >
-                      {/* Opening Quotation Mark - Elegant Detail */}
-                      <div style={{ marginBottom: "8px" }}>
-                        <span
-                          style={{
-                            fontSize: "48px",
-                            color: GOLD,
-                            opacity: 0.3,
-                            lineHeight: "0.8",
-                            fontFamily: CORMORANT,
-                          }}
-                        >
-                          "
-                        </span>
-                      </div>
-
-                      {/* Rating Stars */}
-                      <div style={{ display: "flex", gap: 6, marginBottom: 20 }}>
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <Star
-                            key={i}
-                            size={18}
-                            style={{
-                              fill: i < currentFeedback.rating ? GOLD : "rgba(110,0,37,0.1)",
-                              color: i < currentFeedback.rating ? GOLD : "rgba(110,0,37,0.1)",
-                            }}
-                          />
-                        ))}
-                      </div>
-
-                      {/* Feedback Comment - Enhanced Typography */}
-                      <div style={{ flex: 1, display: "flex", alignItems: "center", marginBottom: 28 }}>
-                        <p
-                          style={{
-                            fontFamily: "DM Sans, system-ui, sans-serif",
-                            fontSize: "clamp(14px, 2.5vw, 16px)",
-                            color: DARK_TEXT,
-                            lineHeight: 1.8,
-                            margin: 0,
-                            fontStyle: "italic",
-                            opacity: 0.9,
-                            letterSpacing: "0.2px",
-                          }}
-                        >
-                          {currentFeedback.comment}
-                        </p>
-                      </div>
-
-                      {/* Divider - Subtle Luxury Detail */}
-                      <div
-                        style={{
-                          height: "1px",
-                          background: `linear-gradient(90deg, ${BURG_ALPHA}, transparent)`,
-                          marginBottom: 20,
+                <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "clamp(24px, 4vw, 40px)" }}>
+                  {/* HORIZONTAL SCROLLING CAROUSEL */}
+                  <div
+                    style={{
+                      width: "100%",
+                      maxWidth: "900px",
+                      position: "relative",
+                      perspective: "1200px",
+                    }}
+                  >
+                    {/* Carousel Container - Horizontal Scroll */}
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={currentIndex}
+                        initial={{ opacity: 0, x: 100 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -100 }}
+                        transition={{
+                          duration: 0.5,
+                          ease: [0.34, 1.56, 0.64, 1],
                         }}
-                      />
+                        style={{
+                          background: "#fff",
+                          border: `1.5px solid ${BURG_ALPHA}`,
+                          borderRadius: 16,
+                          padding: "clamp(40px, 6vw, 56px)",
+                          minHeight: "clamp(480px, 55vh, 560px)",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between",
+                          boxShadow: "0 8px 32px rgba(110,0,37,0.08)",
+                        }}
+                      >
+                        {/* Opening Quotation Mark - Elegant Detail */}
+                        <div style={{ marginBottom: "clamp(8px, 2vw, 12px)" }}>
+                          <span
+                            style={{
+                              fontSize: "clamp(48px, 12vw, 72px)",
+                              color: GOLD,
+                              opacity: 0.25,
+                              lineHeight: "0.8",
+                              fontFamily: CORMORANT,
+                              fontWeight: 700,
+                            }}
+                          >
+                            "
+                          </span>
+                        </div>
 
-                      {/* Author Section - Clean & Elevated */}
-                      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                        {/* Rating Stars */}
+                        <div style={{ display: "flex", gap: "clamp(6px, 1vw, 10px)", marginBottom: "clamp(20px, 3vw, 28px)" }}>
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <motion.div key={i} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: i * 0.08, duration: 0.3 }}>
+                              <Star
+                                size={24}
+                                style={{
+                                  fill: i < currentFeedback.rating ? GOLD : "rgba(110,0,37,0.1)",
+                                  color: i < currentFeedback.rating ? GOLD : "rgba(110,0,37,0.1)",
+                                }}
+                              />
+                            </motion.div>
+                          ))}
+                        </div>
+
+                        {/* Feedback Comment - Enhanced Typography */}
+                        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "clamp(28px, 4vw, 40px)" }}>
+                          <p
+                            style={{
+                              fontFamily: "DM Sans, system-ui, sans-serif",
+                              fontSize: "clamp(16px, 3vw, 20px)",
+                              color: DARK_TEXT,
+                              lineHeight: 1.85,
+                              margin: 0,
+                              fontStyle: "italic",
+                              opacity: 0.92,
+                              letterSpacing: "0.3px",
+                              textAlign: "center",
+                              fontWeight: 400,
+                            }}
+                          >
+                            {currentFeedback.comment}
+                          </p>
+                        </div>
+
+                        {/* Divider - Subtle Luxury Detail */}
                         <div
                           style={{
-                            width: 48,
-                            height: 48,
-                            borderRadius: "50%",
-                            background: `linear-gradient(135deg, ${BURGUNDY}, ${GOLD})`,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "#fff",
-                            flexShrink: 0,
-                            boxShadow: `0 2px 8px rgba(110,0,37,0.15)`,
+                            height: "1px",
+                            background: `linear-gradient(90deg, transparent, ${BURG_ALPHA}, transparent)`,
+                            marginBottom: "clamp(20px, 3vw, 32px)",
                           }}
-                        >
-                          <User size={24} />
-                        </div>
-                        <div>
-                          <p
-                            style={{
-                              fontFamily: "DM Sans, system-ui, sans-serif",
-                              fontSize: "clamp(14px, 2.5vw, 15px)",
-                              fontWeight: 700,
-                              color: DARK_TEXT,
-                              margin: 0,
-                              letterSpacing: "0.3px",
-                            }}
-                          >
-                            {currentFeedback.name}
-                          </p>
-                          <p
-                            style={{
-                              fontFamily: "DM Sans, system-ui, sans-serif",
-                              fontSize: 12,
-                              color: "rgba(34,26,26,0.5)",
-                              margin: "4px 0 0 0",
-                            }}
-                          >
-                            {new Date(currentFeedback.created_at).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                            })}
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  </AnimatePresence>
+                        />
 
-                  {/* Navigation Controls */}
+                        {/* Author Section - Clean & Elevated */}
+                        <div style={{ display: "flex", alignItems: "center", gap: "clamp(14px, 2vw, 18px)", justifyContent: "center" }}>
+                          <div
+                            style={{
+                              width: 56,
+                              height: 56,
+                              borderRadius: "50%",
+                              background: `linear-gradient(135deg, ${BURGUNDY}, ${GOLD})`,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color: "#fff",
+                              flexShrink: 0,
+                              boxShadow: `0 4px 16px rgba(110,0,37,0.18)`,
+                              fontSize: "22px",
+                            }}
+                          >
+                            {currentFeedback.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div style={{ textAlign: "center" }}>
+                            <p
+                              style={{
+                                fontFamily: "DM Sans, system-ui, sans-serif",
+                                fontSize: "clamp(14px, 2.5vw, 16px)",
+                                fontWeight: 700,
+                                color: DARK_TEXT,
+                                margin: 0,
+                                letterSpacing: "0.3px",
+                              }}
+                            >
+                              {currentFeedback.name}
+                            </p>
+                            <p
+                              style={{
+                                fontFamily: "DM Sans, system-ui, sans-serif",
+                                fontSize: "clamp(11px, 2vw, 12px)",
+                                color: "rgba(34,26,26,0.5)",
+                                margin: "4px 0 0 0",
+                              }}
+                            >
+                              {new Date(currentFeedback.created_at).toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    </AnimatePresence>
+
+                  </div>
+
+                  {/* Navigation Controls Below Carousel */}
                   {feedbacks.length > 1 && (
-                    <div
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3, duration: 0.5 }}
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "space-between",
-                        marginTop: "clamp(20px, 4vw, 32px)",
-                        paddingTop: "clamp(16px, 3vw, 24px)",
-                        borderTop: `1px solid ${BURG_ALPHA}`,
-                        gap: "12px",
+                        justifyContent: "center",
+                        gap: "clamp(20px, 4vw, 32px)",
+                        marginTop: "clamp(24px, 4vw, 40px)",
                       }}
                     >
-                      {/* Previous button */}
-                      <motion.button
-                        onClick={goToPrevious}
-                        whileTap={{ scale: 0.95 }}
-                        style={{
-                          background: BURG_LIGHT,
-                          border: `1.5px solid ${BURG_ALPHA}`,
-                          borderRadius: "50%",
-                          width: "44px",
-                          minWidth: "44px",
-                          height: "44px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          cursor: "pointer",
-                          color: BURGUNDY,
-                          transition: "all 0.2s ease",
-                          flexShrink: 0,
-                          padding: 0,
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = BURGUNDY;
-                          e.currentTarget.style.color = "white";
-                          e.currentTarget.style.borderColor = BURGUNDY;
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = BURG_LIGHT;
-                          e.currentTarget.style.color = BURGUNDY;
-                          e.currentTarget.style.borderColor = BURG_ALPHA;
-                        }}
-                        aria-label="Previous feedback"
-                      >
-                        <ChevronLeft size={20} strokeWidth={2} />
-                      </motion.button>
-
-                      {/* Indicators */}
-                      <div style={{ display: "flex", gap: "6px", flex: 1, justifyContent: "center", flexWrap: "wrap", minHeight: "12px" }}>
-                        {feedbacks.slice(0, 5).map((_, idx) => (
+                      {/* Indicators - Dots */}
+                      <div style={{ display: "flex", gap: "clamp(8px, 1.5vw, 12px)", alignItems: "center" }}>
+                        {feedbacks.slice(0, 7).map((_, idx) => (
                           <motion.button
                             key={idx}
                             onClick={() => setCurrentIndex(idx)}
-                            whileTap={{ scale: 1.15 }}
+                            whileTap={{ scale: 1.2 }}
+                            whileHover={{ scale: 1.1 }}
                             type="button"
                             style={{
-                              width: idx === currentIndex ? 24 : 8,
-                              height: 8,
-                              borderRadius: 4,
+                              width: idx === currentIndex ? 32 : 10,
+                              height: 10,
+                              borderRadius: 5,
                               background: idx === currentIndex ? BURGUNDY : BURG_ALPHA,
                               cursor: "pointer",
                               transition: "all 0.3s ease",
                               border: "none",
                               padding: 0,
-                              minWidth: 8,
+                              minWidth: 10,
                             }}
                             aria-label={`Go to feedback ${idx + 1}`}
                             aria-current={idx === currentIndex}
                           />
                         ))}
-                        {feedbacks.length > 5 && (
+                        {feedbacks.length > 7 && (
                           <span
                             style={{
-                              fontSize: "11px",
+                              fontSize: "clamp(11px, 2vw, 12px)",
                               color: "rgba(34,26,26,0.5)",
-                              alignSelf: "center",
-                              marginLeft: "4px",
+                              fontFamily: "DM Sans, system-ui, sans-serif",
+                              marginLeft: "6px",
+                              fontWeight: 500,
                             }}
                           >
-                            +{feedbacks.length - 5}
+                            +{feedbacks.length - 7}
                           </span>
                         )}
                       </div>
 
-                      {/* Next button */}
-                      <motion.button
-                        onClick={goToNext}
-                        whileTap={{ scale: 0.95 }}
+                      {/* Counter */}
+                      <div
                         style={{
-                          background: BURG_LIGHT,
-                          border: `1.5px solid ${BURG_ALPHA}`,
-                          borderRadius: "50%",
-                          width: "44px",
-                          minWidth: "44px",
-                          height: "44px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          cursor: "pointer",
-                          color: BURGUNDY,
-                          transition: "all 0.2s ease",
-                          flexShrink: 0,
-                          padding: 0,
+                          fontSize: "clamp(12px, 2.5vw, 13px)",
+                          color: "rgba(34,26,26,0.6)",
+                          fontFamily: "DM Sans, system-ui, sans-serif",
+                          fontWeight: 500,
+                          letterSpacing: "0.5px",
+                          textTransform: "uppercase",
                         }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = BURGUNDY;
-                          e.currentTarget.style.color = "white";
-                          e.currentTarget.style.borderColor = BURGUNDY;
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = BURG_LIGHT;
-                          e.currentTarget.style.color = BURGUNDY;
-                          e.currentTarget.style.borderColor = BURG_ALPHA;
-                        }}
-                        aria-label="Next feedback"
                       >
-                        <ChevronRight size={20} strokeWidth={2} />
-                      </motion.button>
-                    </div>
+                        {currentIndex + 1} / {feedbacks.length}
+                      </div>
+                    </motion.div>
                   )}
 
-                  {/* Counter */}
+                  {/* Scroll Indicator */}
                   <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                    animate={{ y: [0, 8, 0] }}
+                    transition={{ duration: 2, loop: Infinity }}
                     style={{
-                      textAlign: "center",
-                      marginTop: "clamp(12px, 2vw, 16px)",
-                      fontSize: "clamp(11px, 2.5vw, 12px)",
-                      color: "rgba(34,26,26,0.5)",
-                      fontFamily: "DM Sans, system-ui, sans-serif",
+                      marginTop: "clamp(32px, 5vw, 48px)",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: "8px",
+                      opacity: 0.5,
                     }}
                   >
-                    {currentIndex + 1} of {feedbacks.length}
+                    <p
+                      style={{
+                        fontSize: "clamp(10px, 2vw, 11px)",
+                        color: "rgba(34,26,26,0.5)",
+                        fontFamily: "DM Sans, system-ui, sans-serif",
+                        textTransform: "uppercase",
+                        letterSpacing: "1px",
+                        margin: 0,
+                      }}
+                    >
+                      Scroll Down
+                    </p>
+                    <ChevronDown size={16} color="rgba(110,0,37,0.4)" />
                   </motion.div>
-                </>
+                </div>
               )}
             </div>
           </motion.div>
@@ -561,57 +552,66 @@ export default function VIVAFeedbackCarousel() {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
             viewport={{ once: true }}
-            style={{ width: "100%", maxWidth: "600px", margin: "0 auto" }}
+            style={{ width: "100%", maxWidth: "620px", margin: "0 auto" }}
           >
             <div
               style={{
                 background: "#fff",
-                border: `1px solid ${BURG_ALPHA}`,
-                borderRadius: 12,
-                padding: "clamp(24px, 6vw, 40px)",
-                boxShadow: "0 2px 12px rgba(110,0,37,0.06)",
+                border: `1.5px solid ${BURG_ALPHA}`,
+                borderRadius: 16,
+                padding: "clamp(32px, 6vw, 48px)",
+                boxShadow: "0 4px 20px rgba(110,0,37,0.08)",
                 transition: "all 0.3s ease",
               }}
             >
-              <div style={{ position: "relative" }}>
+              <div style={{ position: "relative", marginBottom: "clamp(8px, 2vw, 12px)" }}>
                 <h3
                   style={{
                     fontFamily: CORMORANT,
-                    fontSize: "clamp(24px, 6vw, 32px)",
+                    fontSize: "clamp(28px, 6vw, 36px)",
                     fontWeight: 700,
                     color: DARK_TEXT,
-                    margin: "0 0 clamp(6px, 1.5vw, 12px) 0",
+                    margin: "0 0 clamp(8px, 1.5vw, 12px) 0",
                     letterSpacing: "-0.5px",
                   }}
                 >
                   Share Your Story
                 </h3>
+                <div
+                  style={{
+                    height: "2px",
+                    width: "clamp(40px, 8vw, 60px)",
+                    background: GOLD,
+                    marginBottom: "clamp(20px, 4vw, 28px)",
+                    opacity: 0.4,
+                  }}
+                />
                 <p
                   style={{
                     fontFamily: "DM Sans, system-ui, sans-serif",
-                    fontSize: "clamp(12px, 2.5vw, 14px)",
+                    fontSize: "clamp(13px, 2.5vw, 15px)",
                     color: "rgba(34,26,26,0.65)",
-                    margin: "0 0 clamp(24px, 5vw, 32px) 0",
-                    lineHeight: 1.6,
+                    margin: "0 0 clamp(28px, 5vw, 36px) 0",
+                    lineHeight: 1.65,
                   }}
                 >
-                  Tell us how VIVA made you feel. Your feedback goes live instantly.
+                  Tell us how VIVA made you feel. Your feedback appears instantly in the carousel above.
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "clamp(20px, 4vw, 28px)" }}>
+              <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "clamp(24px, 5vw, 32px)" }}>
                 {/* Name input */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "clamp(8px, 1.5vw, 10px)" }}>
                   <label
                     style={{
                       fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontSize: "clamp(11px, 2.5vw, 12px)",
-                      fontWeight: 600,
+                      fontSize: "clamp(11px, 2vw, 12px)",
+                      fontWeight: 700,
                       color: DARK_TEXT,
                       textTransform: "uppercase",
-                      letterSpacing: "0.5px",
+                      letterSpacing: "0.8px",
                     }}
                     htmlFor="feedback-name"
                   >
@@ -622,72 +622,76 @@ export default function VIVAFeedbackCarousel() {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Your name"
+                    placeholder="Enter your name"
                     style={{
                       width: "100%",
                       fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontSize: "clamp(13px, 3vw, 15px)",
-                      padding: "clamp(10px, 2vw, 14px) clamp(12px, 2vw, 16px)",
+                      fontSize: "clamp(14px, 3vw, 16px)",
+                      padding: "clamp(12px, 2.5vw, 16px) clamp(14px, 2.5vw, 18px)",
                       border: `1.5px solid ${BURG_ALPHA}`,
-                      borderRadius: 8,
+                      borderRadius: 10,
                       outline: "none",
                       boxSizing: "border-box",
-                      transition: "all 0.25s ease",
-                      backgroundColor: "#fff",
-                      minHeight: "44px",
+                      transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                      backgroundColor: "rgba(245,237,230,0.3)",
+                      minHeight: "48px",
+                      color: DARK_TEXT,
                     }}
                     onFocus={(e) => {
                       e.currentTarget.style.borderColor = BURGUNDY;
                       e.currentTarget.style.boxShadow = `0 0 0 3px ${BURG_LIGHT}`;
+                      e.currentTarget.style.backgroundColor = "#fff";
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = BURG_ALPHA;
                       e.currentTarget.style.boxShadow = "none";
+                      e.currentTarget.style.backgroundColor = "rgba(245,237,230,0.3)";
                     }}
                   />
                 </div>
 
                 {/* Rating */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "clamp(12px, 2vw, 16px)" }}>
                   <label
                     style={{
                       fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontSize: "clamp(11px, 2.5vw, 12px)",
-                      fontWeight: 600,
+                      fontSize: "clamp(11px, 2vw, 12px)",
+                      fontWeight: 700,
                       color: DARK_TEXT,
                       textTransform: "uppercase",
-                      letterSpacing: "0.5px",
+                      letterSpacing: "0.8px",
                     }}
                   >
                     How would you rate your experience?
                   </label>
-                  <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                  <div style={{ display: "flex", gap: "clamp(10px, 2vw, 14px)", alignItems: "center" }}>
                     {[1, 2, 3, 4, 5].map((star) => (
                       <motion.button
                         key={star}
                         type="button"
                         onClick={() => setFormData({ ...formData, rating: star })}
-                        whileTap={{ scale: 1.2 }}
+                        whileTap={{ scale: 1.25 }}
+                        whileHover={{ scale: 1.1 }}
                         style={{
                           background: "transparent",
                           border: "none",
                           cursor: "pointer",
-                          padding: "6px",
+                          padding: "8px",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          minWidth: "44px",
-                          minHeight: "44px",
-                          transition: "transform 0.15s ease",
+                          minWidth: "48px",
+                          minHeight: "48px",
+                          transition: "all 0.2s ease",
                         }}
                         aria-label={`Rate ${star} stars`}
                         aria-pressed={star <= formData.rating}
                       >
                         <Star
-                          size={28}
+                          size={32}
                           style={{
-                            fill: star <= formData.rating ? GOLD : "rgba(110,0,37,0.15)",
-                            color: star <= formData.rating ? GOLD : "rgba(110,0,37,0.15)",
+                            fill: star <= formData.rating ? GOLD : "rgba(110,0,37,0.12)",
+                            color: star <= formData.rating ? GOLD : "rgba(110,0,37,0.12)",
                             transition: "all 0.2s ease",
                           }}
                         />
@@ -697,16 +701,16 @@ export default function VIVAFeedbackCarousel() {
                 </div>
 
                 {/* Comment textarea */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "clamp(8px, 1.5vw, 10px)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "16px" }}>
                     <label
                       style={{
                         fontFamily: "DM Sans, system-ui, sans-serif",
-                        fontSize: "clamp(11px, 2.5vw, 12px)",
-                        fontWeight: 600,
+                        fontSize: "clamp(11px, 2vw, 12px)",
+                        fontWeight: 700,
                         color: DARK_TEXT,
                         textTransform: "uppercase",
-                        letterSpacing: "0.5px",
+                        letterSpacing: "0.8px",
                       }}
                       htmlFor="feedback-comment"
                     >
@@ -717,9 +721,10 @@ export default function VIVAFeedbackCarousel() {
                         fontSize: "clamp(10px, 2vw, 11px)",
                         color: "rgba(34,26,26,0.5)",
                         fontFamily: "DM Sans, system-ui, sans-serif",
+                        fontWeight: 500,
                       }}
                     >
-                      {formData.comment.length}/300
+                      {formData.comment.length} / 300
                     </span>
                   </div>
                   <textarea
@@ -733,33 +738,38 @@ export default function VIVAFeedbackCarousel() {
                     style={{
                       width: "100%",
                       fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontSize: "clamp(13px, 3vw, 15px)",
-                      padding: "clamp(10px, 2vw, 14px) clamp(12px, 2vw, 16px)",
+                      fontSize: "clamp(14px, 3vw, 16px)",
+                      padding: "clamp(12px, 2.5vw, 16px) clamp(14px, 2.5vw, 18px)",
                       border: `1.5px solid ${BURG_ALPHA}`,
-                      borderRadius: 8,
+                      borderRadius: 10,
                       outline: "none",
                       boxSizing: "border-box",
                       resize: "none",
-                      minHeight: "clamp(100px, 20vh, 140px)",
-                      transition: "all 0.25s ease",
-                      backgroundColor: "#fff",
+                      minHeight: "clamp(120px, 22vh, 160px)",
+                      transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                      backgroundColor: "rgba(245,237,230,0.3)",
+                      color: DARK_TEXT,
+                      lineHeight: 1.6,
                     }}
                     maxLength={300}
                     onFocus={(e) => {
                       e.currentTarget.style.borderColor = BURGUNDY;
                       e.currentTarget.style.boxShadow = `0 0 0 3px ${BURG_LIGHT}`;
+                      e.currentTarget.style.backgroundColor = "#fff";
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = BURG_ALPHA;
                       e.currentTarget.style.boxShadow = "none";
+                      e.currentTarget.style.backgroundColor = "rgba(245,237,230,0.3)";
                     }}
                   />
                   <p
                     style={{
                       fontSize: "clamp(11px, 2vw, 12px)",
-                      color: "rgba(34,26,26,0.5)",
-                      margin: "2px 0 0 0",
+                      color: "rgba(34,26,26,0.55)",
+                      margin: "4px 0 0 0",
                       fontFamily: "DM Sans, system-ui, sans-serif",
+                      lineHeight: 1.5,
                     }}
                   >
                     Be specific—tell us what made your experience special.
@@ -770,15 +780,15 @@ export default function VIVAFeedbackCarousel() {
                 <motion.button
                   type="submit"
                   disabled={isSubmitting || !formData.name.trim() || !formData.comment.trim()}
-                  whileTap={!isSubmitting ? { scale: 0.98 } : {}}
+                  whileTap={!isSubmitting ? { scale: 0.96 } : {}}
                   style={{
                     width: "100%",
                     fontFamily: "DM Sans, system-ui, sans-serif",
-                    fontSize: "clamp(12px, 2.5vw, 13px)",
-                    fontWeight: 600,
+                    fontSize: "clamp(12px, 2.5vw, 14px)",
+                    fontWeight: 700,
                     letterSpacing: "1.5px",
                     textTransform: "uppercase",
-                    padding: "clamp(12px, 2.5vw, 14px) clamp(16px, 3vw, 20px)",
+                    padding: "clamp(14px, 3vw, 18px) clamp(20px, 4vw, 28px)",
                     background:
                       submitStatus === "success"
                         ? `linear-gradient(135deg, ${SUCCESS_COLOR}, rgba(46,125,50,0.8))`
@@ -787,30 +797,32 @@ export default function VIVAFeedbackCarousel() {
                         : BURGUNDY,
                     color: "white",
                     border: "none",
-                    borderRadius: 8,
+                    borderRadius: 10,
                     cursor:
                       isSubmitting || !formData.name.trim() || !formData.comment.trim()
                         ? "not-allowed"
                         : "pointer",
                     opacity: isSubmitting || !formData.name.trim() || !formData.comment.trim() ? 0.65 : 1,
-                    transition: "all 0.2s ease",
+                    transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: "8px",
-                    minHeight: "44px",
-                    boxShadow: submitStatus === "success" ? `0 2px 8px rgba(46,125,50,0.2)` : "0 2px 8px rgba(110,0,37,0.15)",
+                    gap: "10px",
+                    minHeight: "52px",
+                    boxShadow: submitStatus === "success" ? `0 4px 16px rgba(46,125,50,0.25)` : "0 4px 16px rgba(110,0,37,0.18)",
                   }}
                   onMouseEnter={(e) => {
                     if (!isSubmitting && !(!formData.name.trim() || !formData.comment.trim()) && submitStatus !== "success") {
-                      e.currentTarget.style.background = "rgba(110,0,37,0.9)";
-                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(110,0,37,0.25)";
+                      e.currentTarget.style.background = "rgba(110,0,37,0.85)";
+                      e.currentTarget.style.boxShadow = "0 8px 24px rgba(110,0,37,0.3)";
+                      e.currentTarget.style.transform = "translateY(-2px)";
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (submitStatus !== "success" && submitStatus !== "error") {
                       e.currentTarget.style.background = BURGUNDY;
-                      e.currentTarget.style.boxShadow = "0 2px 8px rgba(110,0,37,0.15)";
+                      e.currentTarget.style.boxShadow = "0 4px 16px rgba(110,0,37,0.18)";
+                      e.currentTarget.style.transform = "translateY(0)";
                     }
                   }}
                 >
