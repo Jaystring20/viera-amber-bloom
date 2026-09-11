@@ -11,6 +11,7 @@ import {
 import GalleryAdminTab from "@/components/admin/GalleryAdminTab";
 import VAGINImagesAdminTab from "@/components/admin/VAGINImagesAdminTab";
 import BotActivityTab from "@/components/admin/BotActivityTab";
+import VAGINAnalyticsDashboard from "@/components/sections/VAGINAnalyticsDashboard";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -393,7 +394,7 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
 // MAIN DASHBOARD
 // ══════════════════════════════════════════════════════════════════════════════
 const VAGINDashboard = () => {
-  type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions" | "impact" | "gallery" | "vagin_images" | "viva_products";
+  type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions" | "impact" | "analytics" | "gallery" | "vagin_images" | "viva_products";
   type ModalType = "add-school" | "edit-school" | "add-student" | "edit-student" | "add-matron" | "edit-matron" | "add-distribution" | "add-session" | "confirm-delete" | "bulk-import" | null;
 
   const [authed, setAuthed]         = useState<boolean | null>(null);
@@ -1042,6 +1043,7 @@ const VAGINDashboard = () => {
     { id: "vaginart"      as TabId, label: "VaginART",      Icon: Palette },
     { id: "transactions"  as TabId, label: "Transactions",  Icon: ClipboardList },
     { id: "impact"        as TabId, label: "Impact & Investment", Icon: PieChart },
+    { id: "analytics"     as TabId, label: "Analytics",     Icon: TrendingUp },
     { id: "gallery"       as TabId, label: "Gallery CMS",   Icon: Images },
     { id: "vagin_images"  as TabId, label: "VAGIN Images",  Icon: Camera },
     { id: "viva_products" as TabId, label: "VIVA Products", Icon: ShoppingBag },
@@ -1056,7 +1058,7 @@ const VAGINDashboard = () => {
   const ILLUSTRATIONS_GOLD = "#C9974A"; // warm gallery-wall gold, distinct from GOLD (used elsewhere as a UI accent)
   const VIVA_WINE = "#8A0F35";           // Velvet Wine, lightened slightly for legibility on #080810
 
-  const VAGIN_TAB_IDS: readonly TabId[] = ["overview", "schools", "students", "matrons", "pad_kolo", "vaginart", "transactions", "impact"];
+  const VAGIN_TAB_IDS: readonly TabId[] = ["overview", "schools", "students", "matrons", "pad_kolo", "vaginart", "transactions", "impact", "analytics"];
   const ILLUSTRATIONS_TAB_IDS: readonly TabId[] = ["gallery", "vagin_images"];
   const VIVA_TAB_IDS: readonly TabId[] = ["viva_products"];
   const SECTIONS = [
@@ -1474,6 +1476,13 @@ const VAGINDashboard = () => {
                   />
                 </Card>
                 {infoBox(<><strong>How this is calculated:</strong> Market value = real pads issued to date × the local market retail price (₦700 in Nigeria, per the project brief — 1 free + 2 subsidized pads across a 3-month cycle works out to ₦2,100 value / ₦400 paid / ₦1,700 saved per girl who completes a full cycle). Paid by students = actual amounts recorded through PAY and paid-pad issuance. Subsidized = the gap between the two — VAGIN's real contribution. This reflects real issuance so far, not an assumed complete cycle, so it grows as more pads go out.</>, PL)}
+              </motion.div>
+            )}
+
+            {/* ── ANALYTICS ── */}
+            {activeTab === "analytics" && (
+              <motion.div key="analytics" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+                <VAGINAnalyticsDashboard />
               </motion.div>
             )}
 
