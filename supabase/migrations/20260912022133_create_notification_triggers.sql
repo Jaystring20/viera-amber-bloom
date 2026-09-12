@@ -75,43 +75,36 @@ AFTER INSERT ON vagin_pad_distributions
 FOR EACH ROW
 EXECUTE FUNCTION notify_distribution_completed();
 
--- ─── Trigger 3: Payment Received ──────────────────────────────────────────────
-CREATE OR REPLACE FUNCTION notify_payment_received()
+-- ─── Trigger 3: Transaction Recorded (Payment/Refund) ────────────────────────
+CREATE OR REPLACE FUNCTION notify_transaction_recorded()
 RETURNS TRIGGER AS $$
 DECLARE
   school_name TEXT;
+  student_name TEXT;
 BEGIN
-  -- Only notify if payment just transitioned to 'completed' or 'confirmed'
-  IF (NEW.status = 'completed' OR NEW.status = 'confirmed')
-     AND (OLD.status IS NULL OR (OLD.status != 'completed' AND OLD.status != 'confirmed')) THEN
+  -- Only notify significant transactions (amount > 0)
+  IF NEW.amount_ngn > 0 AND NEW.school_id IS NOT NULL THEN
 
-    SELECT name INTO school_name FROM vagin_schools WHERE id = NEW.school_id;
+    SELECT name INTO school_name FROM vagin_schools WHERE id = NEW.school_id LIMIT 1;
+    SELECT name INTO student_name FROM vagin_students WHERE id = NEW.student_id LIMIT 1;
 
-    -- Admin notification
+    -- Admin notification for all transactions
     INSERT INTO vagin_notifications (
       notification_type, title, message, channel, recipient_type, school_id, data, status
     ) VALUES (
       'payment_received',
-      '💳 Payment Processed',
-      'Payment of ₦' || TO_CHAR(NEW.amount, '999,999,999') || ' from ' || COALESCE(school_name, 'a school') || ' has been successfully processed. Thank you!',
+      '💳 Transaction Recorded',
+      'Transaction of ₦' || COALESCE(TO_CHAR(NEW.amount_ngn, '999,999'), '0') || ' recorded' ||
+      CASE WHEN school_name IS NOT NULL THEN ' at ' || school_name ELSE '' END || '.',
       'dashboard',
       'admin',
       NEW.school_id,
-      jsonb_build_object('amount', NEW.amount, 'payment_method', COALESCE(NEW.payment_method, 'unknown')),
-      'pending'
-    );
-
-    -- Matron notification
-    INSERT INTO vagin_notifications (
-      notification_type, title, message, channel, recipient_type, school_id, data, status
-    ) VALUES (
-      'payment_received',
-      '✅ Payment Confirmed',
-      'We received your payment of ₦' || TO_CHAR(NEW.amount, '999,999,999') || '. Your account has been updated.',
-      'whatsapp',
-      'matron',
-      NEW.school_id,
-      jsonb_build_object('amount', NEW.amount, 'payment_method', COALESCE(NEW.payment_method, 'unknown')),
+      jsonb_build_object(
+        'amount', NEW.amount_ngn,
+        'student_id', NEW.student_id,
+        'school_id', NEW.school_id,
+        'transaction_id', NEW.id
+      ),
       'pending'
     );
   END IF;
@@ -119,25 +112,27 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS trigger_payment_received ON vagin_payments;
-CREATE TRIGGER trigger_payment_received
-AFTER INSERT OR UPDATE ON vagin_payments
+-- Only create trigger if vagin_transactions table exists
+DROP TRIGGER IF EXISTS trigger_transaction_recorded ON vagin_transactions;
+CREATE TRIGGER trigger_transaction_recorded
+AFTER INSERT ON vagin_transactions
 FOR EACH ROW
-EXECUTE FUNCTION notify_payment_received();
+EXECUTE FUNCTION notify_transaction_recorded();
 
 -- ───────────────────────────────────────────────────────────────────────────────
 -- Notes on Usage:
--- 1. Database Triggers: Fire automatically when events occur (new school, distribution, payment)
+-- 1. Database Triggers: Fire automatically when events occur (new school, distribution, transactions)
 -- 2. Application Triggers: Call NotificationService methods from your React/TypeScript code
 --
 -- Database triggers are already active for:
---   - New school registration
---   - Distribution completed
---   - Payment received
+--   - New school registration (vagin_schools INSERT)
+--   - Distribution completed (vagin_pad_distributions INSERT)
+--   - Transaction recorded (vagin_transactions INSERT)
 --
 -- Application triggers (call via NotificationService) for:
 --   - Low inventory alert
 --   - Payment reminder
 --   - Cycle completion
 --   - System alerts
+--   - Payment received (manual, when processing payments)
 -- ───────────────────────────────────────────────────────────────────────────────
