@@ -6,7 +6,7 @@ import CategoryThumbnailNav from "@/components/sections/CategoryThumbnailNav";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
 import { scrollToCategory } from "@/lib/illustration-categories";
-import { ARTWORKS, CHAPTERS, ChapterId } from "@/lib/gallery-data";
+import { ARTWORKS, COLLECTIONS, ChapterId } from "@/lib/gallery-data";
 import {
   fadeSlideUp,
   fadeIn,
@@ -34,9 +34,9 @@ const Illustrations = () => {
     scrollToCategory(categoryId);
   };
 
-  // Get all artworks for each category (excluding draft items)
-  const getChapterArtworks = (chapterId: ChapterId) => {
-    return ARTWORKS.filter((a) => a.chapter === chapterId && !a.draft);
+  // Get all artworks for a collection by collectionId (excluding draft items)
+  const getCollectionArtworks = (collectionId: string) => {
+    return ARTWORKS.filter((a) => a.collectionId === collectionId && !a.draft);
   };
 
   return (
@@ -96,21 +96,28 @@ const Illustrations = () => {
           }}
         />
 
-        {/* ── 9 Illustration Category Sections (per PDF structure) ───────────────────────────────────── */}
-        {CHAPTERS.map((chapter) => {
-          const artworks = getChapterArtworks(chapter.id);
+        {/* ── Collections-Based Sections (per PDF structure) ───────────────────────────────────── */}
+        {COLLECTIONS.map((collection) => {
+          const artworks = getCollectionArtworks(collection.id);
           if (artworks.length === 0) return null;
+
+          // Determine if Fashion or Lifestyle based on categoryId
+          const isFashion = collection.categoryId === "fashion-illustrations" ||
+                            collection.categoryId === "bridal-designs" ||
+                            collection.categoryId === "shoes" ||
+                            collection.categoryId === "bags";
+          const umbrella = isFashion ? "FASHION ILLUSTRATION" : "LIFESTYLE ILLUSTRATION";
 
           return (
             <section
-              key={chapter.id}
-              id={chapter.id}
+              key={collection.id}
+              id={collection.id}
               className="w-full py-20"
               style={{ backgroundColor: "#FAFAFA" }}
-              aria-label={chapter.name}
+              aria-label={collection.name}
             >
               <div className="mx-auto px-6" style={{ maxWidth: 1200 }}>
-                {/* Category Header */}
+                {/* Collection Header */}
                 <motion.div
                   className="mb-16"
                   initial="hidden"
@@ -127,10 +134,10 @@ const Illustrations = () => {
                       textTransform: "uppercase",
                       fontWeight: 600,
                       margin: 0,
-                      marginBottom: 24,
+                      marginBottom: 12,
                     }}
                   >
-                    {parseInt(chapter.index) <= 4 ? "FASHION ILLUSTRATION" : "LIFESTYLE ILLUSTRATION"}
+                    {umbrella}: {collection.categoryId === "fashion-illustrations" ? "FASHION ILLUSTRATIONS" : collection.categoryId.toUpperCase().replace("-", " ")}
                   </p>
                   <h2
                     className="font-display"
@@ -140,20 +147,31 @@ const Illustrations = () => {
                       color: "#111111",
                       margin: 0,
                       lineHeight: 1.1,
+                      marginBottom: 12,
                     }}
                   >
-                    {chapter.name}
+                    {collection.name}
                   </h2>
+                  {collection.description && (
+                    <p
+                      style={{
+                        fontFamily: "DM Sans, system-ui, sans-serif",
+                        fontSize: 14,
+                        color: "#666666",
+                        margin: 0,
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      {collection.description}
+                    </p>
+                  )}
                 </motion.div>
 
-                {/* Artworks Grid - Responsive layout per chapter.layout */}
+                {/* Artworks Grid */}
                 <motion.div
                   className="grid gap-6"
                   style={{
-                    gridTemplateColumns:
-                      chapter.layout === "rail"
-                        ? "repeat(auto-fit, minmax(200px, 1fr))"
-                        : "repeat(auto-fit, minmax(250px, 1fr))",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
                   }}
                   variants={staggerVariants}
                   initial="hidden"
@@ -164,12 +182,12 @@ const Illustrations = () => {
                     <motion.div
                       key={artwork.id}
                       variants={cardVariants}
-                      className="overflow-hidden rounded"
+                      className="overflow-hidden"
                       style={{ borderRadius: 4 }}
                     >
                       <img
                         src={artwork.image}
-                        alt={artwork.title || `${chapter.name} item`}
+                        alt={artwork.title || collection.name}
                         style={{
                           width: "100%",
                           height: "auto",
