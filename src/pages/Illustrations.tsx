@@ -6,7 +6,7 @@ import CategoryThumbnailNav from "@/components/sections/CategoryThumbnailNav";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
 import { scrollToCategory } from "@/lib/illustration-categories";
-import { ARTWORKS, COLLECTIONS, ChapterId } from "@/lib/gallery-data";
+import { ARTWORKS, COLLECTIONS, CHAPTERS, ChapterId } from "@/lib/gallery-data";
 import {
   fadeSlideUp,
   fadeIn,
@@ -96,28 +96,25 @@ const Illustrations = () => {
           }}
         />
 
-        {/* ── Collections-Based Sections (per PDF structure) ───────────────────────────────────── */}
-        {COLLECTIONS.map((collection) => {
-          const artworks = getCollectionArtworks(collection.id);
-          if (artworks.length === 0) return null;
+        {/* ── Chapter-Grouped Collections (per PDF structure) ───────────────────────────────────── */}
+        {CHAPTERS.map((chapter) => {
+          const collectionsInChapter = COLLECTIONS.filter(c => c.categoryId === chapter.id).sort((a, b) => a.sortOrder - b.sortOrder);
+          if (collectionsInChapter.length === 0) return null;
 
-          // Determine if Fashion or Lifestyle based on categoryId
-          const isFashion = collection.categoryId === "fashion-illustrations" ||
-                            collection.categoryId === "bridal-designs" ||
-                            collection.categoryId === "shoes" ||
-                            collection.categoryId === "bags";
+          const isFashion = ["fashion-illustrations", "bridal-designs", "shoes", "bags"].includes(chapter.id);
           const umbrella = isFashion ? "FASHION ILLUSTRATION" : "LIFESTYLE ILLUSTRATION";
+          const chapterLabel = chapter.name.toUpperCase().replace("-", " ");
 
           return (
             <section
-              key={collection.id}
-              id={collection.id}
+              key={chapter.id}
+              id={chapter.id}
               className="w-full py-20"
               style={{ backgroundColor: "#FAFAFA" }}
-              aria-label={collection.name}
+              aria-label={chapter.name}
             >
               <div className="mx-auto px-6" style={{ maxWidth: 1200 }}>
-                {/* Collection Header */}
+                {/* Chapter-Level Header */}
                 <motion.div
                   className="mb-16"
                   initial="hidden"
@@ -137,83 +134,103 @@ const Illustrations = () => {
                       marginBottom: 12,
                     }}
                   >
-                    {umbrella}: {collection.categoryId === "fashion-illustrations" ? "FASHION ILLUSTRATIONS" : collection.categoryId.toUpperCase().replace("-", " ")}
+                    {umbrella}: {chapterLabel}
                   </p>
-                  <h2
-                    className="font-display"
-                    style={{
-                      fontSize: "clamp(24px, 4vw, 44px)",
-                      fontWeight: 700,
-                      color: "#111111",
-                      margin: 0,
-                      lineHeight: 1.1,
-                      marginBottom: 12,
-                    }}
-                  >
-                    {collection.name}
-                  </h2>
-                  {collection.description && (
-                    <p
-                      style={{
-                        fontFamily: "DM Sans, system-ui, sans-serif",
-                        fontSize: 14,
-                        color: "#666666",
-                        margin: 0,
-                        lineHeight: 1.6,
-                      }}
-                    >
-                      {collection.description}
-                    </p>
-                  )}
                 </motion.div>
 
-                {/* Artworks Grid */}
-                <motion.div
-                  className="grid gap-6"
-                  style={{
-                    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-                  }}
-                  variants={staggerVariants}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, amount: 0.1 }}
-                >
-                  {artworks.map((artwork) => (
-                    <motion.div
-                      key={artwork.id}
-                      variants={cardVariants}
-                      className="overflow-hidden"
-                      style={{ borderRadius: 4 }}
-                    >
-                      <img
-                        src={artwork.image}
-                        alt={artwork.title || collection.name}
-                        style={{
-                          width: "100%",
-                          height: "auto",
-                          display: "block",
-                          objectFit: "cover",
-                        }}
-                      />
-                      {artwork.title && (
-                        <div style={{ paddingTop: 12 }}>
+                {/* Collections within this Chapter */}
+                {collectionsInChapter.map((collection) => {
+                  const artworks = getCollectionArtworks(collection.id);
+                  if (artworks.length === 0) return null;
+
+                  return (
+                    <div key={collection.id} style={{ marginBottom: 48 }}>
+                      {/* Collection Header */}
+                      <motion.div
+                        className="mb-12"
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, amount: 0.2 }}
+                        variants={fadeVariants}
+                      >
+                        <h2
+                          className="font-display"
+                          style={{
+                            fontSize: "clamp(24px, 4vw, 44px)",
+                            fontWeight: 700,
+                            color: "#111111",
+                            margin: 0,
+                            lineHeight: 1.1,
+                            marginBottom: 12,
+                          }}
+                        >
+                          {collection.name}
+                        </h2>
+                        {collection.description && (
                           <p
                             style={{
                               fontFamily: "DM Sans, system-ui, sans-serif",
-                              fontSize: 12,
-                              fontWeight: 600,
-                              color: "#111111",
+                              fontSize: 14,
+                              color: "#666666",
                               margin: 0,
-                              lineHeight: 1.4,
+                              lineHeight: 1.6,
                             }}
                           >
-                            {artwork.title}
+                            {collection.description}
                           </p>
-                        </div>
-                      )}
-                    </motion.div>
-                  ))}
-                </motion.div>
+                        )}
+                      </motion.div>
+
+                      {/* Artworks Grid */}
+                      <motion.div
+                        className="grid gap-6"
+                        style={{
+                          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+                        }}
+                        variants={staggerVariants}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, amount: 0.1 }}
+                      >
+                        {artworks.map((artwork) => (
+                          <motion.div
+                            key={artwork.id}
+                            variants={cardVariants}
+                            className="overflow-hidden"
+                            style={{ borderRadius: 4 }}
+                          >
+                            <img
+                              src={artwork.image}
+                              alt={artwork.title || collection.name}
+                              style={{
+                                width: "100%",
+                                height: "auto",
+                                display: "block",
+                                objectFit: "cover",
+                              }}
+                            />
+                            {artwork.title && (
+                              <div style={{ paddingTop: 12 }}>
+                                <p
+                                  style={{
+                                    fontFamily: "DM Sans, system-ui, sans-serif",
+                                    fontSize: 12,
+                                    fontWeight: 600,
+                                    color: "#111111",
+                                    margin: 0,
+                                    lineHeight: 1.4,
+                                  }}
+                                >
+                                  {artwork.title}
+                                </p>
+                              </div>
+                            )}
+                          </motion.div>
+                        ))}
+                      </motion.div>
+                    </div>
+                  );
+                })}
               </div>
             </section>
           );
