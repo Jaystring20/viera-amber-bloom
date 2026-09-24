@@ -1,13 +1,12 @@
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
-import EditorialGallery from "@/components/sections/EditorialGallery";
 import BrandFilm from "@/components/BrandFilm";
 import RotatingHeroCarousel from "@/components/sections/RotatingHeroCarousel";
 import CategoryThumbnailNav from "@/components/sections/CategoryThumbnailNav";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
 import { scrollToCategory } from "@/lib/illustration-categories";
-import { ARTWORKS } from "@/lib/gallery-data";
+import { ARTWORKS, CHAPTERS, ChapterId } from "@/lib/gallery-data";
 import {
   fadeSlideUp,
   fadeIn,
@@ -31,22 +30,14 @@ const Illustrations = () => {
   const staggerVariants = useReducedVariants(staggerContainer);
   const cardVariants = useReducedVariants(cardItem);
 
-  // Was navigate(`/collections/${collectionId}`) — a separate page, and one
-  // whose ids mostly didn't match anything real (see
-  // illustration-categories.ts). The client's direction was explicit: a
-  // category click should land on that category's own section further down
-  // this same page, in sync with "Browse by Category" above it — so this is
-  // now an in-page scroll instead of a navigation.
   const handleCategorySelect = (categoryId: string) => {
     scrollToCategory(categoryId);
   };
 
-  // Lifestyle category preview data
-  const lifestyleSingle1 = ARTWORKS.filter((a) => a.chapter === "single-illustrations").slice(0, 1);
-  const productArtworks = ARTWORKS.filter((a) => a.chapter === "product-illustrations").slice(0, 1);
-  const birthdayCoupleSet1 = ARTWORKS.filter((a) => a.chapter === "birthday-couple").slice(0, 1);
-  const bookCoversArtworks = ARTWORKS.filter((a) => a.chapter === "book-covers").slice(0, 1);
-  const eventProgramsArtworks = ARTWORKS.filter((a) => a.chapter === "event-programs").slice(0, 1);
+  // Get all artworks for each category (excluding draft items)
+  const getChapterArtworks = (chapterId: ChapterId) => {
+    return ARTWORKS.filter((a) => a.chapter === chapterId && !a.draft);
+  };
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#FAFAFA" }}>
@@ -105,216 +96,110 @@ const Illustrations = () => {
           }}
         />
 
-        {/* The Collection — editorial scrollytelling gallery */}
-        <EditorialGallery />
+        {/* ── 9 Illustration Category Sections (per PDF structure) ───────────────────────────────────── */}
+        {CHAPTERS.map((chapter) => {
+          const artworks = getChapterArtworks(chapter.id);
+          if (artworks.length === 0) return null;
 
-        {/* ── Lifestyle Illustration Categories (5-column row) ───────────────────────────────────── */}
-        <section
-          id="lifestyle-categories"
-          className="w-full py-20"
-          style={{ backgroundColor: "#FAFAFA" }}
-          aria-label="Lifestyle Illustration Categories"
-        >
-          <div className="mx-auto px-6" style={{ maxWidth: 1200 }}>
-            <motion.div
-              className="mb-12"
-              variants={motion.fadeIn ? {} : {}}
-              initial="hidden"
-              whileInView="visible"
+          return (
+            <section
+              key={chapter.id}
+              id={chapter.id}
+              className="w-full py-20"
+              style={{ backgroundColor: "#FAFAFA" }}
+              aria-label={chapter.name}
             >
-              <p
-                style={{
-                  fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: 13,
-                  color: "#0A0A0A",
-                  letterSpacing: "4px",
-                  textTransform: "uppercase",
-                  fontWeight: 600,
-                  margin: 0,
-                }}
-              >
-                Lifestyle Illustration
-              </p>
-            </motion.div>
-
-            {/* 5-column grid - Desktop: 5 cols, Mobile: responsive */}
-            <motion.div
-              className="grid gap-6"
-              style={{
-                gridTemplateColumns: "repeat(5, 1fr)",
-              }}
-              variants={staggerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-            >
-              {/* Single Illustrations */}
-              <motion.div
-                key="single-illustrations"
-                variants={cardVariants}
-                className="overflow-hidden cursor-pointer group"
-                style={{ borderRadius: 4 }}
-              >
-                <img
-                  src={lifestyleSingle1[0]?.image}
-                  alt="Single Illustrations"
-                  style={{
-                    width: "100%",
-                    height: "auto",
-                    display: "block",
-                    aspectRatio: "3/4",
-                    objectFit: "cover",
-                  }}
-                />
-                <div style={{ textAlign: "center", paddingTop: 12 }}>
+              <div className="mx-auto px-6" style={{ maxWidth: 1200 }}>
+                {/* Category Header */}
+                <motion.div
+                  className="mb-16"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.2 }}
+                  variants={fadeVariants}
+                >
                   <p
                     style={{
                       fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontSize: 14,
+                      fontSize: 13,
+                      color: "#111111",
+                      letterSpacing: "4px",
+                      textTransform: "uppercase",
                       fontWeight: 600,
-                      color: "#0A0A0A",
                       margin: 0,
+                      marginBottom: 24,
                     }}
                   >
-                    Single Illustrations
+                    {parseInt(chapter.index) <= 4 ? "FASHION ILLUSTRATION" : "LIFESTYLE ILLUSTRATION"}
                   </p>
-                </div>
-              </motion.div>
-
-              {/* Product Illustrations */}
-              <motion.div
-                key="product-illustrations"
-                variants={cardVariants}
-                className="overflow-hidden cursor-pointer group"
-                style={{ borderRadius: 4 }}
-              >
-                <img
-                  src={productArtworks[0]?.image}
-                  alt="Product Illustrations"
-                  style={{
-                    width: "100%",
-                    height: "auto",
-                    display: "block",
-                    aspectRatio: "1/1",
-                    objectFit: "cover",
-                  }}
-                />
-                <div style={{ textAlign: "center", paddingTop: 12 }}>
-                  <p
+                  <h2
+                    className="font-display"
                     style={{
-                      fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: "#0A0A0A",
+                      fontSize: "clamp(24px, 4vw, 44px)",
+                      fontWeight: 700,
+                      color: "#111111",
                       margin: 0,
+                      lineHeight: 1.1,
                     }}
                   >
-                    Product Illustrations
-                  </p>
-                </div>
-              </motion.div>
+                    {chapter.name}
+                  </h2>
+                </motion.div>
 
-              {/* Birthday & Couple Illustrations */}
-              <motion.div
-                key="birthday-couple"
-                variants={cardVariants}
-                className="overflow-hidden cursor-pointer group"
-                style={{ borderRadius: 4 }}
-              >
-                <img
-                  src={birthdayCoupleSet1[0]?.image}
-                  alt="Birthday & Couple Illustrations"
+                {/* Artworks Grid - Responsive layout per chapter.layout */}
+                <motion.div
+                  className="grid gap-6"
                   style={{
-                    width: "100%",
-                    height: "auto",
-                    display: "block",
-                    aspectRatio: "3/4",
-                    objectFit: "cover",
+                    gridTemplateColumns:
+                      chapter.layout === "rail"
+                        ? "repeat(auto-fit, minmax(200px, 1fr))"
+                        : "repeat(auto-fit, minmax(250px, 1fr))",
                   }}
-                />
-                <div style={{ textAlign: "center", paddingTop: 12 }}>
-                  <p
-                    style={{
-                      fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: "#0A0A0A",
-                      margin: 0,
-                    }}
-                  >
-                    Birthday & Couple Illustrations
-                  </p>
-                </div>
-              </motion.div>
-
-              {/* Book Covers */}
-              <motion.div
-                key="book-covers"
-                variants={cardVariants}
-                className="overflow-hidden cursor-pointer group"
-                style={{ borderRadius: 4 }}
-              >
-                <img
-                  src={bookCoversArtworks[0]?.image}
-                  alt="Book Covers"
-                  style={{
-                    width: "100%",
-                    height: "auto",
-                    display: "block",
-                    aspectRatio: "2/3",
-                    objectFit: "cover",
-                  }}
-                />
-                <div style={{ textAlign: "center", paddingTop: 12 }}>
-                  <p
-                    style={{
-                      fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: "#0A0A0A",
-                      margin: 0,
-                    }}
-                  >
-                    Book Covers
-                  </p>
-                </div>
-              </motion.div>
-
-              {/* Event Programs */}
-              <motion.div
-                key="event-programs"
-                variants={cardVariants}
-                className="overflow-hidden cursor-pointer group"
-                style={{ borderRadius: 4 }}
-              >
-                <img
-                  src={eventProgramsArtworks[0]?.image}
-                  alt="Event Programs"
-                  style={{
-                    width: "100%",
-                    height: "auto",
-                    display: "block",
-                    aspectRatio: "1/1.4",
-                    objectFit: "cover",
-                  }}
-                />
-                <div style={{ textAlign: "center", paddingTop: 12 }}>
-                  <p
-                    style={{
-                      fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: "#0A0A0A",
-                      margin: 0,
-                    }}
-                  >
-                    Event Programs
-                  </p>
-                </div>
-              </motion.div>
-            </motion.div>
-          </div>
-        </section>
+                  variants={staggerVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.1 }}
+                >
+                  {artworks.map((artwork) => (
+                    <motion.div
+                      key={artwork.id}
+                      variants={cardVariants}
+                      className="overflow-hidden rounded"
+                      style={{ borderRadius: 4 }}
+                    >
+                      <img
+                        src={artwork.image}
+                        alt={artwork.title || `${chapter.name} item`}
+                        style={{
+                          width: "100%",
+                          height: "auto",
+                          display: "block",
+                          objectFit: "cover",
+                        }}
+                      />
+                      {artwork.title && (
+                        <div style={{ paddingTop: 12 }}>
+                          <p
+                            style={{
+                              fontFamily: "DM Sans, system-ui, sans-serif",
+                              fontSize: 12,
+                              fontWeight: 600,
+                              color: "#111111",
+                              margin: 0,
+                              lineHeight: 1.4,
+                            }}
+                          >
+                            {artwork.title}
+                          </p>
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </div>
+            </section>
+          );
+        })}
 
         {/* Commercial Applications */}
         <section
