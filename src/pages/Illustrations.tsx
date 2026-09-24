@@ -1,7 +1,12 @@
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
+import EditorialGallery from "@/components/sections/EditorialGallery";
+import BrandFilm from "@/components/BrandFilm";
+import RotatingHeroCarousel from "@/components/sections/RotatingHeroCarousel";
+import CategoryThumbnailNav from "@/components/sections/CategoryThumbnailNav";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
+import { scrollToCategory } from "@/lib/illustration-categories";
 import {
   fadeSlideUp,
   fadeIn,
@@ -15,13 +20,9 @@ import { ARTWORKS } from "@/lib/gallery-data";
 const Illustrations = () => {
   const reduced = useReducedMotion();
 
-  const fashionRef = useRef<HTMLDivElement>(null);
-  const edenRef = useRef<HTMLDivElement>(null);
-  const oppRef = useRef<HTMLDivElement>(null);
-
-  const fashionInView = useInView(fashionRef, inViewProps);
-  const edenInView = useInView(edenRef, inViewProps);
-  const oppInView = useInView(oppRef, inViewProps);
+  const handleCategorySelect = (categoryId: string) => {
+    scrollToCategory(categoryId);
+  };
 
   const headerVariants = useReducedVariants(fadeSlideUp);
   const fadeVariants = useReducedVariants(fadeIn);
@@ -94,6 +95,62 @@ const Illustrations = () => {
     <div className="min-h-screen" style={{ backgroundColor: "#FAFAFA" }}>
       <NavBar />
       <main className="pt-20">
+        {/* ── Rotating Hero Carousel ───────────────────────────────────── */}
+        <RotatingHeroCarousel onCategorySelect={(category) => {
+          handleCategorySelect(category.id);
+        }} />
+
+        {/* ── Category Thumbnail Navigation ───────────────────────────────────── */}
+        <CategoryThumbnailNav
+          onCategorySelect={(category) => {
+            handleCategorySelect(category.id);
+          }}
+        />
+
+        {/* ── Brand Film / Video Carousel ───────────────────────────────────── */}
+        <section
+          aria-label="Brand Film"
+          style={{ backgroundColor: "#FAFAFA" }}
+        >
+          <div
+            className="mx-auto px-6 pt-12 pb-6 flex flex-col items-center text-center"
+            style={{ maxWidth: 1100, gap: 10 }}
+          >
+            <p
+              style={{
+                fontFamily: "Montserrat, system-ui, sans-serif",
+                fontSize: 13,
+                color: "#111111",
+                letterSpacing: "4px",
+                textTransform: "uppercase",
+                fontWeight: 600,
+                margin: 0,
+              }}
+            >
+              Behind the Work
+            </p>
+            <h2
+              className="font-display"
+              style={{
+                fontSize: "clamp(22px, 3.5vw, 40px)",
+                fontWeight: 700,
+                color: "#111111",
+                margin: 0,
+                lineHeight: 1.1,
+              }}
+            >
+              See the process unfold.
+            </h2>
+          </div>
+
+          <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 48px" }}>
+            <BrandFilm variant="page" />
+          </div>
+        </section>
+
+        {/* The Collection — editorial scrollytelling gallery */}
+        <EditorialGallery />
+
         {/* ── Fashion Illustrations Section ───────────────────────────────────── */}
         <section
           ref={fashionRef}
