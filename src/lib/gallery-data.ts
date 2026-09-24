@@ -168,7 +168,7 @@ const mk = (
 
 export const ARTWORKS: Artwork[] = [
   // ── 01 · The Named Muses ───────────────────────────────────────────────
-  mk(24, "The Hatmaker", "She chose the hat before she chose the room. Presence was never something she asked for — it was something she wore.", "single-illustrations", "Portrait", true, "jewelry", "fashion", false, "red-wine-dress"),
+  mk(24, "The Hatmaker", "She chose the hat before she chose the room. Presence was never something she asked for — it was something she wore.", "fashion-illustrations", "Portrait", true, "jewelry", "fashion", false, "red-wine-dress"),
   mk(64, "Jacqueline", "Under the brim of her hat she keeps her own counsel — and her own crown.", "fashion-illustrations", "Portrait", false, "jewelry", "fashion", false, "five-for-five"),
   mk(65, "Wandé", "Wrapped in colour and palm-shade, she answers to no season but her own.", "fashion-illustrations", "Portrait", false, "jewelry", "fashion", false, "five-for-five"),
   mk(66, "Céline", "Two buns, one bow, zero apologies — softness sharpened to a point.", "fashion-illustrations", "Portrait", false, "jewelry", "fashion", false, "five-for-five"),
@@ -231,15 +231,15 @@ export const ARTWORKS: Artwork[] = [
 
   // ── 06 · The #5for5 Collection (#EndSARS) ──────────────────────────────
   // The five demands of #EndSARS, worn. Notes are the artist's own captions.
-  mk(52, "Release Them", "#5for5, demand one: the immediate release of all arrested protesters — worn like a verdict in END SARS sashes.", "fashion-illustrations", "Campaign", true, "formal-events", "lifestyle", false, "oppenheimer-barbie"),
-  mk(53, "White Robes", "For the civilian soldiers who never came home — now in white, remembered in every hallelujah chorus.", "fashion-illustrations", "Campaign", false, "formal-events", "lifestyle", false, "oppenheimer-barbie"),
+  mk(52, "Release Them", "#5for5, demand one: the immediate release of all arrested protesters — worn like a verdict in END SARS sashes.", "fashion-illustrations", "Campaign", true, "formal-events", "lifestyle", false, "five-for-five"),
+  mk(53, "White Robes", "For the civilian soldiers who never came home — now in white, remembered in every hallelujah chorus.", "fashion-illustrations", "Campaign", false, "formal-events", "lifestyle", false, "five-for-five"),
   mk(54, "Served Hot", "Justice for every life taken — and the demand that it be served hot.", "fashion-illustrations", "Campaign", false, "formal-events", "lifestyle", false, "time-will-tell"),
   mk(55, "Same Old Disguise", "Fine cloth, fine name — but the same old person still hides underneath. Reform, not rebranding.", "fashion-illustrations", "Campaign", false, "formal-events", "lifestyle", false, "time-will-tell"),
   mk(56, "Pay Them Well", "Even the police know how to wear starched agbada — so pay them well, and let them protect, not prey.", "fashion-illustrations", "Campaign", false, "formal-events", "lifestyle", false, "time-will-tell"),
 
   // ── 07 · She Speaks ────────────────────────────────────────────────────
   mk(6, "New Chapter", "She closed the book the world wrote for her and opened a blank one.", "single-illustrations", "Couture", true, "editorial-narratives", "lifestyle", false, "editorial-stories"),
-  mk(26, "Unsilenced", "The tape was meant to quiet her. Read it again.", "single-illustrations", "Campaign", true, "editorial-narratives", "lifestyle", false, "corn-row-dress"),
+  mk(26, "Unsilenced", "The tape was meant to quiet her. Read it again.", "single-illustrations", "Campaign", true, "editorial-narratives", "lifestyle", false, "editorial-stories"),
   mk(15, "Embrace Equity", "Not the same start for everyone — the same chance to finish.", "single-illustrations", "Campaign", false, "editorial-narratives", "lifestyle", false, "editorial-stories"),
   mk(16, "One of a Kind", "Mass-produced was never on the table.", "single-illustrations", "Campaign", false, "editorial-narratives", "lifestyle", false, "editorial-stories"),
   mk(17, "Inspire Inclusion", "Pull up a chair; better yet, build a longer table.", "single-illustrations", "Campaign", false, "editorial-narratives", "lifestyle", false, "editorial-stories"),
