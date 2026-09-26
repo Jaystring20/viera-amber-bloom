@@ -54,21 +54,37 @@ export default function VIVAFeedbackCarousel() {
     fetchFeedback();
 
     // Subscribe to real-time updates
-    const subscription = supabase
-      .channel("viva_feedback_channel")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "viva_feedback" },
-        (payload) => {
-          const newFeedback = payload.new as Feedback;
-          setFeedbacks((prev) => [newFeedback, ...prev]);
-          setCurrentIndex(0);
-        }
-      )
-      .subscribe();
+    let subscription: ReturnType<typeof supabase.channel> | null = null;
+
+    const setupSubscription = async () => {
+      try {
+        subscription = supabase
+          .channel("viva_feedback_channel", { config: { broadcast: { self: true } } })
+          .on(
+            "postgres_changes",
+            { event: "INSERT", schema: "public", table: "viva_feedback" },
+            (payload) => {
+              const newFeedback = payload.new as Feedback;
+              setFeedbacks((prev) => [newFeedback, ...prev]);
+              setCurrentIndex(0);
+            }
+          )
+          .subscribe((status) => {
+            if (status === "SUBSCRIBED") {
+              console.log("Feedback subscription active");
+            }
+          });
+      } catch (err) {
+        console.error("Failed to setup subscription:", err);
+      }
+    };
+
+    setupSubscription();
 
     return () => {
-      subscription.unsubscribe();
+      if (subscription) {
+        subscription.unsubscribe();
+      }
     };
   }, []);
 
