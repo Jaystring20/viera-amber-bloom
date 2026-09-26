@@ -31,6 +31,7 @@ export default function VIVAFeedbackCarousel() {
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
   const [loading, setLoading] = useState(true);
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
+  const subscriptionRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   // Fetch feedback on mount
   useEffect(() => {
@@ -53,38 +54,27 @@ export default function VIVAFeedbackCarousel() {
 
     fetchFeedback();
 
-    // Subscribe to real-time updates
-    let subscription: ReturnType<typeof supabase.channel> | null = null;
+    // Subscribe to real-time updates (only once, using ref to prevent duplicates in Strict Mode)
+    if (!subscriptionRef.current) {
+      const subscription = supabase
+        .channel("viva_feedback_channel")
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "viva_feedback" },
+          (payload) => {
+            const newFeedback = payload.new as Feedback;
+            setFeedbacks((prev) => [newFeedback, ...prev]);
+            setCurrentIndex(0);
+          }
+        )
+        .subscribe();
 
-    const setupSubscription = async () => {
-      try {
-        subscription = supabase
-          .channel("viva_feedback_channel", { config: { broadcast: { self: true } } })
-          .on(
-            "postgres_changes",
-            { event: "INSERT", schema: "public", table: "viva_feedback" },
-            (payload) => {
-              const newFeedback = payload.new as Feedback;
-              setFeedbacks((prev) => [newFeedback, ...prev]);
-              setCurrentIndex(0);
-            }
-          )
-          .subscribe((status) => {
-            if (status === "SUBSCRIBED") {
-              console.log("Feedback subscription active");
-            }
-          });
-      } catch (err) {
-        console.error("Failed to setup subscription:", err);
-      }
-    };
-
-    setupSubscription();
+      subscriptionRef.current = subscription;
+    }
 
     return () => {
-      if (subscription) {
-        subscription.unsubscribe();
-      }
+      // Don't unsubscribe here to avoid issues in Strict Mode
+      // The subscription will persist for the lifetime of the component
     };
   }, []);
 
