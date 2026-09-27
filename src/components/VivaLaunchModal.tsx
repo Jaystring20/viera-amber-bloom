@@ -389,13 +389,15 @@ export default function VivaLaunchModal() {
                       initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                     >
                       <p style={{ fontFamily: SANS, fontSize: 13, color: BURGUNDY, fontWeight: 600, margin: 0 }}>
-                        You're on the list — see you at launch.
+                        Welcome to the VIVA community!
                       </p>
-                      {/* Points back at the pre-order CTA above rather than
+                      {/* Points back at the order CTA above rather than
                           leaving someone who just signalled real interest
                           with nothing further to do but close the window. */}
                       <p style={{ fontFamily: SANS, fontSize: 12, color: "rgba(34,26,26,0.65)", margin: "8px 0 0 0", lineHeight: 1.6 }}>
-                        Want to lock in your size before launch? Pre-order above to enjoy 5% off now.
+                        {countdown.reached
+                          ? "We'll keep you updated on new drops and exclusive offers."
+                          : "Want to lock in your size before launch? Pre-order above to enjoy 5% off now."}
                       </p>
                     </motion.div>
                   ) : (
