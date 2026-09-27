@@ -54,27 +54,57 @@ export default function VIVAFeedbackCarousel() {
 
     fetchFeedback();
 
-    // Subscribe to real-time updates (only once, using ref to prevent duplicates in Strict Mode)
-    if (!subscriptionRef.current) {
-      const subscription = supabase
-        .channel("viva_feedback_channel")
-        .on(
+    // Set up real-time subscription - build entire chain before subscribe
+    const setupSubscription = async () => {
+      try {
+        // Create channel with unique ID to avoid conflicts
+        const channelId = `feedback_${Math.random().toString(36).substr(2, 9)}`;
+        const channel = supabase.channel(channelId, {
+          config: { broadcast: { self: true } }
+        });
+
+        // CRITICAL: Attach ALL listeners BEFORE calling subscribe
+        channel.on(
           "postgres_changes",
           { event: "INSERT", schema: "public", table: "viva_feedback" },
           (payload) => {
-            const newFeedback = payload.new as Feedback;
-            setFeedbacks((prev) => [newFeedback, ...prev]);
-            setCurrentIndex(0);
+            if (payload.eventType === "INSERT") {
+              const newFeedback = payload.new as Feedback;
+              setFeedbacks((prev) => [newFeedback, ...prev].slice(0, 50));
+              setCurrentIndex(0);
+            }
           }
-        )
-        .subscribe();
+        );
 
-      subscriptionRef.current = subscription;
-    }
+        // Subscribe ONLY after listener is attached
+        const subscription = channel.subscribe((status) => {
+          if (status === "SUBSCRIBED") {
+            subscriptionRef.current = channel;
+          } else if (status === "CLOSED") {
+            subscriptionRef.current = null;
+          }
+        });
+
+        // Cleanup: unsubscribe when component unmounts
+        return () => {
+          if (subscriptionRef.current) {
+            supabase.removeChannel(subscriptionRef.current);
+            subscriptionRef.current = null;
+          }
+        };
+      } catch (err) {
+        console.error("Failed to set up real-time subscription:", err);
+        return () => {};
+      }
+    };
+
+    let cleanup: (() => void) | null = null;
+    setupSubscription().then((fn) => {
+      cleanup = fn;
+    });
 
     return () => {
-      // Don't unsubscribe here to avoid issues in Strict Mode
-      // The subscription will persist for the lifetime of the component
+      if (cleanup) cleanup();
     };
   }, []);
 
