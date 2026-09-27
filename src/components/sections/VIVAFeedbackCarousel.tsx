@@ -54,58 +54,11 @@ export default function VIVAFeedbackCarousel() {
 
     fetchFeedback();
 
-    // Set up real-time subscription - build entire chain before subscribe
-    const setupSubscription = async () => {
-      try {
-        // Create channel with unique ID to avoid conflicts
-        const channelId = `feedback_${Math.random().toString(36).substr(2, 9)}`;
-        const channel = supabase.channel(channelId, {
-          config: { broadcast: { self: true } }
-        });
+    // Note: Real-time subscription is intentionally disabled due to Supabase Realtime
+    // WebSocket reliability issues. The carousel fetches feedback on mount and displays
+    // it reliably. New feedback requires a page refresh to appear.
 
-        // CRITICAL: Attach ALL listeners BEFORE calling subscribe
-        channel.on(
-          "postgres_changes",
-          { event: "INSERT", schema: "public", table: "viva_feedback" },
-          (payload) => {
-            if (payload.eventType === "INSERT") {
-              const newFeedback = payload.new as Feedback;
-              setFeedbacks((prev) => [newFeedback, ...prev].slice(0, 50));
-              setCurrentIndex(0);
-            }
-          }
-        );
-
-        // Subscribe ONLY after listener is attached
-        const subscription = channel.subscribe((status) => {
-          if (status === "SUBSCRIBED") {
-            subscriptionRef.current = channel;
-          } else if (status === "CLOSED") {
-            subscriptionRef.current = null;
-          }
-        });
-
-        // Cleanup: unsubscribe when component unmounts
-        return () => {
-          if (subscriptionRef.current) {
-            supabase.removeChannel(subscriptionRef.current);
-            subscriptionRef.current = null;
-          }
-        };
-      } catch (err) {
-        console.error("Failed to set up real-time subscription:", err);
-        return () => {};
-      }
-    };
-
-    let cleanup: (() => void) | null = null;
-    setupSubscription().then((fn) => {
-      cleanup = fn;
-    });
-
-    return () => {
-      if (cleanup) cleanup();
-    };
+    return () => {};
   }, []);
 
   // Auto-play carousel
