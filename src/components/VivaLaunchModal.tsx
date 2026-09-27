@@ -337,14 +337,10 @@ export default function VivaLaunchModal() {
                   fontWeight: 700, color: BURGUNDY, margin: "0 0 20px 0", lineHeight: 1.1,
                 }}
               >
-                Batya is coming!
+                {countdown.reached ? "She's here." : "Batya is coming!"}
               </h2>
 
-              {countdown.reached ? (
-                <p style={{ fontFamily: CORMORANT, fontSize: 20, fontStyle: "italic", color: BURGUNDY, margin: "0 0 20px 0" }}>
-                  She's here.
-                </p>
-              ) : (
+              {!countdown.reached && (
                 <div style={{ display: "flex", gap: "clamp(10px, 2vw, 18px)", marginBottom: 22 }}>
                   <CountdownUnit value={countdown.days} label="Days" />
                   <CountdownUnit value={countdown.hours} label="Hrs" />
@@ -354,7 +350,9 @@ export default function VivaLaunchModal() {
               )}
 
               <p style={{ fontFamily: SANS, fontSize: 14, color: DARK_TEXT, margin: "0 0 14px 0", lineHeight: 1.6 }}>
-                Pre-order to enjoy <strong style={{ color: BURGUNDY }}>5% off</strong>.
+                {countdown.reached
+                  ? "Shop the collection and stay updated with our community."
+                  : "Pre-order to enjoy 5% off."}
               </p>
 
               <a
@@ -371,7 +369,7 @@ export default function VivaLaunchModal() {
                 }}
               >
                 <MessageCircle size={15} />
-                Pre-order Now
+                {countdown.reached ? "Order Now" : "Pre-order Now"}
               </a>
 
               <div style={{ height: 1, background: BURG_ALPHA, margin: "24px 0" }} />
