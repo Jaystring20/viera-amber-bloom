@@ -1341,7 +1341,8 @@ const VIVAPage = () => {
   return (
     <div style={{ backgroundColor: "#FAFAFA", minHeight: "100vh" }}>
       <NavBar />
-      <VivaLaunchModal />
+      {/* Batya launch modal disabled - collection has already launched */}
+      {/* <VivaLaunchModal /> */}
 
       {/* ═══════════════════════════════════════════════════════
           HERO — Responsive Luxury Editorial
