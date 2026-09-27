@@ -196,34 +196,32 @@ export default function VivaLaunchModal() {
       // for a read that was only ever a nice-to-have.
       if (!lookupError && existing && existing.length > 0) {
         try { localStorage.setItem(JOINED_KEY, normalized); } catch { /* non-fatal */ }
-        setStatus("done");
+        // Existing number — open WhatsApp directly
+        const msg = `Hi VIVA! My number is ${normalized}. I'm interested in the Batya collection.`;
+        window.location.href = whatsappLink(msg);
         return;
       }
 
       const { error } = await supabase.from("contact_submissions").insert({
         name: "VIVA Launch List",
-        // Every other caller of this table always has a real email; this
-        // is the first phone-only submission. Using a placeholder rather
-        // than "" in case the column has an email-format check this
-        // session has no way to inspect (no live DB access available).
         email: "no-email@viva-launch-list.local",
         subject: LAUNCH_SUBJECT,
         message: normalized,
       });
       if (error) throw error;
 
-      // Best effort, and explicitly not trusted: notify-admin is not
-      // present anywhere in this repo, so whether it is actually deployed
-      // on Supabase cannot be confirmed from here. If it exists this
-      // reaches the same inbox the enquiry form already notifies; if it
-      // doesn't, this fails exactly as harmlessly as that form's call
-      // already does, and the signup itself has still succeeded either way.
+      // Save to DB, then open WhatsApp with their number embedded
       supabase.functions.invoke("notify-admin", {
         body: { type: "viva_launch_signup", data: { phone: normalized } },
       }).catch(() => {});
 
       try { localStorage.setItem(JOINED_KEY, normalized); } catch { /* non-fatal */ }
-      setStatus("done");
+
+      // Open WhatsApp with their phone number in the message so they can
+      // customize and send — Viera's WhatsApp Business can then set up
+      // automation to reply with launch details.
+      const msg = `Hi VIVA! My number is ${normalized}. I'd like to stay updated on the Batya collection.`;
+      window.location.href = whatsappLink(msg);
     } catch (err) {
       console.error("Launch list signup failed:", err);
       setStatus("error");
