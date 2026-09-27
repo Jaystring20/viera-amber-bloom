@@ -275,7 +275,7 @@ const VAMSection = () => {
               marginBottom: 20,
             }}
           >
-            First cohort launching soon. Secure your spot.
+            Professional masterclasses in illustration, fashion, and creative direction. Join us to elevate your craft.
           </p>
 
           <AnimatePresence mode="wait">

@@ -421,8 +421,8 @@ const VASHPage = () => {
                   }}>
                     {piece.title}
                   </span>
-                  {/* "Coming soon" badge */}
-                  <div style={{
+                  {/* Status badge - hidden for now */}
+                  {/* <div style={{
                     position: "absolute", top: 12, right: 12,
                     background: "rgba(0,0,0,0.5)",
                     borderRadius: 999, padding: "3px 10px",
@@ -434,7 +434,7 @@ const VASHPage = () => {
                     }}>
                       Coming Soon
                     </span>
-                  </div>
+                  </div> */}
                 </div>
 
                 <div style={{ padding: "14px 16px" }}>
@@ -512,7 +512,7 @@ const VASHPage = () => {
                 margin: "0 0 32px 0", maxWidth: 380,
               }}
             >
-              The shop is coming. Launch list members get early access to prints, originals, and limited-release pieces before they go live.
+              Shop prints, originals, and limited-release pieces from VIVA's creative ecosystem. Join our list for early access to new drops.
             </motion.p>
 
             <AnimatePresence mode="wait">

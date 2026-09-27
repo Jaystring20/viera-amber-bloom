@@ -161,8 +161,8 @@ export default function VivaLaunchModal() {
 
   const close = () => setOpen(false);
 
-  const preOrderMessage =
-    "Hi VIVA! I'd like to pre-order from the Batya collection ahead of launch and lock in the 5% pre-order discount.";
+  const orderMessage =
+    "Hi VIVA! I'd like to order from the Batya collection and get more information about current offerings.";
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -356,7 +356,7 @@ export default function VivaLaunchModal() {
               </p>
 
               <a
-                href={whatsappLink(preOrderMessage)}
+                href={whatsappLink(orderMessage)}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
