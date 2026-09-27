@@ -197,7 +197,7 @@ export default function VivaLaunchModal() {
       if (!lookupError && existing && existing.length > 0) {
         try { localStorage.setItem(JOINED_KEY, normalized); } catch { /* non-fatal */ }
         // Existing number — open WhatsApp directly
-        const msg = `Hi VIVA! My number is ${normalized}. I'm interested in the Batya collection.`;
+        const msg = "Hi VIVA! I'd like to stay updated on the Batya collection.";
         window.location.href = whatsappLink(msg);
         return;
       }
@@ -217,10 +217,10 @@ export default function VivaLaunchModal() {
 
       try { localStorage.setItem(JOINED_KEY, normalized); } catch { /* non-fatal */ }
 
-      // Open WhatsApp with their phone number in the message so they can
-      // customize and send — Viera's WhatsApp Business can then set up
-      // automation to reply with launch details.
-      const msg = `Hi VIVA! My number is ${normalized}. I'd like to stay updated on the Batya collection.`;
+      // Open WhatsApp — user's phone number comes from the message itself,
+      // so no need to repeat it in the text. Viera's WhatsApp Business can
+      // set up automation to recognize this message and reply.
+      const msg = "Hi VIVA! I'd like to stay updated on the Batya collection.";
       window.location.href = whatsappLink(msg);
     } catch (err) {
       console.error("Launch list signup failed:", err);
