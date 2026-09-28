@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import Illustrations from "./pages/Illustrations.tsx";
+import IllustrationsGalleryPage from "./pages/IllustrationsGalleryPage.tsx";
 import VAGINPage from "./pages/VAGIN.tsx";
 import VAGINDashboard from "./pages/VAGINDashboard.tsx";
 import VIVAPage from "./pages/VIVA.tsx";
@@ -25,6 +26,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/illustrations" element={<Illustrations />} />
+          <Route path="/illustrations-gallery" element={<IllustrationsGalleryPage />} />
           {/* Retired — this used a separate, now-orphaned category system
               (CollectionId) that never matched the client's real taxonomy
               and had no live links pointing to it anymore. Redirects rather
