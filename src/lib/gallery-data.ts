@@ -48,25 +48,28 @@ export const CHAPTERS: Chapter[] = [
 ];
 
 export const SECTIONS: Section[] = [
-  { id: "section-1", number: 1, name: "The red-wine dress", description: "If red wine was a dress, she would be a captivating blend of elegance and complexity.", seq_start: 1, seq_end: 6 },
-  { id: "section-2", number: 2, name: "The Corn-row dress", description: "Inspired by the Nigerian corn row \"all-back\" traditional hairstyles.", seq_start: 7, seq_end: 10 },
-  { id: "section-3", number: 3, name: "The Teyana Taylor's 2025 Met gala inspired outfit", description: "", seq_start: 11, seq_end: 14 },
-  { id: "section-4", number: 4, name: "The Eden collection", description: "Inspired by the Biblical story of creation.", seq_start: 15, seq_end: 18 },
-  { id: "section-5", number: 5, name: "The Oppenheimer-Barbie collection", description: "Inspired by the movies.", seq_start: 19, seq_end: 22 },
-  { id: "section-6", number: 6, name: "Time will tell collection", description: "Inspired by the way man has told time over the years.", seq_start: 23, seq_end: 28 },
-  { id: "section-7", number: 7, name: "#5for5 collection", description: "An artistic expression of advocacy for human rights and good governance in Nigeria during the October 2020 #EndSARS protest.", seq_start: 29, seq_end: 36 },
+  { id: "section-1", number: 1, name: "", description: "", seq_start: 1, seq_end: 3 },
+  { id: "section-2", number: 2, name: "", description: "", seq_start: 4, seq_end: 13 },
+  { id: "section-4", number: 4, name: "The Eden collection", description: "Inspired by the Biblical story of creation.", seq_start: 14, seq_end: 20 },
+  { id: "section-5", number: 5, name: "The Oppenheimer-Barbie collection", description: "Inspired by the movies.", seq_start: 21, seq_end: 22 },
+  { id: "section-6", number: 6, name: "Time will tell collection", description: "Inspired by the way man has told time over the years.", seq_start: 23, seq_end: 25 },
+  { id: "section-7", number: 7, name: "#5for5 collection", description: "An artistic expression of advocacy for human rights and good governance in Nigeria during the October 2020 #EndSARS protest.", seq_start: 26, seq_end: 30 },
+  { id: "section-7b", number: 7, name: "", description: "", seq_start: 31, seq_end: 34 },
+  { id: "section-7c", number: 7, name: "", description: "", seq_start: 35, seq_end: 36 },
   { id: "section-8", number: 8, name: "A 7-day ready to wear collection", description: "", seq_start: 37, seq_end: 43 },
-  { id: "section-9", number: 9, name: "Bridal Designs", description: "", seq_start: 44, seq_end: 50 },
-  { id: "section-10", number: 10, name: "Ta lo pa chief Shoe collection", description: "Inspired by lagos crime stories.", seq_start: 51, seq_end: 58 },
-  { id: "section-11", number: 11, name: "The ride or die bags", description: "Inspired by the steering wheels of cars such as Tesla.", seq_start: 59, seq_end: 65 },
-  { id: "section-12", number: 12, name: "The sisi Eko bag collection", description: "Inspired by elements of Lagos traffic.", seq_start: 66, seq_end: 72 },
-  { id: "section-13", number: 13, name: "Single Illustrations", description: "", seq_start: 73, seq_end: 80 },
-  { id: "section-14", number: 14, name: "IWD theme inspired Illustrations", description: "", seq_start: 81, seq_end: 86 },
-  { id: "section-15", number: 15, name: "Christmas and New year illustrations", description: "", seq_start: 87, seq_end: 91 },
-  { id: "section-16", number: 16, name: "Malta Guinness", description: "", seq_start: 92, seq_end: 92 },
-  { id: "section-17", number: 17, name: "Birthday & Couple Illustrations", description: "", seq_start: 93, seq_end: 101 },
-  { id: "section-18", number: 18, name: "Book Covers", description: "", seq_start: 102, seq_end: 102 },
-  { id: "section-19", number: 19, name: "Event Programs", description: "", seq_start: 103, seq_end: 103 },
+  { id: "section-9", number: 9, name: "Bridal Designs", description: "", seq_start: 44, seq_end: 47 },
+  { id: "section-10", number: 10, name: "Ta lo pa chief Shoe collection", description: "Inspired by lagos crime stories.", seq_start: 48, seq_end: 52 },
+  { id: "section-11", number: 11, name: "The ride or die bags", description: "Inspired by the steering wheels of cars such as Tesla.", seq_start: 53, seq_end: 54 },
+  { id: "section-12", number: 12, name: "The sisi Eko bag collection", description: "Inspired by elements of Lagos traffic.", seq_start: 55, seq_end: 60 },
+  { id: "section-13", number: 13, name: "", description: "", seq_start: 61, seq_end: 66 },
+  { id: "section-14", number: 14, name: "IWD theme inspired Illustrations", description: "", seq_start: 67, seq_end: 70 },
+  { id: "section-14b", number: 14, name: "", description: "", seq_start: 71, seq_end: 83 },
+  { id: "section-15", number: 15, name: "Christmas and New year illustrations", description: "", seq_start: 84, seq_end: 87 },
+  { id: "section-16", number: 16, name: "Malta Guinness", description: "", seq_start: 88, seq_end: 88 },
+  { id: "section-17", number: 17, name: "Birthday & Couple Illustrations", description: "", seq_start: 89, seq_end: 96 },
+  { id: "section-17b", number: 17, name: "", description: "", seq_start: 97, seq_end: 97 },
+  { id: "section-18", number: 18, name: "Book Covers", description: "", seq_start: 98, seq_end: 98 },
+  { id: "section-19", number: 19, name: "Event Programs", description: "", seq_start: 99, seq_end: 103 },
   { id: "section-20", number: 20, name: "Archive", description: "", seq_start: 0, seq_end: 0 },
   { id: "section-21", number: 21, name: "Archive", description: "", seq_start: 0, seq_end: 0 },
 ];
@@ -84,14 +87,13 @@ function mk(seq: number, chapter: ChapterId, title: string = "", story: string =
 }
 
 export const ARTWORKS_103: Artwork[] = [
-  // Section 1: The red-wine dress (seq 1-6)
-  ...Array.from({ length: 6 }, (_, i) => mk(1 + i, "fashion-illustrations")),
+  // Page 2 (PDF): each artwork carries its own title + description
+  mk(1, "fashion-illustrations", "The red-wine dress.", "If red wine was a dress, she would be a captivating blend of elegance and complexity."),
+  mk(2, "fashion-illustrations", "The Corn-row dress.", "Inspired by the Nigerian corn row “all-back” traditional hairstyles."),
+  mk(3, "fashion-illustrations", "The Teyana Taylor’s 2025 Met gala inspired outfit."),
 
-  // Section 2: The Corn-row dress (seq 7-10)
-  ...Array.from({ length: 4 }, (_, i) => mk(7 + i, "fashion-illustrations")),
-
-  // Section 3: The Teyana Taylor's 2025 Met gala inspired outfit (seq 11-14)
-  ...Array.from({ length: 4 }, (_, i) => mk(11 + i, "fashion-illustrations")),
+  // Placeholder (seq 4-14) until the next PDF pages are done
+  ...Array.from({ length: 11 }, (_, i) => mk(4 + i, "fashion-illustrations")),
 
   // Section 4: The Eden collection (seq 15-18)
   ...Array.from({ length: 4 }, (_, i) => mk(15 + i, "fashion-illustrations")),
@@ -109,35 +111,27 @@ export const ARTWORKS_103: Artwork[] = [
   ...Array.from({ length: 7 }, (_, i) => mk(37 + i, "fashion-illustrations")),
 
   // Section 9: Bridal Designs (seq 44-50)
-  ...Array.from({ length: 7 }, (_, i) => mk(44 + i, "bridal-designs")),
+  ...Array.from({ length: 4 }, (_, i) => mk(44 + i, "bridal-designs")),
 
   // Section 10: Ta lo pa chief Shoe collection (seq 51-58)
-  ...Array.from({ length: 8 }, (_, i) => mk(51 + i, "shoes")),
+  ...Array.from({ length: 5 }, (_, i) => mk(48 + i, "shoes")),
 
   // Section 11: The ride or die bags (seq 59-65)
-  ...Array.from({ length: 7 }, (_, i) => mk(59 + i, "bags")),
+  ...Array.from({ length: 2 }, (_, i) => mk(53 + i, "bags")),
 
   // Section 12: The sisi Eko bag collection (seq 66-72)
-  ...Array.from({ length: 7 }, (_, i) => mk(66 + i, "bags")),
+  ...Array.from({ length: 6 }, (_, i) => mk(55 + i, "bags")),
+  ...Array.from({ length: 27 }, (_, i) => mk(61 + i, "single-illustrations")),
 
-  // Section 13: Single Illustrations (seq 73-80)
-  ...Array.from({ length: 8 }, (_, i) => mk(73 + i, "single-illustrations")),
+  // Malta Guinness (seq 88)
+  mk(88, "product-illustrations"),
 
-  // Section 14: IWD theme inspired Illustrations (seq 81-86)
-  ...Array.from({ length: 6 }, (_, i) => mk(81 + i, "single-illustrations")),
+  // Birthday & Couple (seq 89-97)
+  ...Array.from({ length: 9 }, (_, i) => mk(89 + i, "birthday-couple")),
 
-  // Section 15: Christmas and New year illustrations (seq 87-91)
-  ...Array.from({ length: 5 }, (_, i) => mk(87 + i, "single-illustrations")),
+  // Book Covers (seq 98)
+  mk(98, "book-covers"),
 
-  // Section 16: Malta Guinness (seq 92)
-  mk(92, "product-illustrations"),
-
-  // Section 17: Birthday & Couple Illustrations (seq 93-101)
-  ...Array.from({ length: 9 }, (_, i) => mk(93 + i, "birthday-couple")),
-
-  // Section 18: Book Covers (seq 102)
-  mk(102, "book-covers"),
-
-  // Section 19: Event Programs (seq 103)
-  mk(103, "event-programs"),
+  // Event Programs (seq 99-103)
+  ...Array.from({ length: 5 }, (_, i) => mk(99 + i, "event-programs")),
 ];

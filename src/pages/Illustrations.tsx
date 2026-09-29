@@ -139,9 +139,8 @@ const Illustrations = () => {
               <p className="text-xs font-semibold tracking-widest text-gray-600 uppercase mb-8">
                 Lifestyle Illustration
               </p>
-              {/* First 4 */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                {lifestyleChapters.slice(0, 4).map((chapterId) => {
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+                {lifestyleChapters.map((chapterId) => {
                   const chapter = CHAPTERS.find((c) => c.id === chapterId);
                   const artworksInCategory = ARTWORKS_103.filter(
                     (a) => a.chapter === chapterId
@@ -174,41 +173,6 @@ const Illustrations = () => {
                   );
                 })}
               </div>
-              {/* Last 1 - centered */}
-              <div className="flex justify-start">
-                {lifestyleChapters.slice(4).map((chapterId) => {
-                  const chapter = CHAPTERS.find((c) => c.id === chapterId);
-                  const artworksInCategory = ARTWORKS_103.filter(
-                    (a) => a.chapter === chapterId
-                  );
-                  return (
-                    <motion.div
-                      key={chapterId}
-                      variants={fadeInUp}
-                      className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow w-full md:w-1/4"
-                    >
-                      <div className="aspect-square bg-gray-100 overflow-hidden">
-                        {artworksInCategory[0] && (
-                          <img
-                            src={artworksInCategory[0].image}
-                            alt={chapter?.name}
-                            className="w-full h-full object-cover"
-                          />
-                        )}
-                      </div>
-                      <div className="p-4">
-                        <h3 className="text-sm font-bold text-gray-900">
-                          {chapter?.name}
-                        </h3>
-                        <p className="text-xs text-gray-600">
-                          {artworksInCategory.length} piece
-                          {artworksInCategory.length !== 1 ? "s" : ""}
-                        </p>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
             </motion.div>
           </div>
         </section>
@@ -216,7 +180,7 @@ const Illustrations = () => {
         {/* 103 Artworks in Sections - 3 column grid */}
         <section className="py-20 px-6 bg-white">
           <div className="mx-auto max-w-6xl">
-            {SECTIONS.slice(0, 19).map((section) => {
+            {SECTIONS.map((section) => {
               const artworks = getArtworksBySection(section.id);
               if (artworks.length === 0) return null;
 
@@ -229,21 +193,20 @@ const Illustrations = () => {
                   viewport={{ once: true, amount: 0.1 }}
                   transition={{ duration: 0.6 }}
                 >
-                  {/* Section Header with Separator */}
-                  <div className="mb-12">
-                    {/* Top Separator Line */}
-                    <div className="h-px bg-gray-300 mb-6"></div>
-
-                    {/* Section Title and Description */}
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">
-                      {section.name}
-                    </h3>
-                    {section.description && (
-                      <p className="text-sm text-gray-600 mb-6">
-                        {section.description}
-                      </p>
-                    )}
-                  </div>
+                  {/* Separator line between sections */}
+                  <div className="h-px bg-gray-300 mb-10"></div>
+                  {section.name && (
+                    <div className="mb-10">
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">
+                        {section.name}
+                      </h3>
+                      {section.description && (
+                        <p className="text-sm text-gray-600">
+                          {section.description}
+                        </p>
+                      )}
+                    </div>
+                  )}
 
                   {/* Artworks Grid - 3 columns */}
                   <motion.div
@@ -259,19 +222,24 @@ const Illustrations = () => {
                         variants={fadeInUp}
                         className="flex flex-col"
                       >
-                        {/* Image */}
-                        <div className="mb-4 overflow-hidden rounded-lg bg-gray-100 aspect-square">
+                        {/* Full artwork, uncropped */}
+                        <div className="mb-5 overflow-hidden bg-gray-100">
                           <img
                             src={artwork.image}
                             alt={artwork.title || "Artwork"}
-                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                            className="w-full h-auto block"
                             loading="lazy"
                           />
                         </div>
 
-                        {/* Description (appears below image like in PDF) */}
+                        {/* Title + description sit directly under the artwork */}
+                        {artwork.title && (
+                          <h4 className="text-base font-bold text-gray-900 mb-2">
+                            {artwork.title}
+                          </h4>
+                        )}
                         {artwork.story && (
-                          <p className="text-xs text-gray-600 leading-relaxed">
+                          <p className="text-sm text-gray-600 leading-relaxed">
                             {artwork.story}
                           </p>
                         )}
