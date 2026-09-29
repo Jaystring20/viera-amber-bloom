@@ -216,30 +216,33 @@ const Illustrations = () => {
         {/* 103 Artworks in Sections - 3 column grid */}
         <section className="py-20 px-6 bg-white">
           <div className="mx-auto max-w-6xl">
-            {SECTIONS.slice(0, 16).map((section) => {
+            {SECTIONS.slice(0, 19).map((section) => {
               const artworks = getArtworksBySection(section.id);
               if (artworks.length === 0) return null;
-
-              // Check if this is one of the first 3 sections (first 30 artworks get full descriptions)
-              const showDescriptions = section.number <= 3;
 
               return (
                 <motion.div
                   key={section.id}
-                  className="mb-24"
+                  className="mb-20"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.1 }}
                   transition={{ duration: 0.6 }}
                 >
-                  {/* Section Header */}
+                  {/* Section Header with Separator */}
                   <div className="mb-12">
-                    <p className="text-xs font-semibold tracking-widest text-gray-600 uppercase mb-2">
+                    {/* Top Separator Line */}
+                    <div className="h-px bg-gray-300 mb-6"></div>
+
+                    {/* Section Title and Description */}
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
                       {section.name}
-                    </p>
-                    <h3 className="text-2xl font-bold text-gray-900">
-                      Fashion Illustration: Fashion Illustrations
                     </h3>
+                    {section.description && (
+                      <p className="text-sm text-gray-600 mb-6">
+                        {section.description}
+                      </p>
+                    )}
                   </div>
 
                   {/* Artworks Grid - 3 columns */}
@@ -260,23 +263,18 @@ const Illustrations = () => {
                         <div className="mb-4 overflow-hidden rounded-lg bg-gray-100 aspect-square">
                           <img
                             src={artwork.image}
-                            alt={artwork.title}
+                            alt={artwork.title || "Artwork"}
                             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                             loading="lazy"
                           />
                         </div>
 
-                        {/* Title and Description */}
-                        <div>
-                          <h4 className="text-sm font-bold text-gray-900 mb-1">
-                            {artwork.title}
-                          </h4>
-                          {showDescriptions && artwork.story && (
-                            <p className="text-xs text-gray-600 leading-relaxed">
-                              {artwork.story}
-                            </p>
-                          )}
-                        </div>
+                        {/* Description (appears below image like in PDF) */}
+                        {artwork.story && (
+                          <p className="text-xs text-gray-600 leading-relaxed">
+                            {artwork.story}
+                          </p>
+                        )}
                       </motion.div>
                     ))}
                   </motion.div>
