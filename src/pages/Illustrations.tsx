@@ -14,9 +14,9 @@ const Illustrations = () => {
   const browseInView = useInView(browseRef, { once: true, amount: "some" });
   const [viewerSeq, setViewerSeq] = useState<number | null>(null);
 
-  // Full-screen swipe gallery is a phone experience; desktop keeps the grid.
+  // Full-screen swipe gallery is for phones and tablets; laptops/desktops keep the grid.
   const openViewer = (seq: number) => {
-    if (window.matchMedia("(max-width: 767px)").matches) setViewerSeq(seq);
+    if (window.matchMedia("(max-width: 1023px)").matches) setViewerSeq(seq);
   };
 
   // Get artworks by section
@@ -162,7 +162,7 @@ const Illustrations = () => {
               <p className="text-xs font-semibold tracking-widest text-gray-600 uppercase mb-8">
                 Lifestyle Illustration
               </p>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                 {lifestyleChapters.map((chapterId) => {
                   const chapter = CHAPTERS.find((c) => c.id === chapterId);
                   const artworksInCategory = ARTWORKS_103.filter(
@@ -248,7 +248,7 @@ const Illustrations = () => {
 
                   {/* Desktop: 3-column grid. Phone: sideways swipe strip that opens the full-screen gallery */}
                   <motion.div
-                    className="-mx-6 flex snap-x snap-mandatory items-start gap-4 overflow-x-auto px-6 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:grid-cols-3 md:gap-8 md:overflow-visible md:px-0 md:pb-0"
+                    className="-mx-6 flex snap-x snap-mandatory items-start gap-4 overflow-x-auto px-6 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:grid-cols-2 md:gap-8 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-3"
                     variants={staggerContainer}
                     initial="hidden"
                     whileInView="visible"
