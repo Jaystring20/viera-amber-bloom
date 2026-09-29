@@ -213,7 +213,7 @@ const Illustrations = () => {
           </div>
         </section>
 
-        {/* 103 Artworks - Each Collection is a Separate Contained Unit */}
+        {/* 103 Artworks in Sections - 3 column grid */}
         <section className="py-20 px-6 bg-white">
           <div className="mx-auto max-w-6xl">
             {SECTIONS.slice(0, 19).map((section) => {
@@ -223,25 +223,29 @@ const Illustrations = () => {
               return (
                 <motion.div
                   key={section.id}
-                  className="mb-24 pb-12 border-b border-gray-200 last:border-b-0"
+                  className="mb-20"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.1 }}
                   transition={{ duration: 0.6 }}
                 >
-                  {/* Collection Title and Description - ABOVE the artworks */}
-                  <div className="mb-8">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  {/* Section Header with Separator */}
+                  <div className="mb-12">
+                    {/* Top Separator Line */}
+                    <div className="h-px bg-gray-300 mb-6"></div>
+
+                    {/* Section Title and Description */}
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
                       {section.name}
                     </h3>
                     {section.description && (
-                      <p className="text-base text-gray-600 leading-relaxed max-w-2xl">
+                      <p className="text-sm text-gray-600 mb-6">
                         {section.description}
                       </p>
                     )}
                   </div>
 
-                  {/* Collection Artworks Grid - 3 columns for this collection only */}
+                  {/* Artworks Grid - 3 columns */}
                   <motion.div
                     className="grid grid-cols-1 md:grid-cols-3 gap-8"
                     variants={staggerContainer}
@@ -255,7 +259,7 @@ const Illustrations = () => {
                         variants={fadeInUp}
                         className="flex flex-col"
                       >
-                        {/* Image - Clean display */}
+                        {/* Image */}
                         <div className="mb-4 overflow-hidden rounded-lg bg-gray-100 aspect-square">
                           <img
                             src={artwork.image}
@@ -265,7 +269,7 @@ const Illustrations = () => {
                           />
                         </div>
 
-                        {/* Description beneath each artwork (if available) */}
+                        {/* Description (appears below image like in PDF) */}
                         {artwork.story && (
                           <p className="text-xs text-gray-600 leading-relaxed">
                             {artwork.story}
