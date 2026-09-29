@@ -11,7 +11,7 @@ import {
   inViewProps,
   useReducedVariants,
 } from "@/lib/animations";
-import { CHAPTERS, ARTWORKS as ALL_ARTWORKS } from "@/lib/gallery-data";
+import { CHAPTERS, ARTWORKS_103 } from "@/lib/gallery-data";
 import BrandFilm from "@/components/BrandFilm";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -27,29 +27,29 @@ interface PreviewCard {
 // ─── Data: Featured artworks carousel (expanded for richer preview) ─────────────
 // Show multiple artworks from across chapters for more visual richness
 const FEATURED_ARTWORKS = [
-  // Muses: portraits with strong presence
-  { id: "art-0024", artwork: ALL_ARTWORKS.find((a) => a.n === 24)! }, // The Hatmaker
-  { id: "art-0064", artwork: ALL_ARTWORKS.find((a) => a.n === 64)! }, // Jacqueline
+  // Fashion section sample
+  { id: "art-0001", artwork: ARTWORKS_103.find((a) => a.seq === 1)! },   // Silhouette in Motion
+  { id: "art-0002", artwork: ARTWORKS_103.find((a) => a.seq === 2)! },   // Golden Hour Elegance
 
-  // Atelier: fashion design mastery
-  { id: "art-0036", artwork: ALL_ARTWORKS.find((a) => a.n === 36)! }, // The Ada-Set
-  { id: "art-0038", artwork: ALL_ARTWORKS.find((a) => a.n === 38)! }, // The Ibari-Set
+  // Bridal section sample
+  { id: "art-0053", artwork: ARTWORKS_103.find((a) => a.seq === 53)! },  // Bridal Designs
+  { id: "art-0054", artwork: ARTWORKS_103.find((a) => a.seq === 54)! },  // Bridal Designs
 
-  // Lagos: iconic, witty product design
-  { id: "art-0029", artwork: ALL_ARTWORKS.find((a) => a.n === 29)! }, // Danfo
-  { id: "art-0030", artwork: ALL_ARTWORKS.find((a) => a.n === 30)! }, // Last Bus to Oshodi
+  // Shoes section sample
+  { id: "art-0057", artwork: ARTWORKS_103.find((a) => a.seq === 57)! },  // Shoes
+  { id: "art-0058", artwork: ARTWORKS_103.find((a) => a.seq === 58)! },  // Shoes
 
-  // Heritage: regal, ceremonial
-  { id: "art-0044", artwork: ALL_ARTWORKS.find((a) => a.n === 44)! }, // Trial by Fire
-  { id: "art-0050", artwork: ALL_ARTWORKS.find((a) => a.n === 50)! }, // Coronation
+  // Bags section sample
+  { id: "art-0062", artwork: ARTWORKS_103.find((a) => a.seq === 62)! },  // Bags
+  { id: "art-0063", artwork: ARTWORKS_103.find((a) => a.seq === 63)! },  // Bags
 
-  // Wearable: confidence + glamour
-  { id: "art-0073", artwork: ALL_ARTWORKS.find((a) => a.n === 73)! }, // The Golden Hour
-  { id: "art-0001", artwork: ALL_ARTWORKS.find((a) => a.n === 1)! },  // Pink Means Business
+  // Single Illustrations section sample
+  { id: "art-0070", artwork: ARTWORKS_103.find((a) => a.seq === 70)! },  // Single Illustrations
+  { id: "art-0071", artwork: ARTWORKS_103.find((a) => a.seq === 71)! },  // Single Illustrations
 
-  // #5for5: powerful activism
-  { id: "art-0052", artwork: ALL_ARTWORKS.find((a) => a.n === 52)! }, // Release Them
-  { id: "art-0054", artwork: ALL_ARTWORKS.find((a) => a.n === 54)! }, // Served Hot
+  // Product Illustrations
+  { id: "art-0088", artwork: ARTWORKS_103.find((a) => a.seq === 88)! },  // Product Illustrations
+  { id: "art-0089", artwork: ARTWORKS_103.find((a) => a.seq === 89)! },  // Birthday & Couple
 ];
 
 const PREVIEW_CARDS: PreviewCard[] = FEATURED_ARTWORKS.map((item) => {
@@ -71,13 +71,16 @@ const PREVIEW_CARDS: PreviewCard[] = FEATURED_ARTWORKS.map((item) => {
 // be shown in the carousel while that segment plays in the brand film.
 //
 // Artwork index reference:
-//   0: The Hatmaker   1: Jacqueline     2: The Ada-Set     3: The Ibari-Set
-//   4: Danfo          5: Last Bus       6: Trial by Fire   7: Coronation
-//   8: The Golden Hr  9: Pink Means Biz 10: Release Them  11: Served Hot
+//   0: Silhouette in Motion      1: Golden Hour Elegance
+//   2: Bridal Designs            3: Bridal Designs
+//   4: Shoes                      5: Shoes
+//   6: Bags                       7: Bags
+//   8: Single Illustrations      9: Single Illustrations
+//   10: Product Illustrations    11: Birthday & Couple
 //
 // ⚠️ FILL IN: Watch public/brand-film.mp4 and replace the placeholder entries
 // below with the real second-ranges when each artwork appears in the video.
-// Example: { from: 12, to: 18, artworkIndex: 3 } = Ibari-Set appears 12–18s.
+// Example: { from: 12, to: 18, artworkIndex: 3 } = artwork index 3 appears 12–18s.
 const FILM_ARTWORK_MAP: { from: number; to: number; artworkIndex: number }[] = [
   { from: 0, to: 8, artworkIndex: 0 },
   { from: 8, to: 15, artworkIndex: 1 },
