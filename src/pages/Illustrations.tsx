@@ -3,14 +3,21 @@ import Footer from "@/components/Footer";
 import BrandFilm from "@/components/BrandFilm";
 import RotatingHeroCarousel from "@/components/sections/RotatingHeroCarousel";
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { CHAPTERS, SECTIONS, ARTWORKS_103 } from "@/lib/gallery-data";
 import { ILLUSTRATION_CATEGORIES, categoryAnchorId, scrollToCategory } from "@/lib/illustration-categories";
 import { ARTWORK_DIMENSIONS } from "@/lib/artwork-dimensions";
+import ArtworkViewer from "@/components/sections/ArtworkViewer";
 
 const Illustrations = () => {
   const browseRef = useRef<HTMLDivElement>(null);
   const browseInView = useInView(browseRef, { once: true, amount: "some" });
+  const [viewerSeq, setViewerSeq] = useState<number | null>(null);
+
+  // Full-screen swipe gallery is a phone experience; desktop keeps the grid.
+  const openViewer = (seq: number) => {
+    if (window.matchMedia("(max-width: 767px)").matches) setViewerSeq(seq);
+  };
 
   // Get artworks by section
   const getArtworksBySection = (sectionId: string) => {
@@ -239,9 +246,9 @@ const Illustrations = () => {
                     </div>
                   )}
 
-                  {/* Artworks Grid - 3 columns */}
+                  {/* Desktop: 3-column grid. Phone: sideways swipe strip that opens the full-screen gallery */}
                   <motion.div
-                    className="grid grid-cols-1 md:grid-cols-3 gap-8"
+                    className="-mx-6 flex snap-x snap-mandatory items-start gap-4 overflow-x-auto px-6 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:grid-cols-3 md:gap-8 md:overflow-visible md:px-0 md:pb-0"
                     variants={staggerContainer}
                     initial="hidden"
                     whileInView="visible"
@@ -251,10 +258,15 @@ const Illustrations = () => {
                       <motion.div
                         key={artwork.id}
                         variants={fadeInUp}
-                        className="flex flex-col"
+                        className="flex w-[78vw] max-w-[360px] shrink-0 snap-center flex-col md:w-auto md:max-w-none"
                       >
                         {/* Full artwork, uncropped */}
-                        <div className="mb-5 overflow-hidden bg-gray-100">
+                        <button
+                          type="button"
+                          onClick={() => openViewer(artwork.seq)}
+                          aria-label={`View ${artwork.title || "artwork"} full screen`}
+                          className="mb-5 block cursor-pointer overflow-hidden bg-gray-100 text-left md:cursor-default"
+                        >
                           <img
                             src={artwork.image}
                             alt={artwork.title || "Artwork"}
@@ -263,7 +275,7 @@ const Illustrations = () => {
                             className="w-full h-auto block"
                             loading="lazy"
                           />
-                        </div>
+                        </button>
 
                         {/* Title + description sit directly under the artwork */}
                         {artwork.title && (
@@ -287,6 +299,9 @@ const Illustrations = () => {
       </main>
 
       <Footer />
+      {viewerSeq !== null && (
+        <ArtworkViewer startSeq={viewerSeq} onClose={() => setViewerSeq(null)} />
+      )}
     </div>
   );
 };
