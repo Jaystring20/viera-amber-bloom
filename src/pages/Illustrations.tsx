@@ -8,7 +8,7 @@ import { CHAPTERS, SECTIONS, ARTWORKS_103 } from "@/lib/gallery-data";
 
 const Illustrations = () => {
   const browseRef = useRef<HTMLDivElement>(null);
-  const browseInView = useInView(browseRef, { once: true, amount: 0.2 });
+  const browseInView = useInView(browseRef, { once: true, amount: "some" });
 
   // Get artworks by section
   const getArtworksBySection = (sectionId: string) => {
@@ -94,7 +94,7 @@ const Illustrations = () => {
               <p className="text-xs font-semibold tracking-widest text-gray-600 uppercase mb-8">
                 Fashion Illustration
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {fashionChapters.map((chapterId) => {
                   const chapter = CHAPTERS.find((c) => c.id === chapterId);
                   const artworksInCategory = ARTWORKS_103.filter(
@@ -139,7 +139,7 @@ const Illustrations = () => {
               <p className="text-xs font-semibold tracking-widest text-gray-600 uppercase mb-8">
                 Lifestyle Illustration
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
                 {lifestyleChapters.map((chapterId) => {
                   const chapter = CHAPTERS.find((c) => c.id === chapterId);
                   const artworksInCategory = ARTWORKS_103.filter(
@@ -190,7 +190,7 @@ const Illustrations = () => {
                   className="mb-20"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.1 }}
+                  viewport={{ once: true, amount: "some" }}
                   transition={{ duration: 0.6 }}
                 >
                   {/* Separator line between sections */}
@@ -214,7 +214,7 @@ const Illustrations = () => {
                     variants={staggerContainer}
                     initial="hidden"
                     whileInView="visible"
-                    viewport={{ once: true, amount: 0.1 }}
+                    viewport={{ once: true, amount: "some" }}
                   >
                     {artworks.map((artwork) => (
                       <motion.div
