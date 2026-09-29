@@ -1,0 +1,42 @@
+MANUAL RENAME LIST - 27 Files
+=====================================
+Rename FROM (old) → TO (new PDF #)
+
+artwork_0051.webp → artwork_0014.webp
+artwork_0052.webp → artwork_0026.webp
+artwork_0053.webp → artwork_0030.webp
+artwork_0054.webp → artwork_0028.webp
+artwork_0055.webp → artwork_0027.webp
+artwork_0056.webp → artwork_0029.webp
+artwork_0057.webp → artwork_0059.webp
+artwork_0058.webp → artwork_0055.webp
+artwork_0059.webp → artwork_0056.webp
+artwork_0060.webp → artwork_0057.webp
+artwork_0061.webp → artwork_0058.webp
+artwork_0066.webp → artwork_0034.webp
+artwork_0067.webp → artwork_0032.webp
+artwork_0073.webp → artwork_0002.webp
+artwork_0081.webp → artwork_0090.webp
+artwork_0086.webp → artwork_0091.webp
+artwork_0087.webp → artwork_0092.webp
+artwork_0089.webp → artwork_0096.webp
+artwork_0090.webp → artwork_0100.webp (CHECK: 0100 may already exist)
+artwork_0091.webp → artwork_0098.webp
+artwork_0092.webp → artwork_0103.webp
+artwork_0094.webp → artwork_0099.webp
+artwork_0095.webp → artwork_0097.webp
+artwork_0096.webp → artwork_0101.webp (CHECK: 0101 may already exist)
+artwork_0097.webp → artwork_0102.webp
+artwork_0098.webp → artwork_0105.webp
+artwork_0099.webp → artwork_0067.webp
+
+SPECIAL NOTES:
+- artwork_0090 & 0096 map to artwork_0100 & 0101 which may already exist from a previous rename
+- artwork_0078 & 0079 both map to artwork_0007 (skip both - collision)
+- Check if artwork_0100, 0101, 0102, 0103, etc. exist before renaming
+
+INSTRUCTIONS:
+1. Open File Explorer at: C:\Users\DELL\projects\viera-amber\public\artworks
+2. Rename each file according to the list above
+3. Or use PowerShell:
+   Rename-Item "artwork_XXXX.webp" "artwork_YYYY.webp" -Path "C:\Users\DELL\projects\viera-amber\public\artworks"

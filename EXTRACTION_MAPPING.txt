@@ -1,0 +1,7 @@
+EXTRACTION MAPPING - Illustrations Pack
+================================================================================
+Total images extracted: 103
+Source: C:\Users\DELL\Downloads\Illustrations pack.pdf
+Output folder: C:\Users\DELL\projects\viera-amber\public\artworks
+================================================================================
+
