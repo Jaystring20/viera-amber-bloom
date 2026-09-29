@@ -5,7 +5,8 @@ import RotatingHeroCarousel from "@/components/sections/RotatingHeroCarousel";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { CHAPTERS, SECTIONS, ARTWORKS_103 } from "@/lib/gallery-data";
-import { categoryAnchorId, scrollToCategory } from "@/lib/illustration-categories";
+import { ILLUSTRATION_CATEGORIES, categoryAnchorId, scrollToCategory } from "@/lib/illustration-categories";
+import { ARTWORK_DIMENSIONS } from "@/lib/artwork-dimensions";
 
 const Illustrations = () => {
   const browseRef = useRef<HTMLDivElement>(null);
@@ -203,18 +204,16 @@ const Illustrations = () => {
             {SECTIONS.map((section) => {
               const artworks = getArtworksBySection(section.id);
               if (artworks.length === 0) return null;
+              const anchorChapter = Object.keys(chapterAnchors).find(
+                (k) => chapterAnchors[k] === section.id
+              );
+              const anchorCategory = ILLUSTRATION_CATEGORIES.find((c) => c.id === anchorChapter);
 
               return (
                 <motion.div
                   key={section.id}
-                  id={
-                    Object.keys(chapterAnchors).find((k) => chapterAnchors[k] === section.id)
-                      ? categoryAnchorId(
-                          Object.keys(chapterAnchors).find((k) => chapterAnchors[k] === section.id)!
-                        )
-                      : undefined
-                  }
-                  className="mb-20 scroll-mt-28"
+                  id={anchorChapter ? categoryAnchorId(anchorChapter) : undefined}
+                  className="mb-20 scroll-mt-4"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: "some" }}
@@ -222,6 +221,11 @@ const Illustrations = () => {
                 >
                   {/* Separator line between sections */}
                   <div className="h-px bg-gray-300 mb-10"></div>
+                  {anchorCategory && (
+                    <p className="mb-8 text-xs font-semibold uppercase tracking-widest text-gray-600">
+                      {anchorCategory.umbrella === "fashion" ? "Fashion Illustration" : "Lifestyle Illustration"}: {anchorCategory.name}
+                    </p>
+                  )}
                   {section.name && (
                     <div className="mb-10">
                       <h3 className="text-xl font-bold text-gray-900 mb-2">
@@ -254,6 +258,8 @@ const Illustrations = () => {
                           <img
                             src={artwork.image}
                             alt={artwork.title || "Artwork"}
+                            width={ARTWORK_DIMENSIONS[artwork.seq]?.[0]}
+                            height={ARTWORK_DIMENSIONS[artwork.seq]?.[1]}
                             className="w-full h-auto block"
                             loading="lazy"
                           />

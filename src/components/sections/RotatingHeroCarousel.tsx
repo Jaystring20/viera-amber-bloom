@@ -34,10 +34,11 @@ interface RotatingHeroCarouselProps {
 export const RotatingHeroCarousel = ({ onCategorySelect }: RotatingHeroCarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [focused, setFocused] = useState(false);
+  const [hoveringText, setHoveringText] = useState(false);
   const reduced = useReducedMotion();
   const count = HERO_CATEGORIES.length;
   const current = HERO_CATEGORIES[currentIndex];
-  const playing = !reduced && !focused;
+  const playing = !reduced && !focused && !hoveringText;
 
   const goTo = (index: number) => setCurrentIndex((index + count) % count);
 
@@ -122,7 +123,7 @@ export const RotatingHeroCarousel = ({ onCategorySelect }: RotatingHeroCarouselP
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={fade}
-                className="relative h-auto w-auto max-w-full max-h-[44vh] object-contain md:max-h-[min(640px,68vh)]"
+                className="relative h-auto w-auto max-w-full max-h-[46vh] object-contain md:max-h-[min(720px,76vh)] md:max-w-[40vw]"
                 style={{
                   boxShadow: "0 30px 70px rgba(17,17,17,0.28), 0 3px 8px rgba(17,17,17,0.12)",
                   border: "12px solid #FFFFFF",
@@ -132,7 +133,11 @@ export const RotatingHeroCarousel = ({ onCategorySelect }: RotatingHeroCarouselP
           </div>
 
           {/* Title block */}
-          <div className="text-center md:order-1 md:text-left">
+          <div
+            className="text-center md:order-1 md:text-left"
+            onMouseEnter={() => setHoveringText(true)}
+            onMouseLeave={() => setHoveringText(false)}
+          >
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={`text-${current.id}`}
