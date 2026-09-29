@@ -1,13 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { ILLUSTRATION_CATEGORIES, type IllustrationCategory } from "@/lib/illustration-categories";
+import { ARTWORKS_103 } from "@/lib/gallery-data";
 
-// Was a hardcoded 6-item list here (Couture Gowns, Bridal Designs, Lagos
-// Icons, Conceptual Bags, Jacqueline Portraits, #SOROSOKE Campaign) whose
-// ids mostly didn't match anything real — see illustration-categories.ts
-// for the full story. HeroCategory is now just an alias so downstream code
-// (slide index math, onCategorySelect prop) didn't need reshaping.
 export type HeroCategory = IllustrationCategory;
 export const HERO_CATEGORIES: HeroCategory[] = ILLUSTRATION_CATEGORIES;
 
@@ -26,317 +22,232 @@ const SCROLL_WORDS = [
   "Expression",
 ];
 
+const AUTOPLAY_MS = 3000;
+const ACCENT = "#C2610A";
+
+const pieceCount = (id: string) => ARTWORKS_103.filter((a) => a.chapter === id).length;
+
 interface RotatingHeroCarouselProps {
   onCategorySelect?: (category: HeroCategory) => void;
 }
 
 export const RotatingHeroCarousel = ({ onCategorySelect }: RotatingHeroCarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
+  const [focused, setFocused] = useState(false);
   const reduced = useReducedMotion();
-  const autoplayRef = useRef<NodeJS.Timeout>();
-
+  const count = HERO_CATEGORIES.length;
   const current = HERO_CATEGORIES[currentIndex];
+  const playing = !reduced && !focused;
 
-  const slideVariants = {
-    enter: (dir: number) => ({
-      x: dir > 0 ? 1000 : -1000,
-      opacity: 0,
-    }),
-    center: {
-      zIndex: 1,
-      x: 0,
-      opacity: 1,
-    },
-    exit: (dir: number) => ({
-      zIndex: 0,
-      x: dir < 0 ? 1000 : -1000,
-      opacity: 0,
-    }),
-  };
+  const goTo = (index: number) => setCurrentIndex((index + count) % count);
 
-  const paginate = (newDirection: number) => {
-    setDirection(newDirection);
-    setCurrentIndex((prev) => {
-      let next = prev + newDirection;
-      if (next >= HERO_CATEGORIES.length) next = 0;
-      if (next < 0) next = HERO_CATEGORIES.length - 1;
-      return next;
-    });
-  };
-
-  // Auto-rotate every 5 seconds
+  // Every change (automatic or manual) waits a full 3s before the next advance,
+  // so clicking an arrow never stops the slider and never double-skips.
   useEffect(() => {
-    if (reduced) return;
+    if (!playing) return;
+    const id = setTimeout(() => {
+      if (!document.hidden) setCurrentIndex((i) => (i + 1) % count);
+    }, AUTOPLAY_MS);
+    return () => clearTimeout(id);
+  }, [currentIndex, playing, count]);
 
-    autoplayRef.current = setInterval(() => {
-      setDirection(1);
-      setCurrentIndex((prev) => (prev + 1) % HERO_CATEGORIES.length);
-    }, 5000);
+  // Warm the next slide's image so the swap is instant.
+  useEffect(() => {
+    const img = new Image();
+    img.decoding = "async";
+    img.src = `/artworks/${HERO_CATEGORIES[(currentIndex + 1) % count].image}`;
+  }, [currentIndex, count]);
 
-    return () => {
-      if (autoplayRef.current) clearInterval(autoplayRef.current);
-    };
-  }, [reduced]);
-
-  const handleNavClick = () => {
-    if (autoplayRef.current) clearInterval(autoplayRef.current);
-  };
+  const fade = reduced ? { duration: 0 } : { duration: 0.3 };
+  const arrowClass =
+    "flex h-12 w-12 items-center justify-center rounded-full border border-[#111] bg-white text-[#111] shadow-[0_6px_20px_rgba(17,17,17,0.14)] transition-transform hover:scale-105 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#111]";
 
   return (
-    <div
+    <section
+      aria-roledescription="carousel"
+      aria-label="Illustration categories"
       className="relative w-full overflow-hidden"
       style={{
-        minHeight: "800px",
-        backgroundColor: "#FAFAFA",
+        backgroundColor: `hsl(${current.hue} ${Math.min(current.sat, 55)}% 95%)`,
+        transition: reduced ? "none" : "background-color 600ms ease",
       }}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
     >
-      {/* Featured image - full background */}
-      <motion.div
-        key={`hero-bg-${currentIndex}`}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.6 }}
-        className="absolute inset-0"
-        style={{
-          backgroundImage: `url(/artworks/${current.image})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-        aria-hidden="true"
-      />
+      <div className="relative z-10">
+        {/* Side arrows: at the edges of the slide area, in view without scrolling */}
+        <button
+          type="button"
+          onClick={() => goTo(currentIndex - 1)}
+          aria-label="Previous category"
+          className={`${arrowClass} absolute left-3 top-[34%] z-20 md:left-6 md:top-1/2 md:-translate-y-1/2`}
+        >
+          <ChevronLeft size={22} />
+        </button>
+        <button
+          type="button"
+          onClick={() => goTo(currentIndex + 1)}
+          aria-label="Next category"
+          className={`${arrowClass} absolute right-3 top-[34%] z-20 md:right-6 md:top-1/2 md:-translate-y-1/2`}
+        >
+          <ChevronRight size={22} />
+        </button>
 
-      {/* Strong dark overlay - sophisticated contrast */}
-      <motion.div
-        key={`overlay-${currentIndex}`}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.6 }}
-        className="absolute inset-0"
-        style={{
-          background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.2) 70%, transparent 100%)",
-        }}
-        aria-hidden="true"
-      />
+        <div
+          className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-8 px-6 pb-2 pt-10 md:min-h-[600px] md:grid-cols-[1fr_auto] md:gap-12 md:px-24"
+          role="group"
+          aria-roledescription="slide"
+          aria-label={`${currentIndex + 1} of ${count}: ${current.name}`}
+        >
+          {/* Artwork: whole and sharp, never cropped or stretched */}
+          <div className="relative flex items-center justify-center md:order-2">
+            <div
+              aria-hidden="true"
+              className="absolute left-1/2 top-1/2 aspect-square w-[118%] -translate-x-1/2 -translate-y-1/2 rounded-full"
+              style={{
+                backgroundColor: `hsl(${current.hue} ${Math.min(current.sat, 60)}% 86%)`,
+                transition: reduced ? "none" : "background-color 600ms ease",
+              }}
+            />
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.img
+                key={`img-${current.id}`}
+                src={`/artworks/${current.image}`}
+                alt={`${current.name} illustration`}
+                width={600}
+                height={800}
+                decoding="async"
+                {...{ fetchpriority: currentIndex === 0 ? "high" : "auto" }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={fade}
+                className="relative h-auto w-auto max-w-full max-h-[44vh] object-contain md:max-h-[min(640px,68vh)]"
+                style={{
+                  boxShadow: "0 30px 70px rgba(17,17,17,0.28), 0 3px 8px rgba(17,17,17,0.12)",
+                  border: "12px solid #FFFFFF",
+                }}
+              />
+            </AnimatePresence>
+          </div>
 
-      {/* Content - centered text overlay */}
-      <div className="relative z-10 h-full flex flex-col items-center justify-center px-6" style={{ minHeight: "700px" }}>
-        <AnimatePresence initial={false} custom={direction} mode="wait">
-          <motion.div
-            key={`carousel-${currentIndex}`}
-            custom={direction}
-            variants={slideVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{
-              x: { type: "spring", stiffness: 300, damping: 30 },
-              opacity: { duration: 0.2 },
-            }}
-            className="flex flex-col items-center justify-center text-center"
-          >
-            <div style={{ maxWidth: 800 }}>
-              {/* Theme label - subtle, black on white, minimal */}
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
+          {/* Title block */}
+          <div className="text-center md:order-1 md:text-left">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={`text-${current.id}`}
+                initial={reduced ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                style={{
-                  fontFamily: "Montserrat, system-ui, sans-serif",
-                  fontSize: 11,
-                  fontWeight: 500,
-                  letterSpacing: "3px",
-                  textTransform: "uppercase",
-                  color: "#FFFFFF",
-                  marginBottom: 20,
-                  opacity: 0.8,
-                }}
+                exit={{ opacity: 0 }}
+                transition={fade}
+                className="flex flex-col items-center md:items-start"
               >
-                {current.umbrella === "fashion" ? "Fashion Illustration" : "Lifestyle Illustration"}
-              </motion.p>
-
-              {/* Category name - stark white, elegant serif */}
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="font-display"
-                style={{
-                  fontSize: "clamp(48px, 8vw, 84px)",
-                  fontWeight: 700,
-                  color: "#FFFFFF",
-                  marginBottom: 32,
-                  lineHeight: 1.05,
-                  letterSpacing: "-1px",
-                }}
-              >
-                {current.name}
-              </motion.h1>
-
-              {/* CTA button - strict black */}
-              <motion.button
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.3, duration: 0.4 }}
-                onClick={() => onCategorySelect?.(current)}
-                whileHover={reduced ? {} : { scale: 1.05, y: -2 }}
-                whileTap={reduced ? {} : { scale: 0.95 }}
-                style={{
-                  fontFamily: "Montserrat, system-ui, sans-serif",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  letterSpacing: "1.5px",
-                  textTransform: "uppercase",
-                  padding: "14px 44px",
-                  background: "#111111",
-                  color: "#FFFFFF",
-                  border: "2px solid #111111",
-                  borderRadius: 2,
-                  cursor: "pointer",
-                  transition: "all 300ms cubic-bezier(0.4, 0, 0.2, 1)",
-                }}
-              >
-                Explore Collection
-              </motion.button>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      {/* Word scroll carousel - below hero */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5, duration: 0.6 }}
-        className="relative z-5"
-        style={{
-          backgroundColor: "#FFFFFF",
-          padding: "24px 0",
-          borderTop: "1px solid #EBEBEB",
-          overflow: "hidden",
-        }}
-      >
-        <div style={{ position: "relative", width: "100%", overflow: "hidden" }}>
-          <motion.div
-            animate={{ x: [0, -2000] }}
-            transition={{
-              duration: 20,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-            style={{
-              display: "flex",
-              gap: 32,
-              whiteSpace: "nowrap",
-              paddingLeft: 24,
-            }}
-          >
-            {/* First set of words */}
-            {SCROLL_WORDS.map((word, idx) => (
-              <motion.span
-                key={`word-1-${idx}`}
-                style={{
-                  fontFamily: "Montserrat, system-ui, sans-serif",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                  color: "#111111",
-                  letterSpacing: "1px",
-                  textTransform: "uppercase",
-                  minWidth: "auto",
-                }}
-              >
-                {word} {idx < SCROLL_WORDS.length - 1 && "•"}
-              </motion.span>
-            ))}
-            {/* Second set for seamless loop */}
-            {SCROLL_WORDS.map((word, idx) => (
-              <motion.span
-                key={`word-2-${idx}`}
-                style={{
-                  fontFamily: "Montserrat, system-ui, sans-serif",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                  color: "#111111",
-                  letterSpacing: "1px",
-                  textTransform: "uppercase",
-                  minWidth: "auto",
-                }}
-              >
-                {word} {idx < SCROLL_WORDS.length - 1 && "•"}
-              </motion.span>
-            ))}
-          </motion.div>
+                <p
+                  className="mb-5 text-xs font-semibold uppercase"
+                  style={{ fontFamily: "Montserrat, system-ui, sans-serif", letterSpacing: "3px", color: ACCENT }}
+                >
+                  {current.umbrella === "fashion" ? "Fashion Illustration" : "Lifestyle Illustration"}
+                </p>
+                <h1
+                  className="font-display max-w-[20ch] pb-1"
+                  style={{
+                    fontSize: "clamp(38px, 4.6vw, 64px)",
+                    fontWeight: 700,
+                    color: "#111111",
+                    lineHeight: 1.05,
+                    letterSpacing: "-1px",
+                  }}
+                >
+                  {current.name}
+                </h1>
+                <p
+                  className="mt-4 text-base"
+                  style={{ fontFamily: "Montserrat, system-ui, sans-serif", color: "#444444" }}
+                >
+                  {pieceCount(current.id)} illustrations
+                </p>
+                <button
+                  type="button"
+                  onClick={() => onCategorySelect?.(current)}
+                  className="group mt-8 inline-flex min-h-[52px] items-center gap-3 whitespace-nowrap rounded-full bg-[#111] px-8 text-xs font-semibold uppercase tracking-[1.5px] text-white transition-transform hover:-translate-y-0.5 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#111]"
+                  style={{ fontFamily: "Montserrat, system-ui, sans-serif", cursor: "pointer" }}
+                >
+                  Explore Collection
+                  <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+                </button>
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
-      </motion.div>
 
-      {/* Navigation arrows - minimal black/white */}
-      <motion.button
-        onClick={() => {
-          handleNavClick();
-          paginate(-1);
-        }}
-        aria-label="Previous category"
-        className="absolute left-6 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full transition-colors"
-        style={{
-          background: "#FFFFFF",
-          border: "1px solid #111111",
-          color: "#111111",
-          cursor: "pointer",
-        }}
-        whileHover={reduced ? {} : { scale: 1.1, backgroundColor: "#111111", color: "#FFFFFF" }}
-        whileTap={reduced ? {} : { scale: 0.95 }}
-      >
-        <ChevronLeft size={20} />
-      </motion.button>
-
-      <motion.button
-        onClick={() => {
-          handleNavClick();
-          paginate(1);
-        }}
-        aria-label="Next category"
-        className="absolute right-6 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full transition-colors"
-        style={{
-          background: "#FFFFFF",
-          border: "1px solid #111111",
-          color: "#111111",
-          cursor: "pointer",
-        }}
-        whileHover={reduced ? {} : { scale: 1.1, backgroundColor: "#111111", color: "#FFFFFF" }}
-        whileTap={reduced ? {} : { scale: 0.95 }}
-      >
-        <ChevronRight size={20} />
-      </motion.button>
-
-      {/* Dot indicators - black */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-3">
-        {HERO_CATEGORIES.map((_, idx) => (
-          <motion.button
-            key={idx}
-            onClick={() => {
-              handleNavClick();
-              setDirection(idx > currentIndex ? 1 : -1);
-              setCurrentIndex(idx);
-            }}
-            animate={{
-              width: idx === currentIndex ? 28 : 8,
-              background: idx === currentIndex ? "#111111" : "#CCCCCC",
-            }}
-            transition={{ duration: 0.3 }}
-            style={{
-              height: 8,
-              borderRadius: 4,
-              border: "none",
-              cursor: "pointer",
-              padding: 0,
-            }}
-            aria-label={`Go to category ${idx + 1}`}
-          />
-        ))}
+        {/* Dots: the active one fills over 3s so the timing is visible */}
+        <div className="flex items-center justify-center pb-4">
+          {HERO_CATEGORIES.map((c, idx) => {
+            const active = idx === currentIndex;
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => goTo(idx)}
+                aria-label={`Go to ${c.name}`}
+                aria-current={active}
+                className="flex h-11 items-center justify-center px-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#111]"
+                style={{ cursor: "pointer", background: "none", border: "none" }}
+              >
+                <span
+                  className="relative block h-2 overflow-hidden rounded"
+                  style={{
+                    width: active ? 36 : 8,
+                    background: "rgba(17,17,17,0.22)",
+                    transition: reduced ? "none" : "width 300ms",
+                  }}
+                >
+                  {active && (
+                    <motion.span
+                      key={`fill-${currentIndex}-${playing}`}
+                      className="absolute inset-0 origin-left rounded"
+                      style={{ background: "#111111" }}
+                      initial={{ scaleX: playing ? 0 : 1 }}
+                      animate={{ scaleX: 1 }}
+                      transition={playing ? { duration: AUTOPLAY_MS / 1000, ease: "linear" } : { duration: 0 }}
+                    />
+                  )}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
+
+      {/* Word scroll ticker */}
+      <div
+        aria-hidden="true"
+        className="relative"
+        style={{ backgroundColor: "#FFFFFF", padding: "24px 0", borderTop: "1px solid #EBEBEB", borderBottom: "1px solid #EBEBEB", overflow: "hidden" }}
+      >
+        <motion.div
+          animate={reduced ? { x: 0 } : { x: [0, -2000] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          style={{ display: "flex", gap: 32, whiteSpace: "nowrap", paddingLeft: 24 }}
+        >
+          {[...SCROLL_WORDS, ...SCROLL_WORDS].map((word, idx) => (
+            <span
+              key={idx}
+              style={{
+                fontFamily: "Montserrat, system-ui, sans-serif",
+                fontSize: 14,
+                fontWeight: 600,
+                color: "#111111",
+                letterSpacing: "1px",
+                textTransform: "uppercase",
+              }}
+            >
+              {word} •
+            </span>
+          ))}
+        </motion.div>
+      </div>
+    </section>
   );
 };
 

@@ -5,6 +5,7 @@ import RotatingHeroCarousel from "@/components/sections/RotatingHeroCarousel";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { CHAPTERS, SECTIONS, ARTWORKS_103 } from "@/lib/gallery-data";
+import { categoryAnchorId, scrollToCategory } from "@/lib/illustration-categories";
 
 const Illustrations = () => {
   const browseRef = useRef<HTMLDivElement>(null);
@@ -29,6 +30,15 @@ const Illustrations = () => {
     "event-programs",
   ];
 
+  // First section of each chapter is the scroll target for the hero's "Explore Collection"
+  const chapterAnchors: Record<string, string> = {};
+  SECTIONS.forEach((sec) => {
+    const first = ARTWORKS_103.find((a) => a.seq === sec.seq_start);
+    if (first && sec.seq_start > 0 && !chapterAnchors[first.chapter]) {
+      chapterAnchors[first.chapter] = sec.id;
+    }
+  });
+
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
@@ -47,7 +57,7 @@ const Illustrations = () => {
       <NavBar />
       <main className="pt-20">
         {/* Hero Carousel */}
-        <RotatingHeroCarousel onCategorySelect={() => {}} />
+        <RotatingHeroCarousel onCategorySelect={(c) => scrollToCategory(c.id)} />
 
         {/* Behind the Work */}
         <section className="py-16 px-6 bg-white">
@@ -101,10 +111,15 @@ const Illustrations = () => {
                     (a) => a.chapter === chapterId
                   );
                   return (
-                    <motion.div
+                    <motion.a
                       key={chapterId}
+                      href={`#${categoryAnchorId(chapterId)}`}
                       variants={fadeInUp}
-                      className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        scrollToCategory(chapterId);
+                      }}
+                      className="block bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow text-left cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
                     >
                       <div className="aspect-square bg-gray-100 overflow-hidden">
                         {artworksInCategory[0] && (
@@ -124,7 +139,7 @@ const Illustrations = () => {
                           {artworksInCategory.length !== 1 ? "s" : ""}
                         </p>
                       </div>
-                    </motion.div>
+                    </motion.a>
                   );
                 })}
               </div>
@@ -146,10 +161,15 @@ const Illustrations = () => {
                     (a) => a.chapter === chapterId
                   );
                   return (
-                    <motion.div
+                    <motion.a
                       key={chapterId}
+                      href={`#${categoryAnchorId(chapterId)}`}
                       variants={fadeInUp}
-                      className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        scrollToCategory(chapterId);
+                      }}
+                      className="block bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow text-left cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
                     >
                       <div className="aspect-square bg-gray-100 overflow-hidden">
                         {artworksInCategory[0] && (
@@ -169,7 +189,7 @@ const Illustrations = () => {
                           {artworksInCategory.length !== 1 ? "s" : ""}
                         </p>
                       </div>
-                    </motion.div>
+                    </motion.a>
                   );
                 })}
               </div>
@@ -187,7 +207,14 @@ const Illustrations = () => {
               return (
                 <motion.div
                   key={section.id}
-                  className="mb-20"
+                  id={
+                    Object.keys(chapterAnchors).find((k) => chapterAnchors[k] === section.id)
+                      ? categoryAnchorId(
+                          Object.keys(chapterAnchors).find((k) => chapterAnchors[k] === section.id)!
+                        )
+                      : undefined
+                  }
+                  className="mb-20 scroll-mt-28"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: "some" }}

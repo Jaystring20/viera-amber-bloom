@@ -21,20 +21,23 @@ export interface IllustrationCategory {
   umbrella: Umbrella;
   /** A representative image already in /public/artworks, used for hero/thumbnail art. */
   image: string;
+  /** Hue/saturation pulled from the hero artwork, used for the hero background wash. */
+  hue: number;
+  sat: number;
 }
 
 export const ILLUSTRATION_CATEGORIES: IllustrationCategory[] = [
   // ── Fashion Illustration ──────────────────────────────────────────────
-  { id: "fashion-illustrations", name: "Fashion Illustrations", umbrella: "fashion", image: "artwork_0001.webp" },
-  { id: "bridal-designs",        name: "Bridal Designs",        umbrella: "fashion", image: "artwork_0074.webp" },
-  { id: "shoes",                 name: "Shoes",                 umbrella: "fashion", image: "artwork_0057.webp" },
-  { id: "bags",                  name: "Bags",                  umbrella: "fashion", image: "artwork_0029.webp" },
+  { id: "fashion-illustrations", name: "Fashion Illustrations", umbrella: "fashion", image: "artwork_0001.webp", hue: 355, sat: 70 },
+  { id: "bridal-designs",        name: "Bridal Designs",        umbrella: "fashion", image: "artwork_0044.webp", hue: 345, sat: 35 },
+  { id: "shoes",                 name: "Shoes",                 umbrella: "fashion", image: "artwork_0048.webp", hue: 25, sat: 70 },
+  { id: "bags",                  name: "Bags",                  umbrella: "fashion", image: "artwork_0053.webp", hue: 335, sat: 70 },
   // ── Lifestyle Illustration ────────────────────────────────────────────
-  { id: "single-illustrations",  name: "Single Illustrations",  umbrella: "lifestyle", image: "artwork_0024.webp" },
-  { id: "product-illustrations", name: "Product Illustrations", umbrella: "lifestyle", image: "artwork_0071.webp" },
-  { id: "birthday-couple",       name: "Birthday & Couple Illustrations", umbrella: "lifestyle", image: "artwork_0089.webp" },
-  { id: "book-covers",           name: "Book Covers",           umbrella: "lifestyle", image: "artwork_0098.webp" },
-  { id: "event-programs",        name: "Event Programs",        umbrella: "lifestyle", image: "artwork_0101.webp" },
+  { id: "single-illustrations",  name: "Single Illustrations",  umbrella: "lifestyle", image: "artwork_0080.webp", hue: 25, sat: 47 },
+  { id: "product-illustrations", name: "Product Illustrations", umbrella: "lifestyle", image: "artwork_0088.webp", hue: 45, sat: 56 },
+  { id: "birthday-couple",       name: "Birthday & Couple Illustrations", umbrella: "lifestyle", image: "artwork_0089.webp", hue: 25, sat: 51 },
+  { id: "book-covers",           name: "Book Covers",           umbrella: "lifestyle", image: "artwork_0098.webp", hue: 5, sat: 70 },
+  { id: "event-programs",        name: "Event Programs",        umbrella: "lifestyle", image: "artwork_0099.webp", hue: 30, sat: 8 },
 ];
 
 export const categoryAnchorId = (id: string) => `category-${id}`;
