@@ -2,442 +2,262 @@ import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import BrandFilm from "@/components/BrandFilm";
 import RotatingHeroCarousel from "@/components/sections/RotatingHeroCarousel";
-import CategoryThumbnailNav from "@/components/sections/CategoryThumbnailNav";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { scrollToCategory } from "@/lib/illustration-categories";
-import { ARTWORKS, COLLECTIONS, CHAPTERS, ChapterId } from "@/lib/gallery-data";
-import {
-  fadeSlideUp,
-  fadeIn,
-  staggerContainer,
-  cardItem,
-  inViewProps,
-  useReducedVariants,
-} from "@/lib/animations";
+import { CHAPTERS, SECTIONS, ARTWORKS_103 } from "@/lib/gallery-data";
 
 const Illustrations = () => {
-  const reduced = useReducedMotion();
+  const browseRef = useRef<HTMLDivElement>(null);
+  const browseInView = useInView(browseRef, { once: true, amount: 0.2 });
 
-  const appsRef = useRef<HTMLDivElement>(null);
-  const processRef = useRef<HTMLDivElement>(null);
-
-  const appsInView = useInView(appsRef, inViewProps);
-  const processInView = useInView(processRef, inViewProps);
-
-  const headerVariants = useReducedVariants(fadeSlideUp);
-  const fadeVariants = useReducedVariants(fadeIn);
-  const staggerVariants = useReducedVariants(staggerContainer);
-  const cardVariants = useReducedVariants(cardItem);
-
-  const handleCategorySelect = (categoryId: string) => {
-    scrollToCategory(categoryId);
+  // Get artworks by section
+  const getArtworksBySection = (sectionId: string) => {
+    const section = SECTIONS.find((s) => s.id === sectionId);
+    if (!section || section.seq_start === 0) return [];
+    return ARTWORKS_103.filter(
+      (a) => a.seq >= section.seq_start && a.seq <= section.seq_end
+    );
   };
 
-  // Get all artworks for a collection by collectionId (excluding draft items)
-  const getCollectionArtworks = (collectionId: string) => {
-    return ARTWORKS.filter((a) => a.collectionId === collectionId && !a.draft);
+  // Group chapters by category (Fashion vs Lifestyle)
+  const fashionChapters = ["fashion-illustrations", "bridal-designs", "shoes", "bags"];
+  const lifestyleChapters = [
+    "single-illustrations",
+    "product-illustrations",
+    "birthday-couple",
+    "book-covers",
+    "event-programs",
+  ];
+
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+    },
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#FAFAFA" }}>
+    <div className="min-h-screen bg-white">
       <NavBar />
       <main className="pt-20">
-        {/* ── Rotating Hero Carousel ───────────────────────────────────── */}
-        <RotatingHeroCarousel onCategorySelect={(category) => {
-          handleCategorySelect(category.id);
-        }} />
+        {/* ── Hero Carousel with Subcategories ───────────────────────────────── */}
+        <RotatingHeroCarousel
+          onCategorySelect={(category) => {
+            // Scroll to category section if needed
+          }}
+        />
 
-        {/* ── Brand Film / Video Carousel (BEFORE Browse) ───────────────────────────────────── */}
-        <section
-          aria-label="Brand Film"
-          style={{ backgroundColor: "#FAFAFA" }}
-        >
-          <div
-            className="mx-auto px-6 pt-12 pb-6 flex flex-col items-center text-center"
-            style={{ maxWidth: 1100, gap: 10 }}
-          >
-            <p
-              style={{
-                fontFamily: "Montserrat, system-ui, sans-serif",
-                fontSize: 13,
-                color: "#111111",
-                letterSpacing: "4px",
-                textTransform: "uppercase",
-                fontWeight: 600,
-                margin: 0,
-              }}
-            >
+        {/* ── Behind the Work: Video Section ───────────────────────────────── */}
+        <section className="py-16 px-6 bg-white">
+          <div className="mx-auto max-w-6xl flex flex-col items-center text-center gap-4 mb-12">
+            <p className="text-sm font-semibold tracking-widest text-gray-600 uppercase">
               Behind the Work
             </p>
-            <h2
-              className="font-display"
-              style={{
-                fontSize: "clamp(22px, 3.5vw, 40px)",
-                fontWeight: 700,
-                color: "#111111",
-                margin: 0,
-                lineHeight: 1.1,
-              }}
-            >
+            <h2 className="text-4xl md:text-5xl font-display font-bold text-gray-900">
               See the process unfold.
             </h2>
           </div>
-
-          <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 48px" }}>
+          <div className="mx-auto max-w-6xl">
             <BrandFilm variant="page" />
           </div>
         </section>
 
-        {/* ── Category Thumbnail Navigation ───────────────────────────────────── */}
-        <CategoryThumbnailNav
-          onCategorySelect={(category) => {
-            handleCategorySelect(category.id);
-          }}
-        />
-
-        {/* ── Chapter-Grouped Collections (per PDF structure) ───────────────────────────────────── */}
-        {CHAPTERS.map((chapter) => {
-          const collectionsInChapter = COLLECTIONS.filter(c => c.categoryId === chapter.id).sort((a, b) => a.sortOrder - b.sortOrder);
-          if (collectionsInChapter.length === 0) return null;
-
-          const isFashion = ["fashion-illustrations", "bridal-designs", "shoes", "bags"].includes(chapter.id);
-          const umbrella = isFashion ? "FASHION ILLUSTRATION" : "LIFESTYLE ILLUSTRATION";
-          const chapterLabel = chapter.name.toUpperCase().replace("-", " ");
-
-          return (
-            <section
-              key={chapter.id}
-              id={chapter.id}
-              className="w-full py-20"
-              style={{ backgroundColor: "#FAFAFA" }}
-              aria-label={chapter.name}
+        {/* ── Browse by Category: 9 Subcategories Grid ───────────────────────────────── */}
+        <section
+          ref={browseRef}
+          className="py-20 px-6 bg-gray-50"
+          aria-label="Browse by Category"
+        >
+          <div className="mx-auto max-w-6xl">
+            {/* Section Header */}
+            <motion.div
+              className="text-center mb-16"
+              initial="hidden"
+              animate={browseInView ? "visible" : "hidden"}
+              variants={fadeInUp}
             >
-              <div className="mx-auto px-6" style={{ maxWidth: 1200 }}>
-                {/* Chapter-Level Header */}
-                <motion.div
-                  className="mb-16"
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, amount: 0.2 }}
-                  variants={fadeVariants}
-                >
-                  <p
-                    style={{
-                      fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontSize: 13,
-                      color: "#111111",
-                      letterSpacing: "4px",
-                      textTransform: "uppercase",
-                      fontWeight: 600,
-                      margin: 0,
-                      marginBottom: 12,
-                    }}
-                  >
-                    {umbrella}: {chapterLabel}
-                  </p>
-                </motion.div>
+              <p className="text-sm font-semibold tracking-widest text-gray-600 uppercase mb-2">
+                Explore Our Collections
+              </p>
+              <h2 className="text-4xl md:text-5xl font-display font-bold text-gray-900">
+                Browse by Category
+              </h2>
+            </motion.div>
 
-                {/* Collections within this Chapter */}
-                {collectionsInChapter.map((collection) => {
-                  const artworks = getCollectionArtworks(collection.id);
-                  if (artworks.length === 0) return null;
-
+            {/* Fashion Categories - 4 columns in 1 row */}
+            <motion.div
+              className="mb-16"
+              initial="hidden"
+              animate={browseInView ? "visible" : "hidden"}
+              variants={staggerContainer}
+            >
+              <p className="text-sm font-semibold tracking-widest text-gray-600 uppercase mb-8">
+                Fashion Illustration
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                {fashionChapters.map((chapterId) => {
+                  const chapter = CHAPTERS.find((c) => c.id === chapterId);
+                  const artworksInCategory = ARTWORKS_103.filter(
+                    (a) => a.chapter === chapterId
+                  );
                   return (
-                    <div key={collection.id} style={{ marginBottom: 48 }}>
-                      {/* Collection Header */}
-                      <motion.div
-                        className="mb-12"
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true, amount: 0.2 }}
-                        variants={fadeVariants}
-                      >
-                        <h2
-                          className="font-display"
-                          style={{
-                            fontSize: "clamp(24px, 4vw, 44px)",
-                            fontWeight: 700,
-                            color: "#111111",
-                            margin: 0,
-                            lineHeight: 1.1,
-                            marginBottom: 12,
-                          }}
-                        >
-                          {collection.name}
-                        </h2>
-                        {collection.description && (
-                          <p
-                            style={{
-                              fontFamily: "DM Sans, system-ui, sans-serif",
-                              fontSize: 14,
-                              color: "#666666",
-                              margin: 0,
-                              lineHeight: 1.6,
-                            }}
-                          >
-                            {collection.description}
-                          </p>
-                        )}
-                      </motion.div>
-
-                      {/* Artworks Grid */}
-                      <motion.div
-                        className="grid gap-6"
-                        style={{
-                          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-                        }}
-                        variants={staggerVariants}
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true, amount: 0.1 }}
-                      >
-                        {artworks.map((artwork) => (
-                          <motion.div
-                            key={artwork.id}
-                            variants={cardVariants}
-                            className="overflow-hidden"
-                            style={{ borderRadius: 4 }}
-                          >
-                            <img
-                              src={artwork.image}
-                              alt={artwork.title || collection.name}
-                              style={{
-                                width: "100%",
-                                height: "auto",
-                                display: "block",
-                                objectFit: "cover",
-                              }}
-                            />
-                            {artwork.title && (
-                              <div style={{ paddingTop: 12 }}>
-                                <p
-                                  style={{
-                                    fontFamily: "DM Sans, system-ui, sans-serif",
-                                    fontSize: 12,
-                                    fontWeight: 600,
-                                    color: "#111111",
-                                    margin: 0,
-                                    lineHeight: 1.4,
-                                  }}
-                                >
-                                  {artwork.title}
-                                </p>
-                              </div>
-                            )}
-                          </motion.div>
-                        ))}
-                      </motion.div>
-                    </div>
+                    <motion.div
+                      key={chapterId}
+                      variants={fadeInUp}
+                      className="p-6 bg-white border border-gray-200 rounded-lg hover:shadow-lg transition-shadow"
+                    >
+                      <h3 className="text-lg font-bold text-gray-900 mb-2">
+                        {chapter?.name}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        {artworksInCategory.length} illustration
+                        {artworksInCategory.length !== 1 ? "s" : ""}
+                      </p>
+                    </motion.div>
                   );
                 })}
               </div>
-            </section>
-          );
-        })}
-
-        {/* Commercial Applications */}
-        <section
-          ref={appsRef}
-          id="applications"
-          className="w-full py-20"
-          style={{ backgroundColor: "#FAFAFA" }}
-          aria-label="Commercial Applications"
-        >
-          <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
-            <motion.div className="flex flex-col items-center text-center mb-12" style={{ gap: 16 }}>
-              <motion.p
-                variants={fadeVariants}
-                initial="hidden"
-                animate={appsInView ? "visible" : "hidden"}
-                style={{
-                  fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: 13,
-                  color: "#111111",
-                  letterSpacing: "4px",
-                  textTransform: "uppercase",
-                  fontWeight: 600,
-                  margin: 0,
-                }}
-              >
-                Commercial Applications
-              </motion.p>
-
-              <motion.h2
-                variants={headerVariants}
-                initial="hidden"
-                animate={appsInView ? "visible" : "hidden"}
-                className="font-display"
-                style={{
-                  fontSize: "clamp(26px, 4vw, 48px)",
-                  fontWeight: 700,
-                  color: "#111111",
-                  margin: 0,
-                  lineHeight: 1.1,
-                }}
-              >
-                Where Our Art Lives
-              </motion.h2>
             </motion.div>
 
+            {/* Lifestyle Categories - 4 + 1 layout (4 in first row, 1 centered below) */}
             <motion.div
-              variants={staggerVariants}
               initial="hidden"
-              animate={appsInView ? "visible" : "hidden"}
-              className="grid gap-6"
-              style={{ gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}
+              animate={browseInView ? "visible" : "hidden"}
+              variants={staggerContainer}
             >
-              {[
-                {
-                  title: "Brand Campaigns",
-                  desc: "From #BreakTheBias to Mother's Day. Illustration that gives a campaign a face and a voice.",
-                },
-                {
-                  title: "Editorial & Print",
-                  desc: "Covers, features, and storytelling spreads where a single image has to carry the headline.",
-                },
-                {
-                  title: "Fashion & Product",
-                  desc: "The Atelier line and the Lagos Icons accessories. Art that walks off the page and onto the body.",
-                },
-              ].map((app) => (
-                <motion.div
-                  key={app.title}
-                  variants={cardVariants}
-                  whileHover={reduced ? {} : { y: -3 }}
-                  transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
-                  style={{
-                    backgroundColor: "#FFFFFF",
-                    border: "1px solid #EBEBEB",
-                    borderRadius: 4,
-                    padding: "28px 24px",
-                  }}
-                >
-                  <h3
-                    className="font-display"
-                    style={{ fontSize: 20, fontWeight: 700, color: "#111111", marginBottom: 10 }}
-                  >
-                    {app.title}
-                  </h3>
-                  <p
-                    style={{
-                      fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontWeight: 300,
-                      fontSize: 13,
-                      color: "#666666",
-                      lineHeight: 1.65,
-                      margin: 0,
-                    }}
-                  >
-                    {app.desc}
-                  </p>
-                </motion.div>
-              ))}
+              <p className="text-sm font-semibold tracking-widest text-gray-600 uppercase mb-8">
+                Lifestyle Illustration
+              </p>
+              {/* First 4 lifestyle categories */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                {lifestyleChapters.slice(0, 4).map((chapterId) => {
+                  const chapter = CHAPTERS.find((c) => c.id === chapterId);
+                  const artworksInCategory = ARTWORKS_103.filter(
+                    (a) => a.chapter === chapterId
+                  );
+                  return (
+                    <motion.div
+                      key={chapterId}
+                      variants={fadeInUp}
+                      className="p-6 bg-white border border-gray-200 rounded-lg hover:shadow-lg transition-shadow"
+                    >
+                      <h3 className="text-lg font-bold text-gray-900 mb-2">
+                        {chapter?.name}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        {artworksInCategory.length} illustration
+                        {artworksInCategory.length !== 1 ? "s" : ""}
+                      </p>
+                    </motion.div>
+                  );
+                })}
+              </div>
+              {/* Last lifestyle category - centered in its own row */}
+              <div className="flex justify-center">
+                {lifestyleChapters.slice(4).map((chapterId) => {
+                  const chapter = CHAPTERS.find((c) => c.id === chapterId);
+                  const artworksInCategory = ARTWORKS_103.filter(
+                    (a) => a.chapter === chapterId
+                  );
+                  return (
+                    <motion.div
+                      key={chapterId}
+                      variants={fadeInUp}
+                      className="p-6 bg-white border border-gray-200 rounded-lg hover:shadow-lg transition-shadow w-full md:w-1/4"
+                    >
+                      <h3 className="text-lg font-bold text-gray-900 mb-2">
+                        {chapter?.name}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        {artworksInCategory.length} illustration
+                        {artworksInCategory.length !== 1 ? "s" : ""}
+                      </p>
+                    </motion.div>
+                  );
+                })}
+              </div>
             </motion.div>
           </div>
         </section>
 
-        {/* Process */}
-        <section
-          ref={processRef}
-          id="process"
-          className="w-full py-20"
-          style={{ backgroundColor: "#F5F4F2", borderTop: "1px solid #EBEBEB" }}
-          aria-label="Our Process"
-        >
-          <div className="mx-auto px-6" style={{ maxWidth: 1100 }}>
-            <motion.div className="flex flex-col items-center text-center mb-12" style={{ gap: 16 }}>
-              <motion.p
-                variants={fadeVariants}
-                initial="hidden"
-                animate={processInView ? "visible" : "hidden"}
-                style={{
-                  fontFamily: "DM Sans, system-ui, sans-serif",
-                  fontSize: 13,
-                  color: "#111111",
-                  letterSpacing: "4px",
-                  textTransform: "uppercase",
-                  fontWeight: 600,
-                  margin: 0,
-                }}
-              >
-                Our Process
-              </motion.p>
+        {/* ── 103 Artworks organized into 21 Sections (Sequential) ───────────────────────────────── */}
+        <section className="py-20 px-6 bg-white">
+          <div className="mx-auto max-w-6xl">
+            {SECTIONS.slice(0, 16).map((section) => {
+              const artworks = getArtworksBySection(section.id);
+              if (artworks.length === 0) return null;
 
-              <motion.h2
-                variants={headerVariants}
-                initial="hidden"
-                animate={processInView ? "visible" : "hidden"}
-                className="font-display"
-                style={{
-                  fontSize: "clamp(26px, 4vw, 48px)",
-                  fontWeight: 700,
-                  color: "#111111",
-                  margin: 0,
-                  lineHeight: 1.1,
-                }}
-              >
-                From Concept to Creation
-              </motion.h2>
-            </motion.div>
-
-            <motion.div
-              variants={staggerVariants}
-              initial="hidden"
-              animate={processInView ? "visible" : "hidden"}
-              className="grid gap-6"
-              style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}
-            >
-              {[
-                { num: "01", title: "Research", desc: "Deep dive into stories, themes, and visual inspiration" },
-                { num: "02", title: "Sketch", desc: "Conceptualize compositions and narrative hooks" },
-                { num: "03", title: "Digital", desc: "Refine in Procreate and Adobe, bringing precision and soul" },
-                { num: "04", title: "Delivery", desc: "Final artwork with its accompanying story and context" },
-              ].map((step) => (
+              return (
                 <motion.div
-                  key={step.num}
-                  variants={cardVariants}
-                  style={{
-                    backgroundColor: "#FFFFFF",
-                    border: "1px solid #EBEBEB",
-                    borderRadius: 4,
-                    padding: "28px 24px",
-                  }}
+                  key={section.id}
+                  className="mb-20"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.6 }}
                 >
-                  <span
-                    style={{
-                      fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontWeight: 700,
-                      fontSize: 11,
-                      color: "#111111",
-                      letterSpacing: "3px",
-                      display: "block",
-                      marginBottom: 12,
-                    }}
+                  {/* Section Header */}
+                  <div className="mb-12">
+                    <p className="text-sm font-semibold tracking-widest text-gray-600 uppercase mb-2">
+                      Section {section.number}
+                    </p>
+                    <h3 className="text-3xl font-display font-bold text-gray-900">
+                      {section.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mt-2">
+                      Artwork {section.seq_start} – {section.seq_end}
+                    </p>
+                  </div>
+
+                  {/* Artworks Grid */}
+                  <motion.div
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                    variants={staggerContainer}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, amount: 0.1 }}
                   >
-                    {step.num}
-                  </span>
-                  <h3
-                    className="font-display"
-                    style={{ fontSize: 17, fontWeight: 700, color: "#111111", marginBottom: 10 }}
-                  >
-                    {step.title}
-                  </h3>
-                  <p
-                    style={{
-                      fontFamily: "DM Sans, system-ui, sans-serif",
-                      fontWeight: 300,
-                      fontSize: 13,
-                      color: "#666666",
-                      lineHeight: 1.7,
-                      margin: 0,
-                    }}
-                  >
-                    {step.desc}
-                  </p>
+                    {artworks.map((artwork) => (
+                      <motion.div
+                        key={artwork.id}
+                        variants={fadeInUp}
+                        className="group overflow-hidden rounded-lg bg-gray-50"
+                      >
+                        <div className="aspect-square overflow-hidden bg-gray-200">
+                          <img
+                            src={artwork.image}
+                            alt={artwork.title || `Artwork ${artwork.seq}`}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                          />
+                        </div>
+                        <div className="p-4">
+                          <p className="text-xs text-gray-500 font-semibold tracking-wider mb-1">
+                            Artwork {artwork.seq}
+                          </p>
+                          {artwork.title && (
+                            <h4 className="text-sm font-bold text-gray-900">
+                              {artwork.title}
+                            </h4>
+                          )}
+                          {artwork.story && (
+                            <p className="text-xs text-gray-600 mt-2 line-clamp-2">
+                              {artwork.story}
+                            </p>
+                          )}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </motion.div>
                 </motion.div>
-              ))}
-            </motion.div>
+              );
+            })}
           </div>
         </section>
       </main>
