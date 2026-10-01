@@ -2,17 +2,21 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { lazy, Suspense } from "react";
 import Index from "./pages/Index.tsx";
-import Illustrations from "./pages/Illustrations.tsx";
-import VAGINPage from "./pages/VAGIN.tsx";
-import VAGINDashboard from "./pages/VAGINDashboard.tsx";
-import VIVAPage from "./pages/VIVA.tsx";
-import VIVAStory from "./pages/VIVAStory.tsx";
-import VivaTryOn from "./pages/VivaTryOn.tsx";
-import VAMPage from "./pages/VAM.tsx";
-import VASHPage from "./pages/VASH.tsx";
 import NotFound from "./pages/NotFound.tsx";
-import AdminProducts from "./pages/AdminProducts.tsx";
+
+// The hub loads eagerly; every other page is split into its own chunk and
+// only downloaded when visited.
+const Illustrations = lazy(() => import("./pages/Illustrations.tsx"));
+const VAGINPage = lazy(() => import("./pages/VAGIN.tsx"));
+const VAGINDashboard = lazy(() => import("./pages/VAGINDashboard.tsx"));
+const VIVAPage = lazy(() => import("./pages/VIVA.tsx"));
+const VIVAStory = lazy(() => import("./pages/VIVAStory.tsx"));
+const VivaTryOn = lazy(() => import("./pages/VivaTryOn.tsx"));
+const VAMPage = lazy(() => import("./pages/VAM.tsx"));
+const VASHPage = lazy(() => import("./pages/VASH.tsx"));
+const AdminProducts = lazy(() => import("./pages/AdminProducts.tsx"));
 import MobileTabBar from "./components/MobileTabBar.tsx";
 
 const queryClient = new QueryClient();
@@ -22,6 +26,7 @@ const App = () => (
     <TooltipProvider>
       <Sonner />
       <BrowserRouter>
+        <Suspense fallback={<div className="min-h-screen bg-brand-dark" />}>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/illustrations" element={<Illustrations />} />
@@ -41,6 +46,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </Suspense>
         {/* Inside the router: it reads the active route to light its tab. */}
         <MobileTabBar />
       </BrowserRouter>

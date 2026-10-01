@@ -161,8 +161,13 @@ All hub sections built and wired in `src/pages/Index.tsx`.
 - ⏳ Notification delivery stubs: `src/services/notificationWorker.ts`
   (WhatsApp send ~L248, Resend email ~L299)
 - ⏳ i18n: not started
-- ⏳ Performance + SEO: main bundle ~2 MB (574 KB gzip), no code-splitting yet
-- ⏳ Lint: `npm run lint` reports ~40 errors
+- ✅ Route code-splitting: main bundle 752 KB (222 KB gzip); dashboard chunk
+  (955 KB) only loads for admins
+- ✅ Lint: 0 errors (3 harmless warnings)
+- ⏳ Typecheck: `npx tsc --noEmit -p tsconfig.app.json` reports ~31 errors
+  (`vite build` does not typecheck). Some are real, e.g. `.group_by()` in
+  `notificationWorker.ts` does not exist in supabase-js
+- ⏳ SEO pass
 
 ### Known issues
 - WhatsApp secrets were renamed from `VITE_WHATSAPP_*` to `WHATSAPP_APP_SECRET`
@@ -293,8 +298,8 @@ Live site (vieraamber.com)
 2. 🔄 **Confirm live setup** (owner): Vercel deploys `main`, Supabase
    migrations + edge functions applied, RLS on all admin tables
 3. 🔄 **Wire notification delivery**: WhatsApp + Resend in `notificationWorker.ts`
-4. 🔄 **Move WhatsApp app secret out of client code** (see Known issues)
-5. 🔄 **Clean up**: fix lint errors, code-split routes with `React.lazy`
+4. 🔄 **Re-set WhatsApp secrets under new names** in Supabase (see Known issues)
+5. 🔄 **Clean up**: fix the ~31 typecheck errors
 6. ⏳ **Launch polish**: 375px QA pass, SEO, then i18n
 
 ---
