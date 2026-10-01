@@ -19,24 +19,29 @@ one immersive hub + three distinct sub-brand sites + one admin dashboard.
 
 ## Site Architecture
 
-```
-vieraamber.com              ← Main hub (THIS REPO)
-  ├── /                     ← Chapter-scroll immersive single page
-  ├── #hero
-  ├── #ecosystem            ← 5-arm ecosystem map
-  ├── #illustrations        ← Portfolio preview + story overlays
-  ├── #vagin                ← Girls' Initiative + impact numbers
-  ├── #viva                 ← Fashion brand teaser
-  ├── #vam                  ← Masterclass waitlist
-  ├── #shop                 ← VASH link-out (external store)
-  ├── #founder              ← Faith Adigwe bio
-  └── #contact              ← Contact form
+Everything lives in THIS repo as routes of one Vite SPA (see `src/App.tsx`).
+The original plan of separate sub-domain repos was dropped.
 
-illustrations.vieraamber.com  ← Phase 2 (separate project/repo)
-vagin.vieraamber.com          ← Phase 2 (separate project/repo)
-  └── /admin                  ← PAD KOLO Admin Dashboard (VAGIN team only)
-viva.vieraamber.com           ← Phase 2 (separate project/repo)
 ```
+vieraamber.com
+  /                     ← Hub: chapter-scroll single page (src/pages/Index.tsx)
+    #hero #ecosystem #illustrations #vagin #viva #vam #shop #founder #contact
+  /illustrations        ← Full illustration gallery (Illustrations.tsx)
+  /collections/:id      ← Retired, redirects to /illustrations
+  /vagin                ← VAGIN Girls' Initiative site
+  /vagin-dashboard      ← PAD KOLO admin dashboard (VAGIN team, login required)
+  /viva                 ← VIVA fashion site
+  /viva/story           ← VIVA brand story
+  /viva/try-on          ← Virtual try-on (Supabase function: virtual-tryon)
+  /vam                  ← Masterclass page
+  /vash                 ← Shop page
+  /admin/products       ← VIVA product admin
+  *                     ← NotFound
+```
+
+`MobileTabBar` renders on every route. On Vercel, all requests go through
+`api/index.ts`, which injects per-route Open Graph tags into `index.html`
+(see `vercel.json`).
 
 ---
 
@@ -48,9 +53,13 @@ viva.vieraamber.com           ← Phase 2 (separate project/repo)
 | Styling | Tailwind CSS v3 | Custom tokens in tailwind.config.ts |
 | Animation | Framer Motion v12 | All animations via this — NO CSS keyframes |
 | Database | Supabase (external account) | NOT Lovable-managed |
-| Auth | Supabase Auth + Google SSO | Admin dashboard only |
-| i18n | react-i18next | English base, geo-detect regional switch |
-| Routing | react-router-dom v6 | Single page on hub |
+| Auth | Supabase Auth, email + password | Admin dashboard only (`VAGINAuth.tsx`). Google SSO not wired |
+| i18n | react-i18next (planned) | NOT installed yet |
+| Routing | react-router-dom v6 | Hub + sub-site routes, see Site Architecture |
+| Data fetching | @tanstack/react-query | |
+| Backend functions | Supabase Edge Functions | `supabase/functions/` |
+| Hosting | Vercel | `vercel.json` + `api/index.ts` (OG tags) |
+| Tests | Vitest | `npm test` |
 
 ---
 
@@ -95,60 +104,72 @@ Tailwind classes: `bg-brand-dark`, `text-brand-gold`, `border-brand-borderSubtle
 
 ```
 src/
+├── App.tsx                    ← All routes
 ├── lib/
 │   ├── animations.ts          ← ALL Framer Motion variants (source of truth)
+│   ├── supabase.ts            ← Supabase client (VITE_SUPABASE_URL / _ANON_KEY)
+│   ├── botEngine.ts (+ .test) ← WhatsApp bot conversation logic
+│   ├── whatsapp/              ← Bot providers: Meta (live) + simulator (mock)
+│   ├── gallery-data.ts, illustration-categories.ts, artwork-dimensions.ts
 │   └── utils.ts
 ├── components/
-│   ├── NavBar.tsx             ← Sticky, transparent→solid, mobile overlay
-│   ├── NavLink.tsx
-│   ├── Footer.tsx             ← 3-col, gold rule, all contact details
-│   ├── sections/
-│   │   ├── HeroSection.tsx        ✅ built
-│   │   ├── EcosystemSection.tsx   ✅ built
-│   │   ├── IllustrationsSection.tsx  ✅ built
-│   │   ├── VAGINSection.tsx          ✅ built
-│   │   ├── VIVASection.tsx           ✅ built
-│   │   ├── VAMSection.tsx            ✅ built
-│   │   ├── FounderSection.tsx        ✅ built
-│   │   └── ContactSection.tsx        ✅ built
+│   ├── NavBar.tsx, NavLink.tsx, Footer.tsx, MobileTabBar.tsx
+│   ├── BrandFilm.tsx, VivaLaunchModal.tsx, VAGINAuth.tsx
+│   ├── sections/              ← Hub sections + gallery/dashboard building blocks
+│   ├── admin/                 ← Dashboard tabs: Gallery CMS, VAGIN Images, Bot Activity
 │   └── ui/                    ← shadcn/ui components
-├── pages/
-│   ├── Index.tsx              ← Main hub page ✅ wired
-│   └── NotFound.tsx
+├── pages/                     ← One file per route (see Site Architecture)
+├── hooks/                     ← useProducts, useVaginImages, useNotificationTriggers
+├── services/                  ← notificationService.ts, notificationWorker.ts
+├── config/contact.ts
+├── styles/brand-colors.css
 ├── index.css                  ← Design tokens + global styles
 └── main.tsx
+
+supabase/migrations/           ← Numbered schema migrations (apply in order)
+supabase/functions/            ← Edge functions: whatsapp-bot, whatsapp-webhook,
+                                 notify-admin, process-notifications,
+                                 vagin-notifications, virtual-tryon
+sql/                           ← One-off setup scripts (gallery, storage buckets, bot)
+api/index.ts                   ← Vercel function: per-route OG meta
+scripts/                       ← OG image / PWA icon generators, VIVA product seeder
 ```
+
+The root also holds many feature write-ups (`*_SETUP.md`, `*_SUMMARY.md`,
+`*.sql`). Check the relevant one before changing a feature.
 
 ---
 
 ## Current Build State
 
-### Phase 1 — Hub Shell ✅ COMPLETE
+_Last audited: 2026-10-01. `main` builds and all tests pass._
 
-**All 9 sections built and wired:**
-- ✅ NavBar
-- ✅ HeroSection
-- ✅ EcosystemSection
-- ✅ IllustrationsSection
-- ✅ VAGINSection
-- ✅ VIVASection
-- ✅ VAMSection
-- ✅ FounderSection
-- ✅ ContactSection
-- ✅ Footer
-- ✅ src/lib/animations.ts (all Framer Motion variants)
-- ✅ src/pages/Index.tsx (fully wired)
+### Phase 1 — Hub ✅ COMPLETE
+All hub sections built and wired in `src/pages/Index.tsx`.
 
-### Phase 2 — Sub-Domain Sites (NOT STARTED)
-- `illustrations.vieraamber.com` — full illustration gallery with story overlays
-- `vagin.vieraamber.com` — VAGIN full site + PAD KOLO Admin Dashboard
-- `viva.vieraamber.com` — VIVA editorial fashion site
+### Phase 2 — Sub-sites ✅ BUILT (as routes in this repo)
+- ✅ `/illustrations` gallery: hero carousel, category nav, full-screen viewer,
+  mobile swipe strips, tablet tuning (most recent work)
+- ✅ `/vagin` site + `/vagin-dashboard` admin
+- ✅ `/viva`, `/viva/story`, `/viva/try-on`
+- ✅ `/vam`, `/vash`, `/admin/products`
 
-### Phase 3 — Integration (NOT STARTED)
-- Supabase schema (7 tables — see PAD KOLO section below)
-- WhatsApp Bot API wiring (mock layer first)
-- Regional i18n content
-- Performance audit + SEO
+### Phase 3 — Integration 🔄 PARTLY DONE
+- ✅ Supabase schema: migrations `01`–`07` + two dated notification migrations
+- ✅ WhatsApp bot: engine, simulator provider, Meta provider, edge functions
+- ✅ Notification system: triggers, worker, dashboard Notification Center
+- ⏳ Notification delivery stubs: `src/services/notificationWorker.ts`
+  (WhatsApp send ~L248, Resend email ~L299)
+- ⏳ i18n: not started
+- ⏳ Performance + SEO: main bundle ~2 MB (574 KB gzip), no code-splitting yet
+- ⏳ Lint: `npm run lint` reports ~40 errors
+
+### Known issues
+- `VITE_WHATSAPP_APP_SECRET` is read in client code. Any `VITE_` variable
+  ships to the browser, so app secrets belong in edge functions only.
+- Unknown from the repo alone: whether Vercel deploys `main`, whether the
+  migrations/functions are applied to the live Supabase project, and whether
+  RLS is on for every admin table. Confirm with the owner.
 
 ---
 
@@ -184,35 +205,36 @@ src/
 
 ---
 
-## PAD KOLO Admin Dashboard Spec
+## PAD KOLO Admin Dashboard
 
-**Access:** VAGIN team only via Google SSO (Supabase Auth)
-**Purpose:** Track pad distribution, student micro-savings, fund balance
+**Route:** `/vagin-dashboard` · **File:** `src/pages/VAGINDashboard.tsx`
+**Access:** VAGIN team only, Supabase email/password login (`VAGINAuth.tsx`)
+**Purpose:** Track schools, students, pad distribution, micro-savings, impact
 
-### Supabase Schema (7 tables)
+### Tabs (13)
+Overview · Schools · Students · Matrons · PAD KOLO · VaginART · Transactions ·
+Impact & Investment · Analytics · Notifications · Gallery CMS · VAGIN Images ·
+VIVA Products
 
-```sql
-schools         (id, name, address, state, country, matron_name, matron_phone, active_term, created_at)
-students        (id, student_uid UNIQUE, school_id→schools, class, enrolled_at, is_active)
-pad_transactions(id, student_id→students, transaction_type ENUM(free|subsidized), amount_paid, pads_issued, matron_id, created_at)
-fund_balances   (school_id→schools, term, total_collected, total_spent, balance, last_updated)
-donors          (id, name, organization, email, amount, type ENUM(cash|in-kind), date, export_ready)
-bot_sync_log    (id, event_type, student_uid, payload_json JSONB, status ENUM(pending|synced|error), created_at)
-```
+### Supabase tables (actual, from `supabase/migrations/` + `sql/`)
+- **VAGIN core:** `vagin_schools`, `vagin_students`, `vagin_matrons`,
+  `vagin_pad_distributions`, `vagin_savings`, `vagin_sessions`,
+  `vagin_transactions`, `pad_kolo_tracking`, `teachers_matrons`,
+  `matron_registration_requests`, `country_configs`
+- **Learning / impact:** `vaginart_modules`, `user_module_progress`,
+  `resources`, `impact_stories`, `sponsor_profiles`, `sponsorships`, `users`
+- **Notifications:** `vagin_notifications`, `vagin_notification_triggers`,
+  `vagin_notification_preferences`, `vagin_digest_queue`
+- **WhatsApp bot:** `whatsapp_sessions`, `vagin_bot_config`,
+  `vagin_bot_sessions`, `vagin_bot_logs`
+- **Content:** `va_artworks`, `va_gallery_chapters`,
+  `va_illustration_collections`, `va_vagin_images`, `viva_feedback`
 
-Student UID format: first 2 letters of firstname + first 2 of lastname + class (e.g. `FAADSS2`)
+Student IDs are generated per school as `<SCHOOL CODE>-<name part>-<seq>`
+(see `computeStudentId` / `buildStudentId` in the dashboard). Admins can
+override them manually.
 
-### Dashboard Modules (8)
-1. Overview — summary cards with count-up animation
-2. School List — add/remove schools, matron details
-3. Student Records — per-school drill-down, add/deactivate students
-4. Pad Transactions — log, filter by school/term/type, CSV export
-5. Fund Balance — per school per term, chart view
-6. Donor Management — list, export CSV/PDF
-7. Bot Sync Status — Phase 1 mock, Phase 2 live webhook
-8. Reports — monthly PDF generator
-
-### Public Sponsor Section (on VAGIN site — NOT the dashboard)
+### Public Sponsor Section (on /vagin, NOT the dashboard)
 - Sponsor logo wall
 - Live impact metrics (count-up)
 - Named school list (no student PII)
@@ -255,16 +277,21 @@ Live site (vieraamber.com)
 - Animation variants: `src/lib/animations.ts`
 - Brand assets: `src/assets/`
 - Main page: `src/pages/Index.tsx`
+- Routes: `src/App.tsx`
+- Admin dashboard: `src/pages/VAGINDashboard.tsx`
+- Supabase client: `src/lib/supabase.ts`
 
 ---
 
-## Next Steps (IMMEDIATE)
+## Next Steps
 
-1. ✅ **Integrate all 8 section components** — DONE
-2. ✅ **Wire Index.tsx** — DONE
-3. 🔄 **Commit and push to GitHub** — IN PROGRESS
-4. 🔄 **Connect Vercel** — NEXT
-5. 🔄 **Set up Supabase** — AFTER VERCEL
+1. ✅ Hub, sub-sites and dashboard built; pushed to GitHub
+2. 🔄 **Confirm live setup** (owner): Vercel deploys `main`, Supabase
+   migrations + edge functions applied, RLS on all admin tables
+3. 🔄 **Wire notification delivery**: WhatsApp + Resend in `notificationWorker.ts`
+4. 🔄 **Move WhatsApp app secret out of client code** (see Known issues)
+5. 🔄 **Clean up**: fix lint errors, code-split routes with `React.lazy`
+6. ⏳ **Launch polish**: 375px QA pass, SEO, then i18n
 
 ---
 
