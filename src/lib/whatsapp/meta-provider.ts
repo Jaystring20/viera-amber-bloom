@@ -2,7 +2,8 @@
  * Meta Cloud Provider
  * ═════════════════════════════════════════════════════════════════
  * Production integration with Meta WhatsApp Cloud API (v19.0)
- * Requires: WHATSAPP_ACCESS_TOKEN, VITE_WHATSAPP_PHONE_ID, VITE_WHATSAPP_WABA_ID
+ * Server-side only. Never import from browser code.
+ * Requires: WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_APP_SECRET, WHATSAPP_WABA_ID
  */
 
 import {
@@ -307,14 +308,14 @@ export class MetaCloudProvider implements WhatsAppProvider {
  * Factory function to create a Meta provider with env vars
  */
 export function createMetaProvider(): MetaCloudProvider {
-  const phoneNumberId = process.env.VITE_WHATSAPP_PHONE_ID;
+  const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
   const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
-  const appSecret = process.env.VITE_WHATSAPP_APP_SECRET;
-  const wabaId = process.env.VITE_WHATSAPP_WABA_ID;
+  const appSecret = process.env.WHATSAPP_APP_SECRET;
+  const wabaId = process.env.WHATSAPP_WABA_ID;
 
   if (!phoneNumberId || !accessToken || !appSecret || !wabaId) {
     throw new Error(
-      'Missing required WhatsApp environment variables. Ensure VITE_WHATSAPP_PHONE_ID, WHATSAPP_ACCESS_TOKEN, VITE_WHATSAPP_APP_SECRET, and VITE_WHATSAPP_WABA_ID are set.'
+      'Missing required WhatsApp environment variables. Ensure WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_ACCESS_TOKEN, WHATSAPP_APP_SECRET, and WHATSAPP_WABA_ID are set.'
     );
   }
 

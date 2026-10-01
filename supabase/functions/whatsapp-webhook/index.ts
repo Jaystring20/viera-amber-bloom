@@ -13,8 +13,10 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
 
 const WEBHOOK_VERIFY_TOKEN = Deno.env.get("WHATSAPP_WEBHOOK_TOKEN") || "pad_kolo_webhook_2026_secure";
 const ACCESS_TOKEN = Deno.env.get("WHATSAPP_ACCESS_TOKEN");
-const PHONE_NUMBER_ID = Deno.env.get("VITE_WHATSAPP_PHONE_ID");
-const APP_SECRET = Deno.env.get("VITE_WHATSAPP_APP_SECRET");
+// Server-only names first. The VITE_-prefixed names are legacy fallbacks
+// (VITE_ means "public" to Vite, so secrets should not use it).
+const PHONE_NUMBER_ID = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID") || Deno.env.get("VITE_WHATSAPP_PHONE_ID");
+const APP_SECRET = Deno.env.get("WHATSAPP_APP_SECRET") || Deno.env.get("VITE_WHATSAPP_APP_SECRET");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY");
 

@@ -165,8 +165,12 @@ All hub sections built and wired in `src/pages/Index.tsx`.
 - ⏳ Lint: `npm run lint` reports ~40 errors
 
 ### Known issues
-- `VITE_WHATSAPP_APP_SECRET` is read in client code. Any `VITE_` variable
-  ships to the browser, so app secrets belong in edge functions only.
+- WhatsApp secrets were renamed from `VITE_WHATSAPP_*` to `WHATSAPP_APP_SECRET`
+  / `WHATSAPP_PHONE_NUMBER_ID`. Edge functions still fall back to the old
+  names; once the Supabase secrets are re-set under the new names, delete the
+  old ones and the fallbacks. Never give a secret a `VITE_` prefix.
+- `whatsapp-webhook` has a hardcoded fallback verify token. Make sure
+  `WHATSAPP_WEBHOOK_TOKEN` is set in Supabase so the fallback is never used.
 - Unknown from the repo alone: whether Vercel deploys `main`, whether the
   migrations/functions are applied to the live Supabase project, and whether
   RLS is on for every admin table. Confirm with the owner.

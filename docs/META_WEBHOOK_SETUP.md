@@ -74,8 +74,8 @@ Set these in your Supabase Edge Function environment:
 ```
 WHATSAPP_WEBHOOK_TOKEN = pad_kolo_webhook_2026_secure
 WHATSAPP_ACCESS_TOKEN = <Your Graph API Access Token>
-VITE_WHATSAPP_PHONE_ID = <Your Phone Number ID>
-VITE_WHATSAPP_APP_SECRET = <Your App Secret>
+WHATSAPP_PHONE_NUMBER_ID = <Your Phone Number ID>
+WHATSAPP_APP_SECRET = <Your App Secret>
 ```
 
 ### How to Get These Values:
@@ -87,11 +87,11 @@ VITE_WHATSAPP_APP_SECRET = <Your App Secret>
 - Create or use existing system user with "Admin" role
 - Generate new access token (valid for 60 days, or create permanent token)
 
-**VITE_WHATSAPP_PHONE_ID:**
+**WHATSAPP_PHONE_NUMBER_ID:**
 - Go to WhatsApp API Settings → Phone Numbers
 - Copy the Phone Number ID (not the phone number itself)
 
-**VITE_WHATSAPP_APP_SECRET:**
+**WHATSAPP_APP_SECRET:**
 - Go to Meta App Settings → Basic
 - Copy "App Secret" (keep this confidential!)
 
@@ -170,7 +170,7 @@ Send these from a registered matron's WhatsApp number:
 ## Security Notes
 
 ⚠️ **Important:**
-- Store `VITE_WHATSAPP_APP_SECRET` in environment variables only
+- Store `WHATSAPP_APP_SECRET` in environment variables only
 - Never commit secrets to GitHub
 - Use Supabase's secure environment variable storage
 - Webhook verification ensures only Meta can call your function
@@ -224,8 +224,8 @@ Response delivered to matron's WhatsApp
 |----------|-------|------|
 | `WHATSAPP_WEBHOOK_TOKEN` | `pad_kolo_webhook_2026_secure` | This guide |
 | `WHATSAPP_ACCESS_TOKEN` | Graph API Token | Meta App Settings |
-| `VITE_WHATSAPP_PHONE_ID` | Phone Number ID | WhatsApp API Settings |
-| `VITE_WHATSAPP_APP_SECRET` | App Secret | Meta App Settings → Basic |
+| `WHATSAPP_PHONE_NUMBER_ID` | Phone Number ID | WhatsApp API Settings |
+| `WHATSAPP_APP_SECRET` | App Secret | Meta App Settings → Basic |
 | `SUPABASE_URL` | `https://xcwgethymuvxcalxukzy.supabase.co` | Supabase Dashboard |
 | `SUPABASE_ANON_KEY` | Published Key | Supabase Dashboard → Settings → API |
 

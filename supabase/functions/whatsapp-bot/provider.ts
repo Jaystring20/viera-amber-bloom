@@ -21,18 +21,17 @@ async function computeAppSecretProof(token: string, appSecret: string): Promise<
 }
 
 export async function sendWhatsApp(msg: OutboundMessage): Promise<void> {
-  // WHATSAPP_PHONE_NUMBER_ID is this function's own expected secret name;
-  // VITE_WHATSAPP_PHONE_ID is the one whatsapp-webhook already has set, so
-  // this falls back to it rather than requiring a duplicate secret.
+  // Server-only names first. The VITE_-prefixed names are legacy fallbacks
+  // (VITE_ means "public" to Vite, so secrets should not use it).
   const phoneNumberId = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID") || Deno.env.get("VITE_WHATSAPP_PHONE_ID");
   const token = Deno.env.get("WHATSAPP_ACCESS_TOKEN");
-  const appSecret = Deno.env.get("VITE_WHATSAPP_APP_SECRET");
+  const appSecret = Deno.env.get("WHATSAPP_APP_SECRET") || Deno.env.get("VITE_WHATSAPP_APP_SECRET");
   if (!phoneNumberId || !token) {
     console.error("WhatsApp credentials missing (WHATSAPP_PHONE_NUMBER_ID / WHATSAPP_ACCESS_TOKEN)");
     return;
   }
   if (!appSecret) {
-    console.error("WhatsApp app secret missing (VITE_WHATSAPP_APP_SECRET) — send will fail appsecret_proof check");
+    console.error("WhatsApp app secret missing (WHATSAPP_APP_SECRET) — send will fail appsecret_proof check");
     return;
   }
 
