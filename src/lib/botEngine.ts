@@ -143,7 +143,7 @@ export async function processMessage(db: DBClient, phone: string, text: string):
 
   // 2. Session load / create, expiry, rate limit
   const now = new Date();
-  let { data: session } = await db.from("vagin_bot_sessions").select("*").eq("phone", phone).maybeSingle();
+  const { data: session } = await db.from("vagin_bot_sessions").select("*").eq("phone", phone).maybeSingle();
 
   if (session?.blocked_until && new Date(session.blocked_until) > now) {
     await log("in", text, { matron_id: matron.id, parsed_intent: "REJECTED", error: "rate limited" });

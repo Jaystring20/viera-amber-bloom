@@ -3809,26 +3809,26 @@ const VIVAPage = () => {
                 <div style={{ marginBottom: 24 }}>
                   <h3 style={{ fontFamily: CORMORANT, fontSize: 18, fontWeight: 700, color: BURGUNDY, marginBottom: 8 }}>About This Piece</h3>
                   <p style={{ fontFamily: "DM Sans", fontSize: 14, lineHeight: 1.7, color: DARK_TEXT, margin: 0, marginBottom: 16 }}>
-                    {(selectedProductForDetail as any).fullDesc || selectedProductForDetail.desc}
+                    {selectedProductForDetail.fullDesc || selectedProductForDetail.desc}
                   </p>
                 </div>
 
                 {/* Materials */}
-                {(selectedProductForDetail as any).materials && (
+                {selectedProductForDetail.materials && (
                   <div style={{ marginBottom: 24 }}>
                     <h3 style={{ fontFamily: CORMORANT, fontSize: 18, fontWeight: 700, color: BURGUNDY, marginBottom: 8 }}>Materials</h3>
                     <p style={{ fontFamily: "DM Sans", fontSize: 14, lineHeight: 1.7, color: DARK_TEXT, margin: 0, marginBottom: 16 }}>
-                      {(selectedProductForDetail as any).materials}
+                      {selectedProductForDetail.materials}
                     </p>
                   </div>
                 )}
 
                 {/* Care Instructions */}
-                {(selectedProductForDetail as any).care && (
+                {selectedProductForDetail.care && (
                   <div style={{ marginBottom: 24 }}>
                     <h3 style={{ fontFamily: CORMORANT, fontSize: 18, fontWeight: 700, color: BURGUNDY, marginBottom: 8 }}>Care Instructions</h3>
                     <p style={{ fontFamily: "DM Sans", fontSize: 14, lineHeight: 1.7, color: DARK_TEXT, margin: 0, marginBottom: 16 }}>
-                      {(selectedProductForDetail as any).care}
+                      {selectedProductForDetail.care}
                     </p>
                   </div>
                 )}

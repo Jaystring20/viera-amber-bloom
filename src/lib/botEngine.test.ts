@@ -7,10 +7,10 @@ import { parseMessage, processMessage, type DBClient } from "./botEngine";
    update().eq(), upsert(, {onConflict}), order(), limit(), thenable execution.
    ═══════════════════════════════════════════════════════════════════════════════ */
 
-type Row = Record<string, any>;
+type Row = Record<string, unknown>;
 
 class Query {
-  private filters: [string, any][] = [];
+  private filters: [string, unknown][] = [];
   private op: "select" | "insert" | "update" | "upsert" = "select";
   private payload: Row | null = null;
   private conflictKey: string | null = null;
@@ -20,7 +20,7 @@ class Query {
   select(_cols?: string) { return this; }
   order(_c?: string, _o?: unknown) { return this; }
   limit(_n?: number) { return this; }
-  eq(k: string, v: any) { this.filters.push([k, v]); return this; }
+  eq(k: string, v: unknown) { this.filters.push([k, v]); return this; }
   insert(p: Row) { this.op = "insert"; this.payload = p; return this; }
   update(p: Row) { this.op = "update"; this.payload = p; return this; }
   upsert(p: Row, opts?: { onConflict?: string }) {
@@ -32,7 +32,7 @@ class Query {
     return all.filter(r => this.filters.every(([k, v]) => r[k] === v));
   }
 
-  private run(single: boolean): { data: any; error: any } {
+  private run(single: boolean): { data: unknown; error: unknown } {
     const all = this.tables[this.table] ?? (this.tables[this.table] = []);
     if (this.op === "insert") {
       const row = { id: crypto.randomUUID(), ...this.payload };
@@ -56,12 +56,12 @@ class Query {
 
   maybeSingle() { return Promise.resolve(this.run(true)); }
   single() { return Promise.resolve(this.run(true)); }
-  then(resolve: (v: any) => void, _reject?: (e: any) => void) { resolve(this.run(false)); }
+  then(resolve: (v: unknown) => void, _reject?: (e: unknown) => void) { resolve(this.run(false)); }
 }
 
 const makeDB = (tables: Record<string, Row[]>): DBClient & { tables: Record<string, Row[]> } => ({
   tables,
-  from: (table: string) => new Query(tables, table) as any,
+  from: (table: string) => new Query(tables, table),
 });
 
 // ── Seed fixtures ────────────────────────────────────────────────────────────────

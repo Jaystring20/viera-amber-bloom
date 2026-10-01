@@ -10,6 +10,18 @@ const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
+// Event-specific fields; each handler reads the ones for its event type.
+interface NotificationData {
+  current_pads?: number;
+  threshold?: number;
+  overdue_days?: number;
+  amount_due?: number;
+  cycle_date?: string;
+  girls_count?: number;
+  pads_distributed?: number;
+  [key: string]: unknown;
+}
+
 interface NotificationPayload {
   type: "low_inventory" | "payment_reminder" | "cycle_completion" | "admin_alert";
   school_id: string;
@@ -17,7 +29,7 @@ interface NotificationPayload {
   matron_phone?: string;
   matron_email?: string;
   admin_email?: string;
-  data: Record<string, any>;
+  data: NotificationData;
 }
 
 // Send WhatsApp message
@@ -115,7 +127,7 @@ async function createNotification(
   schoolId: string,
   title: string,
   message: string,
-  data: Record<string, any>
+  data: NotificationData
 ) {
   const { error } = await supabase.from("vagin_notifications").insert({
     notification_type: type,
@@ -197,7 +209,7 @@ async function handlePaymentReminder(payload: NotificationPayload) {
   const { overdue_days, amount_due } = data;
 
   if (matron_phone) {
-    const message = `💰 Payment Reminder\n\n${school_name}: Payment is ${overdue_days} days overdue.\n\nAmount Due: ₦${amount_due.toLocaleString()}\n\nPlease settle immediately.\n\n- VAGIN Program`;
+    const message = `💰 Payment Reminder\n\n${school_name}: Payment is ${overdue_days} days overdue.\n\nAmount Due: ₦${amount_due?.toLocaleString()}\n\nPlease settle immediately.\n\n- VAGIN Program`;
     const success = await sendWhatsAppMessage(matron_phone, message);
 
     await createNotification(

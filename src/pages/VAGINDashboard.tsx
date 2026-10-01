@@ -813,7 +813,7 @@ const VAGINDashboard = () => {
     if (!deleteTarget) return;
     setSaving(true);
     try {
-      const { error } = await supabase.from(deleteTarget.table as any).delete().eq("id", deleteTarget.id);
+      const { error } = await supabase.from(deleteTarget.table).delete().eq("id", deleteTarget.id);
       if (error) throw error;
 
       // If deleting a matron, also delete from teachers_matrons

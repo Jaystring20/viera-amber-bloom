@@ -10,6 +10,21 @@
 
 import { supabase } from "@/lib/supabase";
 
+/** Row shape of vagin_notifications as read by the worker */
+interface QueuedNotification {
+  id: string;
+  channel: string;
+  title: string;
+  message: string;
+  school_id?: string | null;
+  data?: {
+    phone?: string;
+    email?: string;
+    retry_count?: number;
+    [key: string]: unknown;
+  } | null;
+}
+
 export interface NotificationWorkerResult {
   success: boolean;
   processed: number;
@@ -95,10 +110,10 @@ export class NotificationWorker {
   /**
    * Send a single notification via appropriate channel
    */
-  private static async sendNotification(notification: any): Promise<{
+  private static async sendNotification(notification: QueuedNotification): Promise<{
     success: boolean;
     error?: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
   }> {
     try {
       switch (notification.channel) {
@@ -125,8 +140,8 @@ export class NotificationWorker {
    * Send notification via WhatsApp Bot
    */
   private static async sendWhatsAppNotification(
-    notification: any
-  ): Promise<{ success: boolean; error?: string; metadata?: Record<string, any> }> {
+    notification: QueuedNotification
+  ): Promise<{ success: boolean; error?: string; metadata?: Record<string, unknown> }> {
     try {
       // Get recipient phone number (matron)
       let phoneNumber: string | null = null;
@@ -184,8 +199,8 @@ export class NotificationWorker {
    * Send notification via Email (Resend)
    */
   private static async sendEmailNotification(
-    notification: any
-  ): Promise<{ success: boolean; error?: string; metadata?: Record<string, any> }> {
+    notification: QueuedNotification
+  ): Promise<{ success: boolean; error?: string; metadata?: Record<string, unknown> }> {
     try {
       // Get recipient email
       let email: string | null = notification.data?.email || null;
@@ -346,7 +361,7 @@ export class NotificationWorker {
   private static async markNotificationStatus(
     notificationId: string,
     status: "sent" | "failed",
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ) {
     const { error } = await supabase
       .from("vagin_notifications")
@@ -449,7 +464,7 @@ export class NotificationWorker {
         read: 0,
       };
 
-      data?.forEach((row: any) => {
+      data?.forEach((row: { status: string; count?: number }) => {
         stats[row.status as keyof typeof stats] = row.count || 0;
       });
 

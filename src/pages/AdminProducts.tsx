@@ -286,7 +286,7 @@ const AdminProducts = () => {
 
           <select
             value={filterType}
-            onChange={(e) => setFilterType(e.target.value as any)}
+            onChange={(e) => setFilterType(e.target.value as typeof filterType)}
             style={{
               padding: "10px 12px",
               border: `1px solid ${COLORS.BURG_ALPHA}`,
@@ -303,7 +303,7 @@ const AdminProducts = () => {
 
           <select
             value={filterActive}
-            onChange={(e) => setFilterActive(e.target.value as any)}
+            onChange={(e) => setFilterActive(e.target.value as typeof filterActive)}
             style={{
               padding: "10px 12px",
               border: `1px solid ${COLORS.BURG_ALPHA}`,
@@ -320,7 +320,7 @@ const AdminProducts = () => {
 
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
+            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
             style={{
               padding: "10px 12px",
               border: `1px solid ${COLORS.BURG_ALPHA}`,

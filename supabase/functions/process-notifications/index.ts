@@ -9,7 +9,7 @@
  *
  * Scheduling:
  * Set up a cron job in Supabase to call this function every 5 minutes
- * supabase functions deploy process-notifications --create-schedule "0 */5 * * * *"
+ * supabase functions deploy process-notifications --create-schedule "0 0/5 * * * *"
  */
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -29,7 +29,7 @@ interface NotificationRecord {
   channel: "whatsapp" | "email" | "dashboard";
   recipient_type: string;
   school_id?: string;
-  data?: Record<string, any>;
+  data?: { retry_count?: number; [key: string]: unknown };
   created_at: string;
 }
 

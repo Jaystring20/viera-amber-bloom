@@ -156,7 +156,7 @@ async function seed() {
     }
 
     console.log("✅ Successfully seeded products:\n");
-    data?.forEach((p: any) => {
+    data?.forEach((p: { title: string; type: string }) => {
       console.log(`  ✓ ${p.title} (${p.type})`);
     });
 

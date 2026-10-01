@@ -12,7 +12,7 @@ export interface CreateNotificationParams {
   channel: "whatsapp" | "email" | "dashboard";
   recipient_type: "admin" | "matron" | "sponsor";
   school_id?: string;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
 }
 
 export class NotificationService {

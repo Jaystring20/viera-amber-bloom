@@ -372,13 +372,13 @@ async function executeCommand(command: { type: string; data: Record<string, unkn
           query = query.gte("issued_date", cycleStart);
         }
         const { data: transactions } = await query;
-        const freeIssued = transactions?.filter((t) => t.transaction_type === "free_pad").reduce((sum: number, t: any) => sum + (t.pads_issued || 0), 0) || 0;
-        const paidIssued = transactions?.filter((t) => t.transaction_type === "paid_pad").reduce((sum: number, t: any) => sum + (t.pads_issued || 0), 0) || 0;
-        const padRevenue = transactions?.filter((t) => t.transaction_type === "paid_pad").reduce((sum: number, t: any) => sum + (t.amount_ngn || 0), 0) || 0;
+        const freeIssued = transactions?.filter((t) => t.transaction_type === "free_pad").reduce((sum: number, t) => sum + (t.pads_issued || 0), 0) || 0;
+        const paidIssued = transactions?.filter((t) => t.transaction_type === "paid_pad").reduce((sum: number, t) => sum + (t.pads_issued || 0), 0) || 0;
+        const padRevenue = transactions?.filter((t) => t.transaction_type === "paid_pad").reduce((sum: number, t) => sum + (t.amount_ngn || 0), 0) || 0;
         // Distinct from padRevenue: what girls actually paid in via PAY, which
         // won't always match pad revenue 1:1 (she may pay in before she
         // redeems, or an admin adjusts a balance directly).
-        const paymentsCollected = transactions?.filter((t) => t.transaction_type === "student_payment").reduce((sum: number, t: any) => sum + (t.amount_ngn || 0), 0) || 0;
+        const paymentsCollected = transactions?.filter((t) => t.transaction_type === "student_payment").reduce((sum: number, t) => sum + (t.amount_ngn || 0), 0) || 0;
         const totalPads = freeIssued + paidIssued;
         return reportType === "DAILY"
           ? `📈 Today's Report\nPads issued: ${totalPads}\nFree: ${freeIssued}\nPaid: ${paidIssued}\nPayments collected: ${money(paymentsCollected)}\nPaid-pad revenue: ${money(padRevenue)}`

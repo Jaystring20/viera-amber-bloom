@@ -1654,11 +1654,7 @@ const VAGINPage = () => {
                     expertise: ["Midwifery", "Health Research", "SRHR", "Health Systems Strengthening"],
                     accent: PINK,
                   },
-                ].map((member, idx) => {
-                  const [expanded, setExpanded] = useState(false);
-                  const bioPreview = member.bio.substring(0, 100) + "...";
-                  const showReadMore = member.bio.length > 100;
-
+                ].map((member) => {
                   return (
                   <motion.div
                     key={member.name}
@@ -1695,28 +1691,7 @@ const VAGINPage = () => {
                         </h3>
                       </div>
 
-                      <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 13.5, color: "rgba(250,250,250,0.7)", lineHeight: 1.65, margin: "0 0 12px 0" }}>
-                        {expanded ? member.bio : bioPreview}
-                      </p>
-
-                      {showReadMore && (
-                        <button
-                          onClick={() => setExpanded(!expanded)}
-                          style={{
-                            fontFamily: "Poppins, system-ui, sans-serif",
-                            fontSize: 12,
-                            fontWeight: 600,
-                            color: member.accent,
-                            background: "none",
-                            border: "none",
-                            padding: "4px 0",
-                            cursor: "pointer",
-                            textDecoration: "underline",
-                          }}
-                        >
-                          {expanded ? "Read Less" : "Read More"}
-                        </button>
-                      )}
+                      <TeamMemberBio bio={member.bio} accent={member.accent} />
                     </div>
                   </motion.div>
                 );
@@ -1860,5 +1835,40 @@ const ProgramBlock = ({
     <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 14.5, color: "rgba(250,250,250,0.72)", lineHeight: 1.75, margin: 0 }}>{body}</p>
   </motion.div>
 );
+
+// Own component so each card keeps its own "Read More" state
+// (hooks can't be called inside the team .map()).
+function TeamMemberBio({ bio, accent }: { bio: string; accent: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const bioPreview = bio.substring(0, 100) + "...";
+  const showReadMore = bio.length > 100;
+
+  return (
+    <>
+      <p style={{ fontFamily: "Poppins, system-ui, sans-serif", fontWeight: 300, fontSize: 13.5, color: "rgba(250,250,250,0.7)", lineHeight: 1.65, margin: "0 0 12px 0" }}>
+        {expanded ? bio : bioPreview}
+      </p>
+      
+      {showReadMore && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          style={{
+            fontFamily: "Poppins, system-ui, sans-serif",
+            fontSize: 12,
+            fontWeight: 600,
+            color: accent,
+            background: "none",
+            border: "none",
+            padding: "4px 0",
+            cursor: "pointer",
+            textDecoration: "underline",
+          }}
+        >
+          {expanded ? "Read Less" : "Read More"}
+        </button>
+      )}
+    </>
+  );
+}
 
 export default VAGINPage;

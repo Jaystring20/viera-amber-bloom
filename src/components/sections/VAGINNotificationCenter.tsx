@@ -28,7 +28,7 @@ interface Notification {
   channel: "whatsapp" | "email" | "dashboard";
   status: "pending" | "sent" | "failed" | "read";
   school_id?: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   created_at: string;
   recipient_type: "admin" | "matron" | "sponsor";
 }
