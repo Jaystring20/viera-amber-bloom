@@ -11,12 +11,12 @@ import * as path from 'path';
  * Update this whenever og-images are deployed to invalidate browser/CDN caches.
  * Incremented to force Vercel edge cache clear.
  */
-const OG_CACHE_BUST = '20260821-v2';
+const OG_CACHE_BUST = '20261002';
 
 const OG_CONFIG: Record<string, { image: string; title: string; description: string }> = {
   '/': {
     // Home: Main landing page hero (Jacqueline artwork)
-    image: `https://vieraamber.com/artworks/artwork_0064.webp?v=${OG_CACHE_BUST}`,
+    image: `https://vieraamber.com/hero/jacqueline.webp?v=${OG_CACHE_BUST}`,
     title: 'Viera Amber — For her, by her.',
     description: 'A creative ecosystem built for feminine empowerment.',
   },

@@ -202,14 +202,16 @@ const HeroSection = () => {
         {/* ── Jacqueline portrait — high-contrast B&W, multiplied onto paper.
              Contrast is up and brightness slightly down against the previous
              pass: the reference frame holds true blacks, and that density is
-             what stops the band from washing the whole composition out. ── */}
+             what stops the band from washing the whole composition out.
+             Kept in /hero, not /artworks: re-extracting the gallery renumbers
+             /artworks and once silently swapped this image out. ── */}
         <div
           aria-hidden="true"
           className="absolute inset-0 pointer-events-none select-none overflow-hidden"
           style={{ zIndex: 0 }}
         >
           <img
-            src="/artworks/artwork_0064.webp"
+            src="/hero/jacqueline.webp"
             alt=""
             draggable={false}
             className="hero-artwork w-full h-full select-none"
