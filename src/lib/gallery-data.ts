@@ -105,7 +105,11 @@ export const ARTWORKS_103: Artwork[] = [
   ...Array.from({ length: 6 }, (_, i) => mk(23 + i, "fashion-illustrations")),
 
   // Section 7: #5for5 collection (seq 29-36)
-  ...Array.from({ length: 8 }, (_, i) => mk(29 + i, "fashion-illustrations")),
+  ...Array.from({ length: 2 }, (_, i) => mk(29 + i, "fashion-illustrations")),
+  // Jacqueline: title and story restored from the pre-renumbering seed
+  // (sql/gallery_setup.sql, where she was seq 64).
+  mk(31, "fashion-illustrations", "Jacqueline", "Under the brim of her hat she keeps her own counsel — and her own crown."),
+  ...Array.from({ length: 5 }, (_, i) => mk(32 + i, "fashion-illustrations")),
 
   // Section 8: A 7-day ready to wear collection (seq 37-43)
   ...Array.from({ length: 7 }, (_, i) => mk(37 + i, "fashion-illustrations")),
