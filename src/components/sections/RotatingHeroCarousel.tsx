@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { ILLUSTRATION_CATEGORIES, type IllustrationCategory } from "@/lib/illustration-categories";
-import { ARTWORKS_103 } from "@/lib/gallery-data";
 
 export type HeroCategory = IllustrationCategory;
 export const HERO_CATEGORIES: HeroCategory[] = ILLUSTRATION_CATEGORIES;
@@ -25,7 +24,6 @@ const SCROLL_WORDS = [
 const AUTOPLAY_MS = 3000;
 const ACCENT = "#C2610A";
 
-const pieceCount = (id: string) => ARTWORKS_103.filter((a) => a.chapter === id).length;
 
 interface RotatingHeroCarouselProps {
   onCategorySelect?: (category: HeroCategory) => void;
@@ -165,12 +163,6 @@ export const RotatingHeroCarousel = ({ onCategorySelect }: RotatingHeroCarouselP
                 >
                   {current.name}
                 </h1>
-                <p
-                  className="mt-4 text-base"
-                  style={{ fontFamily: "Montserrat, system-ui, sans-serif", color: "#444444" }}
-                >
-                  {pieceCount(current.id)} illustrations
-                </p>
                 <button
                   type="button"
                   onClick={() => onCategorySelect?.(current)}

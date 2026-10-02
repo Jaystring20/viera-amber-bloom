@@ -142,10 +142,6 @@ const Illustrations = () => {
                         <h3 className="text-sm font-bold text-gray-900">
                           {chapter?.name}
                         </h3>
-                        <p className="text-xs text-gray-600">
-                          {artworksInCategory.length} piece
-                          {artworksInCategory.length !== 1 ? "s" : ""}
-                        </p>
                       </div>
                     </motion.a>
                   );
@@ -192,10 +188,6 @@ const Illustrations = () => {
                         <h3 className="text-sm font-bold text-gray-900">
                           {chapter?.name}
                         </h3>
-                        <p className="text-xs text-gray-600">
-                          {artworksInCategory.length} piece
-                          {artworksInCategory.length !== 1 ? "s" : ""}
-                        </p>
                       </div>
                     </motion.a>
                   );
