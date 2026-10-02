@@ -61,10 +61,7 @@ export const ArtworkViewer = ({ startSeq, onClose }: ArtworkViewerProps) => {
       aria-label="Illustration gallery"
       className="fixed inset-0 z-[100] flex flex-col bg-[#0B0B0C] text-white"
     >
-      <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pb-6 pt-[max(12px,env(safe-area-inset-top))] bg-gradient-to-b from-black/70 to-transparent">
-        <span className="text-sm font-medium tabular-nums tracking-wide" aria-live="polite">
-          {index + 1} / {ARTWORKS_103.length}
-        </span>
+      <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-end px-4 pb-6 pt-[max(12px,env(safe-area-inset-top))] bg-gradient-to-b from-black/70 to-transparent">
         <button
           type="button"
           onClick={onClose}
