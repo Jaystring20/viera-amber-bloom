@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import HeroSection from "@/components/sections/HeroSection";
@@ -45,7 +46,7 @@ const Index = () => {
           <VAMSection />
         </section>
 
-        {/* 07 — VASH Shop (links out to existing store) */}
+        {/* 07 — VASH Shop (links to /vash; vieraamber.com/shop does not exist) */}
         <section
           id="shop"
           aria-label="Viera Amber Shop"
@@ -104,10 +105,8 @@ const Index = () => {
               references, and customized design products. All curated by Faith
               Adigwe.
             </p>
-            <a
-              href="https://vieraamber.com/shop"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              to="/vash"
               style={{
                 fontFamily: "DM Sans, system-ui, sans-serif",
                 fontSize: 11,
@@ -125,7 +124,7 @@ const Index = () => {
               }}
             >
               Visit the Shop →
-            </a>
+            </Link>
           </div>
         </section>
 

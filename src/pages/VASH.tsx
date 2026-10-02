@@ -11,6 +11,7 @@ import {
   inViewProps,
   useReducedVariants,
 } from "@/lib/animations";
+import { supabase } from "@/lib/supabase";
 
 const TEAL = "#0B7B8C";
 const TEAL_LIGHT = "#0E9BAF";
@@ -80,12 +81,31 @@ const VASHPage = () => {
   const d = (s: number) => (reduced ? 0 : s);
 
   const [email, setEmail] = useState("");
-  const [notifyStatus, setNotifyStatus] = useState<"idle" | "done">("idle");
+  const [notifyStatus, setNotifyStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
 
-  const handleNotify = (e: React.FormEvent) => {
+  // Saved to contact_submissions like the VIVA launch list, so signups land
+  // somewhere the team can see them. This form previously only showed the
+  // success message and kept nothing.
+  const handleNotify = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
-    setNotifyStatus("done");
+    const address = email.trim().toLowerCase();
+    if (!address || notifyStatus === "sending") return;
+    setNotifyStatus("sending");
+    try {
+      const { error } = await supabase.from("contact_submissions").insert({
+        name: "VASH Launch List",
+        email: address,
+        subject: "VASH launch list",
+        message: address,
+      });
+      if (error) throw error;
+      supabase.functions.invoke("notify-admin", {
+        body: { type: "vash_launch_signup", data: { email: address } },
+      }).catch(() => {});
+      setNotifyStatus("done");
+    } catch {
+      setNotifyStatus("error");
+    }
   };
 
   return (
@@ -594,11 +614,22 @@ const VASHPage = () => {
                       whiteSpace: "nowrap",
                     }}
                   >
-                    Notify Me
+                    {notifyStatus === "sending" ? "Saving…" : "Notify Me"}
                   </motion.button>
                 </motion.form>
               )}
             </AnimatePresence>
+            {notifyStatus === "error" && (
+              <p
+                role="alert"
+                style={{
+                  fontFamily: "DM Sans, system-ui, sans-serif",
+                  fontSize: 13, color: "#F2A0A0", margin: "12px 0 0",
+                }}
+              >
+                Something went wrong saving your email. Please try again.
+              </p>
+            )}
           </motion.div>
         </div>
       </section>
