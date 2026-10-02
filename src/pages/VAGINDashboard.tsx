@@ -12,6 +12,7 @@ import GalleryAdminTab from "@/components/admin/GalleryAdminTab";
 import VAGINImagesAdminTab from "@/components/admin/VAGINImagesAdminTab";
 import BotActivityTab from "@/components/admin/BotActivityTab";
 import { AdminLogin } from "@/components/admin/AdminLogin";
+import VamWaitlistTab from "@/components/admin/VamWaitlistTab";
 import VAGINAnalyticsDashboard from "@/components/sections/VAGINAnalyticsDashboard";
 import VAGINNotificationCenter from "@/components/sections/VAGINNotificationCenter";
 import jsPDF from "jspdf";
@@ -344,7 +345,7 @@ const ConfirmModal = ({ label, onConfirm, onCancel, saving }: { label: string; o
 // MAIN DASHBOARD
 // ══════════════════════════════════════════════════════════════════════════════
 const VAGINDashboard = () => {
-  type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions" | "impact" | "analytics" | "notifications" | "gallery" | "vagin_images" | "viva_products";
+  type TabId = "overview" | "schools" | "students" | "matrons" | "pad_kolo" | "vaginart" | "transactions" | "impact" | "analytics" | "notifications" | "gallery" | "vagin_images" | "viva_products" | "vam_waitlist";
   type ModalType = "add-school" | "edit-school" | "add-student" | "edit-student" | "add-matron" | "edit-matron" | "add-distribution" | "add-session" | "confirm-delete" | "bulk-import" | null;
 
   const [authed, setAuthed]         = useState<boolean | null>(null);
@@ -998,6 +999,7 @@ const VAGINDashboard = () => {
     { id: "gallery"       as TabId, label: "Gallery CMS",   Icon: Images },
     { id: "vagin_images"  as TabId, label: "VAGIN Images",  Icon: Camera },
     { id: "viva_products" as TabId, label: "VIVA Products", Icon: ShoppingBag },
+    { id: "vam_waitlist"  as TabId, label: "VAM Waitlist",  Icon: GraduationCap },
   ] as const;
 
   // This admin serves three distinct products under one roof (VAGIN's own
@@ -1012,10 +1014,12 @@ const VAGINDashboard = () => {
   const VAGIN_TAB_IDS: readonly TabId[] = ["overview", "schools", "students", "matrons", "pad_kolo", "vaginart", "transactions", "impact", "analytics", "notifications"];
   const ILLUSTRATIONS_TAB_IDS: readonly TabId[] = ["gallery", "vagin_images"];
   const VIVA_TAB_IDS: readonly TabId[] = ["viva_products"];
+  const VAM_TAB_IDS: readonly TabId[] = ["vam_waitlist"];
   const SECTIONS = [
     { label: "VAGIN",                    accent: PURPLE,             tabs: TABS.filter(t => (VAGIN_TAB_IDS as string[]).includes(t.id)) },
     { label: "Illustrations & Gallery",  accent: ILLUSTRATIONS_GOLD, tabs: TABS.filter(t => (ILLUSTRATIONS_TAB_IDS as string[]).includes(t.id)) },
     { label: "VIVA",                     accent: VIVA_WINE,          tabs: TABS.filter(t => (VIVA_TAB_IDS as string[]).includes(t.id)) },
+    { label: "VAM",                      accent: GOLD,               tabs: TABS.filter(t => (VAM_TAB_IDS as string[]).includes(t.id)) },
   ];
 
   const sidebarItemSx = (active: boolean, accent: string): React.CSSProperties => ({
@@ -1444,6 +1448,15 @@ const VAGINDashboard = () => {
               </motion.div>
             )}
 
+            {activeTab === "vam_waitlist" && (
+              <motion.div key="vam_waitlist" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+                <div style={{ marginBottom: 20 }}>
+                  <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: GOLD, letterSpacing: "0.25em", textTransform: "uppercase", fontWeight: 600, margin: "0 0 4px" }}>VAM Waitlist</p>
+                  <p style={{ fontFamily: "DM Sans, system-ui, sans-serif", fontSize: 13, color: "rgba(250,250,250,0.45)", margin: 0 }}>Everyone who joined the masterclass waitlist from the VAM page or the home page.</p>
+                </div>
+                <VamWaitlistTab />
+              </motion.div>
+            )}
             {activeTab === "viva_products" && (
               <motion.div key="viva_products" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
                 <Card title="VIVA Products Management">

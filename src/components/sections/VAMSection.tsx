@@ -8,6 +8,7 @@ import {
   inViewProps,
   useReducedVariants,
 } from "@/lib/animations";
+import { joinVamWaitlist } from "@/lib/vamWaitlist";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 const PILLARS = [
@@ -40,6 +41,8 @@ const VAMSection = () => {
   const reduced = useReducedMotion();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   const headerRef = useRef<HTMLDivElement>(null);
   const pillarsRef = useRef<HTMLDivElement>(null);
@@ -56,10 +59,14 @@ const VAMSection = () => {
   const staggerVariants = useReducedVariants(staggerContainer);
   const cardVariants = useReducedVariants(cardItem);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Previously only showed the confirmation and saved nothing.
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
-    setSubmitted(true);
+    if (!email.trim() || saving) return;
+    setSaving(true); setFailed(false);
+    const ok = await joinVamWaitlist({ email, source: "home" });
+    setSaving(false);
+    if (ok) setSubmitted(true); else setFailed(true);
   };
 
   return (
@@ -336,7 +343,7 @@ const VAMSection = () => {
                     whiteSpace: "nowrap",
                   }}
                 >
-                  Notify Me →
+                  {saving ? "Saving…" : "Notify Me →"}
                 </button>
               </motion.form>
             ) : (
@@ -358,6 +365,17 @@ const VAMSection = () => {
               </motion.p>
             )}
           </AnimatePresence>
+          {failed && (
+            <p
+              role="alert"
+              style={{
+                fontFamily: "DM Sans, system-ui, sans-serif",
+                fontSize: 12, color: "#B91C1C", margin: "10px 0 0",
+              }}
+            >
+              Something went wrong. Please try again, or email admin@vieraamber.com.
+            </p>
+          )}
         </motion.div>
       </div>
     </div>

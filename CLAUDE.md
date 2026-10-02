@@ -183,6 +183,9 @@ All hub sections built and wired in `src/pages/Index.tsx`.
   the built-in list in `VIVA.tsx`, matched by `slug`). Writes are admin-only
   (migration `08_products_admin_only.sql`); `/admin/products` requires the
   shared admin login. Garments need `collection` set or they don't show on /viva.
+- VAM waitlist: table `vam_waitlist` (migration `09`, created 2026-10-02;
+  before that it did not exist and no sign-up was ever saved). Both forms use
+  `src/lib/vamWaitlist.ts`; the list is in the dashboard's "VAM Waitlist" tab.
 - Unknown from the repo alone: whether Vercel deploys `main`, whether the
   migrations/functions are applied to the live Supabase project, and whether
   RLS is on for every admin table. Confirm with the owner.
@@ -227,10 +230,10 @@ All hub sections built and wired in `src/pages/Index.tsx`.
 **Access:** VAGIN team only, Supabase email/password login (`VAGINAuth.tsx`)
 **Purpose:** Track schools, students, pad distribution, micro-savings, impact
 
-### Tabs (13)
+### Tabs (14)
 Overview · Schools · Students · Matrons · PAD KOLO · VaginART · Transactions ·
 Impact & Investment · Analytics · Notifications · Gallery CMS · VAGIN Images ·
-VIVA Products
+VIVA Products · VAM Waitlist
 
 ### Supabase tables (actual, from `supabase/migrations/` + `sql/`)
 - **VAGIN core:** `vagin_schools`, `vagin_students`, `vagin_matrons`,

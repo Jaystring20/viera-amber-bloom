@@ -11,7 +11,7 @@ import {
   inViewProps,
   useReducedVariants,
 } from "@/lib/animations";
-import { supabase } from "@/lib/supabase";
+import { joinVamWaitlist } from "@/lib/vamWaitlist";
 
 const GOLD = "#D97706";
 const GOLD_DIM = "rgba(217,119,6,0.08)";
@@ -119,20 +119,8 @@ const VAMPage = () => {
     e.preventDefault();
     if (!form.name.trim() || !form.email.trim()) return;
     setStatus("loading");
-    try {
-      const { error } = await supabase.from("vam_waitlist").insert({
-        name: form.name,
-        email: form.email,
-      });
-      if (error) throw error;
-      // Fire-and-forget email notification
-      supabase.functions.invoke("notify-admin", {
-        body: { type: "vam_waitlist", data: form },
-      }).catch(() => {});
-      setStatus("done");
-    } catch {
-      setStatus("error");
-    }
+    const ok = await joinVamWaitlist({ name: form.name, email: form.email, source: "vam_page" });
+    setStatus(ok ? "done" : "error");
   };
 
   return (
