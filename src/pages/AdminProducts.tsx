@@ -4,6 +4,8 @@ import { Plus, Edit, Trash2, X, Save, ChevronDown, ChevronUp, Search, Eye, EyeOf
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
+import { AdminLogin } from "@/components/admin/AdminLogin";
+import { useAdminSession } from "@/hooks/useAdminSession";
 
 interface Product {
   id?: string;
@@ -27,7 +29,25 @@ interface Product {
   featured?: boolean;
   active?: boolean;
   sort_order?: number;
+  // Stable id the storefront and saved baskets use; null for products
+  // created here (the uuid is used instead).
+  slug?: string | null;
+  // Which line the product sits under on /viva. A garment without one is
+  // not shown there.
+  collection?: Collection | null;
+  // Ajogún-style Top only / Pants only / Full set prices.
+  purchase_options?: PurchaseOptions | null;
 }
+
+type Collection = "ajogun" | "nka" | "daughters";
+type Price = { NGN: number; USD: number };
+type PurchaseOptions = { topOnly?: Price; pantsOnly?: Price; both?: Price };
+
+const COLLECTIONS: { value: Collection; label: string }[] = [
+  { value: "ajogun", label: "Ajogún" },
+  { value: "nka", label: "Nkà Garment" },
+  { value: "daughters", label: "Daughters of Adonai" },
+];
 
 const COLORS = {
   ALABASTER: "#FAF9F6",
@@ -42,6 +62,7 @@ const COLORS = {
 const CORMORANT = "'Cormorant Garamond', 'Playfair Display', Georgia, serif";
 
 const AdminProducts = () => {
+  const [authed, setAuthed] = useAdminSession();
   const [products, setProducts] = useState<Product[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -75,8 +96,8 @@ const AdminProducts = () => {
   });
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    if (authed) fetchProducts();
+  }, [authed]);
 
   const fetchProducts = async () => {
     try {
@@ -116,11 +137,15 @@ const AdminProducts = () => {
     });
 
   const handleSave = async () => {
+    if (formData.type === "garment" && !formData.collection) {
+      alert("Choose the line this garment belongs to (Ajogún, Nkà Garment or Daughters of Adonai). Without it, it won't appear on the VIVA page.");
+      return;
+    }
     try {
       if (editingId) {
         const { error } = await supabase
           .from("products")
-          .update(formData)
+          .update({ ...formData, updated_at: new Date().toISOString() })
           .eq("id", editingId);
 
         if (error) throw error;
@@ -181,6 +206,9 @@ const AdminProducts = () => {
       featured: product.featured || false,
       active: product.active !== false,
       sort_order: product.sort_order || 0,
+      slug: product.slug ?? null,
+      collection: product.collection ?? null,
+      purchase_options: product.purchase_options ?? null,
     });
     setEditingId(product.id || null);
   };
@@ -218,6 +246,9 @@ const AdminProducts = () => {
     featured: products.filter(p => p.featured).length,
     active: products.filter(p => p.active).length,
   };
+
+  if (authed === null) return <div style={{ background: COLORS.ALABASTER, minHeight: "100vh" }} />;
+  if (!authed) return <AdminLogin onLogin={() => setAuthed(true)} badge="VIVA Admin" title="Products Login" />;
 
   return (
     <div style={{ background: COLORS.ALABASTER, minHeight: "100vh" }}>
@@ -787,6 +818,18 @@ const ProductForm = ({ formData, setFormData, onSave, onCancel, isInline }: Prod
         </div>
       </div>
 
+      <div style={{ marginBottom: 16 }}>
+        <label style={labelStyle}>Line on VIVA page{formData.type === "garment" ? " *" : ""}</label>
+        <select
+          value={formData.collection ?? ""}
+          onChange={(e) => setFormData({ ...formData, collection: (e.target.value || null) as Collection | null })}
+          style={inputStyle}
+        >
+          <option value="">— Choose a line —</option>
+          {COLLECTIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+        </select>
+      </div>
+
       <div>
         <label style={labelStyle}>Subtitle *</label>
         <input
@@ -874,6 +917,58 @@ const ProductForm = ({ formData, setFormData, onSave, onCancel, isInline }: Prod
             style={inputStyle}
           />
         </div>
+      </div>
+
+      <div style={{ marginBottom: 16 }}>
+        <label style={labelStyle}>
+          <input
+            type="checkbox"
+            checked={!!formData.purchase_options}
+            onChange={(e) => setFormData({
+              ...formData,
+              purchase_options: e.target.checked
+                ? {
+                    topOnly: { NGN: formData.price_ngn, USD: formData.price_usd },
+                    pantsOnly: { NGN: 0, USD: 0 },
+                    both: { NGN: formData.price_ngn, USD: formData.price_usd },
+                  }
+                : null,
+            })}
+            style={{ marginRight: 6 }}
+          />
+          Sold as Top only / Pants only / Full set (Ajogún style)
+        </label>
+        {formData.purchase_options && (
+          <div style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr", gap: 8, alignItems: "center", marginTop: 8 }}>
+            {([["topOnly", "Top only"], ["pantsOnly", "Pants only"], ["both", "Full set"]] as const).map(([key, label]) => (
+              <div key={key} style={{ display: "contents" }}>
+                <span style={{ fontFamily: "DM Sans", fontSize: 12, color: COLORS.DARK_TEXT }}>{label}</span>
+                <input
+                  type="number"
+                  aria-label={`${label} price (NGN)`}
+                  placeholder="NGN"
+                  value={formData.purchase_options?.[key]?.NGN ?? 0}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    purchase_options: { ...formData.purchase_options, [key]: { NGN: Number(e.target.value), USD: formData.purchase_options?.[key]?.USD ?? 0 } },
+                  })}
+                  style={inputStyle}
+                />
+                <input
+                  type="number"
+                  aria-label={`${label} price (USD)`}
+                  placeholder="USD"
+                  value={formData.purchase_options?.[key]?.USD ?? 0}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    purchase_options: { ...formData.purchase_options, [key]: { NGN: formData.purchase_options?.[key]?.NGN ?? 0, USD: Number(e.target.value) } },
+                  })}
+                  style={inputStyle}
+                />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>

@@ -176,6 +176,10 @@ All hub sections built and wired in `src/pages/Index.tsx`.
   old ones and the fallbacks. Never give a secret a `VITE_` prefix.
 - `whatsapp-webhook` has a hardcoded fallback verify token. Make sure
   `WHATSAPP_WEBHOOK_TOKEN` is set in Supabase so the fallback is never used.
+- VIVA catalogue lives in Supabase `products` (11 rows, loaded 2026-10-02 from
+  the built-in list in `VIVA.tsx`, matched by `slug`). Writes are admin-only
+  (migration `08_products_admin_only.sql`); `/admin/products` requires the
+  shared admin login. Garments need `collection` set or they don't show on /viva.
 - Unknown from the repo alone: whether Vercel deploys `main`, whether the
   migrations/functions are applied to the live Supabase project, and whether
   RLS is on for every admin table. Confirm with the owner.

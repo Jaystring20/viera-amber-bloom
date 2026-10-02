@@ -41,7 +41,9 @@ export interface Product {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toProduct(p: any): Product {
   return {
-    id: p.id,
+    // Prefer the slug: fallback entries and visitors' saved baskets key on
+    // it, so a product keeps the same id when it moves into the database.
+    id: p.slug || p.id,
     title: p.title,
     subtitle: p.subtitle,
     type: p.type,
@@ -60,6 +62,8 @@ function toProduct(p: any): Product {
     fitDetails: p.fit_details,
     featured: p.featured,
     active: p.active,
+    purchaseOptions: p.purchase_options ?? undefined,
+    collection: p.collection ?? undefined,
   };
 }
 
