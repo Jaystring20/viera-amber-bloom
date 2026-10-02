@@ -2372,12 +2372,6 @@ const VIVAPage = () => {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════
-          CUSTOMER FEEDBACK CAROUSEL — Hero Section
-          Full-width testimonial carousel with sample feedback
-          ═══════════════════════════════════════════════════════ */}
-      <VIVAFeedbackCarousel />
-
       {/* Old Collection Header and Shop sections removed here and consolidated
           into the new BATYA CURATED EDITORIAL MOMENT section above (positioned
           before Philosophy for easier shopping access). The modals and FABs
