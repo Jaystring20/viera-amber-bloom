@@ -15,7 +15,6 @@ const VIVAPage = lazy(() => import("./pages/VIVA.tsx"));
 const VIVAStory = lazy(() => import("./pages/VIVAStory.tsx"));
 const VivaTryOn = lazy(() => import("./pages/VivaTryOn.tsx"));
 const VAMPage = lazy(() => import("./pages/VAM.tsx"));
-const VASHPage = lazy(() => import("./pages/VASH.tsx"));
 const AdminProducts = lazy(() => import("./pages/AdminProducts.tsx"));
 import MobileTabBar from "./components/MobileTabBar.tsx";
 
@@ -41,7 +40,8 @@ const App = () => (
           <Route path="/viva/story" element={<VIVAStory />} />
           <Route path="/viva/try-on" element={<VivaTryOn />} />
           <Route path="/vam" element={<VAMPage />} />
-          <Route path="/vash" element={<VASHPage />} />
+          {/* VASH was removed at the client's request; old links go home. */}
+          <Route path="/vash" element={<Navigate to="/" replace />} />
           <Route path="/admin/products" element={<AdminProducts />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

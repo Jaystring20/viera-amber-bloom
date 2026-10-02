@@ -44,12 +44,6 @@ const OG_CONFIG: Record<string, { image: string; title: string; description: str
     title: 'VAM — Viera Amber Masterclass',
     description: 'Professional masterclass in illustration, fashion, and creative direction.',
   },
-  '/vash': {
-    // VASH: Ecosystem hero (fallback to home)
-    image: `https://vieraamber.com/viva/hero-fallback-1664.webp?v=${OG_CACHE_BUST}`,
-    title: 'VASH — Viera Amber Shop',
-    description: 'Curated marketplace for creative tools, resources, and collections.',
-  },
 };
 
 /**

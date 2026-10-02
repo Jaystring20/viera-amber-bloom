@@ -25,7 +25,7 @@ The original plan of separate sub-domain repos was dropped.
 ```
 vieraamber.com
   /                     ← Hub: chapter-scroll single page (src/pages/Index.tsx)
-    #hero #ecosystem #illustrations #vagin #viva #vam #shop #founder #contact
+    #hero #ecosystem #illustrations #vagin #viva #vam #founder #contact
   /illustrations        ← Full illustration gallery (Illustrations.tsx)
   /collections/:id      ← Retired, redirects to /illustrations
   /vagin                ← VAGIN Girls' Initiative site
@@ -34,7 +34,7 @@ vieraamber.com
   /viva/story           ← VIVA brand story
   /viva/try-on          ← Virtual try-on (Supabase function: virtual-tryon)
   /vam                  ← Masterclass page
-  /vash                 ← Shop page
+  /vash                 ← Removed 2026-10-02 (client request); redirects to /
   /admin/products       ← VIVA product admin
   *                     ← NotFound
 ```
@@ -152,7 +152,10 @@ All hub sections built and wired in `src/pages/Index.tsx`.
   mobile swipe strips, tablet tuning (most recent work)
 - ✅ `/vagin` site + `/vagin-dashboard` admin
 - ✅ `/viva`, `/viva/story`, `/viva/try-on`
-- ✅ `/vam`, `/vash`, `/admin/products`
+- ✅ `/vam`, `/admin/products`
+- ❌ VASH shop removed everywhere on 2026-10-02 at the client's request
+  (page, nav, footer, tab bar, home chapter, ecosystem arm). Ecosystem is
+  now four arms: Illustrations, VAGIN, VIVA, VAM. Each sells via WhatsApp.
 
 ### Phase 3 — Integration 🔄 PARTLY DONE
 - ✅ Supabase schema: migrations `01`–`07` + two dated notification migrations

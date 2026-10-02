@@ -5,24 +5,22 @@ import {
   HeartHandshake,
   Shirt,
   GraduationCap,
-  ShoppingBag,
   type LucideIcon,
 } from "lucide-react";
 
 /* ════════════════════════════════════════════════════════════════════════
    MOBILE TAB BAR
 
-   Five tabs, because the product is five arms — the site's own thesis
-   ("One brand. Five expressions.") happens to land exactly on Material's
-   3–5 bottom-nav ceiling, so nothing had to be demoted to fit.
+   Four tabs, one per arm — the site's own thesis ("One brand. Four
+   expressions.") — inside Material's 3–5 bottom-nav ceiling.
 
    Home is deliberately not a tab: the wordmark in the top NavBar already
    goes home on every screen, and spending a sixth slot to duplicate it
    would push past the ceiling.
 
    Every tab carries an icon AND a label. Icon-only bottom navigation is a
-   known discoverability failure, and these five names are the brand's own
-   vocabulary — VAGIN and VASH are not guessable from a glyph.
+   known discoverability failure, and these names are the brand's own
+   vocabulary — VAGIN is not guessable from a glyph.
 
    The active tab is tinted with that arm's own accent, the same colours
    used by the Hero threads and the Ecosystem map, so the colour system
@@ -41,7 +39,6 @@ const TABS: Tab[] = [
   { to: "/vagin",         label: "VAGIN", accent: "#62017F", Icon: HeartHandshake },
   { to: "/viva",          label: "VIVA",  accent: "#6E0025", Icon: Shirt },
   { to: "/vam",           label: "VAM",   accent: "#888888", Icon: GraduationCap },
-  { to: "/vash",          label: "Shop",  accent: "#0B7B8C", Icon: ShoppingBag },
 ];
 
 const INK = "#0A0A0A";

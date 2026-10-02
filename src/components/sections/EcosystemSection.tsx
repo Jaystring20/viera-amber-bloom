@@ -5,7 +5,6 @@ import {
   HeartHandshake,
   Shirt,
   GraduationCap,
-  ShoppingBag,
   type LucideIcon,
   ArrowRight,
 } from "lucide-react";
@@ -18,7 +17,6 @@ const BRAND_COLORS = {
   vagin: { accent: "#62017F" }, // Purple
   viva: { accent: "#6E0025" }, // Burgundy (center, primary)
   vam: { accent: "#888888" }, // Gray
-  vash: { accent: "#0B7B8C" }, // Teal
 };
 
 type Arm = {
@@ -48,7 +46,7 @@ const ARMS: Arm[] = [
     narrative: "Digital illustrations that tell stories. From editorial campaigns, to custom illustrations, to bespoke brand identity, we create visual narratives that make the impossible look inevitable.",
     target: "illustrations",
     Icon: Palette,
-    x: 12,
+    x: 12.5,
     y: 28,
     side: "top",
     scale: 0.85,
@@ -63,7 +61,7 @@ const ARMS: Arm[] = [
     narrative: "Sexual and Reproductive Health & Rights for underserved adolescent girls globally. We believe knowledge is power, and education transforms lives.",
     target: "vagin",
     Icon: HeartHandshake,
-    x: 31,
+    x: 37.5,
     y: 72,
     side: "bottom",
     scale: 0.85,
@@ -78,7 +76,7 @@ const ARMS: Arm[] = [
     narrative: "Contemporary made-to-order fashion celebrating art, storytelling, and feminine identity rooted in faith. Every garment is made only after it's ordered, so nothing goes to waste.",
     target: "viva",
     Icon: Shirt,
-    x: 50,
+    x: 62.5,
     y: 28,
     side: "top",
     scale: 1,
@@ -93,30 +91,15 @@ const ARMS: Arm[] = [
     narrative: "Learn directly from founder Faith Adigwe. Master illustration, design thinking, and the business fundamentals that turn creative passion into sustainable income.",
     target: "vam",
     Icon: GraduationCap,
-    x: 69,
+    x: 87.5,
     y: 72,
     side: "bottom",
-    scale: 0.85,
-  },
-  {
-    number: "05",
-    title: "VASH",
-    shortName: "VASH",
-    accent: BRAND_COLORS.vash.accent,
-    tag: "Commerce",
-    blurb: "The shop for wearable art, brushes and references. The commercial engine.",
-    narrative: "Curated tools for creators. Premium Procreate brushes, pose references, design assets and wearable art. Where art becomes accessible and sustainable.",
-    target: "shop",
-    Icon: ShoppingBag,
-    x: 88,
-    y: 28,
-    side: "top",
     scale: 0.85,
   },
 ];
 
 const FLOW_PATH =
-  "M12,28 C20,28 23,72 31,72 C39,72 42,28 50,28 C58,28 61,72 69,72 C77,72 80,28 88,28";
+  "M12.5,28 C23,28 27,72 37.5,72 C48,72 52,28 62.5,28 C73,28 77,72 87.5,72";
 
 const EcosystemSection = () => {
   const reduced = useReducedMotion();
@@ -226,7 +209,7 @@ const EcosystemSection = () => {
               maxWidth: 900,
             }}
           >
-            One brand. Five expressions.
+            One brand. Four expressions.
           </motion.h2>
 
           <motion.p
@@ -241,7 +224,7 @@ const EcosystemSection = () => {
               letterSpacing: "0.3px",
             }}
           >
-            Art. Impact. Fashion. Education. Commerce. One flowing current, all rooted in the
+            Art. Impact. Fashion. Education. One flowing current, all rooted in the
             same conviction: creativity is the most powerful form of empowerment.
           </motion.p>
         </motion.div>
@@ -327,7 +310,7 @@ const EcosystemSection = () => {
           </div>
 
           {/* Cards below serpentine */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 24, marginTop: 60 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24, marginTop: 60 }}>
             {ARMS.map((arm, idx) => (
               <EcosystemCard
                 key={arm.number}

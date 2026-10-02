@@ -168,7 +168,7 @@ const FounderSection = () => {
               }}
             >
               She started Viera Amber as a passion project in 2013. It's grown
-              into a brand with five arms, all built around the same idea:
+              into a brand with four arms, all built around the same idea:
               femininity and health education for girls and women, everywhere.
             </motion.p>
 
