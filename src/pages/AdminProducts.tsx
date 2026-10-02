@@ -251,7 +251,10 @@ const AdminProducts = () => {
   if (!authed) return <AdminLogin onLogin={() => setAuthed(true)} badge="VIVA Admin" title="Products Login" />;
 
   return (
-    <div style={{ background: COLORS.ALABASTER, minHeight: "100vh" }}>
+    // The site's default text colour is near-white (dark theme). This page is
+    // light, and its inputs inherit colour, so without this every field's
+    // value rendered almost invisible.
+    <div style={{ background: COLORS.ALABASTER, minHeight: "100vh", color: COLORS.DARK_TEXT, colorScheme: "light" }}>
       <NavBar />
 
       <main style={{ maxWidth: 1400, margin: "0 auto", padding: "100px 20px 40px 20px" }}>
