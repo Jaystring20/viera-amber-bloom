@@ -120,13 +120,17 @@ self.addEventListener("fetch", (event) => {
   }
 
   // ── Everything else static (public/ — favicons, logos, icons, brand
-  // photography, video): stale-while-revalidate. Unlike /assets/, these
+  // photography): stale-while-revalidate. Unlike /assets/, these
   // sit at stable filenames a redeploy can silently overwrite, so a pure
   // cache-first policy here would mean a changed logo/favicon never gets
   // picked up on a browser that already cached the old one. Serving the
   // cached copy immediately keeps the offline/instant-load benefit; the
   // parallel network fetch keeps the cache from going stale forever.
-  if (/\.(?:js|css|woff2?|png|jpe?g|webp|svg|ico|mp4)$/i.test(url.pathname)) {
+  // Video (.mp4) is deliberately NOT handled here: media elements stream it
+  // with Range requests, and Safari stalls or refuses playback when a worker
+  // sits in that path. The browser's own HTTP cache (vercel.json gives .mp4
+  // a 1-day max-age) already covers repeat visits.
+  if (/\.(?:js|css|woff2?|png|jpe?g|webp|svg|ico)$/i.test(url.pathname)) {
     event.respondWith(
       caches.open(ASSET_CACHE).then((cache) =>
         cache.match(request).then((cached) => {
