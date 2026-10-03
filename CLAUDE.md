@@ -173,10 +173,15 @@ All hub sections built and wired in `src/pages/Index.tsx`.
 - ⏳ SEO pass
 
 ### Known issues
-- WhatsApp secrets were renamed from `VITE_WHATSAPP_*` to `WHATSAPP_APP_SECRET`
-  / `WHATSAPP_PHONE_NUMBER_ID`. Edge functions still fall back to the old
-  names; once the Supabase secrets are re-set under the new names, delete the
-  old ones and the fallbacks. Never give a secret a `VITE_` prefix.
+- WhatsApp secrets: the LIVE functions read `VITE_WHATSAPP_APP_SECRET` /
+  `VITE_WHATSAPP_PHONE_ID` (server-side only, so not exposed). `whatsapp-bot`
+  in the repo prefers new names `WHATSAPP_APP_SECRET` / `WHATSAPP_PHONE_NUMBER_ID`
+  with the old ones as fallback; `whatsapp-webhook` in the repo matches the
+  deployed v56 exactly (old names). Never give a secret a `VITE_` prefix in
+  frontend env.
+- `whatsapp-webhook` v56 (deployed 2026-10-03): signature is checked against
+  the RAW request body. v55 re-serialised the parsed JSON, so any Meta payload
+  with emoji/accents/"\/" got 403. Rollback = v55 = repo commit 7e5af9c.
 - `whatsapp-webhook` has a hardcoded fallback verify token. Make sure
   `WHATSAPP_WEBHOOK_TOKEN` is set in Supabase so the fallback is never used.
 - VIVA catalogue lives in Supabase `products` (11 rows, loaded 2026-10-02 from

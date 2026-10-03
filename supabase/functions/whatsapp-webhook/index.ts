@@ -13,10 +13,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
 
 const WEBHOOK_VERIFY_TOKEN = Deno.env.get("WHATSAPP_WEBHOOK_TOKEN") || "pad_kolo_webhook_2026_secure";
 const ACCESS_TOKEN = Deno.env.get("WHATSAPP_ACCESS_TOKEN");
-// Server-only names first. The VITE_-prefixed names are legacy fallbacks
-// (VITE_ means "public" to Vite, so secrets should not use it).
-const PHONE_NUMBER_ID = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID") || Deno.env.get("VITE_WHATSAPP_PHONE_ID");
-const APP_SECRET = Deno.env.get("WHATSAPP_APP_SECRET") || Deno.env.get("VITE_WHATSAPP_APP_SECRET");
+const PHONE_NUMBER_ID = Deno.env.get("VITE_WHATSAPP_PHONE_ID");
+const APP_SECRET = Deno.env.get("VITE_WHATSAPP_APP_SECRET");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY");
 
@@ -401,9 +399,12 @@ function handleVerification(verifyToken: string, challenge: string): { statusCod
   return { statusCode: 403, body: "Forbidden" };
 }
 
-async function handleMessage(payload: WebhookPayload, signature: string): Promise<{ statusCode: number; body: string }> {
-  const payloadString = JSON.stringify(payload);
-  if (!(await verifyWebhookSignature(payloadString, signature))) {
+async function handleMessage(payload: WebhookPayload, signature: string, rawBody: string): Promise<{ statusCode: number; body: string }> {
+  // Meta signs the exact bytes it sent. Re-serialising the parsed payload
+  // (JSON.stringify) rewrites Meta's escapes (\uXXXX for emoji/accents, \/
+  // for slashes), so any message or status containing those failed the
+  // check and got a 403. Verify the raw body instead.
+  if (!(await verifyWebhookSignature(rawBody, signature))) {
     console.warn("[Webhook] Invalid signature");
     return { statusCode: 403, body: "Forbidden" };
   }
@@ -516,8 +517,9 @@ Deno.serve(async (req: Request) => {
     }
     if (req.method === "POST") {
       const signature = req.headers.get("x-hub-signature-256") || "";
-      const payload = await req.json() as WebhookPayload;
-      const result = await handleMessage(payload, signature);
+      const rawBody = await req.text();
+      const payload = JSON.parse(rawBody) as WebhookPayload;
+      const result = await handleMessage(payload, signature, rawBody);
       return new Response(JSON.stringify({ message: result.body }), { status: result.statusCode, headers: { "Content-Type": "application/json" } });
     }
     return new Response("Method not allowed", { status: 405 });
