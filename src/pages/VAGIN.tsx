@@ -1354,6 +1354,33 @@ const VAGINPage = () => {
               </p>
             </motion.div>
 
+            {/* PAD KOLO explainer film. Click-to-play with sound, so nothing is
+                fetched until the visitor asks for it (preload="none"); the
+                poster carries the frame until then. Encoded with faststart so
+                playback begins before the whole file arrives. */}
+            <motion.div
+              initial={{ opacity: 0, y: 28 }}
+              animate={padKoloInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
+              transition={reduced ? { duration: 0 } : { duration: 0.65, ease: "easeOut" as const, delay: 0.06 }}
+              className="mb-14 mx-auto"
+              style={{ maxWidth: 880 }}
+            >
+              <p className="text-center" style={{ fontFamily: "Poppins, system-ui, sans-serif", fontSize: 12, color: "#D97706", letterSpacing: "0.3em", textTransform: "uppercase", fontWeight: 600, margin: "0 0 14px" }}>
+                Watch · How PAD KOLO works
+              </p>
+              <div style={{ borderRadius: 20, overflow: "hidden", border: "1px solid rgba(217,119,6,0.28)", background: "#0A0A0A", aspectRatio: "3 / 2", boxShadow: "0 24px 60px rgba(0,0,0,0.45)" }}>
+                <video
+                  src="/vagin/pad-kolo-explainer.mp4"
+                  poster="/vagin/pad-kolo-explainer-poster.webp"
+                  controls
+                  playsInline
+                  preload="none"
+                  title="PAD KOLO explainer: how VAGIN keeps girls in school during their period"
+                  style={{ display: "block", width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </div>
+            </motion.div>
+
             {/* KOLO Explainer */}
             <motion.div
               initial={{ opacity: 0, y: 28 }}
